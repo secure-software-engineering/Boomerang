@@ -1,13 +1,12 @@
 package boomerang.scene.opal
 
 import boomerang.scene.{DeclaredMethod, InvokeExpr, Val}
-import org.opalj.UShort
 import org.opalj.tac.{DUVar, FunctionCall, InstanceFunctionCall, InstanceMethodCall, MethodCall, NonVirtualFunctionCall, NonVirtualMethodCall}
 import org.opalj.value.ValueInformation
 
 import java.util
 
-class OpalMethodInvokeExpr(val delegate: MethodCall[DUVar[ValueInformation]], method: OpalMethod, pc: UShort) extends InvokeExpr {
+class OpalMethodInvokeExpr(val delegate: MethodCall[DUVar[ValueInformation]], method: OpalMethod) extends InvokeExpr {
 
   override def getArg(index: Int): Val = getArgs.get(index)
 
@@ -15,7 +14,7 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[DUVar[ValueInformation]], me
     val result = new util.ArrayList[Val]
 
     delegate.params.foreach(param => {
-      result.add(new OpalVal(param, method))
+      result.add(new OpalLocal(param, method))
     })
 
     result
@@ -25,7 +24,7 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[DUVar[ValueInformation]], me
 
   override def getBase: Val = {
     if (isInstanceInvokeExpr) {
-      return new OpalVal(delegate.asInstanceMethodCall.receiver, method)
+      return new OpalLocal(delegate.asInstanceMethodCall.receiver, method)
     }
 
     throw new RuntimeException("Method call is not an instance invoke expression")
@@ -57,7 +56,7 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[DUVar[ValueInformation]], me
   override def toString: String = delegate.toString
 }
 
-class OpalFunctionInvokeExpr(val delegate: FunctionCall[DUVar[ValueInformation]], method: OpalMethod, pc: UShort) extends InvokeExpr {
+class OpalFunctionInvokeExpr(val delegate: FunctionCall[DUVar[ValueInformation]], method: OpalMethod) extends InvokeExpr {
 
   override def getArg(index: Int): Val = getArgs.get(index)
 
@@ -65,7 +64,7 @@ class OpalFunctionInvokeExpr(val delegate: FunctionCall[DUVar[ValueInformation]]
     val result = new util.ArrayList[Val]
 
     delegate.params.foreach(param => {
-      result.add(new OpalVal(param, method))
+      result.add(new OpalLocal(param, method))
     })
 
     result
@@ -75,7 +74,7 @@ class OpalFunctionInvokeExpr(val delegate: FunctionCall[DUVar[ValueInformation]]
 
   override def getBase: Val = {
     if (isInstanceInvokeExpr) {
-      return new OpalVal(delegate.asInstanceFunctionCall.receiver, method)
+      return new OpalLocal(delegate.asInstanceFunctionCall.receiver, method)
     }
 
     throw new RuntimeException("Function call is not an instance invoke expression")

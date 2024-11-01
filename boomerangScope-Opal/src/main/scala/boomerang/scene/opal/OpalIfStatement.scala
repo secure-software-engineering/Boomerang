@@ -16,6 +16,10 @@ class OpalIfStatement(val delegate: If[DUVar[ValueInformation]], method: OpalMet
   override def evaluate(otherVal: Val): IfStatement.Evaluation = IfStatement.Evaluation.UNKOWN
 
   override def uses(otherVal: Val): Boolean = {
+    // TODO
+    if (otherVal.isInstanceOf[OpalVal]) {}
+    if (otherVal.isInstanceOf[OpalLocal]) {}
+    if (otherVal.isInstanceOf[OpalArrayRef]) {}
     val left = new OpalVal(delegate.left, method)
     val right = new OpalVal(delegate.right, method)
 

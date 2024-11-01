@@ -9,6 +9,10 @@ import java.util
 
 case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
 
+  if (delegate.body.isEmpty) {
+    throw new RuntimeException("Cannot build OpalMethod without existing body")
+  }
+
   private var localCache: Option[util.Set[Val]] = None
   private var parameterLocalCache: Option[util.List[Val]] = None
 
@@ -87,36 +91,36 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
         if (stmt.isMethodCall) {
           // Extract the base
           if (stmt.isInstanceOf[InstanceMethodCall[_]]) {
-            val opalVal = new OpalVal(stmt.asInstanceMethodCall.receiver, this)
-            localCache.get.add(opalVal)
+            val base = new OpalLocal(stmt.asInstanceMethodCall.receiver, this)
+            localCache.get.add(base)
           }
 
           // Parameters of method calls
-          for (param <- stmt.asMethodCall.params) {
+          stmt.asMethodCall.params.foreach(param => {
             if (param.isVar) {
-              localCache.get.add(new OpalVal(param.asVar, this))
+              localCache.get.add(new OpalLocal(param, this))
             }
-          }
+          })
         }
 
         if (stmt.isAssignment) {
           // Target variable
           val targetVar = stmt.asAssignment.targetVar
-          localCache.get.add(new OpalVal(targetVar, this))
+          localCache.get.add(new OpalLocal(targetVar, this))
 
           if (stmt.asAssignment.expr.isFunctionCall) {
             // Extract the base
             if (stmt.asAssignment.expr.isInstanceOf[InstanceFunctionCall[_]]) {
-              val opalVal = new OpalVal(stmt.asAssignment.expr.asInstanceFunctionCall.receiver, this)
-              localCache.get.add(opalVal)
+              val base = new OpalLocal(stmt.asAssignment.expr.asInstanceFunctionCall.receiver, this)
+              localCache.get.add(base)
             }
 
             // Parameters of function call
-            for (param <- stmt.asAssignment.expr.asFunctionCall.params) {
+            stmt.asAssignment.expr.asFunctionCall.params.foreach(param => {
               if (param.isVar) {
-                localCache.get.add(new OpalVal(param.asVar, this))
+                localCache.get.add(new OpalLocal(param, this))
               }
-            }
+            })
           }
         }
       }

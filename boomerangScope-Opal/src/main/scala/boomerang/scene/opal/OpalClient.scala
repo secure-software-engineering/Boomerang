@@ -1,6 +1,6 @@
 package boomerang.scene.opal
 
-import org.opalj.br.{ClassFile, ClassHierarchy, DeclaredMethod, DefinedMethod, Field, Method, MethodDescriptor, ObjectType, ReferenceType}
+import org.opalj.br.{ClassFile, ClassHierarchy, DefinedMethod, Field, Method, MethodDescriptor, ObjectType, ReferenceType}
 import org.opalj.br.analyses.{DeclaredMethods, DeclaredMethodsKey, Project}
 import org.opalj.tac.{AITACode, ComputeTACAIKey, FieldRead, FieldWriteAccessStmt, TACMethodParameter}
 import org.opalj.value.ValueInformation
@@ -16,8 +16,6 @@ object OpalClient {
     declaredMethods = Some(p.get(DeclaredMethodsKey))
     tacCodes = Some(p.get(ComputeTACAIKey))
   }
-
-  def getDeclaredMethod(method: Method): DeclaredMethod = declaredMethods.get(method)
 
   def getClassHierarchy: ClassHierarchy = project.get.classHierarchy
 

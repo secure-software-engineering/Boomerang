@@ -1,44 +1,25 @@
 package boomerang.scene.opal
 
 import boomerang.scene.{ControlFlowGraph, Method, Pair, Type, Val}
-import org.opalj.br.{ObjectType, ReferenceType}
-import org.opalj.tac.{ArrayLength, Const, DUVar, DVar, DefSites, Expr, FunctionCall, InstanceOf, IntConst, LongConst, New, PrimitiveTypecastExpr, StringConst, UVar}
+import org.opalj.br.ReferenceType
+import org.opalj.tac.{ArrayLength, Const, DUVar, Expr, FunctionCall, InstanceOf, IntConst, LongConst, New, PrimitiveTypecastExpr, StringConst}
 import org.opalj.value.ValueInformation
 
 class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
   
+  if (delegate.isVar) {
+    throw new RuntimeException("OpalVal cannot hold a variable (use OpalLocal)")
+  }
+
   override def getType: Type = delegate match {
-    case local : UVar[ValueInformation] =>
-      if (local.value.isReferenceValue) {
-        OpalType(local.value.asReferenceValue.asReferenceType, local.value.asReferenceValue.isNull.isYes)
-      } else if (local.value.isPrimitiveValue) {
-        OpalType(local.value.asPrimitiveValue.primitiveType)
-      } else if (local.value.isVoid) {
-        OpalType(ObjectType.Void)
-      } else if (local.value.isArrayValue.isYes) {
-        OpalType(ObjectType.Array)
-      } else {
-        throw new RuntimeException("Could not determine type " + local.value)
-      }
-    case local: DUVar[ValueInformation] =>
-      if (local.value.isReferenceValue) {
-        OpalType(local.value.asReferenceValue.asReferenceType, local.value.asReferenceValue.isNull.isYes)
-      } else if (local.value.isPrimitiveValue) {
-        OpalType(local.value.asPrimitiveValue.primitiveType)
-      } else if (local.value.isVoid) {
-        OpalType(ObjectType.Void)
-      } else if (local.value.isArrayValue.isYes) {
-        OpalType(ObjectType.Array)
-      } else {
-        throw new RuntimeException("Could not determine type " + local.value)
-      }
     case const: Const => OpalType(const.tpe)
     case newExpr: New => OpalType(newExpr.tpe)
     case functionCall: FunctionCall[_] => OpalType(functionCall.descriptor.returnType)
     case _ => throw new RuntimeException("Type not implemented yet")
   }
 
-  override def isStatic: Boolean = false
+  // TODO
+  override def isStatic: Boolean = ???
 
   override def isNewExpr: Boolean = delegate.isNew
 
@@ -52,7 +33,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalVal(delegate, method, stmt)
 
-  override def isLocal: Boolean = delegate.isVar
+  override def isLocal: Boolean = false
 
   override def isArrayAllocationVal: Boolean = delegate.isNewArray
 
@@ -104,10 +85,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
     throw new RuntimeException("Expression is not a cast expression")
   }
 
-  override def isArrayRef: Boolean = delegate match {
-    case ref: UVar[ValueInformation] => ref.value.isArrayValue.isYes
-    case _ => false
-  }
+  override def isArrayRef: Boolean = false
 
   override def isInstanceOfExpr: Boolean = delegate.astID == InstanceOf.ASTID
 
@@ -163,75 +141,25 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
     throw new RuntimeException("Value is not a long constant")
   }
 
-  override def getArrayBase: Pair[Val, Integer] = {
-    if (isArrayRef) {
-      // TODO
-    }
+  override def getArrayBase: Pair[Val, Integer] = throw new RuntimeException("Value is not an array ref")
 
-    throw new RuntimeException("Value is not an array ref")
-  }
-
-  override def getVariableName: String = delegate.toString
-
-  override def hashCode(): Int = delegate match {
-    case uVar: UVar[_] =>
-      // UVars should reference their DVar to keep the comparisons consistent
-      val tac = OpalClient.getTacForMethod(method.delegate)
-      val defStmt = tac.stmts(uVar.definedBy.head)
-
-      if (!defStmt.isAssignment) {
-        return 31 * super.hashCode() + delegate.hashCode()
-      }
-
-      val targetVar = defStmt.asAssignment.targetVar
-      31 * super.hashCode() + targetVar.hashCode()
-    case _ => 31 * super.hashCode() + delegate.hashCode()
-  }
-
-  private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalVal]
-
-  override def equals(obj: Any): Boolean = obj match {
-    case other: OpalVal =>
-      // DVar does not implement a proper equals() method, so we have to compare the hash codes
-      this.delegate match {
-        case _: DVar[_] if other.delegate.isInstanceOf[DVar[_]] =>
-          super.equals(other) && this.delegate.hashCode() == other.delegate.hashCode()
-        case uVar: UVar[_] if other.delegate.isInstanceOf[DVar[_]] =>
-          val tac = OpalClient.getTacForMethod(method.delegate)
-          val defStmt = tac.stmts(uVar.definedBy.head)
-
-          if (!defStmt.isAssignment) {
-            return false
-          }
-
-          val targetVar = defStmt.asAssignment.targetVar
-          val otherVar = other.delegate.asInstanceOf[DVar[ValueInformation]]
-          super.equals(other) && targetVar.hashCode() == otherVar.hashCode()
-        case dVar: DVar[_] if other.delegate.isInstanceOf[UVar[_]] =>
-          val otherVar = other.delegate.asInstanceOf[UVar[ValueInformation]]
-          val tac = OpalClient.getTacForMethod(method.delegate)
-          val defStmt = tac.stmts(otherVar.definedBy.head)
-
-          if (!defStmt.isAssignment) {
-            return false
-          }
-
-          val targetVar = defStmt.asAssignment.targetVar
-          super.equals(other) && dVar.hashCode() == targetVar.hashCode()
-        case _ =>
-          other.canEqual(this) && super.equals(other) && this.delegate == other.delegate
-      }
-    case _ => false
-  }
-
-  override def toString: String = {
+  override def getVariableName: String = {
     delegate match {
-      case _: DVar[_] => "var" // TODO Add origin
-      case uVar: UVar[_] => "var" + uVar.definedBy.head
       case stringConst: StringConst => "\"" + stringConst.value + "\""
       case intConst: IntConst => intConst.value.toString
       case longConst: LongConst => longConst.value.toString
       case _ => delegate.toString
     }
   }
+
+  override def hashCode(): Int = 31 * super.hashCode() + delegate.hashCode()
+
+  private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalVal]
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: OpalVal => other.canEqual(this) && super.equals(other) && this.delegate == other.delegate
+    case _ => false
+  }
+
+  override def toString: String = getVariableName
 }

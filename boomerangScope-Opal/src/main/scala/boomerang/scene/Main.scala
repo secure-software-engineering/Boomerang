@@ -1,6 +1,6 @@
 package boomerang.scene
 
-import boomerang.scene.opal.{OpalCallGraph, OpalClient}
+import boomerang.scene.opal.{OpalCallGraph, OpalClient, OpalMethod}
 import com.typesafe.config.ConfigValueFactory
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.cg.InitialEntryPointsKey
@@ -14,10 +14,11 @@ object Main {
   def main(args: Array[String]): Unit = {
     OPALLogger.updateLogger(GlobalLogContext, DevNullLogger)
 
-    val project = Project(new File("C:\\Users\\Sven\\Documents\\CogniCrypt\\Opal\\MultipleCalls\\Main.jar"))
+    val project = Project(new File("C:\\Users\\Sven\\Documents\\CogniCrypt\\Opal\\Array\\Array.jar"))
     var config = project.config
 
     val key = s"${InitialEntryPointsKey.ConfigKeyPrefix}entryPoints"
+    println("InitialEntryPoints " + key)
     val currentValues = project.config.getList(key).unwrapped()
     val allMethods = project.allMethodsWithBody
 
@@ -40,15 +41,18 @@ object Main {
     val entryPoints = newProject.get(InitialEntryPointsKey)
     println("Entry Points: " + entryPoints.size)
 
-    callGraph.reachableMethods().foreach(method => {
-      println(method.method)
-    })
-
     OpalClient.init(newProject)
 
     val opalCallGraph = new OpalCallGraph(callGraph, entryPoints.toSet)
-    opalCallGraph.getEdges.forEach(edge => {
-      println(edge)
+    opalCallGraph.getReachableMethods.forEach(method => {
+      if (method.isInstanceOf[OpalMethod]) {
+        val locals = method.getLocals
+        println("Locals in " + method + ": " + locals)
+      }
+
+      method.getStatements.forEach(statement => {
+
+      })
     })
   }
 }

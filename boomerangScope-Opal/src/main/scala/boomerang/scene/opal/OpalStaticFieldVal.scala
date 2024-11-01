@@ -63,4 +63,10 @@ class OpalStaticFieldVal(field: OpalField, method: Method, unbalanced: ControlFl
   override def getArrayBase: Pair[Val, Integer] = throw new RuntimeException("Static field has no array base")
 
   override def getVariableName: String = field.toString
+
+  override def hashCode(): Int = ???
+
+  override def equals(obj: Any): Boolean = ???
+
+  override def toString: String = ???
 }
