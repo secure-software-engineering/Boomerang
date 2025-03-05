@@ -11,6 +11,9 @@
  */
 package sync.pds.weights;
 
+import static sync.pds.weights.SetDomainRefactor.one;
+import static sync.pds.weights.SetDomainRefactor.zero;
+
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Set;
@@ -18,18 +21,13 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-import static sync.pds.weights.SetDomainRefactor.one;
-import static sync.pds.weights.SetDomainRefactor.zero;
-
 public class SetDomain<N, Stmt, Fact> implements Weight {
 
   private final Collection<Node<Stmt, Fact>> nodes;
 
-
   private SetDomain(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
-
 
   @Nonnull
   @Override
@@ -49,7 +47,7 @@ public class SetDomain<N, Stmt, Fact> implements Weight {
     if (other.equals(SetDomainRefactor.zero())) return this;
     if (this.equals(SetDomainRefactor.zero())) return other;
     if (this.equals(SetDomainRefactor.one()) || other.equals(SetDomainRefactor.one())) {
-        return one();
+      return one();
     }
     if (other instanceof SetDomain) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
@@ -58,8 +56,6 @@ public class SetDomain<N, Stmt, Fact> implements Weight {
     }
     return zero();
   }
-
-
 
   @Override
   public String toString() {

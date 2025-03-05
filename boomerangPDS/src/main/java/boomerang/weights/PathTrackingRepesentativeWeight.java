@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class PathTrackingRepesentativeWeight extends Weight {
+public class PathTrackingRepesentativeWeight implements Weight {
 
   private static PathTrackingRepesentativeWeight one;
 

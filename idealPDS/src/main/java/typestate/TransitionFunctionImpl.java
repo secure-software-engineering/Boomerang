@@ -11,9 +11,6 @@
  */
 package typestate;
 
-import static typestate.TransitionRepresentationFunction.one;
-import static typestate.TransitionRepresentationFunction.zero;
-
 import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -48,15 +45,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other.equals(one())) {
+    final Weight one = TransitionRepresentationFunction.one();
+    if (other == one) {
       return this;
     }
-    if (this.equals(TransitionRepresentationFunction.one())) {
+    if (this == one) {
       return other;
     }
-    if (other.equals(TransitionRepresentationFunction.zero())
-        || this.equals(TransitionRepresentationFunction.zero())) {
-      return zero();
+    final Weight zero = TransitionRepresentationFunction.zero();
+    if (other == zero || this == zero) {
+      return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
     Set<ITransition> otherTransitions = func.value;
@@ -85,16 +83,19 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (!(other instanceof TransitionFunctionImpl)) {
       throw new RuntimeException();
     }
-    if (this.equals(zero())) {
+    if (this.equals(TransitionRepresentationFunction.zero())) {
       return other;
     }
-    if (other.equals(zero())) return this;
-    if (other.equals(one()) && this.equals(one())) {
-      return one();
+    if (other.equals(TransitionRepresentationFunction.zero())) {
+        return this;
+    }
+    Weight one = TransitionRepresentationFunction.one();
+    if (other == one && this == one) {
+      return one;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-    if (other.equals(one()) || this.equals(one())) {
-      Set<ITransition> transitions = new HashSet<>((other.equals(one()) ? value : func.value));
+    if (other == one || this == one) {
+      Set<ITransition> transitions = new HashSet<>((other == one ? value : func.value));
       Set<ITransition> idTransitions = Sets.newHashSet();
       for (ITransition t : transitions) {
         idTransitions.add(new Transition(t.from(), t.from()));
@@ -103,7 +104,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return new TransitionFunctionImpl(
           transitions,
           Sets.newHashSet(
-              (other.equals(one()) ? stateChangeStatements : func.stateChangeStatements)));
+              (other == one) ? stateChangeStatements : func.stateChangeStatements));
     }
     Set<ITransition> transitions = new HashSet<>(func.value);
     transitions.addAll(value);

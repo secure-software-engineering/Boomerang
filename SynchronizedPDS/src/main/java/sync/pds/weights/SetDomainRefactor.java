@@ -11,12 +11,10 @@
  */
 package sync.pds.weights;
 
-
+import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
-
-
-public class SetDomainRefactor extends Weight {
+public class SetDomainRefactor implements Weight {
 
   private static SetDomainRefactor one;
   private static SetDomainRefactor zero;
@@ -26,9 +24,9 @@ public class SetDomainRefactor extends Weight {
     this.rep = rep;
   }
 
-
   @Override
-  public Weight extendWith(Weight other) {
+  @Nonnull
+  public Weight extendWith(@Nonnull Weight other) {
     if (other.equals(one())) {
       return this;
     }
@@ -39,7 +37,8 @@ public class SetDomainRefactor extends Weight {
   }
 
   @Override
-  public Weight combineWith(Weight other) {
+  @Nonnull
+  public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
     if (this.equals(one()) || other.equals(one())) return one();
@@ -59,14 +58,14 @@ public class SetDomainRefactor extends Weight {
 
   @Override
   public String toString() {
-   return  (this==one)? "ONE" : "ZERO";
+    return (this == one) ? "ONE" : "ZERO";
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ( rep.hashCode());
+    result = prime * result + (rep.hashCode());
     return result;
   }
 
@@ -76,8 +75,6 @@ public class SetDomainRefactor extends Weight {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     SetDomainRefactor other = (SetDomainRefactor) obj;
-      return rep.equals(other.rep);
+    return rep.equals(other.rep);
   }
-
-
 }
