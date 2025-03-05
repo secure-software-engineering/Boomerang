@@ -25,12 +25,12 @@ public class DataFlowPathWeight implements Weight {
   }
 
   public DataFlowPathWeight(Node<Edge, Val> path) {
-    this.path = new PathTrackingWeight(path);
+    this.path = new PathTrackingWeightImpl(path);
     this.condition = PathConditionWeight.one();
   }
 
   public DataFlowPathWeight(Node<Edge, Val> path, Statement callSite, Method callee) {
-    this.path = new PathTrackingWeight(path);
+    this.path = new PathTrackingWeightImpl(path);
     this.condition = new PathConditionWeight(callSite, callee);
   }
 
@@ -44,7 +44,7 @@ public class DataFlowPathWeight implements Weight {
     this.condition = new PathConditionWeight(ifStatement, condition);
   }
 
-  private DataFlowPathWeight(PathTrackingWeight path, PathConditionWeight condition) {
+  private DataFlowPathWeight(PathTrackingWeightImpl path, PathConditionWeight condition) {
     this.path = path;
     this.condition = condition;
   }
@@ -97,7 +97,7 @@ public class DataFlowPathWeight implements Weight {
   @Nonnull
   public Weight extendWith(@Nonnull Weight other) {
     return new DataFlowPathWeight(
-        (PathTrackingWeight) path.extendWith(((DataFlowPathWeight) other).path),
+        (PathTrackingWeightImpl) path.extendWith(((DataFlowPathWeight) other).path),
         (PathConditionWeight) condition.extendWith(((DataFlowPathWeight) other).condition));
   }
 
@@ -105,7 +105,7 @@ public class DataFlowPathWeight implements Weight {
   @Override
   public Weight combineWith(@Nonnull Weight other) {
     return new DataFlowPathWeight(
-        (PathTrackingWeight) path.combineWith(((DataFlowPathWeight) other).path),
+        (PathTrackingWeightImpl) path.combineWith(((DataFlowPathWeight) other).path),
         (PathConditionWeight) condition.combineWith(((DataFlowPathWeight) other).condition));
   }
 }
