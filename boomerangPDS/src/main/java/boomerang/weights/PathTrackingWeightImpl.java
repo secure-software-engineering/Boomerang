@@ -2,10 +2,9 @@ package boomerang.weights;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Val;
-import com.google.common.collect.Lists;
-
+import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
@@ -18,8 +17,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
    */
   @Nonnull private final LinkedHashSet<Node<Edge, Val>> shortestPathWitness;
 
-  private PathTrackingWeightImpl(
-      LinkedHashSet<Node<Edge, Val>> allStatement) {
+  private PathTrackingWeightImpl(LinkedHashSet<Node<Edge, Val>> allStatement) {
     this.shortestPathWitness = allStatement;
   }
 
@@ -28,13 +26,11 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
     this.shortestPathWitness.add(relevantStatement);
   }
 
-
-
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight o) {
     if (!(o instanceof PathTrackingWeightImpl)) {
-        throw new RuntimeException("Cannot extend to different types of weight!");
+      throw new RuntimeException("Cannot extend to different types of weight!");
     }
 
     PathTrackingWeightImpl other = (PathTrackingWeightImpl) o;
@@ -49,17 +45,15 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
   @Override
   public Weight combineWith(@Nonnull Weight o) {
     if (!(o instanceof PathTrackingWeightImpl)) {
-        throw new RuntimeException("Cannot extend to different types of weight!");
+      throw new RuntimeException("Cannot extend to different types of weight!");
     }
     PathTrackingWeightImpl other = (PathTrackingWeightImpl) o;
 
     if (shortestPathWitness.size() > other.shortestPathWitness.size()) {
-      return new PathTrackingWeightImpl(
-          new LinkedHashSet<>(other.shortestPathWitness));
+      return new PathTrackingWeightImpl(new LinkedHashSet<>(other.shortestPathWitness));
     }
 
-    return new PathTrackingWeightImpl(
-        new LinkedHashSet<>(this.shortestPathWitness));
+    return new PathTrackingWeightImpl(new LinkedHashSet<>(this.shortestPathWitness));
   }
 
   @Override
@@ -70,13 +64,13 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
-        return true;
+      return true;
     }
     if (obj == null) {
-        return false;
+      return false;
     }
     if (getClass() != obj.getClass()) {
-        return false;
+      return false;
     }
     PathTrackingWeightImpl other = (PathTrackingWeightImpl) obj;
     return shortestPathWitness.equals(other.shortestPathWitness);
@@ -88,9 +82,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
   }
 
   @Nonnull
-  public List<Node<Edge, Val>> getShortestPathWitness() {
-    // TODO: [ms] maybe don't copy but return as unmodifiable?
-    return Lists.newArrayList(shortestPathWitness);
+  public Set<Node<Edge, Val>> getShortestPathWitness() {
+    return Collections.unmodifiableSet(shortestPathWitness);
   }
-
 }

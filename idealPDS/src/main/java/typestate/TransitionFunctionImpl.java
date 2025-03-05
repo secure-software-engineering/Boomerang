@@ -87,7 +87,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return other;
     }
     if (other.equals(TransitionRepresentationFunction.zero())) {
-        return this;
+      return this;
     }
     Weight one = TransitionRepresentationFunction.one();
     if (other == one && this == one) {
@@ -103,8 +103,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       transitions.addAll(idTransitions);
       return new TransitionFunctionImpl(
           transitions,
-          Sets.newHashSet(
-              (other == one) ? stateChangeStatements : func.stateChangeStatements));
+          Sets.newHashSet((other == one) ? stateChangeStatements : func.stateChangeStatements));
     }
     Set<ITransition> transitions = new HashSet<>(func.value);
     transitions.addAll(value);

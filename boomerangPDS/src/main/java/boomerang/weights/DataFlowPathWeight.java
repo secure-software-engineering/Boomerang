@@ -6,8 +6,8 @@ import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Objects;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
@@ -77,7 +77,7 @@ public class DataFlowPathWeight implements Weight {
     return Objects.hashCode(path, condition);
   }
 
-  public List<Node<Edge, Val>> getAllStatements() {
+  public Set<Node<Edge, Val>> getAllStatements() {
     return path.getShortestPathWitness();
   }
 

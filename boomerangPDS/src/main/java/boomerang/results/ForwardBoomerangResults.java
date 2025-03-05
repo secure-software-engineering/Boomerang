@@ -27,13 +27,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -369,7 +364,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   private List<PathElement> transformPath(
-      List<Node<Edge, Val>> allStatements, Node<Edge, Val> sinkLocation) {
+      Set<Node<Edge, Val>> allStatements, Node<Edge, Val> sinkLocation) {
     List<PathElement> res = Lists.newArrayList();
     int index = 0;
     for (Node<Edge, Val> x : allStatements) {
