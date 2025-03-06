@@ -30,14 +30,7 @@ public class InferenceWeightOne implements InferenceWeight {
     if (other == one) {
       return this;
     }
-    if (this == one) {
-      return other;
-    }
-    InferenceWeightZero zero = zero();
-    if (other == zero) {
-      return zero;
-    }
-    throw new IllegalStateException("This should not happen!");
+    return other;
   }
 
   @Nonnull
