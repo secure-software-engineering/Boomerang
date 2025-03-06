@@ -54,11 +54,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    final Weight one = TransitionFunctionRepresentativeOne.getInstanceOne();
+    final Weight one = TransitionFunctionOne.getInstanceOne();
     if (other == one) {
       return this;
     }
-    final Weight zero = TransitionFunctionRepresentativeZero.getInstanceZero();
+    final Weight zero = TransitionFunctionZero.getInstanceZero();
     if (other == zero) {
       return zero;
     }
@@ -68,7 +68,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     Set<Edge> newStateChangeStatements = new HashSet<>();
     for (Transition first : values) {
       for (Transition second : otherTransitions) {
-        TransitionIdentity identity = TransitionIdentity.getIdentity();
+        TransitionIdentity identity = TransitionIdentity.identity();
         if (second == identity) {
           ress.add(first);
           newStateChangeStatements.addAll(stateChangeStatements);
@@ -90,10 +90,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (other == TransitionFunctionRepresentativeZero.getInstanceZero()) {
+    if (other == TransitionFunctionZero.getInstanceZero()) {
       return this;
     }
-    Weight one = TransitionFunctionRepresentativeOne.getInstanceOne();
+    Weight one = TransitionFunctionOne.getInstanceOne();
     TransitionFunction func = (TransitionFunction) other;
     Set<Transition> transitions = new HashSet<>(values);
     HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);

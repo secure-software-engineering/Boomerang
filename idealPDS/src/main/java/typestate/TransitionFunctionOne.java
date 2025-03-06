@@ -18,17 +18,16 @@ import javax.annotation.Nonnull;
 import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
-public class TransitionFunctionRepresentativeZero implements TransitionFunction {
+public class TransitionFunctionOne implements TransitionFunction {
 
   @Nonnull
-  private static final TransitionFunctionRepresentativeZero zero =
-      new TransitionFunctionRepresentativeZero();
+  private static final TransitionFunctionOne one =
+      new TransitionFunctionOne();
 
-  public TransitionFunctionRepresentativeZero() {}
+  public TransitionFunctionOne() {}
 
-  @Nonnull
-  public static TransitionFunctionRepresentativeZero getInstanceZero() {
-    return zero;
+  public static TransitionFunctionOne getInstanceOne() {
+    return one;
   }
 
   @Nonnull
@@ -46,27 +45,22 @@ public class TransitionFunctionRepresentativeZero implements TransitionFunction 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    TransitionFunctionRepresentativeOne one = TransitionFunctionRepresentativeOne.getInstanceOne();
-    if (other == one) {
+    if (other == getInstanceOne()) {
       return this;
     }
-    TransitionFunctionRepresentativeZero zero = getInstanceZero();
-    if (other == zero) {
-      return zero;
-    }
-    throw new IllegalStateException("This should not happen!");
+    return other;
   }
 
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    if (!(other instanceof TransitionFunctionRepresentativeZero)) {
+    if (!(other instanceof TransitionFunctionOne)) {
       throw new RuntimeException("don't");
     }
     return other;
   }
 
   public String toString() {
-    return "ZERO";
+    return "ONE";
   }
 }

@@ -17,7 +17,7 @@ public class TransitionIdentity implements Transition {
 
   @Nonnull private static final TransitionIdentity instance = new TransitionIdentity();
 
-  public static TransitionIdentity getIdentity() {
+  public static TransitionIdentity identity() {
     return instance;
   }
 
