@@ -15,23 +15,27 @@ import wpds.impl.Weight;
 
 import javax.annotation.Nonnull;
 
-public class InferenceWeightOne implements Weight {
+import static inference.InferenceWeightZero.zero;
 
-  @Nonnull private static final InferenceWeightOne one  = new InferenceWeightOne();;
+public class InferenceWeightOne implements InferenceWeight {
+
+  @Nonnull private static final InferenceWeightOne one  = new InferenceWeightOne();
 
   private InferenceWeightOne() {}
 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other.equals(one())) {
+    InferenceWeightOne one = one();
+    if (other == one) {
       return this;
     }
-    if (this.equals(one())) {
+    if (this == one) {
       return other;
     }
-    if (other.equals(zero()) || this.equals(zero())) {
-      return zero();
+    InferenceWeightZero zero = zero();
+    if (other == zero) {
+      return zero;
     }
     throw new IllegalStateException("This should not happen!");
   }
