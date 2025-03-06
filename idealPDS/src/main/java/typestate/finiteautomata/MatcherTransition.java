@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MatcherTransition extends Transition {
+public class MatcherTransition extends TransitionImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(MatcherTransition.class);
   private final Type type;
   private final Parameter param;

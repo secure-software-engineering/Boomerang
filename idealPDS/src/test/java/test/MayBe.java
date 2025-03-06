@@ -14,7 +14,7 @@ package test;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import typestate.TransitionFunction;
-import typestate.finiteautomata.ITransition;
+import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.State;
 
 public class MayBe extends ExpectedResults<TransitionFunction, Val> {
@@ -29,7 +29,7 @@ public class MayBe extends ExpectedResults<TransitionFunction, Val> {
 
   @Override
   public void computedResults(TransitionFunction results) {
-    for (ITransition t : results.getValues()) {
+    for (Transition t : results.getValues()) {
       // if(t.equals(Transition.identity()))
       // continue;
       State s = t.to();

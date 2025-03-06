@@ -15,7 +15,7 @@ import boomerang.scope.ControlFlowGraph;
 import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import typestate.finiteautomata.ITransition;
+import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
 public class TransitionFunctionRepresentativeOne implements TransitionFunction {
@@ -32,7 +32,7 @@ public class TransitionFunctionRepresentativeOne implements TransitionFunction {
 
   @Nonnull
   @Override
-  public Collection<ITransition> getValues() {
+  public Collection<Transition> getValues() {
     throw new IllegalStateException("don't");
   }
 

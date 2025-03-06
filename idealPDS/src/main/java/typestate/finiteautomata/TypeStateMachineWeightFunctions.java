@@ -105,7 +105,7 @@ public abstract class TypeStateMachineWeightFunctions
       Collection<MatcherTransition> filteredTrans,
       Type type) {
     Statement transitionStmt = transitionEdge.getStart();
-    Set<ITransition> res = new HashSet<>();
+    Set<Transition> res = new HashSet<>();
     if (filteredTrans.isEmpty() || !transitionStmt.containsInvokeExpr()) return getOne();
     for (MatcherTransition trans : filteredTrans) {
       if (trans.matches(transitionStmt.getInvokeExpr().getMethod())) {
@@ -113,11 +113,11 @@ public abstract class TypeStateMachineWeightFunctions
             "Found potential transition at {}, now checking if parameter match", transitionStmt);
         Parameter param = trans.getParam();
         if (param.equals(Parameter.This) && edge.getMethod().isThisLocal(node))
-          res.add(new Transition(trans.from(), trans.to()));
+          res.add(new TransitionImpl(trans.from(), trans.to()));
         if (param.equals(Parameter.Param1) && edge.getMethod().getParameterLocal(0).equals(node))
-          res.add(new Transition(trans.from(), trans.to()));
+          res.add(new TransitionImpl(trans.from(), trans.to()));
         if (param.equals(Parameter.Param2) && edge.getMethod().getParameterLocal(1).equals(node))
-          res.add(new Transition(trans.from(), trans.to()));
+          res.add(new TransitionImpl(trans.from(), trans.to()));
       }
     }
 
@@ -193,7 +193,7 @@ public abstract class TypeStateMachineWeightFunctions
 
   public TransitionFunction initialTransition() {
     return new TransitionFunctionImpl(
-        new Transition(initialState(), initialState()), Collections.emptySet());
+        new TransitionImpl(initialState(), initialState()), Collections.emptySet());
   }
 
   protected abstract State initialState();

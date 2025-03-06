@@ -16,9 +16,9 @@ import boomerang.scope.Val;
 import com.google.common.collect.Sets;
 import java.util.Set;
 import typestate.TransitionFunction;
-import typestate.finiteautomata.ITransition;
-import typestate.finiteautomata.State;
 import typestate.finiteautomata.Transition;
+import typestate.finiteautomata.State;
+import typestate.finiteautomata.TransitionIdentity;
 
 public class MustBe extends ExpectedResults<TransitionFunction, Val> {
 
@@ -26,24 +26,29 @@ public class MustBe extends ExpectedResults<TransitionFunction, Val> {
     super(unit, val, state);
   }
 
-  public String toString() {
-    return "MustBe " + super.toString();
-  }
-
   @Override
   public void computedResults(TransitionFunction val) {
     Set<State> states = Sets.newHashSet();
-    for (ITransition t : val.getValues()) {
-      if (!t.equals(Transition.identity())) {
+    TransitionIdentity identity = TransitionIdentity.getIdentity();
+    for (Transition t : val.getValues()) {
+      if (t != identity) {
         states.add(t.to());
       }
     }
     for (State s : states) {
-      if (state == InternalState.ACCEPTING) {
-        satisfied |= !s.isErrorState() && states.size() == 1;
-      } else if (state == InternalState.ERROR) {
-        satisfied |= s.isErrorState() && states.size() == 1;
-      }
+        switch (state) {
+            case ACCEPTING:
+                satisfied |= !s.isErrorState() && states.size() == 1;
+                break;
+            case ERROR:
+                satisfied |= s.isErrorState() && states.size() == 1;
+                break;
+        }
     }
   }
+
+  public String toString() {
+    return "MustBe " + super.toString();
+  }
+
 }

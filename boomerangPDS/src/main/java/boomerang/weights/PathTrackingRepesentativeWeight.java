@@ -9,7 +9,8 @@ import wpds.impl.Weight;
 
 public class PathTrackingRepesentativeWeight implements PathTrackingWeight {
 
-  @Nonnull private static final PathTrackingRepesentativeWeight one = new PathTrackingRepesentativeWeight();
+  @Nonnull
+  private static final PathTrackingRepesentativeWeight one = new PathTrackingRepesentativeWeight();
 
   private PathTrackingRepesentativeWeight() {
     /*  Singleton */
@@ -51,5 +52,4 @@ public class PathTrackingRepesentativeWeight implements PathTrackingWeight {
   public String toString() {
     return "ONE";
   }
-
 }

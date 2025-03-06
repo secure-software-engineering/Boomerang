@@ -19,28 +19,29 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import typestate.finiteautomata.ITransition;
 import typestate.finiteautomata.Transition;
+import typestate.finiteautomata.TransitionIdentity;
+import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
-  @Nonnull private final Set<? extends ITransition> values;
+  @Nonnull private final Set<? extends Transition> values;
   @Nonnull private final Set<Edge> stateChangeStatements;
 
   public TransitionFunctionImpl(
-      @Nonnull Set<? extends ITransition> trans, @Nonnull Set<Edge> stateChangeStatements) {
+      @Nonnull Set<? extends Transition> trans, @Nonnull Set<Edge> stateChangeStatements) {
     this.stateChangeStatements = stateChangeStatements;
     this.values = trans;
   }
 
   public TransitionFunctionImpl(
-      @Nonnull ITransition trans, @Nonnull Set<Edge> stateChangeStatements) {
+      @Nonnull Transition trans, @Nonnull Set<Edge> stateChangeStatements) {
     this(Collections.singleton(trans), stateChangeStatements);
   }
 
   @Override
   @Nonnull
-  public Collection<ITransition> getValues() {
+  public Collection<Transition> getValues() {
     return Lists.newArrayList(values);
   }
 
@@ -62,19 +63,20 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-    Set<? extends ITransition> otherTransitions = func.values;
-    Set<ITransition> ress = new HashSet<>();
+    Set<? extends Transition> otherTransitions = func.values;
+    Set<Transition> ress = new HashSet<>();
     Set<Edge> newStateChangeStatements = new HashSet<>();
-    for (ITransition first : values) {
-      for (ITransition second : otherTransitions) {
-        if (second.equals(Transition.identity())) {
+    for (Transition first : values) {
+      for (Transition second : otherTransitions) {
+        TransitionIdentity identity = TransitionIdentity.getIdentity();
+        if (second == identity) {
           ress.add(first);
           newStateChangeStatements.addAll(stateChangeStatements);
-        } else if (first.equals(Transition.identity())) {
+        } else if (first == identity) {
           ress.add(second);
           newStateChangeStatements.addAll(func.stateChangeStatements);
         } else if (first.to().equals(second.from())) {
-          ress.add(new Transition(first.from(), second.to()));
+          ress.add(new TransitionImpl(first.from(), second.to()));
           newStateChangeStatements.addAll(func.stateChangeStatements);
         }
       }
@@ -93,12 +95,12 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
     Weight one = TransitionFunctionRepresentativeOne.getInstanceOne();
     TransitionFunction func = (TransitionFunction) other;
-    Set<ITransition> transitions = new HashSet<>(values);
+    Set<Transition> transitions = new HashSet<>(values);
     HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
     if (other == one) {
-      Set<ITransition> idTransitions = Sets.newHashSet();
-      for (ITransition t : transitions) {
-        idTransitions.add(new Transition(t.from(), t.from()));
+      Set<Transition> idTransitions = Sets.newHashSet();
+      for (Transition t : transitions) {
+        idTransitions.add(new TransitionImpl(t.from(), t.from()));
       }
       transitions.addAll(idTransitions);
     } else {
