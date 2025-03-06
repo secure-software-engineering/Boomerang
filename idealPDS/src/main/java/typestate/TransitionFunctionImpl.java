@@ -52,11 +52,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    final Weight one = TransitionFunctionRepresentativeOne.one();
+    final Weight one = TransitionFunctionRepresentativeOne.getInstanceOne();
     if (other == one) {
       return this;
     }
-    final Weight zero = TransitionFunctionRepresentativeZero.zero();
+    final Weight zero = TransitionFunctionRepresentativeZero.getInstanceZero();
     if (other == zero) {
       return zero;
     }
@@ -87,10 +87,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (other == TransitionFunctionRepresentativeZero.zero()) {
+    if (other == TransitionFunctionRepresentativeZero.getInstanceZero()) {
       return this;
     }
-    Weight one = TransitionFunctionRepresentativeOne.one();
+    Weight one = TransitionFunctionRepresentativeOne.getInstanceOne();
     TransitionFunction func = (TransitionFunction) other;
     Set<ITransition> transitions;
     HashSet<Edge> newStateChangeStmts;

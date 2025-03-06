@@ -20,10 +20,15 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionRepresentativeOne implements TransitionFunction {
 
+  @Nonnull
   private static final TransitionFunctionRepresentativeOne one =
       new TransitionFunctionRepresentativeOne();
 
   public TransitionFunctionRepresentativeOne() {}
+
+  public static TransitionFunctionRepresentativeOne getInstanceOne() {
+    return one;
+  }
 
   @Nonnull
   @Override
@@ -40,7 +45,7 @@ public class TransitionFunctionRepresentativeOne implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other == one()) {
+    if (other == getInstanceOne()) {
       return this;
     }
     return other;
@@ -52,15 +57,7 @@ public class TransitionFunctionRepresentativeOne implements TransitionFunction {
     if (!(other instanceof TransitionFunctionRepresentativeOne)) {
       throw new RuntimeException("don't");
     }
-    TransitionFunctionRepresentativeOne one = one();
-    if (other == one) {
-      return one;
-    }
-    return extendWith(other);
-  }
-
-  public static TransitionFunctionRepresentativeOne one() {
-    return one;
+    return other;
   }
 
   public String toString() {

@@ -20,9 +20,16 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionRepresentativeZero implements TransitionFunction {
 
-  private static TransitionFunctionRepresentativeZero zero;
+  @Nonnull
+  private static final TransitionFunctionRepresentativeZero zero =
+      new TransitionFunctionRepresentativeZero();
 
   public TransitionFunctionRepresentativeZero() {}
+
+  @Nonnull
+  public static TransitionFunctionRepresentativeZero getInstanceZero() {
+    return zero;
+  }
 
   @Nonnull
   @Override
@@ -39,11 +46,11 @@ public class TransitionFunctionRepresentativeZero implements TransitionFunction 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    TransitionFunctionRepresentativeOne one = TransitionFunctionRepresentativeOne.one();
+    TransitionFunctionRepresentativeOne one = TransitionFunctionRepresentativeOne.getInstanceOne();
     if (other == one) {
       return this;
     }
-    TransitionFunctionRepresentativeZero zero = zero();
+    TransitionFunctionRepresentativeZero zero = getInstanceZero();
     if (other == zero) {
       return zero;
     }
@@ -54,17 +61,9 @@ public class TransitionFunctionRepresentativeZero implements TransitionFunction 
   @Override
   public Weight combineWith(@Nonnull Weight other) {
     if (!(other instanceof TransitionFunctionRepresentativeZero)) {
-      throw new RuntimeException();
+      throw new RuntimeException("don't");
     }
     return other;
-  }
-
-  @Nonnull
-  public static TransitionFunctionRepresentativeZero zero() {
-    if (zero == null) {
-      zero = new TransitionFunctionRepresentativeZero();
-    }
-    return zero;
   }
 
   public String toString() {
