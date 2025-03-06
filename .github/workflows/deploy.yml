@@ -1,6 +1,10 @@
-name: Deploy Sparse SPDS
+name: Deploy Boomerang
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: snapshot_version
 
 jobs:
   deployment:
@@ -14,15 +18,15 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
-          java-package: 'jdk'
-          java-version: '11'
-          server-id: 'ossrh' # must match the serverId configured for the nexus-staging-maven-plugin
+          distribution: adopt
+          java-package: jdk
+          java-version: 11
+          server-id: ossrh # must match the serverId configured for the nexus-staging-maven-plugin
           server-username: OSSRH_USERNAME # Env var that holds your OSSRH user name
           server-password: OSSRH_PASSWORD # Env var that holds your OSSRH user pw
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Substituted with the value stored in the referenced secret
           gpg-passphrase: SIGN_KEY_PASS # Env var that holds the key's passphrase
-      - name: Deploy SPDS
+      - name: Deploy Boomerang
         run: mvn -B -U clean deploy -Pdeployment -DskipTests
         env:
           SIGN_KEY_PASS: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
@@ -38,34 +42,20 @@ jobs:
         with:
           fetch-depth: 0
 
-       # Semantic versioning
-      - name: Semantic versioning
-        id: versioning
-        uses: paulhatch/semantic-version@v5.1.0
-        with:
-          tag_prefix: ""
-        # A string which, if present in a git commit, indicates that a change represents a
-        # major (breaking) change, supports regular expressions wrapped with '/'
-          major_pattern: "(MAJOR)"
-        # Same as above except indicating a minor change, supports regular expressions wrapped with '/'
-          minor_pattern: "(MINOR)"
-        # A string to determine the format of the version output
-          version_format: "${major}.${minor}.${patch}"
-
       - name: Create branch and update to next SNAPSHOT version
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git checkout -b version_${{ steps.versioning.outputs.version }}_SNAPSHOT
-          mvn build-helper:parse-version versions:set -DnewVersion=\${{ steps.versioning.outputs.version }}-SNAPSHOT versions:commit
+          git checkout -b ${{ env.BRANCH_NAME }} master
+          mvn versions:set versions:commit -DnextSnapshot
           git ls-files | grep 'pom.xml$' | xargs git add
-          git commit --allow-empty -am "Update version to ${{ steps.versioning.outputs.version }}-SNAPSHOT"
-          git push origin version_${{ steps.versioning.outputs.version }}_SNAPSHOT
+          git commit --allow-empty -am "Update version to next SNAPSHOT"
+          git push origin ${{ env.BRANCH_NAME }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create PR for SNAPSHOT version
         run: |
-          gh pr create -B develop -H version_${{ steps.versioning.outputs.version }}_SNAPSHOT -t "Update to next SNAPSHOT version" -b "Update to next SNAPSHOT version"
+          gh pr create -B develop -H ${{ env.BRANCH_NAME }} -t "Update to next SNAPSHOT version" -b "Update to next SNAPSHOT version"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
