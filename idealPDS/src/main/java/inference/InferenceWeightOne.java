@@ -10,15 +10,16 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-import javax.annotation.Nonnull;
+
 import wpds.impl.Weight;
 
-public class WeightRepresentative implements Weight {
+import javax.annotation.Nonnull;
 
-  private static WeightRepresentative zero;
-  private static WeightRepresentative one;
+public class InferenceWeightOne implements Weight {
 
-  private WeightRepresentative() {}
+  @Nonnull private static final InferenceWeightOne one  = new InferenceWeightOne();;
+
+  private InferenceWeightOne() {}
 
   @Nonnull
   @Override
@@ -41,21 +42,11 @@ public class WeightRepresentative implements Weight {
     return extendWith(other);
   }
 
-  public static <W extends Weight> W one() {
-    if (one == null) {
-      one = new WeightRepresentative();
-    }
-    return (W) one;
-  }
-
-  public static <W extends Weight> W zero() {
-    if (zero == null) {
-      zero = new WeightRepresentative();
-    }
-    return (W) zero;
+  @Nonnull public static InferenceWeightOne one() {
+    return one;
   }
 
   public String toString() {
-    return (this == one) ? "ONE" : "ZERO";
+    return "ONE";
   }
 }

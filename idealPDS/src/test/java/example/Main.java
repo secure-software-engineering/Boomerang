@@ -31,7 +31,7 @@ import ideal.IDEALSeedSolver;
 import ideal.StoreIDEALResultHandler;
 import inference.InferenceWeight;
 import inference.InferenceWeightFunctions;
-import inference.WeightRepresentative;
+import inference.InferenceWeightZero;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -130,7 +130,7 @@ public class Main {
                               .contains("inference.example.InferenceExample$File")) {
                         AllocVal allocVal = new AllocVal(stmt.getLeftOp(), stmt, stmt.getRightOp());
                         return Collections.singleton(
-                            new WeightedForwardQuery<>(edge, allocVal, WeightRepresentative.one()));
+                            new WeightedForwardQuery<>(edge, allocVal, InferenceWeightZero.one()));
                       }
                     }
                     return Collections.emptySet();

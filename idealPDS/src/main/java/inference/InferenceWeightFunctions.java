@@ -25,7 +25,7 @@ public class InferenceWeightFunctions implements WeightFunctions<Edge, Val, Edge
     if (!callee.isStatic()) {
       Val thisLocal = callee.getThisLocal();
       if (succ.fact().equals(thisLocal)) {
-        return new InferenceWeight(callee);
+        return new InferenceWeightImpl(callee);
       }
     }
     return getOne();
@@ -43,6 +43,6 @@ public class InferenceWeightFunctions implements WeightFunctions<Edge, Val, Edge
 
   @Override
   public InferenceWeight getOne() {
-    return WeightRepresentative.one();
+    return InferenceWeightZero.one();
   }
 }
