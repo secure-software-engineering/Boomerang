@@ -27,7 +27,7 @@ public class TransitionFunctionZero implements TransitionFunction {
   public TransitionFunctionZero() {}
 
   @Nonnull
-  public static TransitionFunctionZero getInstanceZero() {
+  public static TransitionFunctionZero zero() {
     return zero;
   }
 
@@ -46,15 +46,7 @@ public class TransitionFunctionZero implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    TransitionFunctionOne one = TransitionFunctionOne.getInstanceOne();
-    if (other == one) {
-      return this;
-    }
-    TransitionFunctionZero zero = getInstanceZero();
-    if (other == zero) {
-      return zero;
-    }
-    throw new IllegalStateException("This should not happen!");
+    return zero();
   }
 
   @Nonnull

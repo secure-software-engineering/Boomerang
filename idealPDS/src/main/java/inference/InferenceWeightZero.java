@@ -22,15 +22,7 @@ public class InferenceWeightZero implements Weight {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    InferenceWeightOne one = InferenceWeightOne.one();
-    if (other == one) {
-      return this;
-    }
-    InferenceWeightZero zero = zero();
-    if (other == zero || this == zero) {
-      return zero;
-    }
-    throw new IllegalStateException("This should not happen!");
+      return zero();
   }
 
   @Nonnull

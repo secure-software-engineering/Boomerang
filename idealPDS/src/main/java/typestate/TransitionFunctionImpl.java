@@ -58,7 +58,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (other == one) {
       return this;
     }
-    final Weight zero = TransitionFunctionZero.getInstanceZero();
+    final Weight zero = TransitionFunctionZero.zero();
     if (other == zero) {
       return zero;
     }
@@ -90,7 +90,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (other == TransitionFunctionZero.getInstanceZero()) {
+    if (other == TransitionFunctionZero.zero()) {
       return this;
     }
     Weight one = TransitionFunctionOne.getInstanceOne();
