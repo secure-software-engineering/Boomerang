@@ -9,17 +9,20 @@ import wpds.impl.Weight;
 
 public class PathTrackingRepesentativeWeight implements PathTrackingWeight {
 
-  private static PathTrackingRepesentativeWeight one;
+  @Nonnull private static final PathTrackingRepesentativeWeight one = new PathTrackingRepesentativeWeight();
 
   private PathTrackingRepesentativeWeight() {
     /*  Singleton */
   }
 
-  public static PathTrackingRepesentativeWeight one() {
-    if (one == null) {
-      one = new PathTrackingRepesentativeWeight();
-    }
+  public static PathTrackingRepesentativeWeight getInstanceOne() {
     return one;
+  }
+
+  @Nonnull
+  @Override
+  public LinkedHashSet<Node<Edge, Val>> getShortestPathWitness() {
+    throw new IllegalStateException("don't!");
   }
 
   @Override
@@ -49,9 +52,4 @@ public class PathTrackingRepesentativeWeight implements PathTrackingWeight {
     return "ONE";
   }
 
-  @Nonnull
-  @Override
-  public LinkedHashSet<Node<Edge, Val>> getShortestPathWitness() {
-    throw new IllegalStateException("don't!");
-  }
 }

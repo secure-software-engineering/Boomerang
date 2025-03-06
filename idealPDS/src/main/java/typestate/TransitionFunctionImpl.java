@@ -15,6 +15,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -23,18 +24,18 @@ import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
-  @Nonnull private final Set<ITransition> values;
+  @Nonnull private final Set<? extends ITransition> values;
   @Nonnull private final Set<Edge> stateChangeStatements;
 
   public TransitionFunctionImpl(
       @Nonnull Set<? extends ITransition> trans, @Nonnull Set<Edge> stateChangeStatements) {
     this.stateChangeStatements = stateChangeStatements;
-    this.values = new HashSet<>(trans);
+    this.values = trans;
   }
 
   public TransitionFunctionImpl(
       @Nonnull ITransition trans, @Nonnull Set<Edge> stateChangeStatements) {
-    this(Sets.newHashSet(trans), stateChangeStatements);
+    this(Collections.singleton(trans), stateChangeStatements);
   }
 
   @Override
@@ -61,7 +62,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-    Set<ITransition> otherTransitions = func.values;
+    Set<? extends ITransition> otherTransitions = func.values;
     Set<ITransition> ress = new HashSet<>();
     Set<Edge> newStateChangeStatements = new HashSet<>();
     for (ITransition first : values) {
@@ -92,20 +93,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
     Weight one = TransitionFunctionRepresentativeOne.getInstanceOne();
     TransitionFunction func = (TransitionFunction) other;
-    Set<ITransition> transitions;
-    HashSet<Edge> newStateChangeStmts;
+    Set<ITransition> transitions = new HashSet<>(values);
+    HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
     if (other == one) {
-      transitions = new HashSet<>((values));
       Set<ITransition> idTransitions = Sets.newHashSet();
       for (ITransition t : transitions) {
         idTransitions.add(new Transition(t.from(), t.from()));
       }
       transitions.addAll(idTransitions);
-      newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
     } else {
-      transitions = new HashSet<>(func.getValues());
-      transitions.addAll(values);
-      newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
+      transitions.addAll(func.getValues());
       newStateChangeStmts.addAll(func.getStateChangeStatements());
     }
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
