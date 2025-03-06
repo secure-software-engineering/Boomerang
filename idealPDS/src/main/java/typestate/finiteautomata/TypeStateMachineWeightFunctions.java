@@ -30,7 +30,7 @@ import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.Node;
 import typestate.TransitionFunction;
 import typestate.TransitionFunctionImpl;
-import typestate.TransitionRepresentationFunction;
+import typestate.TransitionFunctionRepresentativeOne;
 import typestate.finiteautomata.MatcherTransition.Parameter;
 import typestate.finiteautomata.MatcherTransition.Type;
 
@@ -46,7 +46,7 @@ public abstract class TypeStateMachineWeightFunctions
 
   @Override
   public TransitionFunction getOne() {
-    return TransitionRepresentationFunction.one();
+    return TransitionFunctionRepresentativeOne.one();
   }
 
   public TransitionFunction pop(Node<Edge, Val> curr) {

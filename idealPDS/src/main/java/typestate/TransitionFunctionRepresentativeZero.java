@@ -11,33 +11,41 @@
  */
 package typestate;
 
+import boomerang.scope.ControlFlowGraph;
 import java.util.Collection;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import typestate.finiteautomata.ITransition;
 import wpds.impl.Weight;
 
-public class TransitionRepresentationFunction implements TransitionFunction {
+public class TransitionFunctionRepresentativeZero implements TransitionFunction {
 
-  private static TransitionRepresentationFunction one;
-  private static TransitionRepresentationFunction zero;
+  private static TransitionFunctionRepresentativeZero zero;
 
-  public TransitionRepresentationFunction() {}
+  public TransitionFunctionRepresentativeZero() {}
 
   @Nonnull
   @Override
-  public Collection<ITransition> values() {
+  public Collection<ITransition> getValues() {
     throw new IllegalStateException("don't");
   }
 
   @Nonnull
   @Override
+  public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
+    throw new IllegalStateException("This should not happen!");
+  }
+
+  @Nonnull
+  @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other.equals(one())) {
+    TransitionFunctionRepresentativeOne one = TransitionFunctionRepresentativeOne.one();
+    if (other == one) {
       return this;
     }
-    if (this.equals(one())) return other;
-    if (other.equals(zero()) || this.equals(zero())) {
-      return zero();
+    TransitionFunctionRepresentativeZero zero = zero();
+    if (other == zero) {
+      return zero;
     }
     throw new IllegalStateException("This should not happen!");
   }
@@ -45,34 +53,21 @@ public class TransitionRepresentationFunction implements TransitionFunction {
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    if (!(other instanceof TransitionRepresentationFunction)) {
+    if (!(other instanceof TransitionFunctionRepresentativeZero)) {
       throw new RuntimeException();
     }
-    if (this.equals(zero())) {
-      return other;
-    }
-    if (other.equals(zero())) return this;
-    if (other.equals(one()) && this.equals(one())) {
-      return one();
-    }
-    return extendWith(other);
+    return other;
   }
 
-  public static <W extends Weight> W one() {
-    if (one == null) {
-      one = new TransitionRepresentationFunction();
-    }
-    return (W) one;
-  }
-
-  public static <W extends Weight> W zero() {
+  @Nonnull
+  public static TransitionFunctionRepresentativeZero zero() {
     if (zero == null) {
-      zero = new TransitionRepresentationFunction();
+      zero = new TransitionFunctionRepresentativeZero();
     }
-    return (W) zero;
+    return zero;
   }
 
   public String toString() {
-    return (this == one) ? "ONE" : "ZERO";
+    return "ZERO";
   }
 }
