@@ -4,6 +4,7 @@ import boomerang.scope.Field;
 import boomerang.scope.InstanceFieldRef;
 import boomerang.scope.Val;
 
+// TODO May be removed
 public class JimpleInstanceFieldRef implements InstanceFieldRef {
 
   private final soot.jimple.InstanceFieldRef delegate;

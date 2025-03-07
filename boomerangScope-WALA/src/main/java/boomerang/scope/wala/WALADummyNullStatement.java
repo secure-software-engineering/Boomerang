@@ -151,11 +151,6 @@ public class WALADummyNullStatement extends WALAStatement {
   }
 
   @Override
-  public boolean isStringAllocation() {
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return false;
   }

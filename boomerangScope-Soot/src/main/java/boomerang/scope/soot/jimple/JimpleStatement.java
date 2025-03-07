@@ -19,9 +19,9 @@ import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
-import boomerang.scope.soot.BoomerangPretransformer;
 import com.google.common.base.Joiner;
 import java.util.Collection;
+import java.util.Objects;
 import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.CastExpr;
@@ -35,13 +35,11 @@ import soot.jimple.NewMultiArrayExpr;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StaticFieldRef;
 import soot.jimple.Stmt;
-import soot.jimple.StringConstant;
 import soot.jimple.ThrowStmt;
 import soot.tagkit.SourceLnPosTag;
 
 public class JimpleStatement extends Statement {
 
-  // Wrapper for stmt so we know the method
   private final Stmt delegate;
   private final Method method;
 
@@ -55,56 +53,10 @@ public class JimpleStatement extends Statement {
   }
 
   public static Statement create(Stmt delegate, Method m) {
-    JimpleStatement jimpleStatement = new JimpleStatement(delegate, m);
-    return jimpleStatement;
+    return new JimpleStatement(delegate, m);
   }
 
   @Override
-  public String toString() {
-    return shortName(delegate);
-  }
-
-  private String shortName(Stmt s) {
-    if (s.containsInvokeExpr()) {
-      String base = "";
-      if (s.getInvokeExpr() instanceof InstanceInvokeExpr) {
-        InstanceInvokeExpr iie = (InstanceInvokeExpr) s.getInvokeExpr();
-        base = iie.getBase().toString() + ".";
-      }
-      String assign = "";
-      if (s instanceof AssignStmt) {
-        assign = ((AssignStmt) s).getLeftOp() + " = ";
-      }
-      return assign
-          + base
-          + s.getInvokeExpr().getMethod().getName()
-          + "("
-          + Joiner.on(",").join(s.getInvokeExpr().getArgs())
-          + ")";
-    }
-    if (s instanceof IdentityStmt) {
-      return s.toString();
-    }
-    if (s instanceof AssignStmt) {
-      AssignStmt assignStmt = (AssignStmt) s;
-      if (assignStmt.getLeftOp() instanceof InstanceFieldRef) {
-        InstanceFieldRef ifr = (InstanceFieldRef) assignStmt.getLeftOp();
-        return ifr.getBase() + "." + ifr.getField().getName() + " = " + assignStmt.getRightOp();
-      }
-      if (assignStmt.getRightOp() instanceof InstanceFieldRef) {
-        InstanceFieldRef ifr = (InstanceFieldRef) assignStmt.getRightOp();
-        return assignStmt.getLeftOp() + " = " + ifr.getBase() + "." + ifr.getField().getName();
-      }
-      if (assignStmt.getRightOp() instanceof NewExpr) {
-        NewExpr newExpr = (NewExpr) assignStmt.getRightOp();
-        return assignStmt.getLeftOp()
-            + " = new "
-            + newExpr.getBaseType().getSootClass().getShortName();
-      }
-    }
-    return s.toString();
-  }
-
   public boolean containsStaticFieldAccess() {
     if (delegate instanceof AssignStmt) {
       AssignStmt assignStmt = (AssignStmt) delegate;
@@ -114,10 +66,12 @@ public class JimpleStatement extends Statement {
     return false;
   }
 
+  @Override
   public boolean containsInvokeExpr() {
     return delegate.containsInvokeExpr();
   }
 
+  @Override
   public Field getWrittenField() {
     AssignStmt as = (AssignStmt) delegate;
     if (as.getLeftOp() instanceof StaticFieldRef) {
@@ -132,6 +86,7 @@ public class JimpleStatement extends Statement {
     return new JimpleField(ifr.getField());
   }
 
+  @Override
   public boolean isFieldWriteWithBase(Val base) {
     if (isAssignStmt() && isFieldStore()) {
       Pair<Val, Field> instanceFieldRef = getFieldStore();
@@ -144,12 +99,18 @@ public class JimpleStatement extends Statement {
     return false;
   }
 
+  @Override
   public Field getLoadedField() {
-    AssignStmt as = (AssignStmt) delegate;
-    InstanceFieldRef ifr = (InstanceFieldRef) as.getRightOp();
-    return new JimpleField(ifr.getField());
+    if (isFieldLoad()) {
+      AssignStmt as = (AssignStmt) delegate;
+      InstanceFieldRef ifr = (InstanceFieldRef) as.getRightOp();
+      return new JimpleField(ifr.getField());
+    }
+
+    throw new RuntimeException("Statement is not a field load statement");
   }
 
+  @Override
   public boolean isFieldLoadWithBase(Val base) {
     if (isAssignStmt() && isFieldLoad()) {
       return getFieldLoad().getX().equals(base);
@@ -162,18 +123,27 @@ public class JimpleStatement extends Statement {
     return delegate instanceof AssignStmt;
   }
 
+  @Override
   public Val getLeftOp() {
-    assert isAssignStmt();
-    AssignStmt assignStmt = (AssignStmt) delegate;
-    return new JimpleVal(assignStmt.getLeftOp(), method);
+    if (isAssignStmt()) {
+      AssignStmt assignStmt = (AssignStmt) delegate;
+      return new JimpleVal(assignStmt.getLeftOp(), method);
+    }
+
+    throw new RuntimeException("Statement is not an assign statement");
   }
 
+  @Override
   public Val getRightOp() {
-    assert isAssignStmt();
-    AssignStmt assignStmt = (AssignStmt) delegate;
-    return new JimpleVal(assignStmt.getRightOp(), method);
+    if (isAssignStmt()) {
+      AssignStmt assignStmt = (AssignStmt) delegate;
+      return new JimpleVal(assignStmt.getRightOp(), method);
+    }
+
+    throw new RuntimeException("Statement is not an assign statement");
   }
 
+  @Override
   public boolean isInstanceOfStatement(Val fact) {
     if (isAssignStmt()) {
       if (getRightOp().isInstanceOfExpr()) {
@@ -184,74 +154,80 @@ public class JimpleStatement extends Statement {
     return false;
   }
 
+  @Override
   public boolean isCast() {
     return delegate instanceof AssignStmt
         && ((AssignStmt) delegate).getRightOp() instanceof CastExpr;
   }
 
+  @Override
   public InvokeExpr getInvokeExpr() {
     return new JimpleInvokeExpr(delegate.getInvokeExpr(), method);
   }
 
+  @Override
   public boolean isReturnStmt() {
     return delegate instanceof ReturnStmt;
   }
 
+  @Override
   public boolean isThrowStmt() {
     return delegate instanceof ThrowStmt;
   }
 
+  @Override
   public boolean isIfStmt() {
     return delegate instanceof IfStmt;
   }
 
+  @Override
   public IfStatement getIfStmt() {
     return new JimpleIfStatement((IfStmt) delegate, method);
   }
 
-  // TODO Rename to getReturnOp();
+  @Override
   public Val getReturnOp() {
-    assert isReturnStmt();
-    ReturnStmt assignStmt = (ReturnStmt) delegate;
-    return new JimpleVal(assignStmt.getOp(), method);
+    if (isReturnStmt()) {
+      ReturnStmt assignStmt = (ReturnStmt) delegate;
+      return new JimpleVal(assignStmt.getOp(), method);
+    }
+
+    throw new RuntimeException("Statement is not a return statement");
   }
 
+  @Override
   public boolean isMultiArrayAllocation() {
     return (delegate instanceof AssignStmt)
         && ((AssignStmt) delegate).getRightOp() instanceof NewMultiArrayExpr;
   }
 
-  public boolean isStringAllocation() {
-    return delegate instanceof AssignStmt
-        && ((AssignStmt) delegate).getRightOp() instanceof StringConstant;
-  }
-
+  @Override
   public boolean isFieldStore() {
     return delegate instanceof AssignStmt
         && ((AssignStmt) delegate).getLeftOp() instanceof InstanceFieldRef;
   }
 
+  @Override
   public boolean isArrayStore() {
     return delegate instanceof AssignStmt
         && ((AssignStmt) delegate).getLeftOp() instanceof ArrayRef;
   }
 
+  @Override
   public boolean isArrayLoad() {
     return delegate instanceof AssignStmt
         && ((AssignStmt) delegate).getRightOp() instanceof ArrayRef;
   }
 
+  @Override
   public boolean isFieldLoad() {
     return delegate instanceof AssignStmt
         && ((AssignStmt) delegate).getRightOp() instanceof InstanceFieldRef;
   }
 
+  @Override
   public boolean isIdentityStmt() {
     return delegate instanceof IdentityStmt;
-  }
-
-  public Stmt getDelegate() {
-    return delegate;
   }
 
   public String getShortLabel() {
@@ -369,46 +345,25 @@ public class JimpleStatement extends Statement {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((delegate == null) ? 0 : delegate.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    JimpleStatement other = (JimpleStatement) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else {
-      return delegate.equals(other.delegate);
-    }
-  }
-
-  @Override
   public Pair<Val, Field> getFieldStore() {
-    AssignStmt ins = (AssignStmt) delegate;
-    soot.jimple.InstanceFieldRef val = (soot.jimple.InstanceFieldRef) ins.getLeftOp();
-    return new Pair<Val, Field>(
-        new JimpleVal(val.getBase(), method), new JimpleField(val.getField()));
+    if (isFieldStore()) {
+      AssignStmt ins = (AssignStmt) delegate;
+      soot.jimple.InstanceFieldRef val = (soot.jimple.InstanceFieldRef) ins.getLeftOp();
+      return new Pair<>(new JimpleVal(val.getBase(), method), new JimpleField(val.getField()));
+    }
+
+    throw new RuntimeException("Statement is not a field store statement");
   }
 
   @Override
   public Pair<Val, Field> getFieldLoad() {
-    AssignStmt ins = (AssignStmt) delegate;
-    soot.jimple.InstanceFieldRef val = (soot.jimple.InstanceFieldRef) ins.getRightOp();
-    return new Pair<Val, Field>(
-        new JimpleVal(val.getBase(), method), new JimpleField(val.getField()));
+    if (isFieldLoad()) {
+      AssignStmt ins = (AssignStmt) delegate;
+      soot.jimple.InstanceFieldRef val = (soot.jimple.InstanceFieldRef) ins.getRightOp();
+      return new Pair<>(new JimpleVal(val.getBase(), method), new JimpleField(val.getField()));
+    }
+
+    throw new RuntimeException("Statement is not a field load statement");
   }
 
   @Override
@@ -431,7 +386,7 @@ public class JimpleStatement extends Statement {
     } else if (isStaticFieldStore()) {
       v = (StaticFieldRef) ((AssignStmt) delegate).getLeftOp();
     } else {
-      throw new RuntimeException("Error");
+      throw new RuntimeException("Statement has no static field access");
     }
     return new JimpleStaticFieldVal(new JimpleField(v.getField()), method);
   }
@@ -456,7 +411,7 @@ public class JimpleStatement extends Statement {
       Val rightOp = getLeftOp();
       return rightOp.getArrayBase();
     }
-    throw new RuntimeException("Dead code");
+    throw new RuntimeException("Statement has no array base");
   }
 
   @Override
@@ -495,7 +450,67 @@ public class JimpleStatement extends Statement {
         && ((IdentityStmt) delegate).getRightOp() instanceof CaughtExceptionRef;
   }
 
-  public boolean isUnitializedFieldStatement() {
-    return delegate.hasTag(BoomerangPretransformer.UNINITIALIZED_FIELD_TAG_NAME);
+  public Stmt getDelegate() {
+    return delegate;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleStatement that = (JimpleStatement) o;
+    return Objects.equals(delegate, that.delegate) && Objects.equals(method, that.method);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), delegate, method);
+  }
+
+  @Override
+  public String toString() {
+    return shortName(delegate);
+  }
+
+  private String shortName(Stmt s) {
+    if (s.containsInvokeExpr()) {
+      String base = "";
+      if (s.getInvokeExpr() instanceof InstanceInvokeExpr) {
+        InstanceInvokeExpr iie = (InstanceInvokeExpr) s.getInvokeExpr();
+        base = iie.getBase().toString() + ".";
+      }
+      String assign = "";
+      if (s instanceof AssignStmt) {
+        assign = ((AssignStmt) s).getLeftOp() + " = ";
+      }
+      return assign
+          + base
+          + s.getInvokeExpr().getMethod().getName()
+          + "("
+          + Joiner.on(",").join(s.getInvokeExpr().getArgs())
+          + ")";
+    }
+    if (s instanceof IdentityStmt) {
+      return s.toString();
+    }
+    if (s instanceof AssignStmt) {
+      AssignStmt assignStmt = (AssignStmt) s;
+      if (assignStmt.getLeftOp() instanceof InstanceFieldRef) {
+        InstanceFieldRef ifr = (InstanceFieldRef) assignStmt.getLeftOp();
+        return ifr.getBase() + "." + ifr.getField().getName() + " = " + assignStmt.getRightOp();
+      }
+      if (assignStmt.getRightOp() instanceof InstanceFieldRef) {
+        InstanceFieldRef ifr = (InstanceFieldRef) assignStmt.getRightOp();
+        return assignStmt.getLeftOp() + " = " + ifr.getBase() + "." + ifr.getField().getName();
+      }
+      if (assignStmt.getRightOp() instanceof NewExpr) {
+        NewExpr newExpr = (NewExpr) assignStmt.getRightOp();
+        return assignStmt.getLeftOp()
+            + " = new "
+            + newExpr.getBaseType().getSootClass().getShortName();
+      }
+    }
+    return s.toString();
   }
 }

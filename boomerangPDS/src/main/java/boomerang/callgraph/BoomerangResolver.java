@@ -86,7 +86,9 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
           for (CallGraph.Edge e : precomputedCallGraph.edgesOutOf(s)) {
             // TODO Refactor. Should not be required, if the backward analysis is sound (data-flow
             // of static fields)
-            observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+            if (e.tgt().isDefined()) {
+              observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+            }
           }
         }
         if (FALLBACK_OPTION == NoCalleeFoundFallbackOptions.BYPASS) {

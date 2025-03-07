@@ -67,8 +67,10 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
       }
     }
 
-    for (Edge e : Lists.newArrayList(edges)) {
-      listener.onCalleeAdded(stmt, e.tgt());
+    for (Edge e : edges) {
+      if (e.tgt().isDefined()) {
+        listener.onCalleeAdded(stmt, e.tgt());
+      }
     }
 
     InvokeExpr ie = stmt.getInvokeExpr();

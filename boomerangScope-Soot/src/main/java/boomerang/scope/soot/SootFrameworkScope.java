@@ -25,10 +25,10 @@ public class SootFrameworkScope implements FrameworkScope {
   protected DataFlowScope dataFlowScope;
 
   public SootFrameworkScope(
-      Scene scene,
-      soot.jimple.toolkits.callgraph.CallGraph callGraph,
-      Collection<SootMethod> entryPoints,
-      DataFlowScope dataFlowScope) {
+      @Nonnull Scene scene,
+      @Nonnull soot.jimple.toolkits.callgraph.CallGraph callGraph,
+      @Nonnull Collection<SootMethod> entryPoints,
+      @Nonnull DataFlowScope dataFlowScope) {
     this.scene = scene;
 
     this.sootCallGraph = new SootCallGraph(callGraph, entryPoints);
@@ -49,7 +49,7 @@ public class SootFrameworkScope implements FrameworkScope {
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
     JimpleStaticFieldVal val = ((JimpleStaticFieldVal) fact);
     return ((JimpleField) val.field())
-        .getSootField().getDeclaringClass().getMethods().stream()
+        .getDelegate().getDeclaringClass().getMethods().stream()
             .filter(SootMethod::hasActiveBody)
             .map(JimpleMethod::of);
   }
@@ -57,12 +57,6 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public StaticFieldVal newStaticFieldVal(Field field, Method m) {
     return new JimpleStaticFieldVal((JimpleField) field, m);
-  }
-
-  @Nonnull
-  @Override
-  public Method resolveMethod(String signatureStr) {
-    return JimpleMethod.of(scene.getMethod(signatureStr));
   }
 
   @Override
@@ -73,15 +67,5 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public DataFlowScope getDataFlowScope() {
     return dataFlowScope;
-  }
-
-  @Override
-  public void updateDataFlowScope(DataFlowScope dataFlowScope) {
-    this.dataFlowScope = dataFlowScope;
-  }
-
-  @Override
-  public DataFlowScope createDataFlowScopeWithoutComplex() {
-    return SootDataFlowScopeUtil.excludeComplex();
   }
 }

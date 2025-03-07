@@ -15,16 +15,11 @@ import org.junit.Test;
 import test.core.AbstractBoomerangTest;
 
 public class NullAllocationConstructorTest extends AbstractBoomerangTest {
-  private class A {
-    B f = null;
-  }
 
-  private class B {}
+  private final String target = NullAllocationConstructorTarget.class.getName();
 
   @Test
   public void nullAllocationOfField() {
-    A a = new A();
-    B variable = a.f;
-    queryFor(variable);
+    analyze(target, testName.getMethodName());
   }
 }

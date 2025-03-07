@@ -128,11 +128,6 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public boolean isStringAllocation() {
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return true;
   }

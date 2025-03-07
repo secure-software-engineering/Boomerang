@@ -3,9 +3,12 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.Method;
 import boomerang.scope.Val;
 import boomerang.scope.ValWithFalseVariable;
+import java.util.Objects;
 import soot.Value;
 
+// TODO May be removed
 public class JimpleDoubleVal extends JimpleVal implements ValWithFalseVariable {
+
   private final Val falseVariable;
 
   public JimpleDoubleVal(Value v, Method m, Val instanceofValue) {
@@ -18,26 +21,21 @@ public class JimpleDoubleVal extends JimpleVal implements ValWithFalseVariable {
   }
 
   @Override
-  public String toString() {
-    return "Instanceof " + falseVariable + " " + super.toString();
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleDoubleVal that = (JimpleDoubleVal) o;
+    return Objects.equals(falseVariable, that.falseVariable);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((falseVariable == null) ? 0 : falseVariable.hashCode());
-    return result;
+    return Objects.hash(super.hashCode(), falseVariable);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleDoubleVal other = (JimpleDoubleVal) obj;
-    if (falseVariable == null) {
-      return other.falseVariable == null;
-    } else return falseVariable.equals(other.falseVariable);
+  public String toString() {
+    return "InstanceOf " + falseVariable + " " + super.toString();
   }
 }

@@ -14,9 +14,10 @@ package boomerang.scope;
 import de.fraunhofer.iem.Empty;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
+import java.util.Objects;
 
 public abstract class Statement implements Location {
-  // Wrapper for stmt so we know the method
+
   private static Statement epsilon;
   private final String rep;
   protected final Method method;
@@ -46,258 +47,211 @@ public abstract class Statement implements Location {
 
     @Override
     public Method getMethod() {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public boolean containsStaticFieldAccess() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean containsInvokeExpr() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public Field getWrittenField() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not a field write statement");
     }
 
     @Override
     public boolean isFieldWriteWithBase(Val base) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public Field getLoadedField() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not a field load statement");
     }
 
     @Override
     public boolean isFieldLoadWithBase(Val base) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isParameter(Val value) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean assignsValue(Val value) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isReturnOperator(Val val) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean uses(Val value) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isAssignStmt() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public Val getLeftOp() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not an assign statement");
     }
 
     @Override
     public Val getRightOp() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not an assign statement");
     }
 
     @Override
     public boolean isInstanceOfStatement(Val fact) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isCast() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public InvokeExpr getInvokeExpr() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement has no invoke expression");
     }
 
     @Override
     public boolean isReturnStmt() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isThrowStmt() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isIfStmt() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public IfStatement getIfStmt() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not an if statement");
     }
 
     @Override
     public Val getReturnOp() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not a return statement");
     }
 
     @Override
     public boolean isMultiArrayAllocation() {
-      // TODO Auto-generated method stub
-      return false;
-    }
-
-    @Override
-    public boolean isStringAllocation() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isFieldStore() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isArrayStore() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isArrayLoad() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isFieldLoad() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isIdentityStmt() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean killAtIfStmt(Val fact, Statement successor) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public Pair<Val, Field> getFieldStore() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not a field store statement");
     }
 
     @Override
     public Pair<Val, Field> getFieldLoad() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement is not a field load statement");
     }
 
     @Override
     public boolean isStaticFieldLoad() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public boolean isStaticFieldStore() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public StaticFieldVal getStaticField() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement has no static field");
     }
 
     @Override
     public boolean isPhiStatement() {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public Collection<Val> getPhiVals() {
-      return null;
+      throw new RuntimeException("Epsilon statement is not a phi statement");
     }
 
     @Override
     public Pair<Val, Integer> getArrayBase() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("Epsilon statement has no array base");
     }
 
     @Override
     public int getStartLineNumber() {
-      // TODO Auto-generated method stub
-      return 0;
+      return -1;
     }
 
     @Override
     public int getStartColumnNumber() {
-      // TODO Auto-generated method stub
-      return 0;
+      return -1;
     }
 
     @Override
     public int getEndColumnNumber() {
-      // TODO Auto-generated method stub
-      return 0;
+      return -1;
     }
 
     @Override
     public int getEndLineNumber() {
-      // TODO Auto-generated method stub
-      return 0;
+      return -1;
     }
 
     @Override
     public boolean isCatchStmt() {
-      // TODO Auto-generated method stub
       return false;
     }
 
@@ -310,11 +264,6 @@ public abstract class Statement implements Location {
     public boolean equals(Object obj) {
       return obj == this;
     }
-  }
-
-  @Override
-  public String toString() {
-    return rep;
   }
 
   public Method getMethod() {
@@ -415,8 +364,6 @@ public abstract class Statement implements Location {
 
   public abstract boolean isMultiArrayAllocation();
 
-  public abstract boolean isStringAllocation();
-
   public abstract boolean isFieldStore();
 
   public abstract boolean isArrayStore();
@@ -452,29 +399,6 @@ public abstract class Statement implements Location {
 
   public abstract Pair<Val, Integer> getArrayBase();
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((method == null) ? 0 : method.hashCode());
-    result = prime * result + ((rep == null) ? 0 : rep.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    Statement other = (Statement) obj;
-    if (method == null) {
-      if (other.method != null) return false;
-    } else if (!method.equals(other.method)) return false;
-    if (rep == null) {
-      return other.rep == null;
-    } else return rep.equals(other.rep);
-  }
-
   public abstract int getStartLineNumber();
 
   public abstract int getStartColumnNumber();
@@ -488,5 +412,23 @@ public abstract class Statement implements Location {
   @Override
   public boolean accepts(Location other) {
     return this.equals(other);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Statement statement = (Statement) o;
+    return Objects.equals(rep, statement.rep) && Objects.equals(method, statement.method);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(rep, method);
+  }
+
+  @Override
+  public String toString() {
+    return rep;
   }
 }

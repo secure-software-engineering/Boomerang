@@ -11,12 +11,17 @@ import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import soot.Local;
 import soot.SootMethod;
 import soot.util.Chain;
 
+/**
+ * Class that wraps a {@link SootMethod} with an existing body. All operations provide their
+ * corresponding information.
+ */
 public class JimpleMethod extends Method {
 
   private final SootMethod delegate;
@@ -24,13 +29,13 @@ public class JimpleMethod extends Method {
   protected static Interner<JimpleMethod> INTERNAL_POOL = Interners.newWeakInterner();
   protected ControlFlowGraph cfg;
   private List<Val> parameterLocalCache;
-  private Set<Val> localCache;
+  private Collection<Val> localCache;
 
-  protected JimpleMethod(SootMethod m) {
-    this.delegate = m;
-    if (!m.hasActiveBody()) {
+  protected JimpleMethod(SootMethod delegate) {
+    this.delegate = delegate;
+    if (!delegate.hasActiveBody()) {
       throw new RuntimeException(
-          "Building a Jimple method for " + m + " without active body present");
+          "Trying to build a Jimple method for " + delegate + " without active body present");
     }
   }
 
@@ -39,33 +44,11 @@ public class JimpleMethod extends Method {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((delegate == null) ? 0 : delegate.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleMethod other = (JimpleMethod) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
-  }
-
-  @Override
-  public String toString() {
-    return delegate != null ? delegate.toString() : "METHOD EPS";
-  }
-
   public boolean isStaticInitializer() {
     return delegate.isStaticInitializer();
   }
 
+  @Override
   public boolean isParameterLocal(Val val) {
     if (val.isStatic()) return false;
     if (!delegate.hasActiveBody()) {
@@ -91,10 +74,12 @@ public class JimpleMethod extends Method {
     return new JimpleType(delegate.getParameterType(index));
   }
 
+  @Override
   public Type getReturnType() {
     return new JimpleType(delegate.getReturnType());
   }
 
+  @Override
   public boolean isThisLocal(Val val) {
     if (val.isStatic()) return false;
     if (!delegate.hasActiveBody()) {
@@ -105,7 +90,8 @@ public class JimpleMethod extends Method {
     return parameterLocals.equals(val);
   }
 
-  public Set<Val> getLocals() {
+  @Override
+  public Collection<Val> getLocals() {
     if (localCache == null) {
       localCache = Sets.newHashSet();
       Chain<Local> locals = delegate.getActiveBody().getLocals();
@@ -116,10 +102,12 @@ public class JimpleMethod extends Method {
     return localCache;
   }
 
+  @Override
   public Val getThisLocal() {
     return new JimpleVal(delegate.getActiveBody().getThisLocal(), this);
   }
 
+  @Override
   public List<Val> getParameterLocals() {
     if (parameterLocalCache == null) {
       parameterLocalCache = Lists.newArrayList();
@@ -130,22 +118,32 @@ public class JimpleMethod extends Method {
     return parameterLocalCache;
   }
 
+  @Override
   public boolean isStatic() {
     return delegate.isStatic();
   }
 
-  public boolean isNative() {
-    return delegate.isNative();
+  @Override
+  public boolean isDefined() {
+    return true;
   }
 
+  @Override
+  public boolean isPhantom() {
+    return false;
+  }
+
+  @Override
   public List<Statement> getStatements() {
     return getControlFlowGraph().getStatements();
   }
 
+  @Override
   public WrappedClass getDeclaringClass() {
     return new JimpleWrappedClass(delegate.getDeclaringClass());
   }
 
+  @Override
   public ControlFlowGraph getControlFlowGraph() {
     if (cfg == null) {
       cfg = new JimpleControlFlowGraph(this);
@@ -153,14 +151,12 @@ public class JimpleMethod extends Method {
     return cfg;
   }
 
+  @Override
   public String getSubSignature() {
     return delegate.getSubSignature();
   }
 
-  public SootMethod getDelegate() {
-    return delegate;
-  }
-
+  @Override
   public String getName() {
     return delegate.getName();
   }
@@ -170,8 +166,25 @@ public class JimpleMethod extends Method {
     return delegate.isConstructor();
   }
 
+  public SootMethod getDelegate() {
+    return delegate;
+  }
+
   @Override
-  public boolean isPublic() {
-    return delegate.isPublic();
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleMethod that = (JimpleMethod) o;
+    return Objects.equals(delegate, that.delegate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(delegate);
+  }
+
+  @Override
+  public String toString() {
+    return delegate != null ? delegate.toString() : "METHOD_EPS";
   }
 }

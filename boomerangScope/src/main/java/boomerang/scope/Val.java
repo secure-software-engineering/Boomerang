@@ -11,7 +11,10 @@
  */
 package boomerang.scope;
 
+import java.util.Objects;
+
 public abstract class Val {
+
   protected final Method m;
   private final String rep;
   protected final ControlFlowGraph.Edge unbalancedStmt;
@@ -254,33 +257,6 @@ public abstract class Val {
 
   public abstract Type getClassConstantType();
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((m == null) ? 0 : m.hashCode());
-    result = prime * result + ((rep == null) ? 0 : rep.hashCode());
-    result = prime * result + ((unbalancedStmt == null) ? 0 : unbalancedStmt.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    Val other = (Val) obj;
-    if (m == null) {
-      if (other.m != null) return false;
-    } else if (!m.equals(other.m)) return false;
-    if (rep == null) {
-      if (other.rep != null) return false;
-    } else if (!rep.equals(other.rep)) return false;
-    if (unbalancedStmt == null) {
-      return other.unbalancedStmt == null;
-    } else return unbalancedStmt.equals(other.unbalancedStmt);
-  }
-
   public abstract Val withNewMethod(Method callee);
 
   public Val withSecondVal(Val leftOp) {
@@ -312,4 +288,19 @@ public abstract class Val {
   }
 
   public abstract String getVariableName();
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Val val = (Val) o;
+    return Objects.equals(m, val.m)
+        && Objects.equals(rep, val.rep)
+        && Objects.equals(unbalancedStmt, val.unbalancedStmt);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m, rep, unbalancedStmt);
+  }
 }

@@ -4,7 +4,7 @@ public interface IfStatement {
   enum Evaluation {
     TRUE,
     FALSE,
-    UNKOWN
+    UNKNOWN
   }
 
   Statement getTarget();

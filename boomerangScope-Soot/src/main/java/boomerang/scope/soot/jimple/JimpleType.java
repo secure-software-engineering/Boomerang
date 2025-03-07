@@ -6,6 +6,7 @@ import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import soot.ArrayType;
 import soot.BooleanType;
@@ -23,10 +24,12 @@ public class JimpleType implements Type {
     this.delegate = type;
   }
 
+  @Override
   public boolean isNullType() {
     return delegate instanceof NullType;
   }
 
+  @Override
   public boolean isRefType() {
     return delegate instanceof RefType;
   }
@@ -36,14 +39,17 @@ public class JimpleType implements Type {
     return delegate instanceof BooleanType;
   }
 
+  @Override
   public boolean isArrayType() {
     return delegate instanceof ArrayType;
   }
 
+  @Override
   public Type getArrayBaseType() {
     return new JimpleType(((ArrayType) delegate).baseType);
   }
 
+  @Override
   public WrappedClass getWrappedClass() {
     return new JimpleWrappedClass(((RefType) delegate).getSootClass());
   }
@@ -126,30 +132,7 @@ public class JimpleType implements Type {
     return hierarchy.contains(thisClass);
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((delegate == null) ? 0 : delegate.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleType other = (JimpleType) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
-  }
-
-  @Override
-  public String toString() {
-    return delegate.toString();
-  }
-
+  // TODO Move to SootUtils
   private Collection<SootClass> getFullHierarchy(SootClass sourceClass, Set<SootClass> visited) {
     Set<SootClass> result = new HashSet<>();
 
@@ -185,5 +168,23 @@ public class JimpleType implements Type {
     }
 
     return result;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleType that = (JimpleType) o;
+    return Objects.equals(delegate, that.delegate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(delegate);
+  }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
   }
 }

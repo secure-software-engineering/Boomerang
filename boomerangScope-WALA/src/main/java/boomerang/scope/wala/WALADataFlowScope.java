@@ -34,12 +34,12 @@ public class WALADataFlowScope {
       new DataFlowScope() {
         @Override
         public boolean isExcluded(DeclaredMethod method) {
-          return !method.getDeclaringClass().isApplicationClass() || method.isNative();
+          return !method.getDeclaringClass().isApplicationClass();
         }
 
         @Override
         public boolean isExcluded(Method method) {
-          return !method.getDeclaringClass().isApplicationClass() || method.isNative();
+          return !method.getDeclaringClass().isApplicationClass() || method.isPhantom();
         }
       };
 }

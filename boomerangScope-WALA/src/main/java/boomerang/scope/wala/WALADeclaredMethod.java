@@ -13,7 +13,6 @@ package boomerang.scope.wala;
 
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
-import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import com.ibm.wala.types.MethodReference;
@@ -22,17 +21,10 @@ import java.util.List;
 public class WALADeclaredMethod extends DeclaredMethod {
 
   private final MethodReference delegate;
-  private final boolean isStatic;
 
   public WALADeclaredMethod(InvokeExpr inv, MethodReference ref) {
     super(inv);
     this.delegate = ref;
-    this.isStatic = inv.isStaticInvokeExpr();
-  }
-
-  @Override
-  public boolean isNative() {
-    return false;
   }
 
   @Override
@@ -46,11 +38,6 @@ public class WALADeclaredMethod extends DeclaredMethod {
   }
 
   @Override
-  public boolean isStatic() {
-    return isStatic;
-  }
-
-  @Override
   public boolean isConstructor() {
     return delegate.isInit();
   }
@@ -58,11 +45,6 @@ public class WALADeclaredMethod extends DeclaredMethod {
   @Override
   public String getSignature() {
     return delegate.getSignature();
-  }
-
-  @Override
-  public Method getCalledMethod() {
-    throw new RuntimeException("Not implemented");
   }
 
   @Override

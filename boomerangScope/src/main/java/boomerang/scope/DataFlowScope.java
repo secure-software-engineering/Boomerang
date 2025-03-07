@@ -2,20 +2,22 @@ package boomerang.scope;
 
 public interface DataFlowScope {
 
-  DataFlowScope INCLUDE_ALL =
+  boolean isExcluded(DeclaredMethod method);
+
+  boolean isExcluded(Method method);
+
+  /** Basic dataflow scope that excludes all methods from classes that are not loaded */
+  DataFlowScope EXCLUDE_PHANTOM_CLASSES =
       new DataFlowScope() {
+
         @Override
         public boolean isExcluded(DeclaredMethod method) {
-          return false;
+          return method.getDeclaringClass().isPhantom();
         }
 
         @Override
         public boolean isExcluded(Method method) {
-          return false;
+          return method.getDeclaringClass().isPhantom();
         }
       };
-
-  boolean isExcluded(DeclaredMethod method);
-
-  boolean isExcluded(Method method);
 }

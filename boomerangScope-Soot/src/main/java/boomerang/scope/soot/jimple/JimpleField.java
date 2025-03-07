@@ -12,46 +12,42 @@
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.Field;
+import java.util.Objects;
 import soot.SootField;
 
 public class JimpleField extends Field {
+
   private final SootField delegate;
 
   public JimpleField(SootField delegate) {
-    super();
     this.delegate = delegate;
-  }
-
-  @Override
-  public String toString() {
-    return delegate.getName();
-  }
-
-  public SootField getSootField() {
-    return this.delegate;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((delegate == null) ? 0 : delegate.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleField other = (JimpleField) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
   }
 
   @Override
   public boolean isInnerClassField() {
     return this.delegate.getName().contains("$");
+  }
+
+  public SootField getDelegate() {
+    return this.delegate;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleField that = (JimpleField) o;
+    return Objects.equals(delegate, that.delegate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), delegate);
+  }
+
+  @Override
+  public String toString() {
+    return delegate.getName();
   }
 }

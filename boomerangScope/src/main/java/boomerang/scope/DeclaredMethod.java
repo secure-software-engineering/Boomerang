@@ -1,6 +1,7 @@
 package boomerang.scope;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class DeclaredMethod {
 
@@ -10,19 +11,13 @@ public abstract class DeclaredMethod {
     this.inv = inv;
   }
 
-  public abstract boolean isNative();
-
   public abstract String getSubSignature();
 
   public abstract String getName();
 
-  public abstract boolean isStatic();
-
   public abstract boolean isConstructor();
 
   public abstract String getSignature();
-
-  public abstract Method getCalledMethod();
 
   public abstract WrappedClass getDeclaringClass();
 
@@ -34,5 +29,23 @@ public abstract class DeclaredMethod {
 
   public InvokeExpr getInvokeExpr() {
     return inv;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    DeclaredMethod that = (DeclaredMethod) o;
+    return Objects.equals(inv, that.inv);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(inv);
+  }
+
+  @Override
+  public String toString() {
+    return inv.toString();
   }
 }

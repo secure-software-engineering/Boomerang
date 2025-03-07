@@ -5,9 +5,9 @@ import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
@@ -15,14 +15,14 @@ import sootup.java.core.types.JavaClassType;
 public class JimpleUpWrappedClass implements WrappedClass {
 
   private final JavaSootClass delegate;
-  private Set<Method> methodsCache;
+  private Collection<Method> methodsCache;
 
   public JimpleUpWrappedClass(JavaSootClass delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public Set<Method> getMethods() {
+  public Collection<Method> getMethods() {
     if (methodsCache == null) {
       methodsCache = new HashSet<>();
 
@@ -67,12 +67,12 @@ public class JimpleUpWrappedClass implements WrappedClass {
   }
 
   @Override
-  public String getName() {
-    return delegate.getName();
+  public boolean isPhantom() {
+    // TODO May change
+    return false;
   }
 
-  @Override
-  public Object getDelegate() {
+  public JavaSootClass getDelegate() {
     return delegate;
   }
 

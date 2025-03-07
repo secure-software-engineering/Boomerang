@@ -11,7 +11,6 @@ import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.base.Joiner;
 import java.util.Arrays;
 import java.util.Collection;
-import sootup.core.jimple.common.constant.StringConstant;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JCaughtExceptionRef;
@@ -205,12 +204,6 @@ public class JimpleUpStatement extends Statement {
   public boolean isMultiArrayAllocation() {
     return (delegate instanceof JAssignStmt)
         && ((JAssignStmt) delegate).getRightOp() instanceof JNewMultiArrayExpr;
-  }
-
-  @Override
-  public boolean isStringAllocation() {
-    return delegate instanceof JAssignStmt
-        && ((JAssignStmt) delegate).getRightOp() instanceof StringConstant;
   }
 
   @Override

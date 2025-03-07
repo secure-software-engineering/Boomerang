@@ -1,7 +1,5 @@
 package boomerang.scope.sootup;
 
-import static boomerang.scope.sootup.SootUpDataFlowScopeUtil.excludeComplex;
-
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.Field;
@@ -90,13 +88,6 @@ public class SootUpFrameworkScope implements FrameworkScope {
     return new JimpleUpStaticFieldVal((JimpleUpField) field, m);
   }
 
-  @Nonnull
-  @Override
-  public Method resolveMethod(String signatureStr) {
-    return JimpleUpMethod.of(
-        view.getMethod(view.getIdentifierFactory().parseMethodSignature(signatureStr)).get());
-  }
-
   @Override
   public CallGraph getCallGraph() {
     return sootUpCallGraph;
@@ -107,20 +98,10 @@ public class SootUpFrameworkScope implements FrameworkScope {
     return dataflowScope;
   }
 
-  @Override
-  public void updateDataFlowScope(DataFlowScope dataFlowScope) {
-    this.dataflowScope = dataFlowScope;
-  }
-
-  @Override
-  public DataFlowScope createDataFlowScopeWithoutComplex() {
-    return excludeComplex(this);
-  }
-
   // ---
 
-  private static final String CONSTRUCTOR_NAME = "<init>";
-  private static final String STATIC_INITIALIZER_NAME = "<clinit>";
+  public static final String CONSTRUCTOR_NAME = "<init>";
+  public static final String STATIC_INITIALIZER_NAME = "<clinit>";
 
   public JavaView getView() {
     return view;

@@ -4,7 +4,6 @@ import boomerang.BackwardQuery;
 import boomerang.Boomerang;
 import boomerang.ForwardQuery;
 import boomerang.Query;
-import boomerang.WeightedBoomerang;
 import boomerang.WholeProgramBoomerang;
 import boomerang.options.BoomerangOptions;
 import boomerang.options.IntAndStringAllocationSite;
@@ -14,6 +13,7 @@ import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.Field;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
@@ -23,14 +23,15 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.math.BigInteger;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Before;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.OneWeightFunctions;
@@ -38,14 +39,18 @@ import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
 import sync.pds.solver.nodes.SingleNode;
-import test.AbstractTestingFramework;
-import test.FrameworkScopeFactory;
+import test.TestingFramework;
+import test.core.selfrunning.AllocatedObject;
+import test.core.selfrunning.NoAllocatedObject;
+import test.setup.MethodWrapper;
 import wpds.impl.NoWeight;
 import wpds.impl.Transition;
 import wpds.impl.WeightedPAutomaton;
 import wpds.interfaces.WPAStateListener;
 
-public class AbstractBoomerangTest extends AbstractTestingFramework {
+public class AbstractBoomerangTest extends TestingFramework {
+
+  @Rule public TestName testName = new TestName();
 
   /**
    * Fails the test cases, when any instance of the interface {@link
@@ -87,28 +92,19 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
     return 1;
   }
 
-  @Override
-  protected void initializeWithEntryPoint() {
-    frameworkScope =
-        FrameworkScopeFactory.init(
-            buildClassPath(),
-            getTestCaseClassName(),
-            testMethodName.getMethodName(),
-            getIncludedPackagesList(),
-            getExludedPackageList());
+  protected void analyze(String targetClassName, String targetMethodName) {
+    analyze(targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
   }
 
-  @Override
-  protected void analyze() {
-    analyzeWithCallGraph();
+  protected void analyze(
+      String targetClassName, String targetMethodName, DataFlowScope dataFlowScope) {
+    MethodWrapper methodWrapper = new MethodWrapper(targetClassName, targetMethodName);
+    FrameworkScope frameworkScope = super.getFrameworkScope(methodWrapper, dataFlowScope);
+
+    analyzeWithCallGraph(frameworkScope);
   }
 
-  @Before
-  public void beforeTestCaseExecution() {
-    super.beforeTestCaseExecution();
-  }
-
-  private void analyzeWithCallGraph() {
+  private void analyzeWithCallGraph(FrameworkScope frameworkScope) {
     CallGraph callGraph = frameworkScope.getCallGraph();
     queryDetector = new QueryForCallSiteDetector(callGraph);
     queryForCallSites = queryDetector.computeSeeds();
@@ -118,36 +114,34 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
       expectedAllocationSites = an.computeSeeds();
     } else {
       Preanalysis an =
-          new Preanalysis(callGraph, new AllocationSiteOf("test.core.selfrunning.AllocatedObject"));
+          new Preanalysis(callGraph, new AllocationSiteOf(AllocatedObject.class.getName()));
       expectedAllocationSites = an.computeSeeds();
-      an =
-          new Preanalysis(
-              callGraph, new AllocationSiteOf("test.core.selfrunning.NoAllocatedObject"));
+      an = new Preanalysis(callGraph, new AllocationSiteOf(NoAllocatedObject.class.getName()));
       explicitlyUnexpectedAllocationSites =
-          an.computeSeeds().stream().map(x -> x.asNode()).collect(Collectors.toList());
+          an.computeSeeds().stream().map(Query::asNode).collect(Collectors.toList());
     }
     for (int i = 0; i < getIterations(); i++) {
       for (AnalysisMode analysis : getAnalyses()) {
         switch (analysis) {
           case WholeProgram:
-            if (!queryDetector.integerQueries) runWholeProgram();
+            if (!queryDetector.integerQueries) runWholeProgram(frameworkScope);
             break;
           case DemandDrivenBackward:
-            runDemandDrivenBackward();
+            runDemandDrivenBackward(frameworkScope);
             break;
         }
       }
       if (queryDetector.resultsMustNotBeEmpty) return;
       if (!unsoundErrors.isEmpty()) {
-        throw new RuntimeException(Joiner.on("\n").join(unsoundErrors));
+        Assert.fail(Joiner.on("\n").join(unsoundErrors));
       }
       if (!imprecisionErrors.isEmpty() && FAIL_ON_IMPRECISE) {
-        throw new AssertionError(Joiner.on("\n").join(imprecisionErrors));
+        Assert.fail(Joiner.on("\n").join(imprecisionErrors));
       }
     }
   }
 
-  private void runWholeProgram() {
+  private void runWholeProgram(FrameworkScope frameworkScope) {
     final Set<Node<Edge, Val>> results = Sets.newHashSet();
     BoomerangOptions options =
         BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();
@@ -209,7 +203,7 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
       for (Node<Edge, Val> s : solvers.get(q).getReachedStates()) {
         if (s.stmt().getMethod().toString().contains("unreachable")
             && !q.toString().contains("dummyClass.main")) {
-          throw new RuntimeException("Propagation within unreachable method found: " + q);
+          Assert.fail("Propagation within unreachable method found: " + q);
         }
       }
     }
@@ -217,9 +211,9 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
     compareQuery(expectedAllocationSites, results, AnalysisMode.WholeProgram);
   }
 
-  private void runDemandDrivenBackward() {
+  private void runDemandDrivenBackward(FrameworkScope frameworkScope) {
     // Run backward analysis
-    Set<Node<Edge, Val>> backwardResults = runQuery(queryForCallSites);
+    Set<Node<Edge, Val>> backwardResults = runQuery(frameworkScope, queryForCallSites);
     if (queryDetector.integerQueries) {
       compareIntegerResults(backwardResults, AnalysisMode.DemandDrivenBackward);
     } else {
@@ -248,7 +242,9 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
       if (!expectedResults.isEmpty()) {
         unsoundErrors.add(new Error(analysis + " Unsound results!"));
       }
-      if (imprecise) imprecisionErrors.add(new Error(analysis + " Imprecise results!"));
+      if (imprecise) {
+        imprecisionErrors.add(new Error(analysis + " Imprecise results!"));
+      }
     }
   }
 
@@ -257,12 +253,12 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
     return Lists.newArrayList(split);
   }
 
-  private Set<Node<Edge, Val>> runQuery(Collection<? extends Query> queries) {
+  private Set<Node<Edge, Val>> runQuery(
+      FrameworkScope frameworkScope, Collection<? extends Query> queries) {
     final Set<Node<Edge, Val>> results = Sets.newHashSet();
 
     for (final Query query : queries) {
       BoomerangOptions options = createBoomerangOptions();
-      frameworkScope.updateDataFlowScope(getDataFlowScope());
       Boomerang solver = new Boomerang(frameworkScope, options);
 
       if (query instanceof BackwardQuery) {
@@ -277,7 +273,7 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
 
           for (Node<Edge, Val> s : solver.getSolvers().get(q).getReachedStates()) {
             if (s.stmt().getMethod().toString().contains("unreachable")) {
-              throw new RuntimeException("Propagation within unreachable method found.");
+              Assert.fail("Propagation within unreachable method found.");
             }
           }
         }
@@ -287,10 +283,6 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
       }
     }
     return results;
-  }
-
-  protected DataFlowScope getDataFlowScope() {
-    return frameworkScope.getDataFlowScope();
   }
 
   protected BoomerangOptions createBoomerangOptions() {
@@ -306,7 +298,9 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
       Collection<? extends Node<Edge, Val>> results,
       AnalysisMode analysis) {
     LOGGER.info("Boomerang Results: {}", results);
-    LOGGER.info("Expected Results: {}", expectedResults);
+    LOGGER.info(
+        "Expected Results: {}",
+        expectedResults.stream().map(Query::var).collect(Collectors.toList()));
     Collection<Node<Edge, Val>> falseNegativeAllocationSites = new HashSet<>();
     for (Query res : expectedResults) {
       if (!results.contains(res.asNode())) falseNegativeAllocationSites.add(res.asNode());
@@ -328,8 +322,7 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
       imprecisionErrors.add(new Error(analysis + " Imprecise results for:" + answer));
 
     if (queryDetector.resultsMustNotBeEmpty && results.isEmpty()) {
-      throw new RuntimeException(
-          "Expected some results, but Boomerang returned no allocation sites.");
+      Assert.fail("Expected some results, but Boomerang returned no allocation sites.");
     }
 
     for (Node<Edge, Val> r : results) {
@@ -343,48 +336,11 @@ public class AbstractBoomerangTest extends AbstractTestingFramework {
     HashSet<AccessPath> expected = Sets.newHashSet(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
-      throw new RuntimeException("Did not find all access path! " + expected);
+      Assert.fail("Did not find all access path! " + expected);
     }
   }
 
-  protected Collection<String> errorOnVisitMethod() {
-    return Lists.newLinkedList();
+  protected DataFlowScope getDataFlowScope() {
+    return null;
   }
-
-  protected boolean includeJDK() {
-    return true;
-  }
-
-  /**
-   * The methods parameter describes the variable that a query is issued for. Note: We misuse
-   * the @Deprecated annotation to highlight the method in the Code.
-   */
-  public static void queryFor(Object variable) {}
-
-  public static void accessPathQueryFor(Object variable, String aliases) {}
-
-  protected void queryForAndNotEmpty(Object variable) {}
-
-  public static void intQueryFor(int variable, String value) {}
-
-  public static void intQueryFor(BigInteger variable, String value) {}
-
-  /**
-   * A call to this method flags the object as at the call statement as not reachable by the
-   * analysis.
-   *
-   * @param variable
-   */
-  protected void unreachable(Object variable) {}
-
-  /**
-   * This method can be used in test cases to create branching. It is not optimized away.
-   *
-   * @return
-   */
-  protected boolean staticallyUnknown() {
-    return true;
-  }
-
-  protected void setupSolver(WeightedBoomerang<NoWeight> solver) {}
 }

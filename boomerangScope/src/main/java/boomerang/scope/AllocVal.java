@@ -1,178 +1,165 @@
 package boomerang.scope;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import java.util.Objects;
 
 public class AllocVal extends Val {
 
   private final Val delegate;
-  private final Val allocationVal;
   private final Statement allocStatement;
+  private final Val allocationVal;
 
   public AllocVal(Val delegate, Statement allocStatement, Val allocationVal) {
-    super();
     this.delegate = delegate;
-    this.allocationVal = allocationVal;
     this.allocStatement = allocStatement;
+    this.allocationVal = allocationVal;
   }
 
-  public Type getType() {
-    return delegate.getType();
-  }
-
-  public Method m() {
-    return delegate.m();
-  }
-
-  public String toString() {
-    if (allocStatement.isAssignStmt()) {
-      if (allocStatement.getRightOp().isIntConstant()) {
-        return delegate + " Value (int): " + allocStatement.getRightOp().getIntValue();
-      }
-      if (allocStatement.getRightOp().isStringConstant()) {
-        return delegate + " Value (String): " + allocStatement.getRightOp().getStringValue();
-      }
-    }
-    if (delegate == null) return "";
-    return delegate.toString();
-  }
-
-  public boolean isStatic() {
-    return delegate.isStatic();
-  }
-
-  public boolean isNewExpr() {
-    return delegate.isNewExpr();
-  }
-
-  public Type getNewExprType() {
-    return delegate.getNewExprType();
-  }
-
-  public boolean isUnbalanced() {
-    return delegate.isUnbalanced();
-  }
-
-  public Val asUnbalanced(Edge stmt) {
-    return delegate.asUnbalanced(stmt);
-  }
-
-  public boolean isLocal() {
-    return delegate.isLocal();
-  }
-
-  public boolean isArrayAllocationVal() {
-    return delegate.isArrayAllocationVal();
-  }
-
-  public Val getArrayAllocationSize() {
-    return delegate.getArrayAllocationSize();
-  }
-
-  public boolean isNull() {
-    return allocationVal.isNull();
-  }
-
-  public boolean isStringConstant() {
-    return delegate.isStringConstant();
-  }
-
-  public String getStringValue() {
-    return delegate.getStringValue();
-  }
-
-  public boolean isStringBufferOrBuilder() {
-    return delegate.isStringBufferOrBuilder();
-  }
-
-  public boolean isThrowableAllocationType() {
-    return delegate.isThrowableAllocationType();
-  }
-
-  public boolean isCast() {
-    return delegate.isCast();
-  }
-
-  public Val getCastOp() {
-    return delegate.getCastOp();
-  }
-
-  public boolean isArrayRef() {
-    return delegate.isArrayRef();
-  }
-
-  public boolean isInstanceOfExpr() {
-    return delegate.isInstanceOfExpr();
-  }
-
-  public Val getInstanceOfOp() {
-    return delegate.getInstanceOfOp();
-  }
-
-  public boolean isLengthExpr() {
-    return delegate.isLengthExpr();
-  }
-
-  public Val getLengthOp() {
-    return delegate.getLengthOp();
-  }
-
-  public boolean isIntConstant() {
-    return delegate.isIntConstant();
-  }
-
-  public boolean isClassConstant() {
-    return delegate.isClassConstant();
-  }
-
-  public Type getClassConstantType() {
-    return delegate.getClassConstantType();
-  }
-
-  public Val withNewMethod(Method callee) {
-    return delegate.withNewMethod(callee);
-  }
-
-  public Val withSecondVal(Val leftOp) {
-    return delegate.withSecondVal(leftOp);
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((allocStatement == null) ? 0 : allocStatement.hashCode());
-    result = prime * result + ((allocationVal == null) ? 0 : allocationVal.hashCode());
-    result = prime * result + ((delegate == null) ? 0 : delegate.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    AllocVal other = (AllocVal) obj;
-    if (allocStatement == null) {
-      if (other.allocStatement != null) return false;
-    } else if (!allocStatement.equals(other.allocStatement)) return false;
-    if (allocationVal == null) {
-      if (other.allocationVal != null) return false;
-    } else if (!allocationVal.equals(other.allocationVal)) return false;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
-  }
-
-  public Val getAllocVal() {
-    return allocationVal;
+  public Val getDelegate() {
+    return delegate;
   }
 
   public Statement getAllocStatement() {
     return allocStatement;
   }
 
-  public Val getDelegate() {
-    return delegate;
+  public Val getAllocVal() {
+    return allocationVal;
+  }
+
+  @Override
+  public Type getType() {
+    return delegate.getType();
+  }
+
+  @Override
+  public Method m() {
+    return delegate.m();
+  }
+
+  @Override
+  public boolean isStatic() {
+    return delegate.isStatic();
+  }
+
+  @Override
+  public boolean isNewExpr() {
+    return delegate.isNewExpr();
+  }
+
+  @Override
+  public Type getNewExprType() {
+    return delegate.getNewExprType();
+  }
+
+  @Override
+  public boolean isUnbalanced() {
+    return delegate.isUnbalanced();
+  }
+
+  @Override
+  public Val asUnbalanced(Edge stmt) {
+    return delegate.asUnbalanced(stmt);
+  }
+
+  @Override
+  public boolean isLocal() {
+    return delegate.isLocal();
+  }
+
+  @Override
+  public boolean isArrayAllocationVal() {
+    return delegate.isArrayAllocationVal();
+  }
+
+  @Override
+  public Val getArrayAllocationSize() {
+    return delegate.getArrayAllocationSize();
+  }
+
+  @Override
+  public boolean isNull() {
+    return allocationVal.isNull();
+  }
+
+  @Override
+  public boolean isStringConstant() {
+    return delegate.isStringConstant();
+  }
+
+  @Override
+  public String getStringValue() {
+    return delegate.getStringValue();
+  }
+
+  @Override
+  public boolean isStringBufferOrBuilder() {
+    return delegate.isStringBufferOrBuilder();
+  }
+
+  @Override
+  public boolean isThrowableAllocationType() {
+    return delegate.isThrowableAllocationType();
+  }
+
+  @Override
+  public boolean isCast() {
+    return delegate.isCast();
+  }
+
+  @Override
+  public Val getCastOp() {
+    return delegate.getCastOp();
+  }
+
+  @Override
+  public boolean isArrayRef() {
+    return delegate.isArrayRef();
+  }
+
+  @Override
+  public boolean isInstanceOfExpr() {
+    return delegate.isInstanceOfExpr();
+  }
+
+  @Override
+  public Val getInstanceOfOp() {
+    return delegate.getInstanceOfOp();
+  }
+
+  @Override
+  public boolean isLengthExpr() {
+    return delegate.isLengthExpr();
+  }
+
+  @Override
+  public Val getLengthOp() {
+    return delegate.getLengthOp();
+  }
+
+  @Override
+  public boolean isIntConstant() {
+    return delegate.isIntConstant();
+  }
+
+  @Override
+  public boolean isClassConstant() {
+    return delegate.isClassConstant();
+  }
+
+  @Override
+  public Type getClassConstantType() {
+    return delegate.getClassConstantType();
+  }
+
+  @Override
+  public Val withNewMethod(Method callee) {
+    return delegate.withNewMethod(callee);
+  }
+
+  @Override
+  public Val withSecondVal(Val leftOp) {
+    return delegate.withSecondVal(leftOp);
   }
 
   @Override
@@ -198,5 +185,33 @@ public class AllocVal extends Val {
   @Override
   public String getVariableName() {
     return delegate.getVariableName();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    AllocVal allocVal = (AllocVal) o;
+    return Objects.equals(delegate, allocVal.getDelegate())
+        && Objects.equals(allocStatement, allocVal.getAllocStatement())
+        && Objects.equals(allocationVal, allocVal.getAllocVal());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), delegate, allocStatement, allocationVal);
+  }
+
+  @Override
+  public String toString() {
+    return "AllocVal{"
+        + "delegate="
+        + delegate
+        + ", allocStatement="
+        + allocStatement
+        + ", allocationVal="
+        + allocationVal
+        + '}';
   }
 }

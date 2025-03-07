@@ -1,10 +1,10 @@
 package boomerang.scope;
 
-import java.util.Set;
+import java.util.Collection;
 
 public interface WrappedClass {
 
-  Set<Method> getMethods();
+  Collection<Method> getMethods();
 
   boolean hasSuperclass();
 
@@ -16,7 +16,5 @@ public interface WrappedClass {
 
   String getFullyQualifiedName();
 
-  String getName();
-
-  Object getDelegate();
+  boolean isPhantom();
 }

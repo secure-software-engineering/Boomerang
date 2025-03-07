@@ -81,7 +81,7 @@ public class JimpleUpIfStatement implements IfStatement {
       }
     }
 
-    return Evaluation.UNKOWN;
+    return Evaluation.UNKNOWN;
   }
 
   @Override

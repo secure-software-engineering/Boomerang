@@ -50,7 +50,7 @@ public class WALAIfStatement implements IfStatement {
       }
     }
 
-    return Evaluation.UNKOWN;
+    return Evaluation.UNKNOWN;
   }
 
   @Override

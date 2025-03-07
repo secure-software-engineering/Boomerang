@@ -23,13 +23,12 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
 public class URLConnStateMachine extends TypeStateMachineWeightFunctions {
 
-  private static final String CONNECT_METHOD = ".* connect.*";
+  private static final String CONNECT_METHOD = ".*connect.*";
   private static final String TYPE = "java.net.URLConnection";
-  private static final String ILLEGAL_OPERTIONS =
-      ".* (setDoInput|setDoOutput|setAllowUserInteraction|setUseCaches|setIfModifiedSince|setRequestProperty|addRequestProperty|getRequestProperty|getRequestProperties).*";
+  private static final String ILLEGAL_OPERATIONS =
+      ".*(setDoInput|setDoOutput|setAllowUserInteraction|setUseCaches|setIfModifiedSince|setRequestProperty|addRequestProperty|getRequestProperty|getRequestProperties).*";
 
   public enum States implements State {
-    NONE,
     INIT,
     CONNECTED,
     ERROR;
@@ -41,22 +40,25 @@ public class URLConnStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CONNECTED;
     }
   }
 
   public URLConnStateMachine() {
     addTransition(
         new MatcherTransition(
-            States.CONNECTED, ILLEGAL_OPERTIONS, Parameter.This, States.ERROR, Type.OnCall));
+            States.INIT, CONNECT_METHOD, Parameter.This, States.CONNECTED, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.ERROR, ILLEGAL_OPERTIONS, Parameter.This, States.ERROR, Type.OnCall));
+            States.CONNECTED, ILLEGAL_OPERATIONS, Parameter.This, States.ERROR, Type.OnCall));
+    addTransition(
+        new MatcherTransition(
+            States.ERROR, ILLEGAL_OPERATIONS, Parameter.This, States.ERROR, Type.OnCall));
   }
 
   @Override

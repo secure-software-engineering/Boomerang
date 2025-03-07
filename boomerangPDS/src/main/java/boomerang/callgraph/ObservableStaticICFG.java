@@ -39,9 +39,11 @@ public class ObservableStaticICFG implements ObservableICFG<Statement, Method> {
       }
     }
     for (CallGraph.Edge e : edges) {
-      listener.onCalleeAdded(listener.getObservedCaller(), e.tgt());
+      if (e.tgt().isDefined()) {
+        listener.onCalleeAdded(listener.getObservedCaller(), e.tgt());
+      }
     }
-    if (edges.size() == 0) {
+    if (edges.isEmpty()) {
       listener.onNoCalleeFound();
     }
   }

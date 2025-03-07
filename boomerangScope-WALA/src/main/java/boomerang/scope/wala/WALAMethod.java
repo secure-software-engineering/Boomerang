@@ -120,8 +120,13 @@ public class WALAMethod extends Method {
   }
 
   @Override
-  public boolean isNative() {
-    return delegate.isNative();
+  public boolean isDefined() {
+    return true;
+  }
+
+  @Override
+  public boolean isPhantom() {
+    return false;
   }
 
   @Override
@@ -188,11 +193,6 @@ public class WALAMethod extends Method {
   @Override
   public boolean isConstructor() {
     return delegate.isInit();
-  }
-
-  @Override
-  public boolean isPublic() {
-    return delegate.isPublic();
   }
 
   public Statement getBranchTarget(int target) {

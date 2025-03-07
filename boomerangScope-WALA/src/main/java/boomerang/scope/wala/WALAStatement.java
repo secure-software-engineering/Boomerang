@@ -273,12 +273,6 @@ public class WALAStatement extends Statement {
   }
 
   @Override
-  public boolean isStringAllocation() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return delegate instanceof SSAPutInstruction && !((SSAPutInstruction) delegate).isStatic();
   }

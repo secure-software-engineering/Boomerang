@@ -11,13 +11,14 @@
  */
 package boomerang.scope.soot.jimple;
 
-import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Field;
 import boomerang.scope.Method;
 import boomerang.scope.Pair;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import java.util.Objects;
 
 public class JimpleStaticFieldVal extends StaticFieldVal {
 
@@ -27,7 +28,7 @@ public class JimpleStaticFieldVal extends StaticFieldVal {
     this(field, m, null);
   }
 
-  private JimpleStaticFieldVal(JimpleField field, Method m, Edge unbalanced) {
+  private JimpleStaticFieldVal(JimpleField field, Method m, ControlFlowGraph.Edge unbalanced) {
     super(m, unbalanced);
     this.field = field;
   }
@@ -37,22 +38,18 @@ public class JimpleStaticFieldVal extends StaticFieldVal {
     return true;
   }
 
-  public String toString() {
-    return "StaticField: " + field + m;
-  }
-
   public Field field() {
     return field;
   }
 
   @Override
-  public Val asUnbalanced(Edge stmt) {
+  public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
     return new JimpleStaticFieldVal(field, m, stmt);
   }
 
   @Override
   public Type getType() {
-    return new JimpleType(field.getSootField().getType());
+    return new JimpleType(field.getDelegate().getType());
   }
 
   @Override
@@ -161,25 +158,6 @@ public class JimpleStaticFieldVal extends StaticFieldVal {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((field == null) ? 0 : field.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleStaticFieldVal other = (JimpleStaticFieldVal) obj;
-    if (field == null) {
-      return other.field == null;
-    } else return field.equals(other.field);
-  }
-
-  @Override
   public boolean isLongConstant() {
     return false;
   }
@@ -202,5 +180,24 @@ public class JimpleStaticFieldVal extends StaticFieldVal {
   @Override
   public String getVariableName() {
     return toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleStaticFieldVal that = (JimpleStaticFieldVal) o;
+    return Objects.equals(field, that.field);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), field);
+  }
+
+  @Override
+  public String toString() {
+    return "StaticField: " + field;
   }
 }

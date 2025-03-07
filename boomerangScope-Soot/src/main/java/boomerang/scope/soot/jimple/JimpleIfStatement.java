@@ -4,6 +4,7 @@ import boomerang.scope.IfStatement;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import java.util.Objects;
 import soot.Value;
 import soot.jimple.ConditionExpr;
 import soot.jimple.EqExpr;
@@ -68,7 +69,7 @@ public class JimpleIfStatement implements IfStatement {
         return Evaluation.TRUE;
       }
     }
-    return Evaluation.UNKOWN;
+    return Evaluation.UNKNOWN;
   }
 
   @Override
@@ -80,5 +81,18 @@ public class JimpleIfStatement implements IfStatement {
       return val.equals(new JimpleVal(op1, method)) || val.equals(new JimpleVal(op2, method));
     }
     return false;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleIfStatement that = (JimpleIfStatement) o;
+    return Objects.equals(delegate, that.delegate) && Objects.equals(method, that.method);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(delegate, method);
   }
 }

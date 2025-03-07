@@ -48,6 +48,7 @@ public abstract class AnalysisScope {
           Collection<CallGraph.Edge> edgesOutOf = cg.edgesOutOf(u);
           for (CallGraph.Edge e : edgesOutOf) {
             Method tgt = e.tgt();
+            if (tgt.isPhantom()) continue;
             if (!scanLibraryClasses && !tgt.getDeclaringClass().isApplicationClass()) continue;
 
             if (!processed.contains(tgt)) {

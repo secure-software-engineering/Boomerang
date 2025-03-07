@@ -220,7 +220,7 @@ public class WALAControlFlowGraph implements ControlFlowGraph {
   private LinkedList<Statement> addUnitializedFields() {
     LinkedList<Statement> uninitializedStatements = Lists.newLinkedList();
     if (!method.isConstructor()) return uninitializedStatements;
-    TypeReference delegate = (TypeReference) method.getDeclaringClass().getDelegate();
+    TypeReference delegate = ((WALAClass) method.getDeclaringClass()).getDelegate();
     IClass c = cha.lookupClass(delegate);
     Collection<IField> allFields = c.getAllFields();
     List<FieldReference> allDeclaredFields = computeInitializedFields();

@@ -11,13 +11,14 @@
  */
 package boomerang.scope;
 
-import com.google.common.base.Objects;
 import de.fraunhofer.iem.Empty;
 import de.fraunhofer.iem.Location;
 import de.fraunhofer.iem.wildcard.ExclusionWildcard;
 import de.fraunhofer.iem.wildcard.Wildcard;
+import java.util.Objects;
 
 public class Field implements Location {
+
   private final String rep;
 
   private Field(String rep) {
@@ -28,42 +29,30 @@ public class Field implements Location {
     this.rep = null;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((rep == null) ? 0 : rep.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    Field other = (Field) obj;
-    if (rep == null) {
-      return other.rep == null;
-    } else return rep.equals(other.rep);
-  }
-
-  @Override
-  public String toString() {
-    return rep;
-  }
-
   public static Field wildcard() {
     return new WildcardField();
   }
 
   public static Field empty() {
     return new EmptyField("{}");
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Field field = (Field) o;
+    return Objects.equals(rep, field.rep);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(rep);
+  }
+
+  @Override
+  public String toString() {
+    return rep;
   }
 
   private static class EmptyField extends Field implements Empty {
@@ -105,38 +94,28 @@ public class Field implements Location {
     }
 
     @Override
-    public String toString() {
-      return "not " + excludes;
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      if (!super.equals(o)) return false;
+      ExclusionWildcardField that = (ExclusionWildcardField) o;
+      return Objects.equals(excludes, that.excludes);
     }
 
     @Override
     public int hashCode() {
-      final int prime = 31;
-      int result = super.hashCode();
-      result = prime * result + ((excludes == null) ? 0 : excludes.hashCode());
-      return result;
+      return Objects.hash(super.hashCode(), excludes);
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!super.equals(obj)) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      ExclusionWildcardField other = (ExclusionWildcardField) obj;
-      if (excludes == null) {
-        return other.excludes == null;
-      } else return excludes.equals(other.excludes);
+    public String toString() {
+      return "not " + excludes;
     }
   }
 
   public static class ArrayField extends Field {
-    int index = -1;
+
+    private final int index;
 
     private ArrayField(int index) {
       super("array");
@@ -148,31 +127,8 @@ public class Field implements Location {
 
     public ArrayField() {
       super("array");
-    }
 
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      if (!super.equals(o)) {
-        return false;
-      }
-      ArrayField that = (ArrayField) o;
-      return index == that.index;
-    }
-
-    @Override
-    public String toString() {
-      return super.toString() + (index == -1 ? " ANY_INDEX" : "Index: " + index);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hashCode(super.hashCode(), index);
+      this.index = -1;
     }
 
     @Override
@@ -183,6 +139,25 @@ public class Field implements Location {
 
     public int getIndex() {
       return index;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      if (!super.equals(o)) return false;
+      ArrayField that = (ArrayField) o;
+      return index == that.index;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(super.hashCode(), index);
+    }
+
+    @Override
+    public String toString() {
+      return super.toString() + (index == -1 ? " ANY_INDEX" : "Index: " + index);
     }
   }
 

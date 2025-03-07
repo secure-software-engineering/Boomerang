@@ -1,14 +1,15 @@
 package boomerang.scope;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public abstract class Method implements Location {
+
   private static Method epsilon;
+  private Collection<Val> returnLocals;
 
   protected Method() {}
 
@@ -16,15 +17,6 @@ public abstract class Method implements Location {
     if (epsilon == null)
       epsilon =
           new Method() {
-            @Override
-            public int hashCode() {
-              return System.identityHashCode(this);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-              return obj == this;
-            }
 
             @Override
             public boolean isStaticInitializer() {
@@ -38,17 +30,17 @@ public abstract class Method implements Location {
 
             @Override
             public List<Type> getParameterTypes() {
-              return Lists.newArrayList();
+              return Collections.emptyList();
             }
 
             @Override
             public Type getParameterType(int index) {
-              return null;
+              throw new RuntimeException("Epsilon method has no parameters");
             }
 
             @Override
             public Type getReturnType() {
-              return null;
+              throw new RuntimeException("Epsilon method has no return type");
             }
 
             @Override
@@ -57,18 +49,18 @@ public abstract class Method implements Location {
             }
 
             @Override
-            public Set<Val> getLocals() {
-              return Sets.newHashSet();
+            public Collection<Val> getLocals() {
+              return Collections.emptySet();
             }
 
             @Override
             public Val getThisLocal() {
-              return null;
+              throw new RuntimeException("Epsilon method has no this local");
             }
 
             @Override
             public List<Val> getParameterLocals() {
-              return Lists.newArrayList();
+              return Collections.emptyList();
             }
 
             @Override
@@ -77,33 +69,38 @@ public abstract class Method implements Location {
             }
 
             @Override
-            public boolean isNative() {
+            public boolean isDefined() {
               return false;
             }
 
             @Override
+            public boolean isPhantom() {
+              return true;
+            }
+
+            @Override
             public List<Statement> getStatements() {
-              return Lists.newArrayList();
+              return Collections.emptyList();
             }
 
             @Override
             public WrappedClass getDeclaringClass() {
-              return null;
+              throw new RuntimeException("Epsilon method has no declaring class");
             }
 
             @Override
             public ControlFlowGraph getControlFlowGraph() {
-              return null;
+              throw new RuntimeException("Epsilon method has no control flow graph");
             }
 
             @Override
             public String getSubSignature() {
-              return null;
+              return "EPS";
             }
 
             @Override
             public String getName() {
-              return null;
+              return "EPS";
             }
 
             @Override
@@ -112,17 +109,11 @@ public abstract class Method implements Location {
             }
 
             @Override
-            public boolean isPublic() {
-              return false;
+            public String toString() {
+              return "METHOD_EPS";
             }
           };
     return epsilon;
-  }
-
-  // TODO: [ms] looks as if this toString() should go into epsilon..
-  @Override
-  public String toString() {
-    return "METHOD EPS";
   }
 
   public abstract boolean isStaticInitializer();
@@ -137,7 +128,7 @@ public abstract class Method implements Location {
 
   public abstract boolean isThisLocal(Val val);
 
-  public abstract Set<Val> getLocals();
+  public abstract Collection<Val> getLocals();
 
   public abstract Val getThisLocal();
 
@@ -145,7 +136,9 @@ public abstract class Method implements Location {
 
   public abstract boolean isStatic();
 
-  public abstract boolean isNative();
+  public abstract boolean isDefined();
+
+  public abstract boolean isPhantom();
 
   public abstract List<Statement> getStatements();
 
@@ -162,10 +155,6 @@ public abstract class Method implements Location {
   }
 
   public abstract boolean isConstructor();
-
-  public abstract boolean isPublic();
-
-  private Collection<Val> returnLocals;
 
   public Collection<Val> getReturnLocals() {
     if (returnLocals == null) {

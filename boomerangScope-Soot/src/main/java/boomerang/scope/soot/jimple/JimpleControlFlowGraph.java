@@ -27,8 +27,6 @@ public class JimpleControlFlowGraph implements ControlFlowGraph {
 
   protected JimpleMethod method;
 
-  public JimpleControlFlowGraph() {}
-
   public JimpleControlFlowGraph(JimpleMethod method) {
     this.method = method;
     this.graph = new BriefUnitGraph(method.getDelegate().getActiveBody());

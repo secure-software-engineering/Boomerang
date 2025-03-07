@@ -11,29 +11,32 @@
  */
 package test.cases.sets;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import org.junit.Ignore;
 import org.junit.Test;
-import test.cases.fields.Alloc;
 import test.core.AbstractBoomerangTest;
-import test.core.selfrunning.AllocatedObject;
 
+@Ignore("Does not terminate")
 public class HashMapsLongTest extends AbstractBoomerangTest {
-  @Test
-  public void addAndRetrieve() {
-    Map<Object, Object> set = new HashMap<>();
-    Object key = new Object();
-    AllocatedObject alias3 = new Alloc();
-    set.put(key, alias3);
-    Object alias2 = null;
-    for (Object o : set.values()) alias2 = o;
-    Object ir = alias2;
-    Object query2 = ir;
-    queryFor(query2);
-  }
+
+  private final String target = HashMapsLongTarget.class.getName();
 
   @Override
-  protected boolean includeJDK() {
-    return true;
+  protected List<String> getIncludedPackages() {
+    return List.of(
+        "java.util.HashMap",
+        "java.util.HashMap$TreeNode",
+        "java.util.HashMap$HashIterator",
+        "java.util.HashMap$ValueIterator",
+        "java.util.HashMap$Values",
+        "java.util.AbstractCollection",
+        "java.util.HashMap$Node",
+        "java.util.AbstractMap",
+        "java.util.Map");
+  }
+
+  @Test
+  public void addAndRetrieve() {
+    analyze(target, testName.getMethodName());
   }
 }

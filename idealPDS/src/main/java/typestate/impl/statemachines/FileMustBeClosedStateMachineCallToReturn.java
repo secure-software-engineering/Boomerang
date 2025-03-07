@@ -36,12 +36,12 @@ public class FileMustBeClosedStateMachineCallToReturn extends TypeStateMachineWe
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CLOSED;
     }
   }
 
@@ -65,7 +65,7 @@ public class FileMustBeClosedStateMachineCallToReturn extends TypeStateMachineWe
   @Override
   public Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
     try {
-      return generateAtAllocationSiteOf(edge, Class.forName("typestate.test.helper.File"));
+      return generateAtAllocationSiteOf(edge, Class.forName("typestate.targets.helper.File"));
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
