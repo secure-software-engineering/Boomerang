@@ -24,7 +24,6 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 public class PrintStreamStateMachine extends TypeStateMachineWeightFunctions {
 
   public enum States implements State {
-    NONE,
     CLOSED,
     ERROR;
 
@@ -35,12 +34,12 @@ public class PrintStreamStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == CLOSED;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CLOSED;
     }
   }
 

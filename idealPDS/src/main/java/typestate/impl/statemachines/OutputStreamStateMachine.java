@@ -39,12 +39,12 @@ public class OutputStreamStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == NONE;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CLOSED;
     }
   }
 

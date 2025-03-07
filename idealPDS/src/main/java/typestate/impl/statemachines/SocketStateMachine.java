@@ -39,12 +39,12 @@ public class SocketStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CONNECTED;
     }
   }
 

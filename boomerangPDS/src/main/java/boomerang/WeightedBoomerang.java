@@ -174,6 +174,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
                 if (allocNode.isPresent()
                     || node.stmt().getStart().isArrayLoad()
                     || node.stmt().getStart().isFieldLoad()) {
+                  // TODO Static fields should be covered too
+                  // || node.stmt().getStart().isStaticFieldLoad()) {
                   backwardSolver
                       .getFieldAutomaton()
                       .registerListener(new EmptyFieldListener(key, node));

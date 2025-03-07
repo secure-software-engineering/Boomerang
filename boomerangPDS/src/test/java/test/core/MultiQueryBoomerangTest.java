@@ -18,55 +18,45 @@ import boomerang.WeightedBoomerang;
 import boomerang.options.BoomerangOptions;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.scope.AnalysisScope;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
 import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.rules.Timeout;
-import test.AbstractTestingFramework;
-import test.FrameworkScopeFactory;
+import test.TestingFramework;
+import test.setup.MethodWrapper;
 import wpds.impl.Weight;
 
-public class MultiQueryBoomerangTest extends AbstractTestingFramework {
+public class MultiQueryBoomerangTest extends TestingFramework {
 
   private static final boolean FAIL_ON_IMPRECISE = false;
   @Rule public Timeout timeout = new Timeout(10000000, TimeUnit.MILLISECONDS);
-  private Collection<? extends Query> allocationSites;
+  @Rule public TestName testName = new TestName();
+
   protected Collection<? extends Query> queryForCallSites;
   protected Multimap<Query, Query> expectedAllocsForQuery = HashMultimap.create();
   protected Collection<Error> unsoundErrors = Sets.newHashSet();
   protected Collection<Error> imprecisionErrors = Sets.newHashSet();
 
   protected int analysisTimeout = 300 * 1000;
-  private final String classPathStr = Paths.get("target/test-classes").toAbsolutePath().toString();
 
-  private WeightedBoomerang<Weight.NoWeight> solver;
+  protected void analyze(String targetClassName, String targetMethodName) {
+    MethodWrapper methodWrapper = new MethodWrapper(targetClassName, targetMethodName);
+    FrameworkScope frameworkScope = super.getFrameworkScope(methodWrapper);
 
-  @Override
-  protected void initializeWithEntryPoint() {
-    frameworkScope =
-        FrameworkScopeFactory.init(
-            classPathStr,
-            getTestCaseClassName(),
-            testMethodName.getMethodName(),
-            getIncludedPackagesList(),
-            getExludedPackageList());
+    assertResults(frameworkScope);
   }
 
-  @Override
-  protected void analyze() {
-    assertResults();
-  }
-
-  private void assertResults() {
+  private void assertResults(FrameworkScope frameworkScope) {
     AnalysisScope analysisScope =
         new Preanalysis(frameworkScope.getCallGraph(), new FirstArgumentOf("queryFor.*"));
     queryForCallSites = analysisScope.computeSeeds();
@@ -81,21 +71,26 @@ public class MultiQueryBoomerangTest extends AbstractTestingFramework {
         expectedAllocsForQuery.putAll(q, analysis.computeSeeds());
       }
     }
-    runDemandDrivenBackward();
+
+    runDemandDrivenBackward(frameworkScope);
+
     if (!unsoundErrors.isEmpty()) {
-      throw new RuntimeException(Joiner.on("\n").join(unsoundErrors));
+      Assert.fail(Joiner.on("\n - ").join(unsoundErrors));
     }
+
     if (!imprecisionErrors.isEmpty() && FAIL_ON_IMPRECISE) {
-      throw new AssertionError(Joiner.on("\n").join(imprecisionErrors));
+      Assert.fail(Joiner.on("\n - ").join(imprecisionErrors));
     }
   }
 
   private void compareQuery(Query query, Collection<? extends Query> results) {
     Collection<Query> expectedResults = expectedAllocsForQuery.get(query);
     Collection<Query> falseNegativeAllocationSites = new HashSet<>();
+
     for (Query res : expectedResults) {
       if (!results.contains(res)) falseNegativeAllocationSites.add(res);
     }
+
     Collection<Query> falsePositiveAllocationSites = new HashSet<>(results);
     for (Query res : expectedResults) {
       falsePositiveAllocationSites.remove(res);
@@ -114,7 +109,7 @@ public class MultiQueryBoomerangTest extends AbstractTestingFramework {
     for (Entry<Query, Query> e : expectedAllocsForQuery.entries()) {
       if (!e.getKey().equals(query)) {
         if (results.contains(e.getValue())) {
-          throw new RuntimeException(
+          Assert.fail(
               "A query contains the result of a different query.\n"
                   + query
                   + " \n contains \n"
@@ -124,13 +119,13 @@ public class MultiQueryBoomerangTest extends AbstractTestingFramework {
     }
   }
 
-  private void runDemandDrivenBackward() {
+  private void runDemandDrivenBackward(FrameworkScope frameworkScope) {
     BoomerangOptions options =
         BoomerangOptions.builder()
             .withAnalysisTimeout(analysisTimeout)
             .enableAllowMultipleQueries(true)
             .build();
-    solver = new Boomerang(frameworkScope, options);
+    WeightedBoomerang<Weight.NoWeight> solver = new Boomerang(frameworkScope, options);
     for (final Query query : queryForCallSites) {
       if (query instanceof BackwardQuery) {
         BackwardBoomerangResults<Weight.NoWeight> res = solver.solve((BackwardQuery) query);
@@ -138,50 +133,5 @@ public class MultiQueryBoomerangTest extends AbstractTestingFramework {
       }
     }
     solver.unregisterAllListeners();
-  }
-
-  /*
-  // TODO: is it really not used?
-  private boolean allocatesObjectOfInterest(NewExpr rightOp, String type) {
-    SootClass interfaceType = Scene.v().getSootClass(type);
-    if (!interfaceType.isInterface()) return false;
-    RefType allocatedType = rightOp.getBaseType();
-    return Scene.v()
-        .getActiveHierarchy()
-        .getImplementersOf(interfaceType)
-        .contains(allocatedType.getSootClass());
-  }*/
-
-  protected Collection<String> errorOnVisitMethod() {
-    return Lists.newLinkedList();
-  }
-
-  protected boolean includeJDK() {
-    return true;
-  }
-
-  /**
-   * The methods parameter describes the variable that a query is issued for. Note: We misuse
-   * the @Deprecated annotation to highlight the method in the Code.
-   */
-  public static void queryFor1(Object variable, Class interfaceType) {}
-
-  public static void queryFor2(Object variable, Class interfaceType) {}
-
-  public static void accessPathQueryFor(Object variable, String aliases) {}
-
-  protected void queryForAndNotEmpty(Object variable) {}
-
-  protected void intQueryFor(int variable) {}
-
-  /**
-   * A call to this method flags the object as at the call statement as not reachable by the
-   * analysis.
-   */
-  protected void unreachable(Object variable) {}
-
-  /** This method can be used in test cases to create branching. It is not optimized away. */
-  protected boolean staticallyUnknown() {
-    return true;
   }
 }

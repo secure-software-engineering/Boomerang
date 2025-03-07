@@ -48,7 +48,7 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == INIT || this == HASNEXT;
     }
   }
 

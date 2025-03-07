@@ -12,7 +12,10 @@
 package test;
 
 public interface Assertion {
-  boolean isSatisfied();
+
+  boolean isUnsound();
 
   boolean isImprecise();
+
+  String getAssertedMessage();
 }

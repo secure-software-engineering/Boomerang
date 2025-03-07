@@ -59,12 +59,6 @@ public class SootFrameworkScope implements FrameworkScope {
     return new JimpleStaticFieldVal((JimpleField) field, m);
   }
 
-  @Nonnull
-  @Override
-  public Method resolveMethod(String signatureStr) {
-    return JimpleMethod.of(scene.getMethod(signatureStr));
-  }
-
   @Override
   public CallGraph getCallGraph() {
     return sootCallGraph;
@@ -73,15 +67,5 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public DataFlowScope getDataFlowScope() {
     return dataFlowScope;
-  }
-
-  @Override
-  public void updateDataFlowScope(DataFlowScope dataFlowScope) {
-    this.dataFlowScope = dataFlowScope;
-  }
-
-  @Override
-  public DataFlowScope createDataFlowScopeWithoutComplex() {
-    return SootDataFlowScopeUtil.excludeComplex();
   }
 }

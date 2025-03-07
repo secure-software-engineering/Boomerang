@@ -30,7 +30,6 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
   private static final String LOAD_METHOD = ".* load.*";
 
   public enum States implements State {
-    NONE,
     INIT,
     LOADED,
     ERROR;
@@ -42,13 +41,12 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      // TODO Auto-generated method stub
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == LOADED;
     }
   }
 
