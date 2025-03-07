@@ -13,8 +13,8 @@ package sync.pds.solver.nodes;
 
 public class NodeWithLocation<Stmt, Fact, Location> implements INode<Node<Stmt, Fact>> {
 
-  private Location loc;
-  private Node<Stmt, Fact> fact;
+  private final Location loc;
+  private final Node<Stmt, Fact> fact;
 
   public NodeWithLocation(Stmt stmt, Fact variable, Location loc) {
     this.fact = new Node<>(stmt, variable);
@@ -49,9 +49,8 @@ public class NodeWithLocation<Stmt, Fact, Location> implements INode<Node<Stmt, 
       if (other.fact != null) return false;
     } else if (!fact.equals(other.fact)) return false;
     if (loc == null) {
-      if (other.loc != null) return false;
-    } else if (!loc.equals(other.loc)) return false;
-    return true;
+      return other.loc == null;
+    } else return loc.equals(other.loc);
   }
 
   @Override

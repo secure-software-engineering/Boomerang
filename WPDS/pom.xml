@@ -2,12 +2,16 @@
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
         <artifactId>SPDS</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>WPDS</artifactId>
     <dependencies>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>PDS</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

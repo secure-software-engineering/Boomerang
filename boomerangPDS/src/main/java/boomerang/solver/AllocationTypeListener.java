@@ -11,7 +11,7 @@
  */
 package boomerang.solver;
 
-import boomerang.scene.Type;
+import boomerang.scope.Type;
 
 public interface AllocationTypeListener {
 

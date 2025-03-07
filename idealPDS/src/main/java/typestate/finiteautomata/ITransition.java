@@ -12,7 +12,7 @@
 package typestate.finiteautomata;
 
 public interface ITransition {
-  public State from();
+  State from();
 
-  public State to();
+  State to();
 }

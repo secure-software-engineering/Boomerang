@@ -11,6 +11,7 @@
  */
 package wpds.interfaces;
 
+import de.fraunhofer.iem.Location;
 import java.util.Set;
 import wpds.impl.NestedWeightedPAutomatons;
 import wpds.impl.NormalRule;

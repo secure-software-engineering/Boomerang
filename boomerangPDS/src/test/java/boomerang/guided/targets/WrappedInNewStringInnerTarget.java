@@ -8,7 +8,6 @@ public class WrappedInNewStringInnerTarget {
     String x = "bar";
     String bar = doPassArgument(x);
     new File(bar);
-    ;
   }
 
   public static String doPassArgument(String param) {

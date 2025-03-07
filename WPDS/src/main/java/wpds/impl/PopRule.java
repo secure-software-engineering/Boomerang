@@ -11,7 +11,7 @@
  */
 package wpds.impl;
 
-import wpds.interfaces.Location;
+import de.fraunhofer.iem.Location;
 import wpds.interfaces.State;
 
 public class PopRule<N extends Location, D extends State, W extends Weight> extends Rule<N, D, W> {

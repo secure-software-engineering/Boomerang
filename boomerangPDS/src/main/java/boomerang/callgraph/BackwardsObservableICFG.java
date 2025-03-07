@@ -1,8 +1,8 @@
 package boomerang.callgraph;
 
-import boomerang.scene.CallGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
+import boomerang.scope.CallGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
 import java.util.Collection;
 
 public class BackwardsObservableICFG implements ObservableICFG<Statement, Method> {

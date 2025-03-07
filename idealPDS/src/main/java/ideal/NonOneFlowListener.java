@@ -11,8 +11,8 @@
  */
 package ideal;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Val;
 import sync.pds.solver.nodes.Node;
 
 public interface NonOneFlowListener {

@@ -11,7 +11,7 @@
  */
 package typestate;
 
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -32,7 +32,7 @@ public class TransitionFunction extends Weight {
 
   private static TransitionFunction zero;
 
-  private Set<Edge> stateChangeStatements;
+  private final Set<Edge> stateChangeStatements;
 
   public TransitionFunction(Set<? extends ITransition> trans, Set<Edge> stateChangeStatements) {
     this.stateChangeStatements = stateChangeStatements;
@@ -126,7 +126,7 @@ public class TransitionFunction extends Weight {
 
   public String toString() {
     if (this.rep != null) return this.rep;
-    return "Weight: " + value.toString() + "";
+    return "Weight: " + value.toString();
   }
 
   @Override
@@ -148,8 +148,7 @@ public class TransitionFunction extends Weight {
       if (other.rep != null) return false;
     } else if (!rep.equals(other.rep)) return false;
     if (value == null) {
-      if (other.value != null) return false;
-    } else if (!value.equals(other.value)) return false;
-    return true;
+      return other.value == null;
+    } else return value.equals(other.value);
   }
 }

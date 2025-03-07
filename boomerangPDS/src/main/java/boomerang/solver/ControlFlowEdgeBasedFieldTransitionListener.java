@@ -11,9 +11,9 @@
  */
 package boomerang.solver;
 
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Field;
+import boomerang.scope.Val;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Transition;
@@ -61,8 +61,7 @@ public abstract class ControlFlowEdgeBasedFieldTransitionListener<W extends Weig
     ControlFlowEdgeBasedFieldTransitionListener other =
         (ControlFlowEdgeBasedFieldTransitionListener) obj;
     if (cfgEdge == null) {
-      if (other.cfgEdge != null) return false;
-    } else if (!cfgEdge.equals(other.cfgEdge)) return false;
-    return true;
+      return other.cfgEdge == null;
+    } else return cfgEdge.equals(other.cfgEdge);
   }
 }

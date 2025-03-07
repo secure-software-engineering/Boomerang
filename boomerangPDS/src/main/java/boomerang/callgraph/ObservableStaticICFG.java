@@ -1,9 +1,9 @@
 package boomerang.callgraph;
 
-import boomerang.scene.CallGraph;
-import boomerang.scene.CallGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
+import boomerang.scope.CallGraph;
+import boomerang.scope.CallGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
 import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ObservableStaticICFG implements ObservableICFG<Statement, Method> {
   /** Wrapped static ICFG. If available, this is used to handle all queries. */
-  private CallGraph precomputedGraph;
+  private final CallGraph precomputedGraph;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ObservableStaticICFG.class);
   private static final int IMPRECISE_CALL_GRAPH_WARN_THRESHOLD = 30000;
@@ -38,10 +38,12 @@ public class ObservableStaticICFG implements ObservableICFG<Statement, Method> {
         LOGGER.trace("\t callee {}", e.tgt());
       }
     }
-    for (boomerang.scene.CallGraph.Edge e : edges) {
-      listener.onCalleeAdded(listener.getObservedCaller(), e.tgt());
+    for (CallGraph.Edge e : edges) {
+      if (e.tgt().isDefined()) {
+        listener.onCalleeAdded(listener.getObservedCaller(), e.tgt());
+      }
     }
-    if (edges.size() == 0) {
+    if (edges.isEmpty()) {
       listener.onNoCalleeFound();
     }
   }
@@ -58,7 +60,7 @@ public class ObservableStaticICFG implements ObservableICFG<Statement, Method> {
         LOGGER.trace("\t callsite {}", e.src());
       }
     }
-    for (boomerang.scene.CallGraph.Edge e : edges) {
+    for (CallGraph.Edge e : edges) {
       listener.onCallerAdded(e.src(), listener.getObservedCallee());
     }
   }

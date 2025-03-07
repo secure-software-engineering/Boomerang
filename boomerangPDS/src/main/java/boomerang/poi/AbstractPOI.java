@@ -11,7 +11,7 @@
  */
 package boomerang.poi;
 
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 
 public abstract class AbstractPOI<Statement, Val, Field>
     extends PointOfIndirection<Statement, Val, Field> {
@@ -19,7 +19,7 @@ public abstract class AbstractPOI<Statement, Val, Field>
   private final Val baseVar;
   private final Field field;
   private final Val storedVar;
-  private Edge cfgEdge;
+  private final Edge cfgEdge;
 
   public AbstractPOI(Edge cfgEdge, Val baseVar, Field field, Val storedVar) {
     this.cfgEdge = cfgEdge;
@@ -71,9 +71,8 @@ public abstract class AbstractPOI<Statement, Val, Field>
       if (other.storedVar != null) return false;
     } else if (!storedVar.equals(other.storedVar)) return false;
     if (cfgEdge == null) {
-      if (other.cfgEdge != null) return false;
-    } else if (!cfgEdge.equals(other.cfgEdge)) return false;
-    return true;
+      return other.cfgEdge == null;
+    } else return cfgEdge.equals(other.cfgEdge);
   }
 
   @Override

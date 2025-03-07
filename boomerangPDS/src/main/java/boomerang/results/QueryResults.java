@@ -1,12 +1,12 @@
 package boomerang.results;
 
 import boomerang.Query;
-import boomerang.scene.Method;
+import boomerang.scope.Method;
 import java.util.Collection;
 import java.util.Set;
 
 public class QueryResults {
-  private Query query;
+  private final Query query;
   private final Collection<Method> visitedMethods;
   private final Collection<AffectedLocation> affectedLocations;
   private final boolean timedout;

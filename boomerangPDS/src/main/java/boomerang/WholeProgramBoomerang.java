@@ -11,11 +11,13 @@
  */
 package boomerang;
 
-import boomerang.scene.AnalysisScope;
-import boomerang.scene.CallGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.Statement;
+import boomerang.options.BoomerangOptions;
+import boomerang.scope.AllocVal;
+import boomerang.scope.AnalysisScope;
+import boomerang.scope.CallGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.Statement;
 import java.util.Collection;
 import java.util.Collections;
 import wpds.impl.Weight;
@@ -23,15 +25,15 @@ import wpds.impl.Weight;
 public abstract class WholeProgramBoomerang<W extends Weight> extends WeightedBoomerang<W> {
   private int reachableMethodCount;
   private int allocationSites;
-  private CallGraph callGraph;
+  private final CallGraph callGraph;
 
-  public WholeProgramBoomerang(CallGraph cg, DataFlowScope scope, BoomerangOptions opts) {
-    super(cg, scope, opts);
-    this.callGraph = cg;
+  public WholeProgramBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
+    super(frameworkScope, options);
+    this.callGraph = frameworkScope.getCallGraph();
   }
 
-  public WholeProgramBoomerang(CallGraph cg, DataFlowScope scope) {
-    this(cg, scope, new DefaultBoomerangOptions());
+  public WholeProgramBoomerang(FrameworkScope frameworkScope) {
+    this(frameworkScope, BoomerangOptions.DEFAULT());
   }
 
   public void wholeProgramAnalysis() {
@@ -41,9 +43,10 @@ public abstract class WholeProgramBoomerang<W extends Weight> extends WeightedBo
           @Override
           protected Collection<? extends Query> generate(Edge cfgEdge) {
             Statement stmt = cfgEdge.getStart();
-            if (stmt.isAssign()) {
+            if (stmt.isAssignStmt()) {
               if (stmt.getRightOp().isNewExpr()) {
-                return Collections.singleton(new ForwardQuery(cfgEdge, stmt.getRightOp()));
+                AllocVal allocVal = new AllocVal(stmt.getLeftOp(), stmt, stmt.getRightOp());
+                return Collections.singleton(new ForwardQuery(cfgEdge, allocVal));
               }
             }
             return Collections.emptySet();
@@ -58,7 +61,7 @@ public abstract class WholeProgramBoomerang<W extends Weight> extends WeightedBo
     System.out.println("Analyzed methods:\t" + reachableMethodCount);
     System.out.println("Total solvers:\t" + this.getSolvers().size());
     System.out.println("Allocation Sites:\t" + allocationSites);
-    System.out.println(options.statsFactory());
+    System.out.println(getStats());
   }
 
   @Override

@@ -1,7 +1,7 @@
 package boomerang.results;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Val;
 import java.util.Objects;
 
 public class PathElement {

@@ -1,10 +1,10 @@
 package boomerang.poi;
 
 import boomerang.BackwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Objects;
@@ -23,11 +23,11 @@ import wpds.interfaces.WPAStateListener;
 
 public class CopyAccessPathChain<W extends Weight> {
   private static final int MAX_WALK_DEPTH = -1;
-  private ForwardBoomerangSolver<W> forwardSolver;
-  private BackwardBoomerangSolver<W> backwardSolver;
-  private Edge fieldWriteStatement;
+  private final ForwardBoomerangSolver<W> forwardSolver;
+  private final BackwardBoomerangSolver<W> backwardSolver;
+  private final Edge fieldWriteStatement;
   // TODO: Source of non-determinsim: not part of hashCode/equals....but also shall not be.
-  private INode<Node<Edge, Val>> killedTransitionTarget;
+  private final INode<Node<Edge, Val>> killedTransitionTarget;
 
   public CopyAccessPathChain(
       ForwardBoomerangSolver<W> forwardSolver,
@@ -54,8 +54,8 @@ public class CopyAccessPathChain<W extends Weight> {
   private class WalkForwardSolverListener
       extends WPAStateListener<Field, INode<Node<Edge, Val>>, W> {
 
-    private INode<Node<Edge, Val>> stateInBwSolver;
-    private int walkDepth;
+    private final INode<Node<Edge, Val>> stateInBwSolver;
+    private final int walkDepth;
 
     public WalkForwardSolverListener(
         INode<Node<Edge, Val>> target, INode<Node<Edge, Val>> stateInBwSolver, int walkDepth) {
@@ -134,8 +134,8 @@ public class CopyAccessPathChain<W extends Weight> {
 
   // Copied from ExecuteImportFielStmtPOI
 
-  private Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
-  private Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
+  private final Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
+  private final Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
       HashMultimap.create();
 
   public void addReachable(INode<Node<Edge, Val>> node) {
@@ -185,9 +185,8 @@ public class CopyAccessPathChain<W extends Weight> {
       InsertFieldTransitionCallback other = (InsertFieldTransitionCallback) obj;
       if (!getEnclosingInstance().equals(other.getEnclosingInstance())) return false;
       if (trans == null) {
-        if (other.trans != null) return false;
-      } else if (!trans.equals(other.trans)) return false;
-      return true;
+        return other.trans == null;
+      } else return trans.equals(other.trans);
     }
 
     private CopyAccessPathChain getEnclosingInstance() {
@@ -223,8 +222,7 @@ public class CopyAccessPathChain<W extends Weight> {
       if (other.forwardSolver != null) return false;
     } else if (!forwardSolver.equals(other.forwardSolver)) return false;
     if (killedTransitionTarget == null) {
-      if (other.killedTransitionTarget != null) return false;
-    } else if (!killedTransitionTarget.equals(other.killedTransitionTarget)) return false;
-    return true;
+      return other.killedTransitionTarget == null;
+    } else return killedTransitionTarget.equals(other.killedTransitionTarget);
   }
 }

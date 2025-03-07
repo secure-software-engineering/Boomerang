@@ -11,12 +11,12 @@
  */
 package wpds.impl;
 
-import wpds.interfaces.Location;
+import de.fraunhofer.iem.Location;
 import wpds.interfaces.State;
 
 public class Configuration<N extends Location, D extends State> {
-  private D state;
-  private N location;
+  private final D state;
+  private final N location;
 
   public Configuration(N location, D state) {
     this.location = location;
@@ -42,8 +42,7 @@ public class Configuration<N extends Location, D extends State> {
       if (other.location != null) return false;
     } else if (!location.equals(other.location)) return false;
     if (state == null) {
-      if (other.state != null) return false;
-    } else if (!state.equals(other.state)) return false;
-    return true;
+      return other.state == null;
+    } else return state.equals(other.state);
   }
 }

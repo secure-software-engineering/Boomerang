@@ -1,10 +1,11 @@
 package boomerang.util;
 
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.scope.Field;
+import boomerang.scope.Val;
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public class AccessPath {
   private final Val val;
@@ -28,7 +29,6 @@ public class AccessPath {
   @Override
   public String toString() {
     return val.toString()
-        + ""
         + (fieldChain.isEmpty() ? "" : fieldChain.toString())
         + (isOverApproximated() ? "*" : "");
   }
@@ -43,6 +43,19 @@ public class AccessPath {
 
   public Collection<Field> getFields() {
     return fieldChain;
+  }
+
+  /**
+   * Return the AccessPath as a compact representation. For example, a path with a base 'x' and no
+   * fields becomes 'x', a base 'y' and the fields [f,g] becomes 'y.f.g'
+   *
+   * @return the formatted AccessPath
+   */
+  public String toCompactString() {
+    StringJoiner fieldJoiner = new StringJoiner(".");
+    fieldChain.forEach(field -> fieldJoiner.add(field.toString()));
+
+    return val.getVariableName() + (fieldJoiner.toString().isEmpty() ? "" : ".") + fieldJoiner;
   }
 
   @Override
@@ -74,12 +87,7 @@ public class AccessPath {
       return false;
     }
     if (val == null) {
-      if (other.val != null) {
-        return false;
-      }
-    } else if (!val.equals(other.val)) {
-      return false;
-    }
-    return true;
+      return other.val == null;
+    } else return val.equals(other.val);
   }
 }

@@ -41,8 +41,7 @@ public class CallPopNode<Location, Stmt> extends PopNode<Location> {
     if (getClass() != obj.getClass()) return false;
     CallPopNode other = (CallPopNode) obj;
     if (returnSite == null) {
-      if (other.returnSite != null) return false;
-    } else if (!returnSite.equals(other.returnSite)) return false;
-    return true;
+      return other.returnSite == null;
+    } else return returnSite.equals(other.returnSite);
   }
 }

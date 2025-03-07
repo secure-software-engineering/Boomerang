@@ -22,13 +22,13 @@ public class Specification {
     BACKWARD
   }
 
-  private final Set<SootMethodWithSelector> methodAndQueries;
+  private final Set<MethodWithSelector> methodAndQueries;
 
   private Specification(Collection<String> spec) {
     methodAndQueries = spec.stream().map(x -> parse(x)).collect(Collectors.toSet());
   }
 
-  private SootMethodWithSelector parse(String input) {
+  private MethodWithSelector parse(String input) {
     Pattern arguments = Pattern.compile("\\((.*?)\\)");
     Matcher argumentMatcher = arguments.matcher(input);
     Set<QuerySelector> on = Sets.newHashSet();
@@ -71,14 +71,14 @@ public class Specification {
             + go.stream().filter(x -> x.direction == QueryDirection.FORWARD).count();
     if (input.length()
         != sootMethod.length()
-            + (on.size() * ON_SELECTOR.length()
-                + go.size() * GO_SELECTOR.length()
+            + ((long) on.size() * ON_SELECTOR.length()
+                + (long) go.size() * GO_SELECTOR.length()
                 + backwardQueryCount * BACKWARD.length()
                 + forwardQueryCount * FORWARD.length())) {
       throw new RuntimeException("Parsing Specification failed. Please check your specification");
     }
 
-    return new SootMethodWithSelector(sootMethod, on, go);
+    return new MethodWithSelector(sootMethod, on, go);
   }
 
   private void createQuerySelector(
@@ -95,17 +95,17 @@ public class Specification {
     }
   }
 
-  public static class SootMethodWithSelector {
-    SootMethodWithSelector(
-        String sootMethod, Collection<QuerySelector> on, Collection<QuerySelector> go) {
-      this.sootMethod = sootMethod;
+  public static class MethodWithSelector {
+    MethodWithSelector(
+        String methodStr, Collection<QuerySelector> on, Collection<QuerySelector> go) {
+      this.methodStr = methodStr;
       this.on = on;
       this.go = go;
     }
 
-    private String sootMethod;
-    private Collection<QuerySelector> on;
-    private Collection<QuerySelector> go;
+    private final String methodStr;
+    private final Collection<QuerySelector> on;
+    private final Collection<QuerySelector> go;
 
     public Collection<QuerySelector> getOn() {
       return on;
@@ -115,8 +115,8 @@ public class Specification {
       return go;
     }
 
-    public String getSootMethod() {
-      return sootMethod;
+    public String getMethodStr() {
+      return methodStr;
     }
   }
 
@@ -164,7 +164,7 @@ public class Specification {
     }
   }
 
-  public class QuerySelector {
+  public static class QuerySelector {
     QuerySelector(QueryDirection direction, Parameter argumentSelection) {
       this.direction = direction;
       this.argumentSelection = argumentSelection;
@@ -182,7 +182,7 @@ public class Specification {
     return new Specification(Sets.newHashSet(spec));
   }
 
-  public Set<SootMethodWithSelector> getMethodAndQueries() {
+  public Set<MethodWithSelector> getMethodAndQueries() {
     return methodAndQueries;
   }
 }

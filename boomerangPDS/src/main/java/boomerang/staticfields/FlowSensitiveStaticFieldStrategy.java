@@ -1,14 +1,13 @@
 package boomerang.staticfields;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.StaticFieldVal;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.StaticFieldVal;
+import boomerang.scope.Val;
 import java.util.Set;
 import sync.pds.solver.nodes.Node;
-import wpds.impl.Weight;
 import wpds.interfaces.State;
 
-public class FlowSensitiveStaticFieldStrategy<W extends Weight> implements StaticFieldStrategy<W> {
+public class FlowSensitiveStaticFieldStrategy implements StaticFieldHandlingStrategy {
   @Override
   public void handleForward(
       Edge storeStmt, Val storedVal, StaticFieldVal staticVal, Set<State> out) {

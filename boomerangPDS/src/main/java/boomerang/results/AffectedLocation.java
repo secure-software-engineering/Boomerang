@@ -1,7 +1,7 @@
 package boomerang.results;
 
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Val;
 import java.util.List;
 
 public interface AffectedLocation {

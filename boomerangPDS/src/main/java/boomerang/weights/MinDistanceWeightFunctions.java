@@ -1,7 +1,7 @@
 package boomerang.weights;
 
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.Node;
 
@@ -12,7 +12,7 @@ public class MinDistanceWeightFunctions
   public MinDistanceWeight push(
       Node<Statement, Val> curr, Node<Statement, Val> succ, Statement callSite) {
     if (!curr.fact().isStatic()) {
-      return new MinDistanceWeight(new Integer(1));
+      return new MinDistanceWeight(Integer.valueOf(1));
     }
     return MinDistanceWeight.one();
   }
@@ -20,10 +20,10 @@ public class MinDistanceWeightFunctions
   @Override
   public MinDistanceWeight normal(Node<Statement, Val> curr, Node<Statement, Val> succ) {
     if (!curr.fact().equals(succ.fact())) {
-      return new MinDistanceWeight(new Integer(1));
+      return new MinDistanceWeight(Integer.valueOf(1));
     }
     if (succ.stmt().containsInvokeExpr() && succ.stmt().uses(curr.fact())) {
-      return new MinDistanceWeight(new Integer(1));
+      return new MinDistanceWeight(Integer.valueOf(1));
     }
     return MinDistanceWeight.one();
   }

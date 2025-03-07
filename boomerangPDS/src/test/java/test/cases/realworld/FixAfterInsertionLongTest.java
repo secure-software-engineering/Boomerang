@@ -11,33 +11,20 @@
  */
 package test.cases.realworld;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import test.cases.realworld.FixAfterInsertion.Entry;
 import test.core.AbstractBoomerangTest;
 
-@Ignore
 public class FixAfterInsertionLongTest extends AbstractBoomerangTest {
 
+  private final String target = FixAfterInsertionLongTarget.class.getName();
+
   @Test
-  public void main() {
-    Entry<Object, Object> entry = new Entry<Object, Object>(null, null, null);
-    entry = new Entry<Object, Object>(null, null, entry);
-    new FixAfterInsertion<>().fixAfterInsertion(entry);
-    Entry<Object, Object> query = entry.parent;
-    queryFor(query);
+  public void mainTest() {
+    analyze(target, testName.getMethodName());
   }
 
   @Test
   public void rotateLeftAndRightInLoop() {
-    Entry<Object, Object> entry = new Entry<Object, Object>(null, null, null);
-    entry = new Entry<Object, Object>(null, null, entry);
-    while (true) {
-      new FixAfterInsertion<>().rotateLeft(entry);
-      new FixAfterInsertion<>().rotateRight(entry);
-      if (staticallyUnknown()) break;
-    }
-    Entry<Object, Object> query = entry.parent;
-    queryFor(query);
+    analyze(target, testName.getMethodName());
   }
 }

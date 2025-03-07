@@ -18,8 +18,8 @@ import wpds.impl.Weight;
 /** Created by johannesspath on 01.12.17. */
 public class IDEALSeedTimeout extends RuntimeException {
   private final IDEALSeedSolver<? extends Weight> solver;
-  private WeightedBoomerang<? extends Weight> timedoutSolver;
-  private ForwardBoomerangResults<? extends Weight> lastResults;
+  private final WeightedBoomerang<? extends Weight> timedoutSolver;
+  private final ForwardBoomerangResults<? extends Weight> lastResults;
 
   public <W extends Weight> IDEALSeedTimeout(
       IDEALSeedSolver<W> solver,

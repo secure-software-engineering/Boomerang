@@ -6,15 +6,15 @@ import boomerang.callgraph.CallerListener;
 import boomerang.callgraph.ObservableICFG;
 import boomerang.controlflowgraph.ObservableControlFlowGraph;
 import boomerang.controlflowgraph.PredecessorListener;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.Field;
-import boomerang.scene.IfStatement;
-import boomerang.scene.IfStatement.Evaluation;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.JimpleVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.Field;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.IfStatement;
+import boomerang.scope.IfStatement.Evaluation;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -27,12 +27,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import soot.jimple.IntConstant;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -43,19 +44,21 @@ import wpds.interfaces.State;
 
 public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerangResults<W> {
 
+  private final FrameworkScope scopeFactory;
   private final ForwardQuery query;
   private final boolean timedout;
   private final IBoomerangStats<W> stats;
-  private Stopwatch analysisWatch;
-  private long maxMemory;
-  private ObservableICFG<Statement, Method> icfg;
-  private Set<Method> visitedMethods;
+  private final Stopwatch analysisWatch;
+  private final long maxMemory;
+  private final ObservableICFG<Statement, Method> icfg;
+  private final Set<Method> visitedMethods;
   private final boolean trackDataFlowPath;
   private final boolean pruneContradictoryDataFlowPath;
-  private ObservableControlFlowGraph cfg;
-  private boolean pruneImplictFlows;
+  private final ObservableControlFlowGraph cfg;
+  private final boolean pruneImplictFlows;
 
   public ForwardBoomerangResults(
+      FrameworkScope scopeFactory,
       ForwardQuery query,
       ObservableICFG<Statement, Method> icfg,
       ObservableControlFlowGraph cfg,
@@ -68,6 +71,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       boolean pruneContradictoryDataFlowPath,
       boolean pruneImplictFlows) {
     super(queryToSolvers);
+    this.scopeFactory = scopeFactory;
     this.query = query;
     this.icfg = icfg;
     this.cfg = cfg;
@@ -95,7 +99,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     if (solver == null) {
       return HashBasedTable.create();
     }
-    Table<Edge, Val, W> res = asStatementValWeightTable();
+    Table<Edge, Val, W> res = asEdgeValWeightTable();
     Set<Method> visitedMethods = Sets.newHashSet();
     for (Edge s : res.rowKeySet()) {
       visitedMethods.add(s.getMethod());
@@ -138,7 +142,11 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return destructingStatement;
   }
 
-  public Table<Edge, Val, W> asStatementValWeightTable() {
+  public Table<Edge, Val, W> asEdgeValWeightTable() {
+    return asEdgeValWeightTable(query);
+  }
+
+  public Table<Statement, Val, W> asStatementValWeightTable() {
     return asStatementValWeightTable(query);
   }
 
@@ -210,6 +218,22 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
               }
             });
     return invokedMethodsOnInstance;
+  }
+
+  /**
+   * Get all statements that contain an invoke expression belonging to the original seed.
+   *
+   * @return the statements that contain invoke expressions belonging to the original seed.
+   */
+  public Collection<Statement> getInvokeStatementsOnInstance() {
+    Collection<Statement> statements = new HashSet<>();
+
+    Map<Edge, DeclaredMethod> callsOnObject = getInvokedMethodOnInstance();
+    for (Edge edge : callsOnObject.keySet()) {
+      statements.add(edge.getStart());
+    }
+
+    return statements;
   }
 
   public QueryResults getPotentialNullPointerDereferences() {
@@ -316,14 +340,15 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       if (pruneImplictFlows) {
         for (Entry<Val, ConditionDomain> e : evaluationMap.entrySet()) {
 
-          if (ifStmt1.uses(e.getKey())) {
+          Val key = e.getKey();
+          if (ifStmt1.uses(key)) {
             Evaluation eval = null;
             if (e.getValue().equals(ConditionDomain.TRUE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(new JimpleVal(IntConstant.v(1), e.getKey().m()));
+              eval = ifStmt1.evaluate(scopeFactory.getTrueValue(key.m()));
             } else if (e.getValue().equals(ConditionDomain.FALSE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(new JimpleVal(IntConstant.v(0), e.getKey().m()));
+              eval = ifStmt1.evaluate(scopeFactory.getFalseValue(key.m()));
             }
             if (eval != null) {
               if (mustBeVal.equals(ConditionDomain.FALSE)) {

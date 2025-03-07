@@ -1,6 +1,6 @@
 package boomerang.controlflowgraph;
 
-import boomerang.scene.Statement;
+import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;

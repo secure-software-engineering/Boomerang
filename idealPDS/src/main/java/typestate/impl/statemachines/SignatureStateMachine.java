@@ -12,16 +12,11 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.Statement;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.Statement;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import soot.SootClass;
-import soot.SootMethod;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.MatcherTransition;
 import typestate.finiteautomata.MatcherTransition.Parameter;
@@ -38,9 +33,9 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
   private static final String VERIFY = "verify";
   private static final String GET_INSTANCE = "getInstance";
 
-  public static enum States implements State {
+  public enum States implements State {
     NONE,
-    UNITIALIZED,
+    UNINITIALIZED,
     SIGN_CHECK,
     VERIFY_CHECK,
     ERROR;
@@ -52,33 +47,34 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == UNINITIALIZED;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == SIGN_CHECK || this == VERIFY_CHECK;
     }
   }
 
   public SignatureStateMachine() {
     addTransition(
         new MatcherTransition(
-            States.NONE, GET_INSTANCE, Parameter.This, States.UNITIALIZED, Type.OnCall));
+            States.NONE, GET_INSTANCE, Parameter.This, States.UNINITIALIZED, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, INIT_SIGN, Parameter.This, States.SIGN_CHECK, Type.OnCall));
+            States.UNINITIALIZED, INIT_SIGN, Parameter.This, States.SIGN_CHECK, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, INIT_VERIFY, Parameter.This, States.VERIFY_CHECK, Type.OnCall));
-    addTransition(
-        new MatcherTransition(States.UNITIALIZED, SIGN, Parameter.This, States.ERROR, Type.OnCall));
+            States.UNINITIALIZED, INIT_VERIFY, Parameter.This, States.VERIFY_CHECK, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, VERIFY, Parameter.This, States.ERROR, Type.OnCall));
+            States.UNINITIALIZED, SIGN, Parameter.This, States.ERROR, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, UPDATE, Parameter.This, States.ERROR, Type.OnCall));
+            States.UNINITIALIZED, VERIFY, Parameter.This, States.ERROR, Type.OnCall));
+    addTransition(
+        new MatcherTransition(
+            States.UNINITIALIZED, UPDATE, Parameter.This, States.ERROR, Type.OnCall));
 
     addTransition(
         new MatcherTransition(
@@ -125,6 +121,8 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
         new MatcherTransition(States.ERROR, UPDATE, Parameter.This, States.ERROR, Type.OnCall));
   }
 
+  /*
+  // TODO: [ms] re-enable
   private Set<SootMethod> constructor() {
     List<SootClass> subclasses = getSubclassesOf("java.security.Signature");
     Set<SootMethod> out = new HashSet<>();
@@ -134,6 +132,7 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
     }
     return out;
   }
+  */
 
   @Override
   public Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
@@ -150,6 +149,6 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
 
   @Override
   protected State initialState() {
-    return States.UNITIALIZED;
+    return States.UNINITIALIZED;
   }
 }

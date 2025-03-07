@@ -11,12 +11,12 @@
  */
 package sync.pds.solver;
 
+import de.fraunhofer.iem.Location;
 import sync.pds.solver.nodes.Node;
-import wpds.interfaces.Location;
 
 public abstract class SyncStatePDSUpdateListener<Stmt extends Location, Fact> {
 
-  private Node<Stmt, Fact> node;
+  private final Node<Stmt, Fact> node;
 
   public SyncStatePDSUpdateListener(Node<Stmt, Fact> node) {
     this.node = node;

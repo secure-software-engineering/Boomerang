@@ -97,7 +97,7 @@ public class ForwardDFSVisitorTest {
 
     fa.addTransition(t(2, "n1", 4));
 
-    Assert.assertTrue(fa.getTransitions().size() == reachables.size());
+    Assert.assertEquals(fa.getTransitions().size(), reachables.size());
     Assert.assertTrue(reachableMinusTrans().isEmpty());
 
     fa.addTransition(t(3, "n1", 8));

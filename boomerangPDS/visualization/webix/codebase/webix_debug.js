@@ -6918,7 +6918,7 @@ webix.Movable = {
 
 			webix.DragControl.top = webix.DragControl.left = 5;
 			this.master.callEvent("onViewMoveEnd", []);
-			return;
+
 		},
 		$dragPos:function(pos, e){
 			this.master.callEvent("onViewMove", [pos, e]);
@@ -9201,7 +9201,7 @@ webix.protoUI({
 	},
 	customCheckbox_setter: function(value){
 		if( value === true && webix.skin.$active.customCheckbox){
-			value = "<a role='presentation' onclick='javascript:void(0)'><button role='checkbox' aria-checked='false' aria-label='' type='button' aria-invalid='' class='webix_custom_checkbox'></button></a>";
+			value = "<a role='presentation' onclick='void(0)'><button role='checkbox' aria-checked='false' aria-label='' type='button' aria-invalid='' class='webix_custom_checkbox'></button></a>";
 		}
 		return value;
 	},
@@ -9339,7 +9339,7 @@ webix.protoUI({
 	blur: function(){ this._blur(); },
 	customRadio_setter: function(value){
 		if(value === true && webix.skin.$active.customRadio)
-			value = "<a role='presentation' onclick='javascript:void(0)'><button type='button' class='webix_custom_radio' role='radio' aria-checked='false' aria-label='' aria-invalid='' tabindex=''></button></a>";
+			value = "<a role='presentation' onclick='void(0)'><button type='button' class='webix_custom_radio' role='radio' aria-checked='false' aria-label='' aria-invalid='' tabindex=''></button></a>";
 		return value;
 	},
 	$skin:function(){

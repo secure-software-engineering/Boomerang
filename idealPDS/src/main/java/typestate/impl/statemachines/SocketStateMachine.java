@@ -12,8 +12,8 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
 import java.net.Socket;
 import java.util.Collection;
 import typestate.TransitionFunction;
@@ -25,7 +25,7 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
 public class SocketStateMachine extends TypeStateMachineWeightFunctions {
 
-  private static String CONNECT_METHOD = ".* connect.*";
+  private static final String CONNECT_METHOD = ".* connect.*";
 
   public enum States implements State {
     INIT,
@@ -39,12 +39,12 @@ public class SocketStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CONNECTED;
     }
   }
 

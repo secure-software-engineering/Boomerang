@@ -2,11 +2,11 @@ package boomerang;
 
 import boomerang.callgraph.CallerListener;
 import boomerang.callgraph.ObservableICFG;
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
@@ -34,12 +34,12 @@ import wpds.interfaces.WPAStateListener;
 public class QueryGraph<W extends Weight> {
   private static final Logger LOGGER = LoggerFactory.getLogger(QueryGraph.class);
   private final ObservableICFG<Statement, Method> icfg;
-  private Multimap<Query, QueryEdge> sourceToQueryEdgeLookUp = HashMultimap.create();
-  private Multimap<Query, QueryEdge> targetToQueryEdgeLookUp = HashMultimap.create();
-  private Set<Query> roots = Sets.newHashSet();
-  private DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> forwardSolvers;
-  private Multimap<Query, AddTargetEdgeListener> edgeAddListener = HashMultimap.create();
-  private DefaultValueMap<BackwardQuery, BackwardBoomerangSolver<W>> backwardSolver;
+  private final Multimap<Query, QueryEdge> sourceToQueryEdgeLookUp = HashMultimap.create();
+  private final Multimap<Query, QueryEdge> targetToQueryEdgeLookUp = HashMultimap.create();
+  private final Set<Query> roots = Sets.newHashSet();
+  private final DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> forwardSolvers;
+  private final Multimap<Query, AddTargetEdgeListener> edgeAddListener = HashMultimap.create();
+  private final DefaultValueMap<BackwardQuery, BackwardBoomerangSolver<W>> backwardSolver;
 
   public QueryGraph(WeightedBoomerang<W> weightedBoomerang) {
     this.forwardSolvers = weightedBoomerang.getSolvers();
@@ -83,9 +83,9 @@ public class QueryGraph<W extends Weight> {
 
   private class SourceListener extends WPAStateListener<Edge, INode<Val>, W> {
 
-    private Query child;
-    private Query parent;
-    private Method callee;
+    private final Query child;
+    private final Query parent;
+    private final Method callee;
 
     public SourceListener(INode<Val> state, Query parent, Query child, Method callee) {
       super(state);
@@ -151,9 +151,8 @@ public class QueryGraph<W extends Weight> {
         if (other.child != null) return false;
       } else if (!child.equals(other.child)) return false;
       if (parent == null) {
-        if (other.parent != null) return false;
-      } else if (!parent.equals(other.parent)) return false;
-      return true;
+        return other.parent == null;
+      } else return parent.equals(other.parent);
     }
 
     private QueryGraph getEnclosingInstance() {
@@ -194,8 +193,8 @@ public class QueryGraph<W extends Weight> {
   private class UnbalancedContextListener implements AddTargetEdgeListener {
 
     private final Transition<Edge, INode<Val>> transition;
-    private Query parent;
-    private Query child;
+    private final Query parent;
+    private final Query child;
 
     public UnbalancedContextListener(Query child, Query parent, Transition<Edge, INode<Val>> t) {
       this.child = child;
@@ -262,9 +261,8 @@ public class QueryGraph<W extends Weight> {
         if (other.parent != null) return false;
       } else if (!parent.equals(other.parent)) return false;
       if (parent == null) {
-        if (other.transition != null) return false;
-      } else if (!transition.equals(other.transition)) return false;
-      return true;
+        return other.transition == null;
+      } else return transition.equals(other.transition);
     }
 
     private QueryGraph getEnclosingInstance() {
@@ -308,7 +306,7 @@ public class QueryGraph<W extends Weight> {
   private static class QueryEdge {
     private final Query source;
     private final Query target;
-    private Node<ControlFlowGraph.Edge, Val> node;
+    private final Node<ControlFlowGraph.Edge, Val> node;
 
     public QueryEdge(Query source, Node<ControlFlowGraph.Edge, Val> node, Query target) {
       this.source = source;
@@ -351,9 +349,8 @@ public class QueryGraph<W extends Weight> {
         if (other.target != null) return false;
       } else if (!target.equals(other.target)) return false;
       if (node == null) {
-        if (other.node != null) return false;
-      } else if (!node.equals(other.node)) return false;
-      return true;
+        return other.node == null;
+      } else return node.equals(other.node);
     }
   }
 

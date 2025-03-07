@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +39,6 @@ import pathexpression.PathExpressionComputer;
 import pathexpression.RegEx;
 import wpds.interfaces.ForwardDFSEpsilonVisitor;
 import wpds.interfaces.ForwardDFSVisitor;
-import wpds.interfaces.Location;
 import wpds.interfaces.ReachabilityListener;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
@@ -47,7 +47,7 @@ import wpds.interfaces.WPAUpdateListener;
 public abstract class WeightedPAutomaton<N extends Location, D extends State, W extends Weight>
     implements LabeledGraph<D, N> {
   private static final Logger LOGGER = LoggerFactory.getLogger(WeightedPAutomaton.class);
-  private Map<Transition<N, D>, W> transitionToWeights = new HashMap<>();
+  private final Map<Transition<N, D>, W> transitionToWeights = new HashMap<>();
   // Set Q is implicit
   // Weighted Pushdown Systems and their Application to Interprocedural
   // Dataflow Analysis
@@ -59,19 +59,20 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   protected Set<D> states = Sets.newHashSet();
   private final Multimap<D, Transition<N, D>> transitionsOutOf = HashMultimap.create();
   private final Multimap<D, Transition<N, D>> transitionsInto = HashMultimap.create();
-  private Set<WPAUpdateListener<N, D, W>> listeners = Sets.newHashSet();
-  private Multimap<D, WPAStateListener<N, D, W>> stateListeners = HashMultimap.create();
-  private Map<D, ForwardDFSVisitor<N, D, W>> stateToDFS = Maps.newHashMap();
-  private Map<D, ForwardDFSVisitor<N, D, W>> stateToEpsilonDFS = Maps.newHashMap();
-  private Set<WeightedPAutomaton<N, D, W>> nestedAutomatons = Sets.newHashSet();
-  private Set<NestedAutomatonListener<N, D, W>> nestedAutomataListeners = Sets.newHashSet();
-  private Map<D, ReachabilityListener<N, D>> stateToEpsilonReachabilityListener = Maps.newHashMap();
-  private Map<D, ReachabilityListener<N, D>> stateToReachabilityListener = Maps.newHashMap();
-  private Set<ReturnSiteWithWeights> connectedPushes = Sets.newHashSet();
-  private Set<ConnectPushListener<N, D, W>> conntectedPushListeners = Sets.newHashSet();
-  private Set<UnbalancedPopListener<N, D, W>> unbalancedPopListeners = Sets.newHashSet();
-  private Map<UnbalancedPopEntry, W> unbalancedPops = Maps.newHashMap();
-  private Map<Transition<N, D>, W> transitionsToFinalWeights = Maps.newHashMap();
+  private final Set<WPAUpdateListener<N, D, W>> listeners = Sets.newHashSet();
+  private final Multimap<D, WPAStateListener<N, D, W>> stateListeners = HashMultimap.create();
+  private final Map<D, ForwardDFSVisitor<N, D, W>> stateToDFS = Maps.newHashMap();
+  private final Map<D, ForwardDFSVisitor<N, D, W>> stateToEpsilonDFS = Maps.newHashMap();
+  private final Set<WeightedPAutomaton<N, D, W>> nestedAutomatons = Sets.newHashSet();
+  private final Set<NestedAutomatonListener<N, D, W>> nestedAutomataListeners = Sets.newHashSet();
+  private final Map<D, ReachabilityListener<N, D>> stateToEpsilonReachabilityListener =
+      Maps.newHashMap();
+  private final Map<D, ReachabilityListener<N, D>> stateToReachabilityListener = Maps.newHashMap();
+  private final Set<ReturnSiteWithWeights> connectedPushes = Sets.newHashSet();
+  private final Set<ConnectPushListener<N, D, W>> conntectedPushListeners = Sets.newHashSet();
+  private final Set<UnbalancedPopListener<N, D, W>> unbalancedPopListeners = Sets.newHashSet();
+  private final Map<UnbalancedPopEntry, W> unbalancedPops = Maps.newHashMap();
+  private final Map<Transition<N, D>, W> transitionsToFinalWeights = Maps.newHashMap();
   private ForwardDFSVisitor<N, D, W> dfsVisitor;
   private ForwardDFSVisitor<N, D, W> dfsEpsVisitor;
   public int failedAdditions;
@@ -79,9 +80,9 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   private WeightedPAutomaton<N, D, W> initialAutomaton;
   private PathExpressionComputer<D, N> pathExpressionComputer;
   private int lastStates = 0;
-  private Stopwatch watch = Stopwatch.createUnstarted();
-  private Map<D, Integer> stateToDistanceToInitial = Maps.newHashMap();
-  private Map<D, Integer> stateToUnbalancedDistance = Maps.newHashMap();
+  private final Stopwatch watch = Stopwatch.createUnstarted();
+  private final Map<D, Integer> stateToDistanceToInitial = Maps.newHashMap();
+  private final Map<D, Integer> stateToUnbalancedDistance = Maps.newHashMap();
   private final Map<D, Transition<N, D>> stateCreatingTransition = Maps.newHashMap();
 
   public abstract D createState(D d, N loc);
@@ -123,13 +124,13 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   }
 
   private String wrapFinalState(D s) {
-    return finalState.contains(s) ? "TO: " + s + "" : s.toString();
+    return finalState.contains(s) ? "TO: " + s : s.toString();
   }
 
   private static final boolean SUMMARIZE = false;
 
   public String toDotString() {
-    return toDotString(Sets.<WeightedPAutomaton<N, D, W>>newHashSet());
+    return toDotString(Sets.newHashSet());
   }
 
   private String toDotString(Set<WeightedPAutomaton<N, D, W>> visited) {
@@ -257,7 +258,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       if (res == null) {
         res = regEx;
       } else {
-        res = RegEx.<N>union(res, regEx);
+        res = RegEx.union(res, regEx);
       }
     }
     if (res == null) return new RegEx.EmptySet<N>();
@@ -498,8 +499,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     }
   }
 
-  private Set<Transition<N, D>> summaryEdges = Sets.newHashSet();
-  private Set<SummaryListener<N, D>> summaryEdgeListener = Sets.newHashSet();
+  private final Set<Transition<N, D>> summaryEdges = Sets.newHashSet();
+  private final Set<SummaryListener<N, D>> summaryEdgeListener = Sets.newHashSet();
 
   public void registerSummaryEdge(Transition<N, D> t) {
     if (summaryEdges.add(t)) {
@@ -555,9 +556,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
         if (other.targetState != null) return false;
       } else if (!targetState.equals(other.targetState)) return false;
       if (trans == null) {
-        if (other.trans != null) return false;
-      } else if (!trans.equals(other.trans)) return false;
-      return true;
+        return other.trans == null;
+      } else return trans.equals(other.trans);
     }
 
     private WeightedPAutomaton getOuterType() {
@@ -601,9 +601,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
         if (other.returnedFact != null) return false;
       } else if (!returnedFact.equals(other.returnedFact)) return false;
       if (returnedWeight == null) {
-        if (other.returnedWeight != null) return false;
-      } else if (!returnedWeight.equals(other.returnedWeight)) return false;
-      return true;
+        return other.returnedWeight == null;
+      } else return returnedWeight.equals(other.returnedWeight);
     }
 
     private WeightedPAutomaton getOuterType() {
@@ -623,7 +622,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
 
   private class ValueComputationListener extends WPAStateListener<N, D, W> {
 
-    private W weight;
+    private final W weight;
 
     public ValueComputationListener(D state, W weight) {
       super(state);
@@ -661,9 +660,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       ValueComputationListener other = (ValueComputationListener) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (weight == null) {
-        if (other.weight != null) return false;
-      } else if (!weight.equals(other.weight)) return false;
-      return true;
+        return other.weight == null;
+      } else return weight.equals(other.weight);
     }
 
     private WeightedPAutomaton getOuterType() {

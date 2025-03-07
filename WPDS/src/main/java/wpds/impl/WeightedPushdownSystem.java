@@ -14,13 +14,13 @@ package wpds.impl;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
+import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.HashSet;
 import java.util.Set;
 import wpds.interfaces.IPushdownSystem;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPDSUpdateListener;
-import wpds.wildcard.Wildcard;
 
 public class WeightedPushdownSystem<N extends Location, D extends State, W extends Weight>
     implements IPushdownSystem<N, D, W> {

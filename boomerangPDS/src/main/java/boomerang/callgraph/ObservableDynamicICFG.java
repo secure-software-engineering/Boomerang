@@ -1,11 +1,11 @@
 package boomerang.callgraph;
 
 import boomerang.controlflowgraph.ObservableControlFlowGraph;
-import boomerang.scene.CallGraph;
-import boomerang.scene.CallGraph.Edge;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
+import boomerang.scope.CallGraph;
+import boomerang.scope.CallGraph.Edge;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -30,7 +30,7 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
 
   private int numberOfEdgesTakenFromPrecomputedCallGraph = 0;
 
-  private CallGraphOptions options = new CallGraphOptions();
+  private final CallGraphOptions options = new CallGraphOptions();
   private CallGraph demandDrivenCallGraph = new CallGraph();
 
   private final Multimap<Statement, CalleeListener<Statement, Method>> calleeListeners =
@@ -67,8 +67,10 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
       }
     }
 
-    for (Edge e : Lists.newArrayList(edges)) {
-      listener.onCalleeAdded(stmt, e.tgt());
+    for (Edge e : edges) {
+      if (e.tgt().isDefined()) {
+        listener.onCalleeAdded(stmt, e.tgt());
+      }
     }
 
     InvokeExpr ie = stmt.getInvokeExpr();

@@ -2,19 +2,19 @@ package test.core;
 
 import boomerang.ForwardQuery;
 import boomerang.Query;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
 import java.util.Optional;
 
 class IntegerAllocationSiteOf implements ValueOfInterestInUnit {
   public Optional<? extends Query> test(Edge cfgEdge) {
     Statement stmt = cfgEdge.getStart();
-    if (stmt.isAssign()) {
+    if (stmt.isAssignStmt()) {
       if (stmt.getLeftOp().toString().contains("allocation")) {
         if (stmt.getLeftOp().isLocal() && stmt.getRightOp().isIntConstant()) {
-          Val local = stmt.getLeftOp();
-          ForwardQuery forwardQuery = new ForwardQuery(cfgEdge, local);
+          AllocVal allocVal = new AllocVal(stmt.getLeftOp(), stmt, stmt.getRightOp());
+          ForwardQuery forwardQuery = new ForwardQuery(cfgEdge, allocVal);
           return Optional.of(forwardQuery);
         }
       }

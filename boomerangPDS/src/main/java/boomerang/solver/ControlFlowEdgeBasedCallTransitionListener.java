@@ -11,9 +11,9 @@
  */
 package boomerang.solver;
 
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Val;
 import sync.pds.solver.nodes.INode;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
@@ -59,8 +59,7 @@ public abstract class ControlFlowEdgeBasedCallTransitionListener<W extends Weigh
     ControlFlowEdgeBasedCallTransitionListener other =
         (ControlFlowEdgeBasedCallTransitionListener) obj;
     if (edge == null) {
-      if (other.edge != null) return false;
-    } else if (!edge.equals(other.edge)) return false;
-    return true;
+      return other.edge == null;
+    } else return edge.equals(other.edge);
   }
 }

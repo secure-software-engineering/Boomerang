@@ -6,7 +6,7 @@ import boomerang.DefaultBoomerangOptions;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.scene.*;
 import boomerang.scene.jimple.*;
-import boomerang.scene.sparse.SparseCFGCache;
+import boomerang.sparse.SparsificationStrategy;
 import boomerang.util.AccessPath;
 import com.google.common.base.Stopwatch;
 import com.google.common.cache.CacheBuilder;
@@ -35,24 +35,24 @@ public class SparseAliasManager {
   private DataFlowScope dataFlowScope;
 
   private boolean disableAliasing = false;
-  private SparseCFGCache.SparsificationStrategy sparsificationStrategy;
+  private SparsificationStrategy sparsificationStrategy;
   private boolean ignoreAfterQuery;
 
   static class BoomerangOptions extends DefaultBoomerangOptions {
 
-    private SparseCFGCache.SparsificationStrategy sparsificationStrategy;
+    private SparsificationStrategy sparsificationStrategy;
     private boolean ignoreAfterQuery;
 
     public BoomerangOptions(
-        SparseCFGCache.SparsificationStrategy sparsificationStrategy, boolean ignoreAfterQuery) {
+        SparsificationStrategy sparsificationStrategy, boolean ignoreAfterQuery) {
       this.sparsificationStrategy = sparsificationStrategy;
       this.ignoreAfterQuery = ignoreAfterQuery;
     }
 
     @Override
-    public SparseCFGCache.SparsificationStrategy getSparsificationStrategy() {
+    public SparsificationStrategy getSparsificationStrategy() {
       if (this.sparsificationStrategy == null) {
-        return SparseCFGCache.SparsificationStrategy.NONE;
+        return SparsificationStrategy.NONE;
       }
       return this.sparsificationStrategy;
     }
@@ -96,7 +96,7 @@ public class SparseAliasManager {
   private static Duration totalAliasingDuration;
 
   private SparseAliasManager(
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy, boolean ignoreAfterQuery) {
+      SparsificationStrategy sparsificationStrategy, boolean ignoreAfterQuery) {
     this.sparsificationStrategy = sparsificationStrategy;
     this.ignoreAfterQuery = ignoreAfterQuery;
     totalAliasingDuration = Duration.ZERO;
@@ -110,7 +110,7 @@ public class SparseAliasManager {
   }
 
   public static synchronized SparseAliasManager getInstance(
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy, boolean ignoreAfterQuery) {
+      SparsificationStrategy sparsificationStrategy, boolean ignoreAfterQuery) {
     if (INSTANCE == null
         || INSTANCE.sparsificationStrategy != sparsificationStrategy
         || INSTANCE.ignoreAfterQuery != ignoreAfterQuery) {

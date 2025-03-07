@@ -11,25 +11,26 @@
  */
 package boomerang.solver;
 
-import boomerang.BoomerangOptions;
 import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.callgraph.CalleeListener;
 import boomerang.callgraph.ObservableICFG;
 import boomerang.controlflowgraph.*;
 import boomerang.flowfunction.IForwardFlowFunction;
-import boomerang.scene.AllocVal;
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.Field;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Type;
-import boomerang.scene.Val;
+import boomerang.options.BoomerangOptions;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DataFlowScope;
+import boomerang.scope.Field;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Type;
+import boomerang.scope.Val;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -47,7 +48,6 @@ import wpds.impl.NestedWeightedPAutomatons;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
 import wpds.impl.WeightedPAutomaton;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
 
@@ -131,9 +131,8 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       OverwriteAtFieldStore other = (OverwriteAtFieldStore) obj;
       if (!getEnclosingInstance().equals(other.getEnclosingInstance())) return false;
       if (nextStmt == null) {
-        if (other.nextStmt != null) return false;
-      } else if (!nextStmt.equals(other.nextStmt)) return false;
-      return true;
+        return other.nextStmt == null;
+      } else return nextStmt.equals(other.nextStmt);
     }
 
     private ForwardBoomerangSolver getEnclosingInstance() {
@@ -184,9 +183,8 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       OverwriteAtArrayStore other = (OverwriteAtArrayStore) obj;
       if (!getEnclosingInstance().equals(other.getEnclosingInstance())) return false;
       if (nextStmt == null) {
-        if (other.nextStmt != null) return false;
-      } else if (!nextStmt.equals(other.nextStmt)) return false;
-      return true;
+        return other.nextStmt == null;
+      } else return nextStmt.equals(other.nextStmt);
     }
 
     private ForwardBoomerangSolver getEnclosingInstance() {
@@ -214,7 +212,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
                   public void getPredecessor(Statement pred) {
                     Node<ControlFlowGraph.Edge, Val> curr =
                         new Node<>(new Edge(pred, callSite), query.var());
-                    /**
+                    /*
                      * Transition<Field, INode<Node<Statement, Val>>> fieldTrans = new
                      * Transition<>(new SingleNode<>(curr), emptyField(), new SingleNode<>(curr));
                      * fieldAutomaton.addTransition(fieldTrans);*
@@ -284,9 +282,8 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         if (other.caller != null) return false;
       } else if (!caller.equals(other.caller)) return false;
       if (currNode == null) {
-        if (other.currNode != null) return false;
-      } else if (!currNode.equals(other.currNode)) return false;
-      return true;
+        return other.currNode == null;
+      } else return currNode.equals(other.currNode);
     }
 
     @Override
@@ -342,7 +339,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         }
       }
       if (returnedFact.isReturnLocal()) {
-        if (callSite.isAssign()) {
+        if (callSite.isAssignStmt()) {
           out.add(new Node<>(returnSiteStatement, callSite.getLeftOp()));
         }
       }

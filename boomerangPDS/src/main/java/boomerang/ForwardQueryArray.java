@@ -11,15 +11,15 @@
  */
 package boomerang;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.base.Objects;
 
 public class ForwardQueryArray extends ForwardQuery {
 
   private final Integer index;
 
-  public ForwardQueryArray(Edge stmt, Val variable, Integer index) {
+  public ForwardQueryArray(Edge stmt, AllocVal variable, Integer index) {
     super(stmt, variable);
     this.index = index;
   }

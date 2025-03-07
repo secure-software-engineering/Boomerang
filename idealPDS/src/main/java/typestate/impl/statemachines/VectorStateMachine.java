@@ -12,7 +12,7 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Vector;
@@ -25,12 +25,13 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
 public class VectorStateMachine extends TypeStateMachineWeightFunctions {
 
-  private static String ADD_ELEMENT_METHODS =
+  private static final String ADD_ELEMENT_METHODS =
       "(.* (add|addAll|addElement|insertElementAt|set|setElementAt).*)|<java.util.Vector: void <init>(java.util.Collection)>";
-  private static String ACCESS_ELEMENT_METHODS = ".* (elementAt|firstElement|lastElement|get).*";
-  private static String REMOVE_ALL_METHODS = ".* removeAllElements.*";
+  private static final String ACCESS_ELEMENT_METHODS =
+      ".* (elementAt|firstElement|lastElement|get).*";
+  private static final String REMOVE_ALL_METHODS = ".* removeAllElements.*";
 
-  public static enum States implements State {
+  public enum States implements State {
     INIT,
     NOT_EMPTY,
     ACCESSED_EMPTY;
@@ -42,12 +43,12 @@ public class VectorStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == INIT || this == NOT_EMPTY;
     }
   }
 

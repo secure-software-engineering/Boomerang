@@ -11,33 +11,20 @@
  */
 package test.cases.reflection;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import test.cases.fields.Alloc;
 import test.core.AbstractBoomerangTest;
 
 public class ReflectionTest extends AbstractBoomerangTest {
 
+  private final String target = ReflectionTarget.class.getName();
+
   @Test
-  public void bypassClassForName()
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-    Alloc query = new Alloc();
-    Class<?> cls = Class.forName(A.class.getName());
-    queryFor(query);
+  public void bypassClassForName() {
+    analyze(target, testName.getMethodName());
   }
 
-  @Ignore
   @Test
-  public void loadObject()
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-    Class<?> cls = Class.forName(A.class.getName());
-    Object newInstance = cls.newInstance();
-    A a = (A) newInstance;
-    Alloc query = a.field;
-    queryFor(query);
-  }
-
-  private static class A {
-    Alloc field = new Alloc();
+  public void loadObject() {
+    analyze(target, testName.getMethodName());
   }
 }

@@ -15,8 +15,8 @@ import boomerang.stats.IBoomerangStats;
 
 public class BoomerangTimeoutException extends RuntimeException {
 
-  private IBoomerangStats stats;
-  private long elapsed;
+  private final IBoomerangStats stats;
+  private final long elapsed;
 
   BoomerangTimeoutException(long elapsed, IBoomerangStats stats) {
     this.elapsed = elapsed;

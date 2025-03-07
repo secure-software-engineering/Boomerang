@@ -2,7 +2,7 @@
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
         <artifactId>SPDS</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -46,7 +46,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>3.5.0</version>
+                        <version>${maven-surefire-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>integration-test</phase>
+                            </execution>
+                        </executions>
                         <configuration>
                             <argLine>-Xmx8G -Xss128m</argLine>
                             <excludes>

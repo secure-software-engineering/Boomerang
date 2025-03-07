@@ -1,10 +1,10 @@
 package boomerang.callgraph;
 
 import boomerang.WeightedBoomerang;
-import boomerang.scene.CallGraph;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
+import boomerang.scope.CallGraph;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
 import java.util.Collection;
 
 public interface ICallerCalleeResolutionStrategy {

@@ -1,7 +1,7 @@
 package boomerang.util;
 
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.scope.Field;
+import boomerang.scope.Val;
 import pathexpression.IRegEx;
 
 public class RegExAccessPath {
@@ -45,8 +45,7 @@ public class RegExAccessPath {
       if (other.fields != null) return false;
     } else if (!fields.equals(other.fields)) return false;
     if (val == null) {
-      if (other.val != null) return false;
-    } else if (!val.equals(other.val)) return false;
-    return true;
+      return other.val == null;
+    } else return val.equals(other.val);
   }
 }

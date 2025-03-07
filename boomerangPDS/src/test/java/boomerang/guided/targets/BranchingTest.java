@@ -8,7 +8,6 @@ public class BranchingTest {
     String x = new String(Math.random() > 0 ? "bar" : "foo");
     String bar = doPassArgument(x);
     new File(bar);
-    ;
   }
 
   public static String doPassArgument(String param) {

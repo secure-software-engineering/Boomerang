@@ -11,95 +11,26 @@
  */
 package test.cases.sets;
 
-import java.util.Iterator;
+import java.util.List;
 import org.junit.Test;
-import test.cases.fields.Alloc;
 import test.core.AbstractBoomerangTest;
-import test.core.selfrunning.AllocatedObject;
 
 public class CustomSetTest extends AbstractBoomerangTest {
 
-  @Test
-  public void mySetIteratorTest() {
-    MySetIterator mySet = new MySetIterator();
-    AllocatedObject alias = new AllocatedObject() {};
-    mySet.add(alias);
-    Object query = null;
-    while (mySet.hasNext()) {
-      query = mySet.next();
-    }
-    queryFor(query);
+  private final String target = CustomSetTarget.class.getName();
+
+  @Override
+  protected List<String> getIncludedPackages() {
+    return List.of("java.util.Iterator");
   }
 
-  public static class MySetIterator implements Iterator<Object> {
-    Object[] content = new Object[10];
-    int curr = 0;
-
-    void add(Object o) {
-      content[o.hashCode()] = o;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return curr < 10;
-    }
-
-    @Override
-    public Object next() {
-      return content[curr++];
-    }
-
-    @Override
-    public void remove() {
-      // TODO Auto-generated method stub
-
-    }
+  @Test
+  public void mySetIteratorTest() {
+    analyze(target, testName.getMethodName());
   }
 
   @Test
   public void mySetIterableTest() {
-    MySet mySet = new MySet();
-    AllocatedObject alias = new Alloc();
-    mySet.add(alias);
-    Object query = null;
-    for (Object el : mySet) {
-      query = el;
-    }
-    queryFor(query);
-  }
-
-  public class MySet implements Iterable<Object> {
-    Object[] content = new Object[10];
-    int curr = 0;
-    Iterator<Object> it;
-
-    void add(Object o) {
-      content[o.hashCode()] = o;
-    }
-
-    @Override
-    public Iterator<Object> iterator() {
-      if (it == null) it = new SetIterator();
-      return it;
-    }
-
-    private class SetIterator implements Iterator<Object> {
-
-      @Override
-      public boolean hasNext() {
-        return curr < 10;
-      }
-
-      @Override
-      public Object next() {
-        return content[curr++];
-      }
-
-      @Override
-      public void remove() {
-        // TODO Auto-generated method stub
-
-      }
-    }
+    analyze(target, testName.getMethodName());
   }
 }

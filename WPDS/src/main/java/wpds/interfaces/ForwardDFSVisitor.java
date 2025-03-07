@@ -16,6 +16,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
+import de.fraunhofer.iem.Location;
 import java.util.LinkedList;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
@@ -23,12 +24,12 @@ import wpds.impl.WeightedPAutomaton;
 
 public class ForwardDFSVisitor<N extends Location, D extends State, W extends Weight>
     implements WPAUpdateListener<N, D, W> {
-  private Multimap<D, ReachabilityListener<N, D>> listeners = HashMultimap.create();
+  private final Multimap<D, ReachabilityListener<N, D>> listeners = HashMultimap.create();
   protected WeightedPAutomaton<N, D, W> aut;
-  private Multimap<D, D> adjacent = HashMultimap.create();
-  private Multimap<D, D> reaches = HashMultimap.create();
-  private Multimap<D, D> inverseReaches = HashMultimap.create();
-  private Table<D, D, Integer> refCount = HashBasedTable.create();
+  private final Multimap<D, D> adjacent = HashMultimap.create();
+  private final Multimap<D, D> reaches = HashMultimap.create();
+  private final Multimap<D, D> inverseReaches = HashMultimap.create();
+  private final Table<D, D, Integer> refCount = HashBasedTable.create();
 
   public ForwardDFSVisitor(WeightedPAutomaton<N, D, W> aut) {
     this.aut = aut;
@@ -44,8 +45,8 @@ public class ForwardDFSVisitor<N extends Location, D extends State, W extends We
 
   private class TransitiveClosure extends WPAStateListener<N, D, W> {
 
-    private ReachabilityListener<N, D> listener;
-    private D s;
+    private final ReachabilityListener<N, D> listener;
+    private final D s;
 
     public TransitiveClosure(D state, D s, ReachabilityListener<N, D> l) {
       super(state);
@@ -82,9 +83,8 @@ public class ForwardDFSVisitor<N extends Location, D extends State, W extends We
         if (other.s != null) return false;
       } else if (!s.equals(other.s)) return false;
       if (listener == null) {
-        if (other.listener != null) return false;
-      } else if (!listener.equals(other.listener)) return false;
-      return true;
+        return other.listener == null;
+      } else return listener.equals(other.listener);
     }
 
     private ForwardDFSVisitor getOuterType() {
@@ -188,9 +188,8 @@ public class ForwardDFSVisitor<N extends Location, D extends State, W extends We
         if (other.from != null) return false;
       } else if (!from.equals(other.from)) return false;
       if (to == null) {
-        if (other.to != null) return false;
-      } else if (!to.equals(other.to)) return false;
-      return true;
+        return other.to == null;
+      } else return to.equals(other.to);
     }
   }
 
@@ -209,8 +208,7 @@ public class ForwardDFSVisitor<N extends Location, D extends State, W extends We
     if (getClass() != obj.getClass()) return false;
     ForwardDFSVisitor other = (ForwardDFSVisitor) obj;
     if (aut == null) {
-      if (other.aut != null) return false;
-    } else if (!aut.equals(other.aut)) return false;
-    return true;
+      return other.aut == null;
+    } else return aut.equals(other.aut);
   }
 }

@@ -11,17 +11,16 @@
  */
 package boomerang.arrays;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Pair;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Pair;
+import boomerang.scope.Val;
 import java.util.Set;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
 import sync.pds.solver.nodes.PushNode;
-import wpds.impl.Weight;
 import wpds.interfaces.State;
 
-public class ArrayIndexInsensitiveStrategy<W extends Weight> implements ArrayHandlingStrategy<W> {
+public class ArrayIndexInsensitiveStrategy implements ArrayHandlingStrategy {
 
   @Override
   public void handleForward(Edge curr, Pair<Val, Integer> arrayBase, Set<State> out) {

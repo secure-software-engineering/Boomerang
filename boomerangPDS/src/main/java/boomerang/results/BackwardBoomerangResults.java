@@ -4,10 +4,10 @@ import boomerang.BackwardQuery;
 import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.Util;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Type;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
+import boomerang.scope.Type;
+import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -32,8 +32,8 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
   private Map<ForwardQuery, Context> allocationSites;
   private final boolean timedout;
   private final IBoomerangStats<W> stats;
-  private Stopwatch analysisWatch;
-  private long maxMemory;
+  private final Stopwatch analysisWatch;
+  private final long maxMemory;
 
   public BackwardBoomerangResults(
       BackwardQuery query,
@@ -77,7 +77,7 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
         fw.getValue()
             .getFieldAutomaton()
             .registerListener(
-                new ExtractAllocationSiteStateListener<W>(node, query, (ForwardQuery) fw.getKey()) {
+                new ExtractAllocationSiteStateListener<W>(node, query, fw.getKey()) {
 
                   @Override
                   protected void allocationSiteFound(
@@ -105,7 +105,6 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
     return false;
   }
 
-  @Deprecated
   public Set<AccessPath> getAllAliases(Edge stmt) {
     final Set<AccessPath> results = Sets.newHashSet();
     for (final ForwardQuery fw : getAllocationSites().keySet()) {
@@ -117,7 +116,11 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
     return results;
   }
 
-  @Deprecated
+  /**
+   * Return an {@link AccessPath} for each aliasing object of the original query.
+   *
+   * @return all access paths aliasing with the query variable
+   */
   public Set<AccessPath> getAllAliases() {
     return getAllAliases(query.cfgEdge());
   }

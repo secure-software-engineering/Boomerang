@@ -11,7 +11,7 @@
  */
 package inference;
 
-import boomerang.scene.Method;
+import boomerang.scope.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -92,8 +92,7 @@ public class InferenceWeight extends Weight {
       if (other.rep != null) return false;
     } else if (!rep.equals(other.rep)) return false;
     if (invokedMethods == null) {
-      if (other.invokedMethods != null) return false;
-    } else if (!invokedMethods.equals(other.invokedMethods)) return false;
-    return true;
+      return other.invokedMethods == null;
+    } else return invokedMethods.equals(other.invokedMethods);
   }
 }

@@ -53,9 +53,8 @@ public class Node<Stmt, Fact> implements State {
       if (other.stmt != null) return false;
     } else if (!stmt.equals(other.stmt)) return false;
     if (variable == null) {
-      if (other.variable != null) return false;
-    } else if (!variable.equals(other.variable)) return false;
-    return true;
+      return other.variable == null;
+    } else return variable.equals(other.variable);
   }
 
   @Override

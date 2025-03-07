@@ -11,16 +11,16 @@
  */
 package typestate.finiteautomata;
 
-import boomerang.scene.DeclaredMethod;
+import boomerang.scope.DeclaredMethod;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MatcherTransition extends Transition {
   private static final Logger LOGGER = LoggerFactory.getLogger(MatcherTransition.class);
-  private Type type;
-  private Parameter param;
-  private String methodMatcher;
+  private final Type type;
+  private final Parameter param;
+  private final String methodMatcher;
   private boolean negate = false;
 
   public enum Type {
@@ -33,7 +33,7 @@ public class MatcherTransition extends Transition {
   public enum Parameter {
     This,
     Param1,
-    Param2;
+    Param2
   }
 
   public MatcherTransition(State from, String methodMatcher, Parameter param, State to, Type type) {
@@ -57,7 +57,7 @@ public class MatcherTransition extends Transition {
     if (matches)
       LOGGER.debug(
           "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
-    return negate ? !matches : matches;
+    return negate != matches;
   }
 
   public Type getType() {
@@ -95,7 +95,6 @@ public class MatcherTransition extends Transition {
     } else if (!methodMatcher.equals(other.methodMatcher)) return false;
     if (negate != other.negate) return false;
     if (param != other.param) return false;
-    if (type != other.type) return false;
-    return true;
+    return type == other.type;
   }
 }

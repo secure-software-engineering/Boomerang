@@ -12,9 +12,10 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.AllocVal;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Statement;
 import java.util.Collections;
 import java.util.Set;
 import typestate.TransitionFunction;
@@ -26,10 +27,10 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
 public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
 
-  private static String NEXT_METHOD = ".* next\\(\\)";
-  private static String HAS_NEXT_METHOD = ".* hasNext\\(\\)";
+  private static final String NEXT_METHOD = ".* next\\(\\)";
+  private static final String HAS_NEXT_METHOD = ".* hasNext\\(\\)";
 
-  public static enum States implements State {
+  public enum States implements State {
     NONE,
     INIT,
     HASNEXT,
@@ -47,7 +48,7 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == INIT || this == HASNEXT;
     }
   }
 
@@ -73,8 +74,8 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
 
   public Set<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
     Statement unit = edge.getStart();
-    if (unit.containsInvokeExpr() && unit.isAssign()) {
-      boomerang.scene.InvokeExpr invokeExpr = unit.getInvokeExpr();
+    if (unit.containsInvokeExpr() && unit.isAssignStmt()) {
+      InvokeExpr invokeExpr = unit.getInvokeExpr();
       if (invokeExpr.isInstanceInvokeExpr()) {
         if (invokeExpr.getMethod().getName().contains("iterator")) {
           return Collections.singleton(

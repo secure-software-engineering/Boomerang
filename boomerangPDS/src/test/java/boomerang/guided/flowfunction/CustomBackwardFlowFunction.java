@@ -1,20 +1,20 @@
 package boomerang.guided.flowfunction;
 
-import boomerang.DefaultBoomerangOptions;
 import boomerang.flowfunction.DefaultBackwardFlowFunction;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.flowfunction.DefaultBackwardFlowFunctionOptions;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import java.util.Collection;
 import java.util.Collections;
 import wpds.interfaces.State;
 
 public class CustomBackwardFlowFunction extends DefaultBackwardFlowFunction {
 
-  public CustomBackwardFlowFunction(DefaultBoomerangOptions opts) {
-    super(opts);
+  public CustomBackwardFlowFunction(DefaultBackwardFlowFunctionOptions options) {
+    super(options);
   }
 
   @Override

@@ -1,25 +1,24 @@
 package boomerang.staticfields;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Statement;
-import boomerang.scene.StaticFieldVal;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Statement;
+import boomerang.scope.StaticFieldVal;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import com.google.common.collect.Multimap;
 import java.util.Set;
 import sync.pds.solver.nodes.Node;
-import wpds.impl.Weight;
 import wpds.interfaces.State;
 
-public class SingletonStaticFieldStrategy<W extends Weight> implements StaticFieldStrategy<W> {
+public class SingletonStaticFieldStrategy implements StaticFieldHandlingStrategy {
 
-  private Multimap<Field, Statement> fieldStoreStatements;
-  private Multimap<Field, Statement> fieldLoadStatements;
-  private AbstractBoomerangSolver solver;
+  private final Multimap<Field, Statement> fieldStoreStatements;
+  private final Multimap<Field, Statement> fieldLoadStatements;
+  private final AbstractBoomerangSolver<?> solver;
 
   public SingletonStaticFieldStrategy(
-      AbstractBoomerangSolver solver,
+      AbstractBoomerangSolver<?> solver,
       Multimap<Field, Statement> fieldLoadStatements,
       Multimap<Field, Statement> fieldStoreStatements) {
     this.solver = solver;
@@ -31,7 +30,7 @@ public class SingletonStaticFieldStrategy<W extends Weight> implements StaticFie
   public void handleForward(
       Edge storeStmt, Val storedVal, StaticFieldVal staticVal, Set<State> out) {
     for (Statement matchingStore : fieldLoadStatements.get(staticVal.field())) {
-      if (matchingStore.isAssign()) {
+      if (matchingStore.isAssignStmt()) {
         for (Statement succ :
             matchingStore.getMethod().getControlFlowGraph().getSuccsOf(matchingStore)) {
           solver.processNormal(

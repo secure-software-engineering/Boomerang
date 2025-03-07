@@ -1,14 +1,13 @@
 package boomerang.flowfunction;
 
-import boomerang.BoomerangOptions;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Method;
-import boomerang.scene.Pair;
-import boomerang.scene.Statement;
-import boomerang.scene.StaticFieldVal;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Pair;
+import boomerang.scope.Statement;
+import boomerang.scope.StaticFieldVal;
+import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
@@ -23,17 +22,15 @@ import sync.pds.solver.nodes.Node;
 import sync.pds.solver.nodes.NodeWithLocation;
 import sync.pds.solver.nodes.PopNode;
 import sync.pds.solver.nodes.PushNode;
-import wpds.impl.Weight;
 import wpds.interfaces.State;
 
 public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
-  private final BoomerangOptions options;
-  private Strategies<Weight> strategies;
-  private BackwardBoomerangSolver solver;
+  private final DefaultBackwardFlowFunctionOptions options;
+  private Strategies strategies;
 
-  public DefaultBackwardFlowFunction(BoomerangOptions opts) {
-    this.options = opts;
+  public DefaultBackwardFlowFunction(DefaultBackwardFlowFunctionOptions options) {
+    this.options = options;
   }
 
   @Override
@@ -77,7 +74,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
       i++;
     }
 
-    if (callSite.isAssign() && calleeSp.isReturnStmt()) {
+    if (callSite.isAssignStmt() && calleeSp.isReturnStmt()) {
       if (callSite.getLeftOp().equals(fact)) {
         out.add(calleeSp.getReturnOp());
       }
@@ -91,7 +88,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
   @Override
   public Collection<State> normalFlow(Edge currEdge, Val fact) {
     Statement curr = currEdge.getTarget();
-    if (options.getAllocationVal(curr.getMethod(), curr, fact).isPresent()) {
+    if (options.allocationSite().getAllocationSite(curr.getMethod(), curr, fact).isPresent()) {
       return Collections.emptySet();
     }
     if (curr.isThrowStmt()) {
@@ -100,7 +97,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
     Set<State> out = Sets.newHashSet();
 
     boolean leftSideMatches = false;
-    if (curr.isAssign()) {
+    if (curr.isAssignStmt()) {
       Val leftOp = curr.getLeftOp();
       Val rightOp = curr.getRightOp();
       if (leftOp.equals(fact)) {
@@ -108,7 +105,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
         if (curr.isFieldLoad()) {
           if (options.trackFields()) {
             Pair<Val, Field> ifr = curr.getFieldLoad();
-            if (!options.ignoreInnerClassFields() || !ifr.getY().isInnerClassField()) {
+            if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
               out.add(new PushNode<>(currEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
             }
           }
@@ -174,11 +171,16 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
   @Override
   public void setSolver(
-      BackwardBoomerangSolver solver,
+      BackwardBoomerangSolver<?> solver,
       Multimap<Field, Statement> fieldLoadStatements,
       Multimap<Field, Statement> fieldStoreStatements) {
-    this.solver = solver;
-    this.strategies = new Strategies<>(options, solver, fieldLoadStatements, fieldStoreStatements);
+    this.strategies =
+        new Strategies(
+            options.staticFieldStrategy(),
+            options.arrayStrategy(),
+            solver,
+            fieldLoadStatements,
+            fieldStoreStatements);
   }
 
   protected Collection<State> systemArrayCopyFlow(Edge edge, Val fact) {

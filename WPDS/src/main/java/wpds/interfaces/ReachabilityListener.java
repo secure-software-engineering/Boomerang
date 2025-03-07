@@ -11,6 +11,7 @@
  */
 package wpds.interfaces;
 
+import de.fraunhofer.iem.Location;
 import wpds.impl.Transition;
 
 public interface ReachabilityListener<N extends Location, D extends State> {

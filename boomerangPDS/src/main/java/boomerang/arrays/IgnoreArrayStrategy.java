@@ -11,14 +11,13 @@
  */
 package boomerang.arrays;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Pair;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Pair;
+import boomerang.scope.Val;
 import java.util.Set;
-import wpds.impl.Weight;
 import wpds.interfaces.State;
 
-public class IgnoreArrayStrategy<W extends Weight> implements ArrayHandlingStrategy<W> {
+public class IgnoreArrayStrategy implements ArrayHandlingStrategy {
 
   @Override
   public void handleForward(Edge storeStmt, Pair<Val, Integer> storedVal, Set<State> out) {}

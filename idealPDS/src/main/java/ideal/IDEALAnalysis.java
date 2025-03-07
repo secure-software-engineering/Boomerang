@@ -15,8 +15,8 @@ import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.WeightedForwardQuery;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.AnalysisScope;
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.AnalysisScope;
+import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.base.Stopwatch;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,8 +37,8 @@ public class IDEALAnalysis<W extends Weight> {
   protected final IDEALAnalysisDefinition<W> analysisDefinition;
   private final AnalysisScope seedFactory;
   private int seedCount;
-  private Map<WeightedForwardQuery<W>, Stopwatch> analysisTime = new HashMap<>();
-  private Set<WeightedForwardQuery<W>> timedoutSeeds = new HashSet<>();
+  private final Map<WeightedForwardQuery<W>, Stopwatch> analysisTime = new HashMap<>();
+  private final Set<WeightedForwardQuery<W>> timedoutSeeds = new HashSet<>();
 
   public IDEALAnalysis(final IDEALAnalysisDefinition<W> analysisDefinition) {
     this.analysisDefinition = analysisDefinition;

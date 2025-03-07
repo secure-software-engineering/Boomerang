@@ -1,9 +1,9 @@
 package boomerang.weights;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Objects;
 import java.util.List;
@@ -15,8 +15,8 @@ public class DataFlowPathWeight extends Weight {
 
   private static DataFlowPathWeight one;
 
-  private PathTrackingWeight path;
-  private PathConditionWeight condition;
+  private final PathTrackingWeight path;
+  private final PathConditionWeight condition;
 
   private DataFlowPathWeight() {
     path = PathTrackingWeight.one();

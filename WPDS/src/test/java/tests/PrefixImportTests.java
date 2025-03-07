@@ -2,11 +2,11 @@ package tests;
 
 import static org.junit.Assert.assertTrue;
 
+import de.fraunhofer.iem.Location;
 import org.junit.Test;
 import wpds.impl.PAutomaton;
 import wpds.impl.PrefixImport;
 import wpds.impl.Transition;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class PrefixImportTests {
@@ -92,7 +92,7 @@ public class PrefixImportTests {
   }
 
   class StringState implements State {
-    private String rep;
+    private final String rep;
 
     public StringState(String string) {
       rep = string;
@@ -119,9 +119,8 @@ public class PrefixImportTests {
       StringState other = (StringState) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (rep == null) {
-        if (other.rep != null) return false;
-      } else if (!rep.equals(other.rep)) return false;
-      return true;
+        return other.rep == null;
+      } else return rep.equals(other.rep);
     }
 
     @Override
@@ -153,12 +152,11 @@ public class PrefixImportTests {
       StringLoc other = (StringLoc) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (rep == null) {
-        if (other.rep != null) return false;
-      } else if (!rep.equals(other.rep)) return false;
-      return true;
+        return other.rep == null;
+      } else return rep.equals(other.rep);
     }
 
-    private String rep;
+    private final String rep;
 
     public StringLoc(String string) {
       rep = string;

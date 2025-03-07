@@ -16,7 +16,7 @@ import wpds.impl.Weight;
 
 public class OneWeightFunctions<Stmt, Fact, Field, W extends Weight>
     implements WeightFunctions<Stmt, Fact, Field, W> {
-  private W one;
+  private final W one;
 
   public OneWeightFunctions(W one) {
     this.one = one;

@@ -1,21 +1,22 @@
 package boomerang.guided.flowfunction;
 
-import boomerang.BoomerangOptions;
 import boomerang.ForwardQuery;
 import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.flowfunction.DefaultForwardFlowFunctionOptions;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import wpds.interfaces.State;
 
 public class CustomForwardFlowFunction extends DefaultForwardFlowFunction {
-  public CustomForwardFlowFunction(BoomerangOptions opts) {
-    super(opts);
+
+  public CustomForwardFlowFunction(DefaultForwardFlowFunctionOptions options) {
+    super(options);
   }
 
   @Override
@@ -43,11 +44,8 @@ public class CustomForwardFlowFunction extends DefaultForwardFlowFunction {
 
   public boolean declaredMethodIsSystemExit(Statement callSite) {
     DeclaredMethod method = callSite.getInvokeExpr().getMethod();
-    if (method.getDeclaringClass().getFullyQualifiedName().equals("java.lang.System")
-        && method.getName().equals("exit")) {
-      return true;
-    }
-    return false;
+    return method.getDeclaringClass().getFullyQualifiedName().equals("java.lang.System")
+        && method.getName().equals("exit");
   }
 
   @Override

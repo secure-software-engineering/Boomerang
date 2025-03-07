@@ -16,8 +16,8 @@ import wpds.interfaces.State;
 
 public class PopNode<Location> implements State {
 
-  private PDSSystem system;
-  private Location location;
+  private final PDSSystem system;
+  private final Location location;
 
   public PopNode(Location location, PDSSystem system) {
     this.system = system;
@@ -43,9 +43,8 @@ public class PopNode<Location> implements State {
     if (getClass() != obj.getClass()) return false;
     PopNode other = (PopNode) obj;
     if (location == null) {
-      if (other.location != null) return false;
-    } else if (!location.equals(other.location)) return false;
-    return true;
+      return other.location == null;
+    } else return location.equals(other.location);
   }
 
   public Location location() {

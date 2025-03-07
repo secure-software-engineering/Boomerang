@@ -11,24 +11,22 @@
  */
 package test.cases.sets;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 import org.junit.Test;
-import test.cases.fields.Alloc;
 import test.core.AbstractBoomerangTest;
 
 public class TreeMapLongTest extends AbstractBoomerangTest {
-  @Test
-  public void addAndRetrieve() {
-    Map<Integer, Object> set = new TreeMap<Integer, Object>();
-    Alloc alias = new Alloc();
-    set.put(1, alias);
-    Object query2 = set.get(2);
-    queryFor(query2);
-  }
+
+  private final String target = TreeMapLongTarget.class.getName();
 
   @Override
-  protected boolean includeJDK() {
-    return true;
+  protected List<String> getIncludedPackages() {
+    return List.of(
+        "java.util.Map", "java.util.AbstractMap", "java.util.TreeMap", "java.util.TreeMap$Entry");
+  }
+
+  @Test
+  public void addAndRetrieve() {
+    analyze(target, testName.getMethodName());
   }
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
         <artifactId>SPDS</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -18,14 +18,34 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <!-- TODO: [ms] remove this when ready for deployment -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.4</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangScope</artifactId>
         </dependency>
+        <!-- from the release
         <dependency>
             <groupId>org.soot-oss</groupId>
             <artifactId>sootup.core</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.soot-oss</groupId>
+            <artifactId>sootup.java.bytecode</artifactId>
             <version>1.3.0</version>
         </dependency>
         <dependency>
@@ -43,6 +63,55 @@
             <artifactId>sootup.analysis</artifactId>
             <version>1.3.0</version>
         </dependency>
+-->
+
+        <!-- latest from jitpack -->
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.core</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.java.core</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.java.bytecode.frontend</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.callgraph</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.analysis.intraprocedural</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.analysis.interprocedural</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.interceptors</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.soot-oss.SootUp</groupId>
+            <artifactId>sootup.jimple.frontend</artifactId>
+            <version>develop-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>

@@ -12,14 +12,14 @@
 package wpds.impl;
 
 import com.google.common.collect.Maps;
+import de.fraunhofer.iem.Location;
 import java.util.Map;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class SummaryNestedWeightedPAutomatons<N extends Location, D extends State, W extends Weight>
     implements NestedWeightedPAutomatons<N, D, W> {
 
-  private Map<D, WeightedPAutomaton<N, D, W>> summaries = Maps.newHashMap();
+  private final Map<D, WeightedPAutomaton<N, D, W>> summaries = Maps.newHashMap();
 
   @Override
   public void putSummaryAutomaton(D target, WeightedPAutomaton<N, D, W> aut) {

@@ -11,7 +11,7 @@
  */
 package boomerang.solver;
 
-import boomerang.scene.Method;
+import boomerang.scope.Method;
 import wpds.impl.Weight;
 
 public interface ReachableMethodListener<W extends Weight> {

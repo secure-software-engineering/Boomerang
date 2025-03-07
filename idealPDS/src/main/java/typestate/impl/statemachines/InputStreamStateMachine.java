@@ -12,7 +12,7 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 import java.util.Collection;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.MatcherTransition;
@@ -27,7 +27,7 @@ public class InputStreamStateMachine extends TypeStateMachineWeightFunctions {
   private static final String READ_METHODS = ".* read.*";
   private static final String TYPE = "java.io.InputStream";
 
-  public static enum States implements State {
+  public enum States implements State {
     CLOSED,
     ERROR;
 
@@ -43,7 +43,7 @@ public class InputStreamStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CLOSED;
     }
   }
 

@@ -1,7 +1,7 @@
 package boomerang.weights;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Val;
 import boomerang.weights.PathConditionWeight.ConditionDomain;
 import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.Node;
@@ -9,9 +9,9 @@ import sync.pds.solver.nodes.Node;
 public class PathTrackingWeightFunctions
     implements WeightFunctions<Edge, Val, Edge, DataFlowPathWeight> {
 
-  private boolean trackDataFlowPath;
-  private boolean trackPathConditions;
-  private boolean implicitBooleanCondition;
+  private final boolean trackDataFlowPath;
+  private final boolean trackPathConditions;
+  private final boolean implicitBooleanCondition;
 
   public PathTrackingWeightFunctions(
       boolean trackDataFlowPath, boolean trackPathConditions, boolean implicitBooleanCondition) {
@@ -24,13 +24,13 @@ public class PathTrackingWeightFunctions
   public DataFlowPathWeight push(Node<Edge, Val> curr, Node<Edge, Val> succ, Edge callSite) {
     if (trackDataFlowPath && !curr.fact().isStatic()) {
       if (callSite.getStart().uses(curr.fact())) {
-        if (implicitBooleanCondition && callSite.getTarget().isAssign()) {
+        if (implicitBooleanCondition && callSite.getTarget().isAssignStmt()) {
           return new DataFlowPathWeight(
               new Node<>(callSite, curr.fact()), callSite.getStart(), succ.stmt().getMethod());
         }
         return new DataFlowPathWeight(new Node<>(callSite, curr.fact()));
       }
-      if (implicitBooleanCondition && callSite.getStart().isAssign()) {
+      if (implicitBooleanCondition && callSite.getStart().isAssignStmt()) {
         return new DataFlowPathWeight(callSite.getStart(), succ.stmt().getMethod());
       }
     }
@@ -52,7 +52,7 @@ public class PathTrackingWeightFunctions
       return new DataFlowPathWeight(succ);
     }
     if (implicitBooleanCondition
-        && curr.stmt().getTarget().isAssign()
+        && curr.stmt().getTarget().isAssignStmt()
         && curr.stmt().getTarget().getLeftOp().getType().isBooleanType()) {
       return new DataFlowPathWeight(
           curr.stmt().getTarget().getLeftOp(),

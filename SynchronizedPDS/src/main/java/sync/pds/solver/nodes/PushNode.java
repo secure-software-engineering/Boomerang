@@ -15,8 +15,8 @@ import sync.pds.solver.SyncPDSSolver.PDSSystem;
 
 public class PushNode<Stmt, Fact, Location> extends Node<Stmt, Fact> {
 
-  private PDSSystem system;
-  private Location location;
+  private final PDSSystem system;
+  private final Location location;
 
   public PushNode(Stmt stmt, Fact variable, Location location, PDSSystem system) {
     super(stmt, variable);
@@ -47,9 +47,8 @@ public class PushNode<Stmt, Fact, Location> extends Node<Stmt, Fact> {
     if (getClass() != obj.getClass()) return false;
     PushNode other = (PushNode) obj;
     if (location == null) {
-      if (other.location != null) return false;
-    } else if (!location.equals(other.location)) return false;
-    return true;
+      return other.location == null;
+    } else return location.equals(other.location);
   }
 
   @Override

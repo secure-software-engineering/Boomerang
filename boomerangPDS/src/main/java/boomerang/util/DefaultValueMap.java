@@ -18,7 +18,7 @@ import java.util.Set;
 
 public abstract class DefaultValueMap<K, V> implements Map<K, V> {
 
-  private HashMap<K, V> map;
+  private final HashMap<K, V> map;
 
   public DefaultValueMap() {
     map = new HashMap<K, V>();
@@ -48,8 +48,8 @@ public abstract class DefaultValueMap<K, V> implements Map<K, V> {
 
   public V getOrCreate(K key) {
     if (!map.containsKey(key)) {
-      V value = createItem((K) key);
-      map.put((K) key, value);
+      V value = createItem(key);
+      map.put(key, value);
       return value;
     }
 

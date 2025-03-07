@@ -13,7 +13,7 @@ package sync.pds.solver.nodes;
 
 public class ExclusionNode<Stmt, Fact, Location> extends Node<Stmt, Fact> {
 
-  private Location exclusion;
+  private final Location exclusion;
 
   public ExclusionNode(Stmt stmt, Fact variable, Location exclusion) {
     super(stmt, variable);
@@ -35,9 +35,8 @@ public class ExclusionNode<Stmt, Fact, Location> extends Node<Stmt, Fact> {
     if (getClass() != obj.getClass()) return false;
     ExclusionNode other = (ExclusionNode) obj;
     if (exclusion == null) {
-      if (other.exclusion != null) return false;
-    } else if (!exclusion.equals(other.exclusion)) return false;
-    return true;
+      return other.exclusion == null;
+    } else return exclusion.equals(other.exclusion);
   }
 
   public Location exclusion() {

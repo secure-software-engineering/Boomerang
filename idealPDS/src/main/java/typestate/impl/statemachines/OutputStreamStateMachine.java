@@ -12,7 +12,7 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 import java.util.Collection;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.MatcherTransition;
@@ -27,7 +27,7 @@ public class OutputStreamStateMachine extends TypeStateMachineWeightFunctions {
   private static final String WRITE_METHODS = ".* write.*";
   private static final String TYPE = "java.io.OutputStream";
 
-  public static enum States implements State {
+  public enum States implements State {
     NONE,
     CLOSED,
     ERROR;
@@ -39,12 +39,12 @@ public class OutputStreamStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == NONE;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CLOSED;
     }
   }
 

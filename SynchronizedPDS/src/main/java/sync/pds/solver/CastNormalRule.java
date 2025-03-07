@@ -11,10 +11,10 @@
  */
 package sync.pds.solver;
 
+import de.fraunhofer.iem.Location;
 import wpds.impl.NormalRule;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class CastNormalRule<N extends Location, D extends State, W extends Weight>

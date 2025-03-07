@@ -1,13 +1,13 @@
 package boomerang.callgraph;
 
-import boomerang.scene.CallGraph.Edge;
+import boomerang.scope.CallGraph.Edge;
 import java.util.Collection;
 
 /**
  * An interprocedural control-flow graph, for which caller-callee edges can be observed using {@link
  * CalleeListener} and {@link CallerListener}. Can be used for demand-driven call graph generation.
  *
- * @param <N> Nodes in the CFG, typically {@link Unit} or {@link Block}
+ * @param <N> Nodes in the CFG
  * @param <M> Method representation
  * @author Melanie Bruns on 04.05.2018
  */

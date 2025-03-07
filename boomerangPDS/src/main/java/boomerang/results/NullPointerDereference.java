@@ -1,12 +1,12 @@
 package boomerang.results;
 
 import boomerang.Query;
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.Field;
-import boomerang.scene.Method;
-import boomerang.scene.Pair;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Field;
+import boomerang.scope.Method;
+import boomerang.scope.Pair;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import java.util.List;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -17,12 +17,12 @@ public class NullPointerDereference implements AffectedLocation {
 
   private final ControlFlowGraph.Edge statement;
   private final Val variable;
-  private PAutomaton<Statement, INode<Val>> openingContext;
-  private PAutomaton<Statement, INode<Val>> closingContext;
-  private List<PathElement> dataFlowPath;
+  private final PAutomaton<Statement, INode<Val>> openingContext;
+  private final PAutomaton<Statement, INode<Val>> closingContext;
+  private final List<PathElement> dataFlowPath;
   private final ControlFlowGraph.Edge sourceStatement;
   private final Val sourceVariable;
-  private Query query;
+  private final Query query;
 
   public NullPointerDereference(ControlFlowGraph.Edge statement) {
     this(null, statement, null, null, null, null);
@@ -124,7 +124,7 @@ public class NullPointerDereference implements AffectedLocation {
    * 	foo(y); //call site context "c2"
    * }
    * foo(Object z){
-   * 	z.toString() //<- Variable z is null here under context c1, but *not* under c2)
+   * 	z.toString() // Variable z is null here under context c1, but *not* under c2)
    * }
    * </pre>
    *
@@ -153,7 +153,7 @@ public class NullPointerDereference implements AffectedLocation {
    *  } else {
    *  	x = returnNotNull(); //b2
    *  }
-   * 	x.toString() //<- Variable x is null here when the program executes along branch b1
+   * 	x.toString() // Variable x is null here when the program executes along branch b1
    * }
    * Object returnNull(){
    * 	Object y = null;
@@ -204,7 +204,7 @@ public class NullPointerDereference implements AffectedLocation {
         }
       }
     }
-    if (curr.isAssign()) {
+    if (curr.isAssignStmt()) {
       if (curr.isFieldLoad()) {
         Pair<Val, Field> ifr = curr.getFieldLoad();
         if (ifr.getX().equals(fact)) {
@@ -213,9 +213,7 @@ public class NullPointerDereference implements AffectedLocation {
       }
       if (curr.getRightOp().isLengthExpr()) {
         Val lengthOp = curr.getRightOp().getLengthOp();
-        if (lengthOp.equals(fact)) {
-          return true;
-        }
+        return lengthOp.equals(fact);
       }
     }
     return false;

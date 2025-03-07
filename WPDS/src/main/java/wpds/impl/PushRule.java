@@ -11,7 +11,7 @@
  */
 package wpds.impl;
 
-import wpds.interfaces.Location;
+import de.fraunhofer.iem.Location;
 import wpds.interfaces.State;
 
 public class PushRule<N extends Location, D extends State, W extends Weight> extends Rule<N, D, W> {
@@ -42,9 +42,8 @@ public class PushRule<N extends Location, D extends State, W extends Weight> ext
     if (getClass() != obj.getClass()) return false;
     PushRule other = (PushRule) obj;
     if (callSite == null) {
-      if (other.callSite != null) return false;
-    } else if (!callSite.equals(other.callSite)) return false;
-    return true;
+      return other.callSite == null;
+    } else return callSite.equals(other.callSite);
   }
 
   @Override

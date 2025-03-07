@@ -1,7 +1,7 @@
 package test.core;
 
 import boomerang.Query;
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 import java.util.Optional;
 
 public interface ValueOfInterestInUnit {

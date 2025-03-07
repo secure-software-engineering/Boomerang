@@ -1,8 +1,8 @@
 package wpds.impl;
 
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
 import java.util.Set;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
 
@@ -11,8 +11,8 @@ public abstract class StackListener<N extends Location, D extends State, W exten
   /** */
   private final WeightedPAutomaton<N, D, W> aut;
 
-  private N source;
-  private Set<N> notifiedStacks = Sets.newHashSet();
+  private final N source;
+  private final Set<N> notifiedStacks = Sets.newHashSet();
 
   public StackListener(WeightedPAutomaton<N, D, W> weightedPAutomaton, D state, N source) {
     super(state);
@@ -58,13 +58,12 @@ public abstract class StackListener<N extends Location, D extends State, W exten
     if (getClass() != obj.getClass()) return false;
     StackListener<N, D, W> other = (StackListener<N, D, W>) obj;
     if (source == null) {
-      if (other.source != null) return false;
-    } else if (!source.equals(other.source)) return false;
-    return true;
+      return other.source == null;
+    } else return source.equals(other.source);
   }
 
   private class SubStackListener extends WPAStateListener<N, D, W> {
-    private StackListener parent;
+    private final StackListener parent;
 
     public SubStackListener(D state, StackListener parent) {
       super(state);
@@ -106,9 +105,8 @@ public abstract class StackListener<N extends Location, D extends State, W exten
       if (getClass() != obj.getClass()) return false;
       SubStackListener other = (SubStackListener) obj;
       if (parent == null) {
-        if (other.parent != null) return false;
-      } else if (!parent.equals(other.parent)) return false;
-      return true;
+        return other.parent == null;
+      } else return parent.equals(other.parent);
     }
   }
 }

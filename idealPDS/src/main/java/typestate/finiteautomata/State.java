@@ -12,9 +12,9 @@
 package typestate.finiteautomata;
 
 public interface State {
-  public boolean isErrorState();
+  boolean isErrorState();
 
-  public boolean isInitialState();
+  boolean isInitialState();
 
-  public boolean isAccepting();
+  boolean isAccepting();
 }

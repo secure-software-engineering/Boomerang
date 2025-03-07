@@ -11,15 +11,15 @@
  */
 package wpds.impl;
 
-import wpds.interfaces.Empty;
+import de.fraunhofer.iem.Empty;
+import de.fraunhofer.iem.Location;
+import de.fraunhofer.iem.wildcard.ExclusionWildcard;
+import de.fraunhofer.iem.wildcard.Wildcard;
 import wpds.interfaces.IPushdownSystem;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
 import wpds.interfaces.WPAUpdateListener;
 import wpds.interfaces.WPDSUpdateListener;
-import wpds.wildcard.ExclusionWildcard;
-import wpds.wildcard.Wildcard;
 
 public abstract class PostStar<N extends Location, D extends State, W extends Weight> {
   private IPushdownSystem<N, D, W> pds;
@@ -34,7 +34,7 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
 
   private class PostStarUpdateListener implements WPDSUpdateListener<N, D, W> {
 
-    private WeightedPAutomaton<N, D, W> aut;
+    private final WeightedPAutomaton<N, D, W> aut;
 
     public PostStarUpdateListener(WeightedPAutomaton<N, D, W> fa) {
       aut = fa;
@@ -67,17 +67,16 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
       if (getClass() != obj.getClass()) return false;
       PostStarUpdateListener other = (PostStarUpdateListener) obj;
       if (aut == null) {
-        if (other.aut != null) return false;
-      } else if (!aut.equals(other.aut)) return false;
-      return true;
+        return other.aut == null;
+      } else return aut.equals(other.aut);
     }
   }
 
   private class UpdateTransitivePopListener extends WPAStateListener<N, D, W> {
 
-    private D start;
-    private N label;
-    private W newWeight;
+    private final D start;
+    private final N label;
+    private final W newWeight;
 
     public UpdateTransitivePopListener(D start, N label, D target, W newWeight) {
       super(target);
@@ -118,16 +117,15 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
         if (other.newWeight != null) return false;
       } else if (!newWeight.equals(other.newWeight)) return false;
       if (label == null) {
-        if (other.label != null) return false;
-      } else if (!label.equals(other.label)) return false;
-      return true;
+        return other.label == null;
+      } else return label.equals(other.label);
     }
   }
 
   private class HandlePopListener extends WPAStateListener<N, D, W> {
-    private N popLabel;
-    private D targetState;
-    private W ruleWeight;
+    private final N popLabel;
+    private final D targetState;
+    private final W ruleWeight;
 
     public HandlePopListener(D state, N popLabel, D targetState, W ruleWeight) {
       super(state);
@@ -192,14 +190,13 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
         if (other.ruleWeight != null) return false;
       } else if (!ruleWeight.equals(other.ruleWeight)) return false;
       if (targetState == null) {
-        if (other.targetState != null) return false;
-      } else if (!targetState.equals(other.targetState)) return false;
-      return true;
+        return other.targetState == null;
+      } else return targetState.equals(other.targetState);
     }
   }
 
   private class HandleNormalListener extends WPAStateListener<N, D, W> {
-    private NormalRule<N, D, W> rule;
+    private final NormalRule<N, D, W> rule;
 
     public HandleNormalListener(NormalRule<N, D, W> rule) {
       super(rule.getS1());
@@ -247,14 +244,13 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
       if (getClass() != obj.getClass()) return false;
       HandleNormalListener other = (HandleNormalListener) obj;
       if (rule == null) {
-        if (other.rule != null) return false;
-      } else if (!rule.equals(other.rule)) return false;
-      return true;
+        return other.rule == null;
+      } else return rule.equals(other.rule);
     }
   }
 
   private class HandlePushListener extends WPAStateListener<N, D, W> {
-    private PushRule<N, D, W> rule;
+    private final PushRule<N, D, W> rule;
 
     public HandlePushListener(PushRule<N, D, W> rule) {
       super(rule.getS1());
@@ -291,7 +287,7 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
                 public void onWeightAdded(
                     Transition<N, D> t, W w, WeightedPAutomaton<N, D, W> innerAut) {
                   if ((t.getLabel().equals(fa.epsilon()) && t.getTarget().equals(irState))) {
-                    update(t, (W) w);
+                    update(t, w);
 
                     W newWeight = getWeightFor(callSiteTransition);
                     update(
@@ -326,9 +322,8 @@ public abstract class PostStar<N extends Location, D extends State, W extends We
       if (getClass() != obj.getClass()) return false;
       HandlePushListener other = (HandlePushListener) obj;
       if (rule == null) {
-        if (other.rule != null) return false;
-      } else if (!rule.equals(other.rule)) return false;
-      return true;
+        return other.rule == null;
+      } else return rule.equals(other.rule);
     }
   }
 

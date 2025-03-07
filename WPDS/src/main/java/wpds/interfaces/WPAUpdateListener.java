@@ -11,6 +11,7 @@
  */
 package wpds.interfaces;
 
+import de.fraunhofer.iem.Location;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
 import wpds.impl.WeightedPAutomaton;

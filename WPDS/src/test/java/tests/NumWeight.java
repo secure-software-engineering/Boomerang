@@ -11,8 +11,8 @@
  */
 package tests;
 
+import de.fraunhofer.iem.Location;
 import wpds.impl.Weight;
-import wpds.interfaces.Location;
 
 public class NumWeight extends Weight {
 
@@ -99,7 +99,6 @@ public class NumWeight extends Weight {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     NumWeight other = (NumWeight) obj;
-    if (i != other.i) return false;
-    return true;
+    return i == other.i;
   }
 }

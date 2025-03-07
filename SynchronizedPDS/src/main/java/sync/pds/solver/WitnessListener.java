@@ -11,10 +11,10 @@
  */
 package sync.pds.solver;
 
+import de.fraunhofer.iem.Location;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Transition;
-import wpds.interfaces.Location;
 
 public interface WitnessListener<Stmt extends Location, Fact, Field extends Location> {
 

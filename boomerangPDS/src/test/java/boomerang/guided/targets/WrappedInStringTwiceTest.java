@@ -8,7 +8,6 @@ public class WrappedInStringTwiceTest {
     String x = new String("bar");
     String bar = doPassArgument(x);
     new File(bar);
-    ;
   }
 
   public static String doPassArgument(String param) {
