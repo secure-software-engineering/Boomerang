@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{IfStatement, Statement, Val}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{IfStatement, Statement, Val}
 import org.opalj.tac.{DUVar, If}
 import org.opalj.value.ValueInformation
 

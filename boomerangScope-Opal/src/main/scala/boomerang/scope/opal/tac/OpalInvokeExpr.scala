@@ -1,7 +1,8 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{DeclaredMethod, InvokeExpr, Val}
-import org.opalj.tac.{DUVar, FunctionCall, InstanceFunctionCall, InstanceMethodCall, MethodCall, NonVirtualFunctionCall, NonVirtualMethodCall}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{DeclaredMethod, InvokeExpr, Val}
+import org.opalj.tac._
 import org.opalj.value.ValueInformation
 
 import java.util

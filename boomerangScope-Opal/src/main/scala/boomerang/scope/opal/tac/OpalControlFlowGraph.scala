@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Statement}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{ControlFlowGraph, Statement}
 import com.google.common.collect.{HashMultimap, Multimap}
 
 import java.util

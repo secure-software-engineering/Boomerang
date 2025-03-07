@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{Field, IfStatement, InvokeExpr, Pair, Statement, StaticFieldVal, Val}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope._
 import com.google.common.base.Joiner
 import org.opalj.tac.{DUVar, PrimitiveTypecastExpr, Stmt}
 import org.opalj.value.ValueInformation

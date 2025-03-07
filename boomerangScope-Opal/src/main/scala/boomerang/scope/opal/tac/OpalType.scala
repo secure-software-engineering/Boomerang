@@ -1,5 +1,7 @@
-package boomerang.scene.opal
-import boomerang.scene.{AllocVal, Type, Val, WrappedClass}
+package boomerang.scope.opal.tac
+
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{AllocVal, Type, Val, WrappedClass}
 import org.opalj.br.ObjectType
 
 case class OpalType(delegate: org.opalj.br.Type, isNull: Boolean = false) extends Type {

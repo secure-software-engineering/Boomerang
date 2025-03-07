@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{DeclaredMethod, InvokeExpr, Type, WrappedClass}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{DeclaredMethod, InvokeExpr, Type, WrappedClass}
 import org.opalj.br.{DefinedMethod, MethodDescriptor, MethodSignature, ReferenceType}
 
 import java.util

@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Method, Pair, Type, Val}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope._
 import org.opalj.br.ObjectType
 import org.opalj.tac.{DUVar, DVar, Expr, UVar}
 import org.opalj.value.ValueInformation

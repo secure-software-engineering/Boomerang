@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{Method, Type, WrappedClass}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{Method, Type, WrappedClass}
 import org.opalj.br.{ClassFile, ReferenceType}
 
 import java.util

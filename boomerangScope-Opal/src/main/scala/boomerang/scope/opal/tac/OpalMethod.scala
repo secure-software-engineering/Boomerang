@@ -1,11 +1,12 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Method, Statement, Type, Val, WrappedClass}
+import boomerang.scope._
+import boomerang.scope.opal.OpalClient
 import org.opalj.br.{MethodDescriptor, MethodSignature, ObjectType}
 import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall, UVar}
 
-import scala.jdk.CollectionConverters._
 import java.util
+import scala.jdk.CollectionConverters._
 
 case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
 

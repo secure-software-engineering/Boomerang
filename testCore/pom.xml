@@ -35,11 +35,15 @@
 
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>boomerangScope-Soot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangScope-SootUp</artifactId>
         </dependency>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
-            <artifactId>boomerangScope-Soot</artifactId>
+            <artifactId>boomerangScope-Opal</artifactId>
         </dependency>
     </dependencies>
 </project>
