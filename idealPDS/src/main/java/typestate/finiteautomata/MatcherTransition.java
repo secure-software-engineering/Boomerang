@@ -16,12 +16,14 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+
 public class MatcherTransition extends TransitionImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(MatcherTransition.class);
-  private final Type type;
-  private final Parameter param;
-  private final String methodMatcher;
-  private boolean negate = false;
+  @Nonnull private final Type type;
+  @Nonnull private final Parameter param;
+  @Nonnull private final Pattern methodMatcher;
+  private final boolean negate;
 
   public enum Type {
     OnCall,
@@ -36,41 +38,36 @@ public class MatcherTransition extends TransitionImpl {
     Param2
   }
 
-  public MatcherTransition(State from, String methodMatcher, Parameter param, State to, Type type) {
-    super(from, to);
-    this.methodMatcher = methodMatcher;
-    this.type = type;
-    this.param = param;
+  public MatcherTransition(@Nonnull State from, @Nonnull String methodMatcher, @Nonnull Parameter param, @Nonnull State to, @Nonnull Type type) {
+    this(from, methodMatcher, false, param,to , type );
   }
 
   public MatcherTransition(
-      State from, String methodMatcher, boolean negate, Parameter param, State to, Type type) {
+          @Nonnull State from, @Nonnull String methodMatcher, boolean negate, @Nonnull Parameter param, @Nonnull State to, @Nonnull Type type) {
     super(from, to);
-    this.methodMatcher = methodMatcher;
+    this.methodMatcher = Pattern.compile(methodMatcher);
     this.negate = negate;
     this.type = type;
     this.param = param;
   }
 
-  public boolean matches(DeclaredMethod declaredMethod) {
-    boolean matches = Pattern.matches(methodMatcher, declaredMethod.getSubSignature());
-    if (matches)
-      LOGGER.debug(
-          "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
+  public boolean matches(@Nonnull DeclaredMethod declaredMethod) {
+    boolean matches = methodMatcher.matcher(declaredMethod.getSubSignature()).matches();
+    if (matches) {
+        LOGGER.debug(
+            "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
+    }
     return negate != matches;
   }
 
+  @Nonnull
   public Type getType() {
     return type;
   }
 
+  @Nonnull
   public Parameter getParam() {
     return param;
-  }
-
-  @Override
-  public String toString() {
-    return super.toString();
   }
 
   @Override
