@@ -11,51 +11,64 @@
  */
 package sync.pds.weights;
 
-import static sync.pds.weights.SetDomainRefactor.one;
-import static sync.pds.weights.SetDomainRefactor.zero;
-
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.Collection;
-import java.util.Set;
-import javax.annotation.Nonnull;
+
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class SetDomain<N, Stmt, Fact> implements Weight {
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Set;
 
-  private final Collection<Node<Stmt, Fact>> nodes;
+import static sync.pds.weights.SetDomainOne.one;
+import static sync.pds.weights.SetDomainZero.zero;
 
-  private SetDomain(Collection<Node<Stmt, Fact>> nodes) {
+public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
+
+  @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
+
+
+  private SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
+
 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other.equals(one())) {
+    final Weight one = one();
+    final Weight zero = SetDomainZero.zero();
+    if (other == one) {
       return this;
     }
-    if (this.equals(SetDomainRefactor.one())) {
+    if (this== one) {
       return other;
     }
-    return zero();
+    return zero;
   }
 
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    if (other.equals(SetDomainRefactor.zero())) return this;
-    if (this.equals(SetDomainRefactor.zero())) return other;
-    if (this.equals(SetDomainRefactor.one()) || other.equals(SetDomainRefactor.one())) {
-      return one();
-    }
-    if (other instanceof SetDomain) {
+    final Weight zero = SetDomainZero.zero();
+    final Weight one = SetDomainOne.one();
+    if (other==zero) return this;
+    if (this==one) return one();
+    if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
-      merged.addAll(((SetDomain) other).nodes);
-      return new SetDomain<N, Stmt, Fact>(merged);
+      merged.addAll(((SetDomainImpl) other).nodes);
+      return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
     return zero();
   }
+
+  @Nonnull
+  @Override
+  public Collection<Node> getNodes() {
+    return Lists.newArrayList(nodes);
+  }
+
 
   @Override
   public String toString() {
@@ -66,7 +79,7 @@ public class SetDomain<N, Stmt, Fact> implements Weight {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((nodes == null) ? 0 : nodes.hashCode());
+    result = prime * result +  nodes.hashCode();
     return result;
   }
 
@@ -75,13 +88,11 @@ public class SetDomain<N, Stmt, Fact> implements Weight {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    SetDomain other = (SetDomain) obj;
-    if (nodes == null) {
-      if (other.nodes != null) return false;
-    } else if (!nodes.equals(other.nodes)) return false;
-    return false;
+   return false;
   }
 
+  @Nonnull
+  @Override
   public Collection<Node<Stmt, Fact>> elements() {
     return Sets.newHashSet(nodes);
   }
