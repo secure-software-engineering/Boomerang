@@ -9,8 +9,7 @@ import wpds.impl.Weight;
 
 public class PathTrackingWeightOne implements PathTrackingWeight {
 
-  @Nonnull
-  private static final PathTrackingWeightOne one = new PathTrackingWeightOne();
+  @Nonnull private static final PathTrackingWeightOne one = new PathTrackingWeightOne();
 
   private PathTrackingWeightOne() {
     /*  Singleton */

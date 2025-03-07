@@ -33,7 +33,7 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Nonnull
   @Override
   public Collection<Transition> getValues() {
-    throw new IllegalStateException("don't");
+    throw new IllegalStateException("TransitionFunctionOne.getValues() - don't");
   }
 
   @Nonnull
@@ -55,7 +55,7 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Override
   public Weight combineWith(@Nonnull Weight other) {
     if (!(other instanceof TransitionFunctionOne)) {
-      throw new RuntimeException("don't");
+      throw new RuntimeException("TransitionFunctionOne.combineWith() - don't");
     }
     return other;
   }

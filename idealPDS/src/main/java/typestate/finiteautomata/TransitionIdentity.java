@@ -28,13 +28,13 @@ public class TransitionIdentity implements Transition {
   @Override
   @Nonnull
   public State from() {
-    throw new IllegalStateException("don't");
+    throw new IllegalStateException("TransitionIdentity.from() - don't");
   }
 
   @Override
   @Nonnull
   public State to() {
-    throw new IllegalStateException("don't");
+    throw new IllegalStateException("TransitionIdentity.to() - don't");
   }
 
   @Override
