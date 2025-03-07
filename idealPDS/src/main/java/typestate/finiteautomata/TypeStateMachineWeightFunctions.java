@@ -46,7 +46,7 @@ public abstract class TypeStateMachineWeightFunctions
 
   @Override
   public TransitionFunction getOne() {
-    return TransitionFunctionOne.getInstanceOne();
+    return TransitionFunctionOne.one();
   }
 
   public TransitionFunction pop(Node<Edge, Val> curr) {

@@ -20,7 +20,7 @@ public class DataFlowPathWeight implements Weight {
   private final PathConditionWeight condition;
 
   private DataFlowPathWeight() {
-    path = PathTrackingRepesentativeWeight.getInstanceOne();
+    path = PathTrackingWeightOne.one();
     condition = PathConditionWeight.one();
   }
 
@@ -35,12 +35,12 @@ public class DataFlowPathWeight implements Weight {
   }
 
   public DataFlowPathWeight(Statement callSite, Method callee) {
-    this.path = PathTrackingRepesentativeWeight.getInstanceOne();
+    this.path = PathTrackingWeightOne.one();
     this.condition = new PathConditionWeight(callSite, callee);
   }
 
   public DataFlowPathWeight(Statement ifStatement, Boolean condition) {
-    this.path = PathTrackingRepesentativeWeight.getInstanceOne();
+    this.path = PathTrackingWeightOne.one();
     this.condition = new PathConditionWeight(ifStatement, condition);
   }
 
@@ -50,12 +50,12 @@ public class DataFlowPathWeight implements Weight {
   }
 
   public DataFlowPathWeight(Val leftOp, ConditionDomain conditionVal) {
-    this.path = PathTrackingRepesentativeWeight.getInstanceOne();
+    this.path = PathTrackingWeightOne.one();
     this.condition = new PathConditionWeight(leftOp, conditionVal);
   }
 
   public DataFlowPathWeight(Val returnVal) {
-    this.path = PathTrackingRepesentativeWeight.getInstanceOne();
+    this.path = PathTrackingWeightOne.one();
     this.condition = new PathConditionWeight(returnVal);
   }
 

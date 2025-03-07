@@ -26,7 +26,7 @@ public class TransitionFunctionOne implements TransitionFunction {
 
   public TransitionFunctionOne() {}
 
-  public static TransitionFunctionOne getInstanceOne() {
+  public static TransitionFunctionOne one() {
     return one;
   }
 
@@ -45,7 +45,7 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other == getInstanceOne()) {
+    if (other == one()) {
       return this;
     }
     return other;

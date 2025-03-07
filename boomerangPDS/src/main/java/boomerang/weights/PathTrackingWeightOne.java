@@ -7,16 +7,16 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class PathTrackingRepesentativeWeight implements PathTrackingWeight {
+public class PathTrackingWeightOne implements PathTrackingWeight {
 
   @Nonnull
-  private static final PathTrackingRepesentativeWeight one = new PathTrackingRepesentativeWeight();
+  private static final PathTrackingWeightOne one = new PathTrackingWeightOne();
 
-  private PathTrackingRepesentativeWeight() {
+  private PathTrackingWeightOne() {
     /*  Singleton */
   }
 
-  public static PathTrackingRepesentativeWeight getInstanceOne() {
+  public static PathTrackingWeightOne one() {
     return one;
   }
 
@@ -36,11 +36,6 @@ public class PathTrackingRepesentativeWeight implements PathTrackingWeight {
   @Nonnull
   public Weight combineWith(@Nonnull Weight o) {
     throw new IllegalStateException("This should not happen!");
-  }
-
-  @Override
-  public int hashCode() {
-    return toString().hashCode();
   }
 
   @Override

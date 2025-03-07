@@ -54,7 +54,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    final Weight one = TransitionFunctionOne.getInstanceOne();
+    final Weight one = TransitionFunctionOne.one();
     if (other == one) {
       return this;
     }
@@ -93,7 +93,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (other == TransitionFunctionZero.zero()) {
       return this;
     }
-    Weight one = TransitionFunctionOne.getInstanceOne();
+    Weight one = TransitionFunctionOne.one();
     TransitionFunction func = (TransitionFunction) other;
     Set<Transition> transitions = new HashSet<>(values);
     HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
