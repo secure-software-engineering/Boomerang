@@ -34,31 +34,27 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
   }
 
 
-  @Nonnull
+
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
-    final Weight one = one();
-    final Weight zero = SetDomainZero.zero();
-    if (other == one) {
+  public Weight extendWith(Weight other) {
+    if (other.equals(one())) {
       return this;
     }
-    if (this== one) {
+    if (this.equals(one())) {
       return other;
     }
-    return zero;
+    return zero();
   }
 
-  @Nonnull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
-    final Weight zero = SetDomainZero.zero();
-    final Weight one = SetDomainOne.one();
-    if (other==zero) return this;
-    if (this==one) return one();
+  public Weight combineWith(Weight other) {
+    if (other.equals(zero())) return this;
+    if (this.equals(zero())) return other;
+    if (this.equals(one()) || other.equals(one())) return one();
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
       merged.addAll(((SetDomainImpl) other).nodes);
-      return new SetDomainImpl<N, Stmt, Fact>(merged);
+      return new SetDomainImpl<>(merged);
     }
     return zero();
   }
