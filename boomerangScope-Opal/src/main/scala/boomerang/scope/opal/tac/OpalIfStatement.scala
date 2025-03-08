@@ -14,7 +14,7 @@ class OpalIfStatement(val delegate: If[DUVar[ValueInformation]], method: OpalMet
     new OpalStatement(tac.stmts(target), method)
   }
 
-  override def evaluate(otherVal: Val): IfStatement.Evaluation = IfStatement.Evaluation.UNKOWN
+  override def evaluate(otherVal: Val): IfStatement.Evaluation = IfStatement.Evaluation.UNKNOWN
 
   override def uses(otherVal: Val): Boolean = {
     // TODO

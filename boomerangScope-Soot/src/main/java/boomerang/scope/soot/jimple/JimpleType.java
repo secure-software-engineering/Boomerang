@@ -187,41 +187,4 @@ public class JimpleType implements Type {
   public String toString() {
     return delegate.toString();
   }
-
-  private Collection<SootClass> getFullHierarchy(SootClass sourceClass, Set<SootClass> visited) {
-    Set<SootClass> result = new HashSet<>();
-
-    if (visited.contains(sourceClass)) {
-      return result;
-    }
-
-    result.add(sourceClass);
-    visited.add(sourceClass);
-
-    // Super interfaces
-    Collection<SootClass> interfaces = sourceClass.getInterfaces();
-    for (SootClass intFace : interfaces) {
-      result.addAll(getFullHierarchy(intFace, visited));
-    }
-
-    if (sourceClass.isInterface()) {
-      // Super interfaces
-      Collection<SootClass> superInterfaces =
-          Scene.v().getActiveHierarchy().getSuperinterfacesOf(sourceClass);
-
-      for (SootClass superInterface : superInterfaces) {
-        result.addAll(getFullHierarchy(superInterface, visited));
-      }
-    } else {
-      // Super classes
-      Collection<SootClass> superClasses =
-          Scene.v().getActiveHierarchy().getSuperclassesOf(sourceClass);
-
-      for (SootClass superClass : superClasses) {
-        result.addAll(getFullHierarchy(superClass, visited));
-      }
-    }
-
-    return result;
-  }
 }

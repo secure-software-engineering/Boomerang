@@ -21,3 +21,8 @@ class OpalFrameworkScope(project: Project[_], callGraph: org.opalj.tac.cg.CallGr
 
   override def newStaticFieldVal(field: Field, m: Method): StaticFieldVal = ???
 }
+
+object OpalFrameworkScope {
+  final val STATIC_INITIALIZER: String = "<clinit>"
+  final val CONSTRUCTOR: String = "<init>"
+}

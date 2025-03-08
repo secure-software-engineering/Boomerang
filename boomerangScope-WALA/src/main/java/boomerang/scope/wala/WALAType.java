@@ -80,6 +80,7 @@ public class WALAType implements Type {
     return meet.equals(typeAbstraction);
   }
 
+  @Override
   public boolean isSupertypeOf(String subType) {
     throw new RuntimeException("Not implemented");
   }
@@ -115,11 +116,6 @@ public class WALAType implements Type {
       }
     }
     return typeAbstraction.equals(TypeAbstraction.TOP);
-  }
-
-  @Override
-  public boolean isSupertypeOf(String subType) {
-    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   private boolean hasClassInterface(IClass next, String t) {

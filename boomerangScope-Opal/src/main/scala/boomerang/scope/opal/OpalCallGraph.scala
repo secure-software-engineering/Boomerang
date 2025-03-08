@@ -34,7 +34,7 @@ class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Meth
 
               addEdge(new Edge(srcStatement, targetMethod))
             case virtualMethod: VirtualDeclaredMethod =>
-              val targetMethod = OpalPhantomMethod(virtualMethod.declaringClassType, virtualMethod.name, virtualMethod.descriptor, srcStatement.getInvokeExpr.isStaticInvokeExpr)
+              val targetMethod = OpalPhantomMethod(virtualMethod, srcStatement.getInvokeExpr.isStaticInvokeExpr)
 
               addEdge(new Edge(srcStatement, targetMethod))
             case definedMethods: MultipleDefinedMethods =>

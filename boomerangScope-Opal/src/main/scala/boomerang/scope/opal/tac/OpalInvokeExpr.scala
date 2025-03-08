@@ -1,6 +1,5 @@
 package boomerang.scope.opal.tac
 
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.{DeclaredMethod, InvokeExpr, Val}
 import org.opalj.tac._
 import org.opalj.value.ValueInformation
@@ -31,15 +30,7 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[DUVar[ValueInformation]], me
     throw new RuntimeException("Method call is not an instance invoke expression")
   }
 
-  override def getMethod: DeclaredMethod = {
-    val resolvedMethod = OpalClient.resolveMethodRef(delegate.declaringClass, delegate.name, delegate.descriptor)
-
-    if (resolvedMethod.isDefined) {
-      OpalDeclaredMethod(this, resolvedMethod.get)
-    } else {
-      OpalPhantomDeclaredMethod(this, delegate.declaringClass, delegate.name, delegate.descriptor, delegate.isStaticMethodCall)
-    }
-  }
+  override def getMethod: DeclaredMethod = OpalDeclaredMethod(this, delegate)
 
   override def isSpecialInvokeExpr: Boolean = delegate.astID == NonVirtualMethodCall.ASTID
 
@@ -81,15 +72,7 @@ class OpalFunctionInvokeExpr(val delegate: FunctionCall[DUVar[ValueInformation]]
     throw new RuntimeException("Function call is not an instance invoke expression")
   }
 
-  override def getMethod: DeclaredMethod = {
-    val resolvedMethod = OpalClient.resolveMethodRef(delegate.declaringClass, delegate.name, delegate.descriptor)
-
-    if (resolvedMethod.isDefined) {
-      OpalDeclaredMethod(this, resolvedMethod.get)
-    } else {
-      OpalPhantomDeclaredMethod(this, delegate.declaringClass, delegate.name, delegate.descriptor, delegate.isStaticFunctionCall)
-    }
-  }
+  override def getMethod: DeclaredMethod = OpalDeclaredMethod(this, delegate)
 
   override def isSpecialInvokeExpr: Boolean = delegate.astID == NonVirtualFunctionCall.ASTID
 

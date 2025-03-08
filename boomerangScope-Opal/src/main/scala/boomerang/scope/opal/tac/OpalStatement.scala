@@ -83,10 +83,10 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     false
   }
 
-  override def isAssign: Boolean = delegate.isAssignment || isFieldStore || isArrayStore
+  override def isAssignStmt: Boolean = delegate.isAssignment || isFieldStore || isArrayStore
 
   override def getLeftOp: Val = {
-    if (isAssign) {
+    if (isAssignStmt) {
       if (delegate.isAssignment) {
         // TODO Change to variable
         return new OpalVal(delegate.asAssignment.targetVar, m)
@@ -113,7 +113,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
   }
 
   override def getRightOp: Val = {
-    if (isAssign) {
+    if (isAssignStmt) {
       if (delegate.isAssignment) {
         val rightExpr = delegate.asAssignment.expr
 
@@ -199,14 +199,6 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
   }
 
   override def isMultiArrayAllocation: Boolean = false
-
-  override def isStringAllocation: Boolean = {
-    if (delegate.isAssignment) {
-      return delegate.asAssignment.expr.isStringConst
-    }
-
-    throw new RuntimeException("Statement is not an allocation statement")
-  }
 
   override def isFieldStore: Boolean = {
     if (!delegate.isPutField) {
@@ -350,14 +342,14 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
         base = getInvokeExpr.getBase.toString + "."
       }
       var assign = ""
-      if (isAssign) {
+      if (isAssignStmt) {
         assign = getLeftOp + " = "
       }
 
       return assign + base + getInvokeExpr.getMethod.getName + "(" + Joiner.on(",").join(getInvokeExpr.getArgs) + ")"
     }
 
-    if (isAssign) {
+    if (isAssignStmt) {
       if (delegate.isAssignment) {
         if (getRightOp.isNewExpr) {
           return s"$getLeftOp = new + ${getRightOp.getNewExprType}"
