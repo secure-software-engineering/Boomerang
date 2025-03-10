@@ -1,35 +1,23 @@
 <p align="center">
-<img src="https://github.com/secure-software-engineering/SparseBoomerang/blob/master/SparseBoomerangLogo.png">
+<img src="https://github.com/secure-software-engineering/Boomerang/blob/master/BoomerangLogo.png">
 </p> 
 
-
-
-# SparseBoomerang
-
-SparseBoomerang is an extension to SPDS-based [Boomerang](https://github.com/CodeShield-Security/SPDS).
-This [SparseBoomerang repository](https://github.com/secure-software-engineering/SparseBoomerang) is now the main fork of [CodeShield](https://codeshield.io/)'s [Boomerang](https://github.com/CodeShield-Security/SPDS) which is providing further maintainance and development.
-SparseBoomerang introduces two sparsification strategies to aid the scalability of precise Boomerang pointer analysis.
-[SparseBoomerangCorrectness](SparseBoomerangCorrectness) show how these work and compare them against the default non-sparse Boomerang.
-
-## FlowDroid with SparseBoomerang
-The FlowDroid fork that works with SparseBoomerang is available at: [https://github.com/kadirayk/FlowDroid](https://github.com/kadirayk/FlowDroid)
-
-## Publications
-The paper is available:
-[Two Sparsification Strategies for Accelerating Demand-Driven Pointer Analysis](https://ieeexplore.ieee.org/document/10132184) (ICST 2023)
-
-Preprint is available: 
-[Two Sparsification Strategies for Accelerating Demand-Driven Pointer Analysis](https://www.bodden.de/pubs/kb23sparsification.pdf) (ICST 2023)
-
 ## Boomerang
-This repository contains a Java implementation of Synchronized Pushdown Systems.
-Additionally, it contains an implementation of [Boomerang](boomerangPDS) and [IDEal](idealPDS) based on a Weighted Pushdown System.
+Synchronized Pushdown Systems enable precise data-flow analysis.
+SPDS relies on two pushdown systems, one system models field-sensitivity, the other one context-sensitivity. The results of both systems are then synchronized and yield a field- and context-sensitive data-flow analysis.
+
+This repository contains:
+- a Java implementation of [Synchronized Pushdown Systems](https://digital.ub.uni-paderborn.de/hs/content/titleinfo/3030984).
+- an implementation of [Boomerang](boomerangPDS)
+- [IDEal](idealPDS) based on a Weighted Pushdown System.
+
+## Examples
+
+Boomerang code examples can be found [here](https://github.com/CodeShield-Security/SPDS/tree/master/boomerangPDS/src/main/java/boomerang/example). Code examples for IDEal are given [here](https://github.com/CodeShield-Security/SPDS/tree/master/idealPDS/src/main/java/inference/example).
 
 
-## Use as Maven dependency
-
+## Maven dependency
 The projects are released on [Maven Central](https://central.sonatype.com/artifact/de.fraunhofer.iem/SPDS) and can be included as a dependency in `.pom` files (replace `x.y.z` with the latest version).
-
 - Boomerang can be included with the following dependency:
 
 ```.xml
@@ -49,19 +37,6 @@ The projects are released on [Maven Central](https://central.sonatype.com/artifa
   <version>x.y.z</version>
 </dependency>
 ```
-
-## Checkout, Build and Install
-
-To build and install SPDS into your local repository, run 
-
-``mvn clean install -DskipTests``
-
-in the root directory of this git repository. If you do not want to skip the test cases, remove the last flag.
-
-## Examples
-
-Boomerang code examples can be found [here](https://github.com/CodeShield-Security/SPDS/tree/master/boomerangPDS/src/main/java/boomerang/example). Code examples for IDEal are given [here](https://github.com/CodeShield-Security/SPDS/tree/master/idealPDS/src/main/java/inference/example).
-
 
 ## Notes on the Test Cases
 
