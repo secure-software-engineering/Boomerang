@@ -1,38 +1,18 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-/*
-  sven said this example did not work before refactoring
-
 package example;
 
-import boomerang.BackwardQuery;
-import boomerang.Boomerang;
-import boomerang.DefaultBoomerangOptions;
-import boomerang.Query;
-import boomerang.results.BackwardBoomerangResults;
-import boomerang.scene.AnalysisScope;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import wpds.impl.Weight;
-
 public class ExampleMain1 {
-  public static void main(String... args) {
+  /*public static void main(String... args) {
     String sootClassPath = getSootClassPath();
     setupSoot(sootClassPath, "boomerang.example.BoomerangExampleTarget1");
     analyze();
@@ -112,7 +92,7 @@ public class ExampleMain1 {
         AnalysisScope scope =
             new AnalysisScope(sootCallGraph) {
               @Override
-              protected Collection<? extends Query> generate(Edge cfgEdge) {
+              protected Collection<? extends Query> generate(ControlFlowGraph.Edge cfgEdge) {
                 Statement statement = cfgEdge.getTarget();
                 if (statement.toString().contains("queryFor") && statement.containsInvokeExpr()) {
                   Val arg = statement.getInvokeExpr().getArg(0);
@@ -125,7 +105,7 @@ public class ExampleMain1 {
         Boomerang solver =
             new Boomerang(
                 sootCallGraph,
-                SootDataFlowScope.make(Scene.v()),
+                DataFlowScope.EXCLUDE_PHANTOM_CLASSES,
                 new DefaultBoomerangOptions(),
                 new SootFrameworkFactory());
 
@@ -143,7 +123,5 @@ public class ExampleMain1 {
         }
       }
     };
-  }
+  }*/
 }
-
- */
