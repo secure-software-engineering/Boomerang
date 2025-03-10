@@ -1,7 +1,5 @@
 package typestate.tests;
 
-import java.io.FileNotFoundException;
-import java.util.List;
 import org.junit.Test;
 import test.IDEALTestingFramework;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
@@ -17,13 +15,8 @@ public class PrintStreamLongTest extends IDEALTestingFramework {
     return new PrintStreamStateMachine();
   }
 
-  @Override
-  protected List<String> getIncludedPackages() {
-    return List.of("java.io.PrintStream");
-  }
-
   @Test
-  public void test1() throws FileNotFoundException {
+  public void test1() {
     analyze(target, testName.getMethodName(), 1, 1);
   }
 

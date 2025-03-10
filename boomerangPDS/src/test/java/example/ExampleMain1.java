@@ -14,22 +14,6 @@
 
 package example;
 
-import boomerang.BackwardQuery;
-import boomerang.Boomerang;
-import boomerang.DefaultBoomerangOptions;
-import boomerang.Query;
-import boomerang.results.BackwardBoomerangResults;
-import boomerang.scene.AnalysisScope;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import wpds.impl.Weight;
 
 public class ExampleMain1 {
   public static void main(String... args) {

@@ -13,11 +13,13 @@ import wpds.impl.Weight;
 public class PathTrackingWeight extends Weight {
 
   private static PathTrackingWeight one;
+
   /**
    * This set keeps track of all statements on a shortest path that use an alias from source to
    * sink.
    */
   private LinkedHashSet<Node<Edge, Val>> shortestPathWitness = new LinkedHashSet<>();
+
   /**
    * This set keeps track of all statement along all paths that use an alias from source to sink.
    */

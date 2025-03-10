@@ -15,36 +15,6 @@
 
 package example;
 
-import boomerang.Boomerang;
-import boomerang.DefaultBoomerangOptions;
-import boomerang.ForwardQuery;
-import boomerang.Query;
-import boomerang.framework.soot.SootDataFlowScope;
-import boomerang.framework.soot.SootFrameworkFactory;
-import boomerang.framework.soot.BoomerangPretransformer;
-import boomerang.framework.soot.SootCallGraph;
-import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.AllocVal;
-import boomerang.scene.AnalysisScope;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import com.google.common.collect.Table;
-import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import soot.G;
-import soot.PackManager;
-import soot.Scene;
-import soot.SceneTransformer;
-import soot.SootClass;
-import soot.Transform;
-import soot.Transformer;
-import soot.options.Options;
-import wpds.impl.Weight.NoWeight;
 
 public class ExampleMain2 {
   public static void main(String... args) {
