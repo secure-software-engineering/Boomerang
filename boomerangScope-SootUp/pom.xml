@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <sootUp.version>develop-SNAPSHOT</sootUp.version>
+        <sootUp.version>v2.0.0</sootUp.version>
         <license.dir>${project.parent.basedir}</license.dir>
         <!-- TODO [ms] remove this when ready for deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
