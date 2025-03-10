@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/secure-software-engineering/Boomerang/blob/master/BoomerangLogo.png">
+<img src="https://github.com/secure-software-engineering/Boomerang/blob/master/docs/img/BoomerangLogo.png">
 </p> 
 
 ## Boomerang
@@ -8,8 +8,8 @@ SPDS relies on two pushdown systems, one system models field-sensitivity, the ot
 
 This repository contains:
 - a Java implementation of [Synchronized Pushdown Systems](https://digital.ub.uni-paderborn.de/hs/content/titleinfo/3030984).
-- an implementation of [Boomerang](boomerangPDS)
-- [IDEal](idealPDS) based on a Weighted Pushdown System.
+- [Boomerang](boomerangPDS) to calculate on-demand dataflow queries using a generic approach so you can plugin your favorite Static Analysis Framework.
+- [IDEal](idealPDS) based on a [Weighted Pushdown System](https://www.bodden.de/pubs/sab19context.pdf).
 
 ## Examples
 
