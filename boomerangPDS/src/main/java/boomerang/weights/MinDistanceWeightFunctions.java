@@ -12,7 +12,7 @@ public class MinDistanceWeightFunctions
   public MinDistanceWeight push(
       Node<Statement, Val> curr, Node<Statement, Val> succ, Statement callSite) {
     if (!curr.fact().isStatic()) {
-      return new MinDistanceWeight(1);
+      return new MinDistanceWeight(Integer.valueOf(1));
     }
     return MinDistanceWeightOne.one();
   }

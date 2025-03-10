@@ -12,9 +12,9 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class DataFlowPathWeight implements Weight {
+public class DataFlowPathWeight implements Weight, DataFlowPathWeightImpl {
 
-  private static DataFlowPathWeight one;
+
 
   private final PathTrackingWeight path;
   private final PathConditionWeight condition;
@@ -59,10 +59,7 @@ public class DataFlowPathWeight implements Weight {
     this.condition = new PathConditionWeight(returnVal);
   }
 
-  public static DataFlowPathWeight one() {
-    if (one == null) one = new DataFlowPathWeight();
-    return one;
-  }
+
 
   @Override
   public boolean equals(Object o) {
@@ -77,14 +74,17 @@ public class DataFlowPathWeight implements Weight {
     return Objects.hashCode(path, condition);
   }
 
+  @Override
   public Set<Node<Edge, Val>> getAllStatements() {
     return path.getShortestPathWitness();
   }
 
+  @Override
   public Map<Statement, ConditionDomain> getConditions() {
     return condition.getConditions();
   }
 
+  @Override
   public Map<Val, ConditionDomain> getEvaluationMap() {
     return condition.getEvaluationMap();
   }
@@ -95,6 +95,7 @@ public class DataFlowPathWeight implements Weight {
   }
 
   @Nonnull
+  @Override
   public Weight extendWith(@Nonnull Weight other) {
     return new DataFlowPathWeight(
         (PathTrackingWeightImpl) path.extendWith(((DataFlowPathWeight) other).path),
