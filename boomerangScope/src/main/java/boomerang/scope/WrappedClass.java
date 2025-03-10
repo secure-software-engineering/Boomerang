@@ -1,10 +1,21 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope;
 
-import java.util.Set;
+import java.util.Collection;
 
 public interface WrappedClass {
 
-  Set<Method> getMethods();
+  Collection<Method> getMethods();
 
   boolean hasSuperclass();
 
@@ -16,7 +27,5 @@ public interface WrappedClass {
 
   String getFullyQualifiedName();
 
-  String getName();
-
-  Object getDelegate();
+  boolean isPhantom();
 }

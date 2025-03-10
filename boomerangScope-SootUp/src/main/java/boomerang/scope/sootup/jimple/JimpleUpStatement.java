@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.Field;
@@ -11,7 +22,6 @@ import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.base.Joiner;
 import java.util.Arrays;
 import java.util.Collection;
-import sootup.core.jimple.common.constant.StringConstant;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JCaughtExceptionRef;
@@ -205,12 +215,6 @@ public class JimpleUpStatement extends Statement {
   public boolean isMultiArrayAllocation() {
     return (delegate instanceof JAssignStmt)
         && ((JAssignStmt) delegate).getRightOp() instanceof JNewMultiArrayExpr;
-  }
-
-  @Override
-  public boolean isStringAllocation() {
-    return delegate instanceof JAssignStmt
-        && ((JAssignStmt) delegate).getRightOp() instanceof StringConstant;
   }
 
   @Override

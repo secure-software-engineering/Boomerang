@@ -1,24 +1,36 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import com.google.common.collect.Sets;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import soot.SootClass;
 import soot.SootMethod;
 
 public class JimpleWrappedClass implements WrappedClass {
 
   private final SootClass delegate;
-  private Set<Method> methods;
+  private Collection<Method> methods;
 
   public JimpleWrappedClass(SootClass delegate) {
     this.delegate = delegate;
   }
 
-  public Set<Method> getMethods() {
+  public Collection<Method> getMethods() {
     List<SootMethod> ms = delegate.getMethods();
     if (methods == null) {
       methods = Sets.newHashSet();
@@ -46,41 +58,34 @@ public class JimpleWrappedClass implements WrappedClass {
   }
 
   @Override
-  public String toString() {
-    return delegate.toString();
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((delegate == null) ? 0 : delegate.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleWrappedClass other = (JimpleWrappedClass) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
-  }
-
-  @Override
   public String getFullyQualifiedName() {
     return delegate.getName();
   }
 
   @Override
-  public String getName() {
-    return delegate.getName();
+  public boolean isPhantom() {
+    return delegate.isPhantom();
+  }
+
+  public SootClass getDelegate() {
+    return delegate;
   }
 
   @Override
-  public Object getDelegate() {
-    return delegate;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleWrappedClass that = (JimpleWrappedClass) o;
+    return Objects.equals(delegate, that.delegate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(delegate);
+  }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
   }
 }

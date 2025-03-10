@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -174,6 +174,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
                 if (allocNode.isPresent()
                     || node.stmt().getStart().isArrayLoad()
                     || node.stmt().getStart().isFieldLoad()) {
+                  // TODO Static fields should be covered too
+                  // || node.stmt().getStart().isStaticFieldLoad()) {
                   backwardSolver
                       .getFieldAutomaton()
                       .registerListener(new EmptyFieldListener(key, node));

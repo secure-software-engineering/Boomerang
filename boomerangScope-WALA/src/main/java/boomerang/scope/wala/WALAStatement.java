@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2020
- * CodeShield GmbH, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -268,12 +268,6 @@ public class WALAStatement extends Statement {
 
   @Override
   public boolean isMultiArrayAllocation() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isStringAllocation() {
     // TODO Auto-generated method stub
     return false;
   }

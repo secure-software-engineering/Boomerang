@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2020
- * CodeShield GmbH, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -120,8 +120,13 @@ public class WALAMethod extends Method {
   }
 
   @Override
-  public boolean isNative() {
-    return delegate.isNative();
+  public boolean isDefined() {
+    return true;
+  }
+
+  @Override
+  public boolean isPhantom() {
+    return false;
   }
 
   @Override
@@ -188,11 +193,6 @@ public class WALAMethod extends Method {
   @Override
   public boolean isConstructor() {
     return delegate.isInit();
-  }
-
-  @Override
-  public boolean isPublic() {
-    return delegate.isPublic();
   }
 
   public Statement getBranchTarget(int target) {

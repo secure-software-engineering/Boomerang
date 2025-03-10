@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2020
- * CodeShield GmbH, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -34,12 +34,12 @@ public class WALADataFlowScope {
       new DataFlowScope() {
         @Override
         public boolean isExcluded(DeclaredMethod method) {
-          return !method.getDeclaringClass().isApplicationClass() || method.isNative();
+          return !method.getDeclaringClass().isApplicationClass();
         }
 
         @Override
         public boolean isExcluded(Method method) {
-          return !method.getDeclaringClass().isApplicationClass() || method.isNative();
+          return !method.getDeclaringClass().isApplicationClass() || method.isPhantom();
         }
       };
 }

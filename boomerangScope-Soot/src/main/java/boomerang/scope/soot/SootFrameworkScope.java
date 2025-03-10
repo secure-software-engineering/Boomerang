@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.soot;
 
 import boomerang.scope.CallGraph;
@@ -25,10 +36,10 @@ public class SootFrameworkScope implements FrameworkScope {
   protected DataFlowScope dataFlowScope;
 
   public SootFrameworkScope(
-      Scene scene,
-      soot.jimple.toolkits.callgraph.CallGraph callGraph,
-      Collection<SootMethod> entryPoints,
-      DataFlowScope dataFlowScope) {
+      @Nonnull Scene scene,
+      @Nonnull soot.jimple.toolkits.callgraph.CallGraph callGraph,
+      @Nonnull Collection<SootMethod> entryPoints,
+      @Nonnull DataFlowScope dataFlowScope) {
     this.scene = scene;
 
     this.sootCallGraph = new SootCallGraph(callGraph, entryPoints);
@@ -49,7 +60,7 @@ public class SootFrameworkScope implements FrameworkScope {
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
     JimpleStaticFieldVal val = ((JimpleStaticFieldVal) fact);
     return ((JimpleField) val.field())
-        .getSootField().getDeclaringClass().getMethods().stream()
+        .getDelegate().getDeclaringClass().getMethods().stream()
             .filter(SootMethod::hasActiveBody)
             .map(JimpleMethod::of);
   }
@@ -57,12 +68,6 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public StaticFieldVal newStaticFieldVal(Field field, Method m) {
     return new JimpleStaticFieldVal((JimpleField) field, m);
-  }
-
-  @Nonnull
-  @Override
-  public Method resolveMethod(String signatureStr) {
-    return JimpleMethod.of(scene.getMethod(signatureStr));
   }
 
   @Override
@@ -73,15 +78,5 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public DataFlowScope getDataFlowScope() {
     return dataFlowScope;
-  }
-
-  @Override
-  public void updateDataFlowScope(DataFlowScope dataFlowScope) {
-    this.dataFlowScope = dataFlowScope;
-  }
-
-  @Override
-  public DataFlowScope createDataFlowScopeWithoutComplex() {
-    return SootDataFlowScopeUtil.excludeComplex();
   }
 }

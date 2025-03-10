@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -16,11 +16,11 @@ import boomerang.debugger.Debugger;
 import boomerang.results.ForwardBoomerangResults;
 import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.scope.soot.BoomerangPretransformer;
-import boomerang.scope.soot.SootDataFlowScopeUtil;
 import boomerang.scope.soot.SootFrameworkScope;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Table;
@@ -113,7 +113,7 @@ public class Main {
                 Scene.v(),
                 Scene.v().getCallGraph(),
                 Scene.v().getEntryPoints(),
-                SootDataFlowScopeUtil.make(Scene.v()));
+                DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
         IDEALAnalysis<InferenceWeight> solver =
             new IDEALAnalysis<>(
                 new IDEALAnalysisDefinition<>() {

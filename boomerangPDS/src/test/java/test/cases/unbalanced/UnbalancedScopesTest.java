@@ -1,72 +1,45 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.cases.unbalanced;
 
 import org.junit.Test;
-import test.cases.fields.Alloc;
-import test.cases.fields.B;
 import test.core.AbstractBoomerangTest;
 
 public class UnbalancedScopesTest extends AbstractBoomerangTest {
+
+  private final String target = UnbalancedScopesTarget.class.getName();
+
   @Test
   public void closingContext() {
-    Object object = create();
-    queryFor(object);
+    analyze(target, testName.getMethodName());
   }
 
   @Test
   public void openingContext() {
-    Object object = create();
-    Object y = object;
-    inner(y);
+    analyze(target, testName.getMethodName());
   }
 
   @Test
   public void doubleClosingContext() {
-    Object object = wrappedCreate();
-    queryFor(object);
+    analyze(target, testName.getMethodName());
   }
 
   @Test
   public void branchedReturn() {
-    Object object = aOrB();
-    queryFor(object);
+    analyze(target, testName.getMethodName());
   }
 
   @Test
   public void summaryReuse() {
-    Object object = createA();
-    Object y = object;
-    Object x = id(y);
-    queryFor(x);
-  }
-
-  private Object createA() {
-    Alloc c = new Alloc();
-    Object d = id(c);
-    return d;
-  }
-
-  private Object id(Object c) {
-    return c;
-  }
-
-  private Object aOrB() {
-    if (staticallyUnknown()) {
-      return new Alloc();
-    }
-    return new B();
-  }
-
-  public Object wrappedCreate() {
-    if (staticallyUnknown()) return create();
-    return wrappedCreate();
-  }
-
-  private void inner(Object inner) {
-    Object x = inner;
-    queryFor(x);
-  }
-
-  private Object create() {
-    return new Alloc();
+    analyze(target, testName.getMethodName());
   }
 }

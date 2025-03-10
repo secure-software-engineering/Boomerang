@@ -1,9 +1,19 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
-import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +21,6 @@ import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
 import sootup.core.jimple.common.expr.JStaticInvokeExpr;
-import sootup.java.core.JavaSootMethod;
 
 public class JimpleUpInvokeExpr implements InvokeExpr {
 
@@ -60,14 +69,7 @@ public class JimpleUpInvokeExpr implements InvokeExpr {
 
   @Override
   public DeclaredMethod getMethod() {
-    JavaSootMethod sootMethod =
-        SootUpFrameworkScope.getInstance()
-            .getSootMethod(delegate.getMethodSignature())
-            .orElseThrow(
-                () ->
-                    new IllegalStateException(
-                        "Can't find Method Declaration! " + delegate.getMethodSignature()));
-    return new JimpleUpDeclaredMethod(this, sootMethod);
+    return new JimpleUpDeclaredMethod(this, delegate.getMethodSignature());
   }
 
   @Override

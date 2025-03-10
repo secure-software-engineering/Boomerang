@@ -1,16 +1,28 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CallGraph {
 
-  protected Logger LOGGER = LoggerFactory.getLogger(CallGraph.class);
+  protected static final Logger LOGGER = LoggerFactory.getLogger(CallGraph.class);
   private final Set<Edge> edges = Sets.newHashSet();
   private final Multimap<Statement, Edge> edgesOutOf = HashMultimap.create();
   private final Multimap<Method, Edge> edgesInto = HashMultimap.create();
@@ -42,26 +54,16 @@ public class CallGraph {
     }
 
     @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((callSite == null) ? 0 : callSite.hashCode());
-      result = prime * result + ((callee == null) ? 0 : callee.hashCode());
-      return result;
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      Edge edge = (Edge) o;
+      return Objects.equals(callSite, edge.callSite) && Objects.equals(callee, edge.callee);
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
-      Edge other = (Edge) obj;
-      if (callSite == null) {
-        if (other.callSite != null) return false;
-      } else if (!callSite.equals(other.callSite)) return false;
-      if (callee == null) {
-        return other.callee == null;
-      } else return callee.equals(other.callee);
+    public int hashCode() {
+      return Objects.hash(callSite, callee);
     }
 
     @Override
@@ -73,7 +75,11 @@ public class CallGraph {
   public boolean addEdge(Edge edge) {
     edgesOutOf.put(edge.callSite, edge);
     edgesInto.put(edge.tgt(), edge);
-    computeStaticFieldsLoadAndStores(edge.tgt());
+
+    if (edge.tgt().isDefined()) {
+      computeStaticFieldsLoadAndStores(edge.tgt());
+    }
+
     return edges.add(edge);
   }
 

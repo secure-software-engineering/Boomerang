@@ -1,7 +1,17 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope;
 
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 
 public interface FrameworkScope {
 
@@ -16,14 +26,4 @@ public interface FrameworkScope {
   Stream<Method> handleStaticFieldInitializers(Val fact);
 
   StaticFieldVal newStaticFieldVal(Field field, Method m);
-
-  // TODO Refactor: Only used in tests
-  void updateDataFlowScope(DataFlowScope dataFlowScope);
-
-  // TODO Refactor: Only used in tests
-  @Nonnull
-  Method resolveMethod(String signatureStr);
-
-  // TODO Refactor: Only used in tests
-  DataFlowScope createDataFlowScopeWithoutComplex();
 }

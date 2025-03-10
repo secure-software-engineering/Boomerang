@@ -1,39 +1,44 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.DeclaredMethod;
-import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import sootup.core.signatures.MethodSignature;
 import sootup.java.core.JavaSootClass;
-import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
 public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
-  private final JavaSootMethod delegate;
+  private final MethodSignature delegate;
 
-  public JimpleUpDeclaredMethod(JimpleUpInvokeExpr invokeExpr, JavaSootMethod delegate) {
+  public JimpleUpDeclaredMethod(JimpleUpInvokeExpr invokeExpr, MethodSignature delegate) {
     super(invokeExpr);
 
     this.delegate = delegate;
   }
 
-  public JavaSootMethod getDelegate() {
+  public MethodSignature getDelegate() {
     return delegate;
   }
 
   @Override
-  public boolean isNative() {
-    return delegate.isNative();
-  }
-
-  @Override
   public String getSubSignature() {
-    return delegate.getSignature().getSubSignature().toString();
+    return delegate.getSubSignature().toString();
   }
 
   @Override
@@ -42,30 +47,20 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
   }
 
   @Override
-  public boolean isStatic() {
-    return delegate.isStatic();
-  }
-
-  @Override
   public boolean isConstructor() {
-    return SootUpFrameworkScope.isConstructor(delegate);
+    return delegate.getName().equals(SootUpFrameworkScope.CONSTRUCTOR_NAME);
   }
 
   @Override
   public String getSignature() {
-    return delegate.getSignature().toString();
-  }
-
-  @Override
-  public Method getCalledMethod() {
-    return JimpleUpMethod.of(delegate);
+    return delegate.toString();
   }
 
   @Override
   public WrappedClass getDeclaringClass() {
     JavaSootClass sootClass =
         SootUpFrameworkScope.getInstance()
-            .getSootClass((JavaClassType) delegate.getDeclaringClassType());
+            .getSootClass((JavaClassType) delegate.getDeclClassType());
     return new JimpleUpWrappedClass(sootClass);
   }
 
@@ -83,7 +78,7 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(delegate.getReturnType());
+    return new JimpleUpType(delegate.getType());
   }
 
   @Override

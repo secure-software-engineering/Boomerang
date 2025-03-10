@@ -1,6 +1,15 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.sootup;
-
-import static boomerang.scope.sootup.SootUpDataFlowScopeUtil.excludeComplex;
 
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
@@ -90,13 +99,6 @@ public class SootUpFrameworkScope implements FrameworkScope {
     return new JimpleUpStaticFieldVal((JimpleUpField) field, m);
   }
 
-  @Nonnull
-  @Override
-  public Method resolveMethod(String signatureStr) {
-    return JimpleUpMethod.of(
-        view.getMethod(view.getIdentifierFactory().parseMethodSignature(signatureStr)).get());
-  }
-
   @Override
   public CallGraph getCallGraph() {
     return sootUpCallGraph;
@@ -107,20 +109,10 @@ public class SootUpFrameworkScope implements FrameworkScope {
     return dataflowScope;
   }
 
-  @Override
-  public void updateDataFlowScope(DataFlowScope dataFlowScope) {
-    this.dataflowScope = dataFlowScope;
-  }
-
-  @Override
-  public DataFlowScope createDataFlowScopeWithoutComplex() {
-    return excludeComplex(this);
-  }
-
   // ---
 
-  private static final String CONSTRUCTOR_NAME = "<init>";
-  private static final String STATIC_INITIALIZER_NAME = "<clinit>";
+  public static final String CONSTRUCTOR_NAME = "<init>";
+  public static final String STATIC_INITIALIZER_NAME = "<clinit>";
 
   public JavaView getView() {
     return view;

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -17,6 +17,7 @@ import boomerang.scope.Pair;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import java.util.Objects;
 import soot.Local;
 import soot.NullType;
 import soot.Scene;
@@ -36,6 +37,7 @@ import soot.jimple.StaticFieldRef;
 import soot.jimple.StringConstant;
 
 public class JimpleVal extends Val {
+
   private final Value v;
 
   public JimpleVal(Value v, Method m) {
@@ -48,52 +50,47 @@ public class JimpleVal extends Val {
     this.v = v;
   }
 
+  @Override
   public JimpleType getType() {
     return v == null ? new JimpleType(NullType.v()) : new JimpleType(v.getType());
   }
 
-  public Method m() {
-    return m;
-  }
-
   @Override
-  public String toString() {
-    return v.toString()
-        + " ("
-        + m.getDeclaringClass()
-        + "."
-        + m
-        + ")"
-        + (isUnbalanced() ? " unbalanaced " + unbalancedStmt : "");
-  }
-
   public boolean isStatic() {
     return false;
   }
 
+  @Override
   public boolean isNewExpr() {
     return v instanceof NewExpr;
   }
 
+  @Override
   public Type getNewExprType() {
-    return new JimpleType(v.getType());
+    if (isNewExpr()) {
+      return new JimpleType(v.getType());
+    }
+
+    throw new RuntimeException("Val is not a new expression");
   }
 
+  @Override
   public Val asUnbalanced(Edge stmt) {
     return new JimpleVal(v, m, stmt);
   }
 
+  @Override
   public boolean isLocal() {
     return v instanceof Local;
   }
 
+  @Override
   public boolean isArrayAllocationVal() {
     // TODO Split this into single array and multi array allocation
-    if (v instanceof NewArrayExpr) {
-      return true;
-    } else return v instanceof NewMultiArrayExpr;
+    return v instanceof NewArrayExpr || v instanceof NewMultiArrayExpr;
   }
 
+  @Override
   public Val getArrayAllocationSize() {
     // TODO Split this into single array and multi array allocation
     if (v instanceof NewArrayExpr) {
@@ -111,18 +108,26 @@ public class JimpleVal extends Val {
     throw new RuntimeException("Val is not an array allocation val");
   }
 
+  @Override
   public boolean isNull() {
     return v instanceof NullConstant;
   }
 
+  @Override
   public boolean isStringConstant() {
     return v instanceof StringConstant;
   }
 
+  @Override
   public String getStringValue() {
-    return ((StringConstant) v).value;
+    if (isStringConstant()) {
+      return ((StringConstant) v).value;
+    }
+
+    throw new RuntimeException("Val is not a String constant");
   }
 
+  @Override
   public boolean isStringBufferOrBuilder() {
     Type type = getType();
     return type.toString().equals("java.lang.String")
@@ -130,19 +135,26 @@ public class JimpleVal extends Val {
         || type.toString().equals("java.lang.StringBuffer");
   }
 
+  @Override
   public boolean isThrowableAllocationType() {
     return Scene.v()
         .getOrMakeFastHierarchy()
         .canStoreType(getType().getDelegate(), Scene.v().getType("java.lang.Throwable"));
   }
 
+  @Override
   public boolean isCast() {
     return v instanceof CastExpr;
   }
 
+  @Override
   public Val getCastOp() {
-    CastExpr cast = (CastExpr) v;
-    return new JimpleVal(cast.getOp(), m);
+    if (isCast()) {
+      CastExpr cast = (CastExpr) v;
+      return new JimpleVal(cast.getOp(), m);
+    }
+
+    throw new RuntimeException("Val is not a cast expression");
   }
 
   public boolean isInstanceFieldRef() {
@@ -158,59 +170,94 @@ public class JimpleVal extends Val {
     return new JimpleStaticFieldVal(new JimpleField(val.getField()), m);
   }
 
+  @Override
   public boolean isArrayRef() {
     return v instanceof ArrayRef;
   }
 
   @Override
   public Pair<Val, Integer> getArrayBase() {
-    return new Pair<>(
-        new JimpleVal(((ArrayRef) v).getBase(), m),
-        ((ArrayRef) v).getIndex() instanceof IntConstant
-            ? ((IntConstant) ((ArrayRef) v).getIndex()).value
-            : -1);
+    if (isArrayRef()) {
+      return new Pair<>(
+          new JimpleVal(((ArrayRef) v).getBase(), m),
+          ((ArrayRef) v).getIndex() instanceof IntConstant
+              ? ((IntConstant) ((ArrayRef) v).getIndex()).value
+              : -1);
+    }
+
+    throw new RuntimeException("Val is not an array ref");
   }
 
+  @Override
   public boolean isInstanceOfExpr() {
     return v instanceof InstanceOfExpr;
   }
 
+  @Override
   public Val getInstanceOfOp() {
-    InstanceOfExpr val = (InstanceOfExpr) v;
-    return new JimpleVal(val.getOp(), m);
+    if (isInstanceOfExpr()) {
+      InstanceOfExpr val = (InstanceOfExpr) v;
+      return new JimpleVal(val.getOp(), m);
+    }
+
+    throw new RuntimeException("Val is not an instanceOf operator");
   }
 
+  @Override
   public boolean isLengthExpr() {
     return v instanceof LengthExpr;
   }
 
+  @Override
   public Val getLengthOp() {
-    LengthExpr val = (LengthExpr) v;
-    return new JimpleVal(val.getOp(), m);
+    if (isLengthExpr()) {
+      LengthExpr val = (LengthExpr) v;
+      return new JimpleVal(val.getOp(), m);
+    }
+
+    throw new RuntimeException("Val is not a length expression");
   }
 
+  @Override
   public boolean isIntConstant() {
     return v instanceof IntConstant;
   }
 
+  @Override
   public int getIntValue() {
-    return ((IntConstant) v).value;
+    if (isIntConstant()) {
+      return ((IntConstant) v).value;
+    }
+
+    throw new RuntimeException("Val is not an integer constant");
   }
 
+  @Override
   public boolean isLongConstant() {
     return v instanceof LongConstant;
   }
 
+  @Override
   public long getLongValue() {
-    return ((LongConstant) v).value;
+    if (isLongConstant()) {
+      return ((LongConstant) v).value;
+    }
+
+    throw new RuntimeException("Val is not a long constant");
   }
 
+  @Override
   public boolean isClassConstant() {
     return v instanceof ClassConstant;
   }
 
+  @Override
   public Type getClassConstantType() {
-    return new JimpleType(((ClassConstant) v).toSootType());
+    if (isClassConstant()) {
+      return new JimpleType(((ClassConstant) v).toSootType());
+    }
+
+    throw new RuntimeException("Val is not a class constant");
   }
 
   @Override
@@ -224,22 +271,8 @@ public class JimpleVal extends Val {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((v == null) ? 0 : v.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    JimpleVal other = (JimpleVal) obj;
-    if (v == null) {
-      return other.v == null;
-    } else return v.equals(other.v);
+  public String getVariableName() {
+    return v.toString();
   }
 
   public Value getDelegate() {
@@ -247,7 +280,21 @@ public class JimpleVal extends Val {
   }
 
   @Override
-  public String getVariableName() {
-    return v.toString();
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleVal jimpleVal = (JimpleVal) o;
+    return Objects.equals(v, jimpleVal.v);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), v);
+  }
+
+  @Override
+  public String toString() {
+    return v.toString() + " (" + m + ")" + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
   }
 }

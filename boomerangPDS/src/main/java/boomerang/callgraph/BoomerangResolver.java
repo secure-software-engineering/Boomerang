@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.callgraph;
 
 import boomerang.BackwardQuery;
@@ -86,7 +97,9 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
           for (CallGraph.Edge e : precomputedCallGraph.edgesOutOf(s)) {
             // TODO Refactor. Should not be required, if the backward analysis is sound (data-flow
             // of static fields)
-            observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+            if (e.tgt().isDefined()) {
+              observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+            }
           }
         }
         if (FALLBACK_OPTION == NoCalleeFoundFallbackOptions.BYPASS) {

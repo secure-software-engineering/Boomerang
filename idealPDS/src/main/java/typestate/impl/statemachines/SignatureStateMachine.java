@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -35,7 +35,7 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
 
   public enum States implements State {
     NONE,
-    UNITIALIZED,
+    UNINITIALIZED,
     SIGN_CHECK,
     VERIFY_CHECK,
     ERROR;
@@ -47,33 +47,34 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      return false;
+      return this == UNINITIALIZED;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == SIGN_CHECK || this == VERIFY_CHECK;
     }
   }
 
   public SignatureStateMachine() {
     addTransition(
         new MatcherTransition(
-            States.NONE, GET_INSTANCE, Parameter.This, States.UNITIALIZED, Type.OnCall));
+            States.NONE, GET_INSTANCE, Parameter.This, States.UNINITIALIZED, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, INIT_SIGN, Parameter.This, States.SIGN_CHECK, Type.OnCall));
+            States.UNINITIALIZED, INIT_SIGN, Parameter.This, States.SIGN_CHECK, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, INIT_VERIFY, Parameter.This, States.VERIFY_CHECK, Type.OnCall));
-    addTransition(
-        new MatcherTransition(States.UNITIALIZED, SIGN, Parameter.This, States.ERROR, Type.OnCall));
+            States.UNINITIALIZED, INIT_VERIFY, Parameter.This, States.VERIFY_CHECK, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, VERIFY, Parameter.This, States.ERROR, Type.OnCall));
+            States.UNINITIALIZED, SIGN, Parameter.This, States.ERROR, Type.OnCall));
     addTransition(
         new MatcherTransition(
-            States.UNITIALIZED, UPDATE, Parameter.This, States.ERROR, Type.OnCall));
+            States.UNINITIALIZED, VERIFY, Parameter.This, States.ERROR, Type.OnCall));
+    addTransition(
+        new MatcherTransition(
+            States.UNINITIALIZED, UPDATE, Parameter.This, States.ERROR, Type.OnCall));
 
     addTransition(
         new MatcherTransition(
@@ -148,6 +149,6 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
 
   @Override
   protected State initialState() {
-    return States.UNITIALIZED;
+    return States.UNINITIALIZED;
   }
 }

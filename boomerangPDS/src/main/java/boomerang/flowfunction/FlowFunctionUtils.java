@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.flowfunction;
 
 import boomerang.scope.DeclaredMethod;
@@ -5,6 +16,6 @@ import boomerang.scope.DeclaredMethod;
 public class FlowFunctionUtils {
   public static boolean isSystemArrayCopy(DeclaredMethod method) {
     return method.getName().equals("arraycopy")
-        && method.getDeclaringClass().getName().equals("java.lang.System");
+        && method.getDeclaringClass().getFullyQualifiedName().equals("java.lang.System");
   }
 }

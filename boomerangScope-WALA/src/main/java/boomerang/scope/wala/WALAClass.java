@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2020
- * CodeShield GmbH, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -17,7 +17,7 @@ import boomerang.scope.WrappedClass;
 import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.TypeReference;
-import java.util.Set;
+import java.util.Collection;
 
 public class WALAClass implements WrappedClass {
 
@@ -28,7 +28,7 @@ public class WALAClass implements WrappedClass {
   }
 
   @Override
-  public Set<Method> getMethods() {
+  public Collection<Method> getMethods() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -57,6 +57,11 @@ public class WALAClass implements WrappedClass {
   }
 
   @Override
+  public boolean isPhantom() {
+    return false;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -79,20 +84,14 @@ public class WALAClass implements WrappedClass {
   public String getFullyQualifiedName() {
     if (delegate.getName() == null) return "FAILED";
     if (delegate.getName().getPackage() == null) {
-      return getName();
+      return delegate.getName().getClassName().toString();
     }
     return delegate.getName().getPackage().toString().replace("/", ".")
         + "."
         + delegate.getName().getClassName();
   }
 
-  @Override
-  public String getName() {
-    return delegate.getName().getClassName().toString();
-  }
-
-  @Override
-  public Object getDelegate() {
+  public TypeReference getDelegate() {
     return delegate;
   }
 }

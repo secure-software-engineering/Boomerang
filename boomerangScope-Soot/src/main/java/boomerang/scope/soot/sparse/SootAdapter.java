@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.soot.sparse;
 
 import boomerang.scope.Field;
@@ -40,7 +51,7 @@ public class SootAdapter {
     if (val instanceof JimpleStaticFieldVal) {
       JimpleStaticFieldVal staticVal = (JimpleStaticFieldVal) val;
       Field field = staticVal.field();
-      SootField sootField = ((JimpleField) field).getSootField();
+      SootField sootField = ((JimpleField) field).getDelegate();
       SootFieldRef sootFieldRef = sootField.makeRef();
       StaticFieldRef srf = new MStaticFieldRef(sootFieldRef);
       return srf;
@@ -50,7 +61,7 @@ public class SootAdapter {
 
   public static SootField asField(Val val) {
     Field field = ((JimpleStaticFieldVal) val).field();
-    return ((JimpleField) field).getSootField();
+    return ((JimpleField) field).getDelegate();
   }
 
   public static SootMethod asSootMethod(Method m) {

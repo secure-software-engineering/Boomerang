@@ -1,6 +1,20 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope;
 
+import java.util.Objects;
+
 public class Pair<X, Y> {
+
   private final Y y;
   private final X x;
 
@@ -18,30 +32,20 @@ public class Pair<X, Y> {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((x == null) ? 0 : x.hashCode());
-    result = prime * result + ((y == null) ? 0 : y.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    Pair other = (Pair) obj;
-    if (x == null) {
-      if (other.x != null) return false;
-    } else if (!x.equals(other.x)) return false;
-    if (y == null) {
-      return other.y == null;
-    } else return y.equals(other.y);
-  }
-
-  @Override
   public String toString() {
     return "Pair(" + x + "," + y + ")";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Pair<?, ?> pair = (Pair<?, ?>) o;
+    return Objects.equals(y, pair.y) && Objects.equals(x, pair.x);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(y, x);
   }
 }

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2020
- * CodeShield GmbH, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -220,7 +220,7 @@ public class WALAControlFlowGraph implements ControlFlowGraph {
   private LinkedList<Statement> addUnitializedFields() {
     LinkedList<Statement> uninitializedStatements = Lists.newLinkedList();
     if (!method.isConstructor()) return uninitializedStatements;
-    TypeReference delegate = (TypeReference) method.getDeclaringClass().getDelegate();
+    TypeReference delegate = ((WALAClass) method.getDeclaringClass()).getDelegate();
     IClass c = cha.lookupClass(delegate);
     Collection<IField> allFields = c.getAllFields();
     List<FieldReference> allDeclaredFields = computeInitializedFields();
