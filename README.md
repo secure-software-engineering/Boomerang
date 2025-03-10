@@ -37,3 +37,13 @@ The projects are released on [Maven Central](https://central.sonatype.com/artifa
   <version>x.y.z</version>
 </dependency>
 ```
+
+## Contributing
+
+We hare happy for every contribution from the community! You can simply create a fork and open a pull request. Note that we use the Google style sheet to keep the code clean. To format the code, run the command 
+
+```xml
+mvn spotless:apply
+```
+
+before commiting your changes.
