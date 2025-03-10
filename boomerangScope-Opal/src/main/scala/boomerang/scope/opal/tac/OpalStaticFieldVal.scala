@@ -1,6 +1,6 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Field, Method, Pair, StaticFieldVal, Type, Val}
+import boomerang.scope._
 
 class OpalStaticFieldVal(field: OpalField, method: Method, unbalanced: ControlFlowGraph.Edge = null) extends StaticFieldVal(method, unbalanced) {
 

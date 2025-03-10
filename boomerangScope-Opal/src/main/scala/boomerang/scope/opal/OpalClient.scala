@@ -1,4 +1,4 @@
-package boomerang.scene.opal
+package boomerang.scope.opal
 
 import org.opalj.br.{ClassFile, ClassHierarchy, DefinedMethod, Field, Method, MethodDescriptor, ObjectType, ReferenceType}
 import org.opalj.br.analyses.{DeclaredMethods, DeclaredMethodsKey, Project}

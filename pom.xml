@@ -54,6 +54,7 @@
         <module>boomerangScope</module>
         <module>boomerangScope-Soot</module>
         <module>boomerangScope-SootUp</module>
+        <module>boomerangScope-Opal</module>
         <module>boomerangScope-WALA</module>
         <!--<module>SparseBoomerangCorrectness</module>-->
     </modules>
@@ -236,6 +237,11 @@
             <dependency>
                 <groupId>de.fraunhofer.iem</groupId>
                 <artifactId>boomerangScope-SootUp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.fraunhofer.iem</groupId>
+                <artifactId>boomerangScope-Opal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

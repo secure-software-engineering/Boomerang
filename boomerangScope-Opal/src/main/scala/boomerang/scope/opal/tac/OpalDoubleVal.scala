@@ -1,6 +1,6 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{Val, ValWithFalseVariable}
+import boomerang.scope.{Val, ValWithFalseVariable}
 import org.opalj.tac.{DUVar, Expr}
 import org.opalj.value.ValueInformation
 

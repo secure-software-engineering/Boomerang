@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{IfStatement, Statement, Val}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope.{IfStatement, Statement, Val}
 import org.opalj.tac.{DUVar, If}
 import org.opalj.value.ValueInformation
 
@@ -13,7 +14,7 @@ class OpalIfStatement(val delegate: If[DUVar[ValueInformation]], method: OpalMet
     new OpalStatement(tac.stmts(target), method)
   }
 
-  override def evaluate(otherVal: Val): IfStatement.Evaluation = IfStatement.Evaluation.UNKOWN
+  override def evaluate(otherVal: Val): IfStatement.Evaluation = IfStatement.Evaluation.UNKNOWN
 
   override def uses(otherVal: Val): Boolean = {
     // TODO

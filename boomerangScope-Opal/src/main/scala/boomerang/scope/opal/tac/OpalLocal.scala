@@ -1,6 +1,7 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Method, Pair, Type, Val}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope._
 import org.opalj.br.ObjectType
 import org.opalj.tac.{DUVar, DVar, Expr, UVar}
 import org.opalj.value.ValueInformation
@@ -148,6 +149,8 @@ class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod,
 
           val targetVar = defStmt.asAssignment.targetVar
           super.equals(other) && dVar.hashCode() == targetVar.hashCode()
+        case _: UVar[_] if other.delegate.isInstanceOf[UVar[_]] =>
+          super.equals(other) && this.delegate.hashCode() == other.delegate.hashCode()
         case _ => throw new RuntimeException("Cannot compare a variable with a non variable")
       }
     case _ => false

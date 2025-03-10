@@ -1,10 +1,11 @@
-package boomerang.scene.opal
+package boomerang.scope.opal
 
-import boomerang.scene.CallGraph.Edge
+import boomerang.scope.CallGraph
+import boomerang.scope.CallGraph.Edge
+import boomerang.scope.opal.tac.{OpalMethod, OpalPhantomMethod, OpalStatement}
 import org.opalj.br.{DefinedMethod, Method, MultipleDefinedMethods, VirtualDeclaredMethod}
-import org.opalj.tac.cg.CallGraph
 
-class OpalCallGraph(callGraph: CallGraph, entryPoints: Set[Method]) extends boomerang.scene.CallGraph {
+class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Method]) extends CallGraph {
 
   callGraph.reachableMethods().foreach(method => {
     method.method match {
@@ -33,7 +34,7 @@ class OpalCallGraph(callGraph: CallGraph, entryPoints: Set[Method]) extends boom
 
               addEdge(new Edge(srcStatement, targetMethod))
             case virtualMethod: VirtualDeclaredMethod =>
-              val targetMethod = OpalPhantomMethod(virtualMethod.declaringClassType, virtualMethod.name, virtualMethod.descriptor, srcStatement.getInvokeExpr.isStaticInvokeExpr)
+              val targetMethod = OpalPhantomMethod(virtualMethod, srcStatement.getInvokeExpr.isStaticInvokeExpr)
 
               addEdge(new Edge(srcStatement, targetMethod))
             case definedMethods: MultipleDefinedMethods =>

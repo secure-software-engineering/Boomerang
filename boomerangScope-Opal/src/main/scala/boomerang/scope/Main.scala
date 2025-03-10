@@ -1,6 +1,7 @@
-package boomerang.scene
+package boomerang.scope
 
-import boomerang.scene.opal.{OpalCallGraph, OpalClient, OpalMethod}
+import boomerang.scope.opal.tac.OpalMethod
+import boomerang.scope.opal.{OpalCallGraph, OpalClient}
 import com.typesafe.config.ConfigValueFactory
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.cg.InitialEntryPointsKey

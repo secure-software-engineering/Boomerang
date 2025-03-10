@@ -1,8 +1,9 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Method, Pair, Type, Val}
+import boomerang.scope.opal.OpalClient
+import boomerang.scope._
 import org.opalj.br.ReferenceType
-import org.opalj.tac.{ArrayLength, Const, DUVar, Expr, FunctionCall, InstanceOf, IntConst, LongConst, New, PrimitiveTypecastExpr, StringConst}
+import org.opalj.tac._
 import org.opalj.value.ValueInformation
 
 class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {

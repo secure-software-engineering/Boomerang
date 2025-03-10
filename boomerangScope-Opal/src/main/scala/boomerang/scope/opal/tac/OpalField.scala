@@ -1,6 +1,6 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.Field
+import boomerang.scope.Field
 
 case class OpalField(delegate: org.opalj.br.Field) extends Field {
 

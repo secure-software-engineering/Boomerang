@@ -1,11 +1,11 @@
-package boomerang.scene.opal
+package boomerang.scope.opal.tac
 
-import boomerang.scene.{ControlFlowGraph, Method, Statement, Type, Val, WrappedClass}
-import org.opalj.br.{MethodDescriptor, MethodSignature, ObjectType}
+import boomerang.scope._
+import boomerang.scope.opal.OpalClient
 import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall, UVar}
 
-import scala.jdk.CollectionConverters._
 import java.util
+import scala.jdk.CollectionConverters._
 
 case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
 
@@ -38,6 +38,8 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
   }
 
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
+
+  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
 
   override def isThisLocal(fact: Val): Boolean = {
     if (isStatic) return false
@@ -153,7 +155,9 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
 
   override def isStatic: Boolean = delegate.isStatic
 
-  override def isNative: Boolean = delegate.isNative
+  override def isDefined: Boolean = true
+
+  override def isPhantom: Boolean = false
 
   override def getStatements: util.List[Statement] = cfg.getStatements
 
@@ -167,52 +171,5 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
 
   override def isConstructor: Boolean = delegate.isConstructor
 
-  override def isPublic: Boolean = delegate.isPublic
-
   override def toString: String = delegate.toJava
-}
-
-case class OpalPhantomMethod(declaringClassType: ObjectType, name: String, descriptor: MethodDescriptor, isStatic: Boolean) extends Method {
-
-  override def isStaticInitializer: Boolean = name == "<clinit>"
-
-  override def isParameterLocal(value: Val): Boolean = false
-
-  override def getParameterTypes: util.List[Type] = {
-    val result = new util.ArrayList[Type]()
-
-    descriptor.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType))
-    })
-
-    result
-  }
-
-  override def getParameterType(index: Int): Type = OpalType(descriptor.parameterType(index))
-
-  override def isThisLocal(value: Val): Boolean = false
-
-  override def getLocals: util.Set[Val] = throw new RuntimeException("Locals of phantom method are not available")
-
-  override def getThisLocal: Val = throw new RuntimeException("this local of phantom method is not available")
-
-  override def getParameterLocals: util.List[Val] = throw new RuntimeException("Parameter locals of phantom method are not available")
-
-  override def isNative: Boolean = false
-
-  override def getStatements: util.List[Statement] = new util.ArrayList[Statement]()
-
-  override def getDeclaringClass: WrappedClass = OpalPhantomWrappedClass(declaringClassType)
-
-  override def getControlFlowGraph: ControlFlowGraph = throw new RuntimeException("CFG of phantom method is not available")
-
-  override def getSubSignature: String = MethodSignature(name, descriptor).toJava
-
-  override def getName: String = name
-
-  override def isConstructor: Boolean = name == "<init>"
-
-  override def isPublic: Boolean = true
-
-  override def toString: String = "PHANTOM: " + getSubSignature
 }

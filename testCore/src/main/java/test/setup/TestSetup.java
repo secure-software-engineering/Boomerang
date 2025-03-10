@@ -9,7 +9,7 @@ public interface TestSetup {
 
   void initialize(
       String classPath,
-      MethodWrapper testMethod,
+      MethodWrapper methodWrapper,
       List<String> includedPackages,
       List<String> excludedPackages);
 
