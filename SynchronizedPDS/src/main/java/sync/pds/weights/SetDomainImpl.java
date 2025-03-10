@@ -11,22 +11,32 @@
  */
 package sync.pds.weights;
 
-import javax.annotation.Nonnull;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class SetDomainRefactor implements Weight {
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Set;
 
-  private static SetDomainRefactor one;
-  private static SetDomainRefactor zero;
-  private final String rep;
+import static sync.pds.weights.SetDomainOne.one;
+import static sync.pds.weights.SetDomainZero.zero;
 
-  private SetDomainRefactor(String rep) {
-    this.rep = rep;
+public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
+
+  @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
+
+
+  private SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
+    this.nodes = nodes;
   }
 
+
+
   @Override
-  @Nonnull
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(Weight other) {
     if (other.equals(one())) {
       return this;
     }
@@ -37,35 +47,35 @@ public class SetDomainRefactor implements Weight {
   }
 
   @Override
-  @Nonnull
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
     if (this.equals(one()) || other.equals(one())) return one();
-
+    if (other instanceof SetDomainImpl) {
+      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
+      merged.addAll(((SetDomainImpl) other).nodes);
+      return new SetDomainImpl<>(merged);
+    }
     return zero();
   }
 
-  public static SetDomainRefactor one() {
-    if (one == null) one = new SetDomainRefactor("<1>");
-    return one;
+  @Nonnull
+  @Override
+  public Collection<Node> getNodes() {
+    return Lists.newArrayList(nodes);
   }
 
-  public static SetDomainRefactor zero() {
-    if (zero == null) zero = new SetDomainRefactor("<0>");
-    return zero;
-  }
 
   @Override
   public String toString() {
-    return (this == one) ? "ONE" : "ZERO";
+    return nodes.toString();
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (rep.hashCode());
+    result = prime * result +  nodes.hashCode();
     return result;
   }
 
@@ -74,7 +84,12 @@ public class SetDomainRefactor implements Weight {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    SetDomainRefactor other = (SetDomainRefactor) obj;
-    return rep.equals(other.rep);
+   return false;
+  }
+
+  @Nonnull
+  @Override
+  public Collection<Node<Stmt, Fact>> elements() {
+    return Sets.newHashSet(nodes);
   }
 }
