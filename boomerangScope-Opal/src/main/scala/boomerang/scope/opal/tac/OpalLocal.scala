@@ -149,6 +149,8 @@ class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod,
 
           val targetVar = defStmt.asAssignment.targetVar
           super.equals(other) && dVar.hashCode() == targetVar.hashCode()
+        case _: UVar[_] if other.delegate.isInstanceOf[UVar[_]] =>
+          super.equals(other) && this.delegate.hashCode() == other.delegate.hashCode()
         case _ => throw new RuntimeException("Cannot compare a variable with a non variable")
       }
     case _ => false

@@ -7,6 +7,7 @@ import java.util.stream
 
 class OpalFrameworkScope(project: Project[_], callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[org.opalj.br.Method], dataFlowScope: DataFlowScope) extends FrameworkScope {
 
+  OpalClient.init(project)
   val opalCallGraph = new OpalCallGraph(callGraph, entryPoints)
 
   override def getCallGraph: CallGraph = opalCallGraph

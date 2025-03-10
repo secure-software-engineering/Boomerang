@@ -89,7 +89,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     if (isAssignStmt) {
       if (delegate.isAssignment) {
         // TODO Change to variable
-        return new OpalVal(delegate.asAssignment.targetVar, m)
+        return new OpalLocal(delegate.asAssignment.targetVar, m)
       }
 
       if (isFieldStore) {
@@ -352,7 +352,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     if (isAssignStmt) {
       if (delegate.isAssignment) {
         if (getRightOp.isNewExpr) {
-          return s"$getLeftOp = new + ${getRightOp.getNewExprType}"
+          return s"$getLeftOp = new ${getRightOp.getNewExprType}"
         } else {
           // TODO Array load
           return getLeftOp + " = " + getRightOp

@@ -48,7 +48,7 @@ case class OpalType(delegate: org.opalj.br.Type, isNull: Boolean = false) extend
       return false
     }
 
-    OpalClient.getClassHierarchy.isSubtypeOf(delegate.asObjectType, ObjectType(otherType))
+    OpalClient.getClassHierarchy.isSubtypeOf(delegate.asObjectType, ObjectType(otherType.replace(".", "/")))
   }
 
   override def isSupertypeOf(subType: String): Boolean = {
