@@ -58,6 +58,8 @@ public class TransitionImpl implements Transition {
     return to.equals(other.to);
   }
 
+  @Override
+  @Nonnull
   public String toString() {
     return from + " -> " + to;
   }

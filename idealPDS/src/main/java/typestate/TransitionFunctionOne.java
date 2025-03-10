@@ -39,15 +39,12 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Nonnull
   @Override
   public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
-    throw new IllegalStateException("This should not happen!");
+    throw new IllegalStateException("TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
   }
 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other == one()) {
-      return this;
-    }
     return other;
   }
 

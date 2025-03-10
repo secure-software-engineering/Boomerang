@@ -46,7 +46,7 @@ public class TransitionFunctionZero implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    return zero();
+    return this;
   }
 
   @Nonnull

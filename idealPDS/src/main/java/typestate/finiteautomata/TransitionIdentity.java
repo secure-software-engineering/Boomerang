@@ -17,6 +17,7 @@ public class TransitionIdentity implements Transition {
 
   @Nonnull private static final TransitionIdentity instance = new TransitionIdentity();
 
+  @Nonnull
   public static TransitionIdentity identity() {
     return instance;
   }
@@ -42,6 +43,8 @@ public class TransitionIdentity implements Transition {
     return this == obj;
   }
 
+  @Override
+  @Nonnull
   public String toString() {
     return "ID -> ID";
   }

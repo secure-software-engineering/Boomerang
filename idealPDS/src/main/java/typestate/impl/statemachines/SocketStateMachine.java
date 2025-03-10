@@ -23,6 +23,8 @@ import typestate.finiteautomata.MatcherTransition.Type;
 import typestate.finiteautomata.State;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
+import javax.annotation.Nonnull;
+
 public class SocketStateMachine extends TypeStateMachineWeightFunctions {
 
   private static final String CONNECT_METHOD = ".* connect.*";
@@ -98,7 +100,7 @@ public class SocketStateMachine extends TypeStateMachineWeightFunctions {
     }
 
     @Override
-    public boolean matches(DeclaredMethod declaredMethod) {
+    public boolean matches(@Nonnull DeclaredMethod declaredMethod) {
       if (super.matches(declaredMethod)) {
         return false;
       }
