@@ -12,17 +12,17 @@
 
     <properties>
         <wala.version>1.6.9</wala.version>
+        <license.dir>${project.parent.basedir}</license.dir>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangScope</artifactId>
         </dependency>
-
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangPDS</artifactId>
-
             <scope>test</scope>
         </dependency>
         <!-- wala  -->

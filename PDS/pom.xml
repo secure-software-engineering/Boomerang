@@ -20,4 +20,8 @@
         <url>https://github.com/secure-software-engineering/Boomerang</url>
     </scm>
 
+    <properties>
+        <license.dir>${project.parent.basedir}</license.dir>
+    </properties>
+
 </project>

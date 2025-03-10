@@ -23,6 +23,7 @@
 
     <properties>
         <soot.version>4.6.0</soot.version>
+        <license.dir>${project.parent.basedir}</license.dir>
     </properties>
 
     <dependencies>
