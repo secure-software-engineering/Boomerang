@@ -10,4 +10,14 @@
     </parent>
     <artifactId>PDS</artifactId>
 
+    <name>PDS</name>
+    <description>Helper implementation for the Pushdown System</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
 </project>

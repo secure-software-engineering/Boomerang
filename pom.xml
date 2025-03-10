@@ -7,7 +7,7 @@
     <version>3.2.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Boomerang-Parent</name>
-    <description>Synchronized Pushdown Systems for Pointer and Data-Flow Analysis</description>
+    <description>Parent project that holds all definitions for Synchronized and Weighted Pushdown Systems, Boomerang, and IDEal</description>
     <url>https://github.com/secure-software-engineering/Boomerang</url>
 
     <licenses>
@@ -40,12 +40,6 @@
         </contributor>
     </contributors>
 
-    <scm>
-        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
-        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
-        <url>https://github.com/secure-software-engineering/Boomerang</url>
-    </scm>
-
     <modules>
         <module>PDS</module>
         <module>WPDS</module>
@@ -59,6 +53,12 @@
         <module>boomerangScope-WALA</module>
         <!--<module>SparseBoomerangCorrectness</module>-->
     </modules>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
 
     <distributionManagement>
         <repository>

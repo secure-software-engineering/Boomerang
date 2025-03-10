@@ -50,16 +50,28 @@ public class PrintStreamStateMachine extends TypeStateMachineWeightFunctions {
   public PrintStreamStateMachine() {
     addTransition(
         new MatcherTransition(
-            States.CLOSED, CLOSE_METHODS, Parameter.This, States.CLOSED, Type.OnCallOrOnCallToReturn));
+            States.CLOSED,
+            CLOSE_METHODS,
+            Parameter.This,
+            States.CLOSED,
+            Type.OnCallOrOnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.CLOSED, READ_METHODS, Parameter.This, States.ERROR, Type.OnCallOrOnCallToReturn));
+            States.CLOSED,
+            READ_METHODS,
+            Parameter.This,
+            States.ERROR,
+            Type.OnCallOrOnCallToReturn));
     addTransition(
         new MatcherTransition(
             States.ERROR, READ_METHODS, Parameter.This, States.ERROR, Type.OnCallOrOnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, CLOSE_METHODS, Parameter.This, States.ERROR, Type.OnCallOrOnCallToReturn));
+            States.ERROR,
+            CLOSE_METHODS,
+            Parameter.This,
+            States.ERROR,
+            Type.OnCallOrOnCallToReturn));
   }
 
   //

@@ -10,6 +10,16 @@
     </parent>
     <artifactId>testCore</artifactId>
 
+    <name>TestCore</name>
+    <description>Implementation for setting up Boomerang tests</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>

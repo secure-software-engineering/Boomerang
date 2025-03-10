@@ -11,6 +11,16 @@
 
     <artifactId>boomerangScope-SootUp</artifactId>
 
+    <name>BoomerangScope-SootUp</name>
+    <description>Scope implementation to run Boomerang and IDEal with SootUp</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
     <properties>
         <sootUp.version>develop-SNAPSHOT</sootUp.version>
         <!-- TODO [ms] remove this when ready for deployment -->
