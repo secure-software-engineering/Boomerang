@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** Copyright (c) 2018
+ * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,31 +11,33 @@
  */
 package sync.pds.weights;
 
-import static sync.pds.weights.SetDomainOne.one;
-import static sync.pds.weights.SetDomainZero.zero;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.Collection;
-import java.util.Set;
-import javax.annotation.Nonnull;
+
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Set;
+
+import static sync.pds.weights.SetDomainOne.one;
+import static sync.pds.weights.SetDomainZero.zero;
+
+public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
 
   @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
+
 
   private SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
 
+
   @Nonnull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
-    final Weight one = one();
-    final Weight zero = SetDomainZero.zero();
-    if (other == one) {
+  public Weight extendWith(Weight other) {
+    if (other.equals(one())) {
       return this;
     }
     if (this.equals(one())) {
@@ -47,10 +49,11 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    final Weight zero = SetDomainZero.zero();
-    final Weight one = SetDomainOne.one();
-    if (other == zero) return this;
-    if (this == one) return one();
+
+    if (other.equals(zero())) return this;
+    if (this.equals(zero())) return other;
+    if (this.equals(one()) || other.equals(one())) return one();
+
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
       merged.addAll(((SetDomainImpl) other).nodes);
@@ -65,6 +68,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     return Lists.newArrayList(nodes);
   }
 
+
   @Override
   public String toString() {
     return nodes.toString();
@@ -74,7 +78,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + nodes.hashCode();
+    result = prime * result +  nodes.hashCode();
     return result;
   }
 
@@ -83,7 +87,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    return false;
+   return false;
   }
 
   @Nonnull

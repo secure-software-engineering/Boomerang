@@ -18,6 +18,9 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
+import static inference.InferenceWeightOne.one;
+import static inference.InferenceWeightZero.zero;
+
 public class InferenceWeightImpl implements InferenceWeight {
 
   @Nonnull private final Set<Method> invokedMethods;
@@ -31,19 +34,17 @@ public class InferenceWeightImpl implements InferenceWeight {
   }
 
   @Nonnull
-  @Override
+@Override
   public Weight extendWith(@Nonnull Weight other) {
-    InferenceWeightOne one = InferenceWeightOne.one();
-    if (other == one) {
-      return this;
+    if (other.equals(one())) return this;
+    if (this.equals(one())) return other;
+    if (other.equals(zero()) || this.equals(zero())) {
+      return zero();
     }
-    InferenceWeightZero zero = InferenceWeightZero.zero();
-    if (other == zero) {
-      return zero;
-    }
-    InferenceWeightImpl func = (InferenceWeightImpl) other;
+    InferenceWeight func = (InferenceWeightImpl) other;
+    Set<Method> otherInvokedMethods = ((InferenceWeightImpl) func).invokedMethods;
     Set<Method> res = new HashSet<>(invokedMethods);
-    res.addAll(func.invokedMethods);
+    res.addAll(otherInvokedMethods);
     return new InferenceWeightImpl(res);
   }
 
