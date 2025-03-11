@@ -1,32 +1,41 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
-        <artifactId>SPDS</artifactId>
+        <artifactId>Boomerang-Parent</artifactId>
         <version>3.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
     <artifactId>WPDS</artifactId>
+
+    <name>Weighted Pushdown System</name>
+    <description>Implementation of a Weighted Pushdown System</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
+    <properties>
+        <license.dir>${project.parent.basedir}</license.dir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>PDS</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>pathexpression</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 </project>
