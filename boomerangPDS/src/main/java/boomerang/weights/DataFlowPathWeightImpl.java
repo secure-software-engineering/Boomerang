@@ -70,16 +70,19 @@ public class DataFlowPathWeightImpl implements Weight, DataFlowPathWeight {
     return Objects.hashCode(path, condition);
   }
 
+  @Nonnull
   @Override
   public Set<Node<Edge, Val>> getAllStatements() {
     return path.getShortestPathWitness();
   }
 
+  @Nonnull
   @Override
   public Map<Statement, ConditionDomain> getConditions() {
     return condition.getConditions();
   }
 
+  @Nonnull
   @Override
   public Map<Val, ConditionDomain> getEvaluationMap() {
     return condition.getEvaluationMap();

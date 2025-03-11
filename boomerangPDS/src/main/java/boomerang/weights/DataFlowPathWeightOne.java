@@ -19,30 +19,33 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
     return one;
   }
 
+  @Nonnull
   @Override
   public Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements() {
-    return Set.of();
+    throw new IllegalStateException("MinDistanceWeight.getAllStatements() - don't");
   }
 
+  @Nonnull
   @Override
   public Map<Statement, PathConditionWeight.ConditionDomain> getConditions() {
-    return Map.of();
+    throw new IllegalStateException("MinDistanceWeight.getAllStatements() - don't");
   }
 
+  @Nonnull
   @Override
   public Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap() {
-    return Map.of();
+    throw new IllegalStateException("MinDistanceWeight.getEvaluationMap() - don't");
   }
 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    return null;
+    throw new IllegalStateException("MinDistanceWeight.extendWith() - don't");
   }
 
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    return null;
+    throw new IllegalStateException("MinDistanceWeight.combineWith() - don't");
   }
 }

@@ -2,6 +2,8 @@ package boomerang.weights;
 
 import wpds.impl.Weight;
 
+import javax.annotation.Nonnull;
+
 public class MinDistanceWeightOne implements MinDistanceWeight {
 
   private static final MinDistanceWeightOne one = new MinDistanceWeightOne();
@@ -10,18 +12,21 @@ public class MinDistanceWeightOne implements MinDistanceWeight {
     return one;
   }
 
+  @Nonnull
   @Override
-  public Weight extendWith(Weight o) {
-    return null;
+  public Weight extendWith(@Nonnull Weight o) {
+    throw new IllegalStateException("MinDistanceWeight.extendWith() - don't");
+
   }
 
+  @Nonnull
   @Override
-  public Weight combineWith(Weight o) {
-    return null;
+  public Weight combineWith(@Nonnull Weight o) {
+    throw new IllegalStateException("MinDistanceWeight.combineWith() - don't");
   }
 
   @Override
   public Integer getMinDistance() {
-    return 0;
+    throw new IllegalStateException("MinDistanceWeight.minDistance() - don't");
   }
 }
