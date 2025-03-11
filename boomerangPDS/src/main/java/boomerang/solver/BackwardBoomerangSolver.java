@@ -79,7 +79,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     if (value.isStatic()) {
       return false;
     }
-    return m.getLocals().stream().noneMatch(local -> local.toString().equals(value.toString()));
+    return m.getLocals().stream().noneMatch(local -> local.equals(value));
   }
 
   public INode<Node<ControlFlowGraph.Edge, Val>> generateFieldState(
