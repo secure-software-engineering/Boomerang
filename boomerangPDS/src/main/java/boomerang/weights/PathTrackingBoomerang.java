@@ -57,7 +57,7 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
 
   private WeightFunctions<Edge, Val, Field, DataFlowPathWeight> getOrCreateFieldWeights() {
     if (fieldWeights == null) {
-      fieldWeights = new OneWeightFunctions<>(DataFlowPathWeight.one());
+      fieldWeights = new OneWeightFunctions<>(DataFlowPathWeightOne.one());
     }
     return fieldWeights;
   }

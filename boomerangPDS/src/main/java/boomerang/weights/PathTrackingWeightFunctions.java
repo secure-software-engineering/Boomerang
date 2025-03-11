@@ -34,7 +34,7 @@ public class PathTrackingWeightFunctions
         return new DataFlowPathWeight(callSite.getStart(), succ.stmt().getMethod());
       }
     }
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 
   @Override
@@ -71,16 +71,16 @@ public class PathTrackingWeightFunctions
       }
       return new DataFlowPathWeight(curr.stmt().getTarget(), false);
     }
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 
   @Override
   public DataFlowPathWeight pop(Node<Edge, Val> curr) {
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 
   @Override
   public DataFlowPathWeight getOne() {
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 }

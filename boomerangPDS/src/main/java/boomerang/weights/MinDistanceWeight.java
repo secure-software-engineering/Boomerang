@@ -1,5 +1,6 @@
 package boomerang.weights;
 
+import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
 import static boomerang.weights.MinDistanceWeightOne.one;
@@ -8,8 +9,6 @@ import static boomerang.weights.MinDistanceWeightOne.one;
 public class MinDistanceWeight implements MinDistanceWeightInterface {
 
   private Integer minDistance = -1;
-  private static MinDistanceWeight one;
-  private static MinDistanceWeight zero;
 
 
 
@@ -17,11 +16,7 @@ public class MinDistanceWeight implements MinDistanceWeightInterface {
     this.minDistance = minDistance;
   }
 
-  public MinDistanceWeight() {
-
-  }
-
-
+  @Nonnull
   @Override
   public Weight extendWith( Weight o) {
     if (!(o instanceof MinDistanceWeight))
@@ -33,7 +28,7 @@ public class MinDistanceWeight implements MinDistanceWeightInterface {
     return new MinDistanceWeight(newDistance);
   }
 
-
+  @Nonnull
   @Override
   public Weight combineWith(Weight o) {
     if (!(o instanceof MinDistanceWeight))

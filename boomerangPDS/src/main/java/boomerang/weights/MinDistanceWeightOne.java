@@ -5,10 +5,10 @@ import wpds.impl.Weight;
 
 public class MinDistanceWeightOne implements MinDistanceWeightInterface {
 
-    private static final MinDistanceWeight one =
-            new MinDistanceWeight();
+    private static final MinDistanceWeightOne one =
+            new MinDistanceWeightOne();
 
-    public static MinDistanceWeight one() {
+    public static MinDistanceWeightOne one() {
         return one;
     }
 
