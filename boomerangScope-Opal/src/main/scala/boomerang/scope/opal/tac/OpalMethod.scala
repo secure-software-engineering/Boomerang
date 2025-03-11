@@ -135,6 +135,15 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
     if (parameterLocalCache.isEmpty) {
       parameterLocalCache = Some(new util.ArrayList[Val]())
 
+      delegate.parameterTypes.foreach(param => {
+        val parameterLocal = new OpalParameterLocal(param, this)
+        parameterLocalCache.get.add(parameterLocal)
+      })
+    }
+
+    if (parameterLocalCache.isEmpty) {
+      parameterLocalCache = Some(new util.ArrayList[Val]())
+
       val locals = getLocals
       for (local <- locals.asScala) {
         if (local.isLocal) {

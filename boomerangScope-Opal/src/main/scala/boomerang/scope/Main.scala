@@ -1,8 +1,6 @@
 package boomerang.scope
 
-import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.opal.{OpalCallGraph, OpalClient}
-import com.typesafe.config.ConfigValueFactory
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.cg.InitialEntryPointsKey
 import org.opalj.log.{DevNullLogger, GlobalLogContext, OPALLogger}
@@ -15,8 +13,20 @@ object Main {
   def main(args: Array[String]): Unit = {
     OPALLogger.updateLogger(GlobalLogContext, DevNullLogger)
 
-    val project = Project(new File("C:\\Users\\Sven\\Documents\\CogniCrypt\\Opal\\Array\\Array.jar"))
-    var config = project.config
+    val project = Project(new File("C:\\Users\\Sven\\Documents\\CogniCrypt\\Opal\\Parameter\\Parameter.jar"))
+    OpalClient.init(project)
+
+    val callGraph = project.get(CHACallGraphKey)
+    val entryPoints = project.get(InitialEntryPointsKey)
+    val opalCallGraph = new OpalCallGraph(callGraph, entryPoints.toSet)
+
+    opalCallGraph.getReachableMethods.forEach(method => {
+      if (method.isDefined) {
+        print(method.getParameterLocals)
+      }
+    })
+
+    /*var config = project.config
 
     val key = s"${InitialEntryPointsKey.ConfigKeyPrefix}entryPoints"
     println("InitialEntryPoints " + key)
@@ -54,6 +64,6 @@ object Main {
       method.getStatements.forEach(statement => {
 
       })
-    })
+    })*/
   }
 }

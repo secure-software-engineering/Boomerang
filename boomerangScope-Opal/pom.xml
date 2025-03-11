@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
@@ -13,7 +12,6 @@
 
     <properties>
         <opal.version>5.0.0</opal.version>
-        <scala.version>2.13.16</scala.version>
         <license.dir>${project.parent.basedir}</license.dir>
     </properties>
 
@@ -23,11 +21,6 @@
             <artifactId>boomerangScope</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
             <groupId>de.opal-project</groupId>
             <artifactId>framework_2.13</artifactId>
             <version>${opal.version}</version>
@@ -35,24 +28,27 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/scala</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>4.9.2</version>
                 <configuration>
-                    <recompileMode>incremental</recompileMode>
-                    <scalaVersion>${scala.version}</scalaVersion>
+                    <recompileMode>all</recompileMode>
+                    <args>
+                        <arg>-deprecation</arg>
+                    </args>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
+                            <goal>add-source</goal>
                             <goal>compile</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+        <sourceDirectory>src/main/scala</sourceDirectory>
     </build>
 </project>

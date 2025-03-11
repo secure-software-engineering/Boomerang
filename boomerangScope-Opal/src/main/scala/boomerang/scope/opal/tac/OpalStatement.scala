@@ -339,11 +339,11 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     if (containsInvokeExpr()) {
       var base = ""
       if (getInvokeExpr.isInstanceInvokeExpr) {
-        base = getInvokeExpr.getBase.toString + "."
+        base = s"${getInvokeExpr.getBase}."
       }
       var assign = ""
       if (isAssignStmt) {
-        assign = getLeftOp + " = "
+        assign = s"$getLeftOp = "
       }
 
       return assign + base + getInvokeExpr.getMethod.getName + "(" + Joiner.on(",").join(getInvokeExpr.getArgs) + ")"
@@ -355,7 +355,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
           return s"$getLeftOp = new ${getRightOp.getNewExprType}"
         } else {
           // TODO Array load
-          return getLeftOp + " = " + getRightOp
+          return s"$getLeftOp = $getRightOp"
         }
       } else if (isFieldStore) {
         return s"$getLeftOp = $getWrittenField"
