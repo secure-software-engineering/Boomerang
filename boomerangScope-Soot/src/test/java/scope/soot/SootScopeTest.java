@@ -14,10 +14,6 @@ import java.util.List;
 
 public class SootScopeTest implements BoomerangScopeTests {
 
-    private static MethodSignature mainMethod(String className) {
-        return new MethodSignature(className, "main", "void", List.of("java.lang.String[]"));
-    }
-
     @Test
     @Override
     public void parameterLocalTest() {

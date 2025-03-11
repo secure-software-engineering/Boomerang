@@ -21,13 +21,25 @@
             <artifactId>boomerangScope</artifactId>
         </dependency>
         <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>boomerangScope</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>de.opal-project</groupId>
             <artifactId>framework_2.13</artifactId>
             <version>${opal.version}</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -44,11 +56,11 @@
                         <goals>
                             <goal>add-source</goal>
                             <goal>compile</goal>
+                            <goal>testCompile</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-        <sourceDirectory>src/main/scala</sourceDirectory>
     </build>
 </project>
