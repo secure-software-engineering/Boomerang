@@ -16,14 +16,13 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DeclaredMethod;
 import java.net.Socket;
 import java.util.Collection;
+import javax.annotation.Nonnull;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.MatcherTransition;
 import typestate.finiteautomata.MatcherTransition.Parameter;
 import typestate.finiteautomata.MatcherTransition.Type;
 import typestate.finiteautomata.State;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
-
-import javax.annotation.Nonnull;
 
 public class SocketStateMachine extends TypeStateMachineWeightFunctions {
 

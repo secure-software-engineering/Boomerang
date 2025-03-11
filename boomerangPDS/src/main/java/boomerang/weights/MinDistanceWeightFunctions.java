@@ -12,7 +12,7 @@ public class MinDistanceWeightFunctions
   public MinDistanceWeight push(
       Node<Statement, Val> curr, Node<Statement, Val> succ, Statement callSite) {
     if (!curr.fact().isStatic()) {
-      return new MinDistanceWeight(Integer.valueOf(1));
+      return new MinDistanceWeightImpl(1);
     }
     return MinDistanceWeightOne.one();
   }
@@ -20,10 +20,10 @@ public class MinDistanceWeightFunctions
   @Override
   public MinDistanceWeight normal(Node<Statement, Val> curr, Node<Statement, Val> succ) {
     if (!curr.fact().equals(succ.fact())) {
-      return new MinDistanceWeight(1);
+      return new MinDistanceWeightImpl(1);
     }
     if (succ.stmt().containsInvokeExpr() && succ.stmt().uses(curr.fact())) {
-      return new MinDistanceWeight(1);
+      return new MinDistanceWeightImpl(1);
     }
     return MinDistanceWeightOne.one();
   }

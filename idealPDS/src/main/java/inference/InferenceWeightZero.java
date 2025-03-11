@@ -15,14 +15,15 @@ import wpds.impl.Weight;
 
 public class InferenceWeightZero implements Weight {
 
-  @Nonnull private static final InferenceWeightZero zero = new InferenceWeightZero();;
+  @Nonnull private static final InferenceWeightZero zero = new InferenceWeightZero();
+  ;
 
   private InferenceWeightZero() {}
 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-      return zero();
+    return zero();
   }
 
   @Nonnull

@@ -13,10 +13,9 @@ package typestate.finiteautomata;
 
 import boomerang.scope.DeclaredMethod;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 
 public class MatcherTransition extends TransitionImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(MatcherTransition.class);
@@ -38,12 +37,22 @@ public class MatcherTransition extends TransitionImpl {
     Param2
   }
 
-  public MatcherTransition(@Nonnull State from, @Nonnull String methodMatcher, @Nonnull Parameter param, @Nonnull State to, @Nonnull Type type) {
-    this(from, methodMatcher, false, param,to , type );
+  public MatcherTransition(
+      @Nonnull State from,
+      @Nonnull String methodMatcher,
+      @Nonnull Parameter param,
+      @Nonnull State to,
+      @Nonnull Type type) {
+    this(from, methodMatcher, false, param, to, type);
   }
 
   public MatcherTransition(
-          @Nonnull State from, @Nonnull String methodMatcher, boolean negate, @Nonnull Parameter param, @Nonnull State to, @Nonnull Type type) {
+      @Nonnull State from,
+      @Nonnull String methodMatcher,
+      boolean negate,
+      @Nonnull Parameter param,
+      @Nonnull State to,
+      @Nonnull Type type) {
     super(from, to);
     this.methodMatcher = Pattern.compile(methodMatcher);
     this.negate = negate;
@@ -54,8 +63,8 @@ public class MatcherTransition extends TransitionImpl {
   public boolean matches(@Nonnull DeclaredMethod declaredMethod) {
     boolean matches = methodMatcher.matcher(declaredMethod.getSubSignature()).matches();
     if (matches) {
-        LOGGER.debug(
-            "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
+      LOGGER.debug(
+          "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
     }
     return negate != matches;
   }

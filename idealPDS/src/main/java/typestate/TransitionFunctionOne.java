@@ -20,9 +20,7 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionOne implements TransitionFunction {
 
-  @Nonnull
-  private static final TransitionFunctionOne one =
-      new TransitionFunctionOne();
+  @Nonnull private static final TransitionFunctionOne one = new TransitionFunctionOne();
 
   public TransitionFunctionOne() {}
 
@@ -39,7 +37,8 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Nonnull
   @Override
   public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
-    throw new IllegalStateException("TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
+    throw new IllegalStateException(
+        "TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
   }
 
   @Nonnull

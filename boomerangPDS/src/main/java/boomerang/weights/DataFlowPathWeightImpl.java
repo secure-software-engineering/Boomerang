@@ -1,25 +1,108 @@
 package boomerang.weights;
 
-import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.weights.PathConditionWeight.ConditionDomain;
+import com.google.common.base.Objects;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-import javax.annotation.Nonnull;
-import java.util.Map;
-import java.util.Set;
+public class DataFlowPathWeightImpl implements Weight, DataFlowPathWeight {
 
-public interface DataFlowPathWeightImpl {
-    Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
+  private final PathTrackingWeight path;
+  private final PathConditionWeight condition;
 
-    Map<Statement, PathConditionWeight.ConditionDomain> getConditions();
+  private DataFlowPathWeightImpl() {
+    path = PathTrackingWeightOne.one();
+    condition = PathConditionWeight.one();
+  }
 
-    Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap();
+  public DataFlowPathWeightImpl(Node<Edge, Val> path) {
+    this.path = new PathTrackingWeightImpl(path);
+    this.condition = PathConditionWeight.one();
+  }
 
-    @Nonnull
-    Weight extendWith(@Nonnull Weight other);
+  public DataFlowPathWeightImpl(Node<Edge, Val> path, Statement callSite, Method callee) {
+    this.path = new PathTrackingWeightImpl(path);
+    this.condition = new PathConditionWeight(callSite, callee);
+  }
 
-    @Nonnull
-    Weight combineWith(@Nonnull Weight other);
+  public DataFlowPathWeightImpl(Statement callSite, Method callee) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(callSite, callee);
+  }
+
+  public DataFlowPathWeightImpl(Statement ifStatement, Boolean condition) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(ifStatement, condition);
+  }
+
+  private DataFlowPathWeightImpl(PathTrackingWeightImpl path, PathConditionWeight condition) {
+    this.path = path;
+    this.condition = condition;
+  }
+
+  public DataFlowPathWeightImpl(Val leftOp, ConditionDomain conditionVal) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(leftOp, conditionVal);
+  }
+
+  public DataFlowPathWeightImpl(Val returnVal) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(returnVal);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    DataFlowPathWeightImpl that = (DataFlowPathWeightImpl) o;
+    return Objects.equal(path, that.path) && Objects.equal(condition, that.condition);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(path, condition);
+  }
+
+  @Override
+  public Set<Node<Edge, Val>> getAllStatements() {
+    return path.getShortestPathWitness();
+  }
+
+  @Override
+  public Map<Statement, ConditionDomain> getConditions() {
+    return condition.getConditions();
+  }
+
+  @Override
+  public Map<Val, ConditionDomain> getEvaluationMap() {
+    return condition.getEvaluationMap();
+  }
+
+  @Override
+  public String toString() {
+    return /*"PATH" + path +*/ " COND: " + condition;
+  }
+
+  @Nonnull
+  @Override
+  public Weight extendWith(@Nonnull Weight other) {
+    return new DataFlowPathWeightImpl(
+        (PathTrackingWeightImpl) path.extendWith(((DataFlowPathWeightImpl) other).path),
+        (PathConditionWeight) condition.extendWith(((DataFlowPathWeightImpl) other).condition));
+  }
+
+  @Nonnull
+  @Override
+  public Weight combineWith(@Nonnull Weight other) {
+    return new DataFlowPathWeightImpl(
+        (PathTrackingWeightImpl) path.combineWith(((DataFlowPathWeightImpl) other).path),
+        (PathConditionWeight) condition.combineWith(((DataFlowPathWeightImpl) other).condition));
+  }
 }

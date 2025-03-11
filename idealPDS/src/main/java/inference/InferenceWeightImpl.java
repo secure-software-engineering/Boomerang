@@ -65,13 +65,13 @@ public class InferenceWeightImpl implements InferenceWeight {
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
-        return true;
+      return true;
     }
     if (obj == null) {
-        return false;
+      return false;
     }
     if (getClass() != obj.getClass()) {
-        return false;
+      return false;
     }
     InferenceWeightImpl other = (InferenceWeightImpl) obj;
     return invokedMethods.equals(other.invokedMethods);

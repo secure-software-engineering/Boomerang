@@ -20,9 +20,7 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionZero implements TransitionFunction {
 
-  @Nonnull
-  private static final TransitionFunctionZero zero =
-      new TransitionFunctionZero();
+  @Nonnull private static final TransitionFunctionZero zero = new TransitionFunctionZero();
 
   public TransitionFunctionZero() {}
 

@@ -32,7 +32,6 @@ import ideal.StoreIDEALResultHandler;
 import inference.InferenceWeight;
 import inference.InferenceWeightFunctions;
 import inference.InferenceWeightOne;
-import inference.InferenceWeightZero;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;

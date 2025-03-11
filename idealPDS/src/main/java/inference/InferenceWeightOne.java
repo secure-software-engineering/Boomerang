@@ -10,16 +10,12 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-
-import wpds.impl.Weight;
-
 import javax.annotation.Nonnull;
-
-import static inference.InferenceWeightZero.zero;
+import wpds.impl.Weight;
 
 public class InferenceWeightOne implements InferenceWeight {
 
-  @Nonnull private static final InferenceWeightOne one  = new InferenceWeightOne();
+  @Nonnull private static final InferenceWeightOne one = new InferenceWeightOne();
 
   private InferenceWeightOne() {}
 
@@ -39,7 +35,8 @@ public class InferenceWeightOne implements InferenceWeight {
     return extendWith(other);
   }
 
-  @Nonnull public static InferenceWeightOne one() {
+  @Nonnull
+  public static InferenceWeightOne one() {
     return one;
   }
 

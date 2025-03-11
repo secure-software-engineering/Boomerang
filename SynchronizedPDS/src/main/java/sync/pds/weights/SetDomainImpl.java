@@ -11,28 +11,24 @@
  */
 package sync.pds.weights;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import sync.pds.solver.nodes.Node;
-import wpds.impl.Weight;
-
-import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.Set;
-
 import static sync.pds.weights.SetDomainOne.one;
 import static sync.pds.weights.SetDomainZero.zero;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import sync.pds.solver.nodes.Node;
+import wpds.impl.Weight;
 
 public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
 
   @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
 
-
   private SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
-
 
   @Nonnull
   @Override
@@ -53,8 +49,8 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
   public Weight combineWith(@Nonnull Weight other) {
     final Weight zero = SetDomainZero.zero();
     final Weight one = SetDomainOne.one();
-    if (other==zero) return this;
-    if (this==one) return one();
+    if (other == zero) return this;
+    if (this == one) return one();
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
       merged.addAll(((SetDomainImpl) other).nodes);
@@ -69,7 +65,6 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
     return Lists.newArrayList(nodes);
   }
 
-
   @Override
   public String toString() {
     return nodes.toString();
@@ -79,7 +74,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result +  nodes.hashCode();
+    result = prime * result + nodes.hashCode();
     return result;
   }
 
@@ -88,7 +83,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-   return false;
+    return false;
   }
 
   @Nonnull
