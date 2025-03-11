@@ -45,6 +45,26 @@ on:
         - name: Install Dependencies
           run: pip install mike mkdocs-material mkdocs-tooltips git+https://github.com/RedisLabs/mkdocs-include.git git+https://github.com/swissiety/LspLexer4Pygments.git
 
+        # Sanitize head_ref name
+        - run: echo "DOC_VERSION_NAME=$(echo ${{ github.head_ref }} | sed "s/[^a-zA-Z0-9._-]/_/g" )" >> $GITHUB_ENV
+
+        # on PR events..
+        - name: Deploy Doc in Subdirectory
+          if: startsWith(github.event_name, 'pull_request')
+          run: mike deploy ${{ env.DOC_VERSION_NAME }}_preview -t "PR Preview ${{ env.DOC_VERSION_NAME }}" --push && mike props ${{ env.DOC_VERSION_NAME }}_preview --set-string hidden=true --push
+
+        - name: Comment Link to Preview
+          if: startsWith(github.event_name, 'pull_request') && github.event.action != 'closed'
+          uses: marocchino/sticky-pull-request-comment@v2
+          with:
+            message: |
+              [Documentation Preview](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ env.DOC_VERSION_NAME }}_preview/).
+
+        # on PR close - delete preview
+        - name: Delete the Deployed Preview
+          if: startsWith(github.event_name, 'pull_request') && github.event.action == 'closed'
+          run: mike delete ${{ env.DOC_VERSION_NAME }}_preview --push
+
         - name: Deploy to GitHub Pages
           if: github.event_name == 'push' && github.base_ref == 'develop'
           run: mike deploy develop --push --update-aliases develop latest
