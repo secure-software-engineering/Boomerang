@@ -24,6 +24,9 @@ import typestate.finiteautomata.TransitionIdentity;
 import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
 
+import static typestate.TransitionFunctionOne.one;
+import static typestate.TransitionFunctionZero.zero;
+
 public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull private final Set<? extends Transition> values;
   @Nonnull private final Set<Edge> stateChangeStatements;
@@ -54,13 +57,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    final Weight one = TransitionFunctionOne.one();
-    if (other == one) {
-      return this;
-    }
-    final Weight zero = TransitionFunctionZero.zero();
-    if (other == zero) {
-      return zero;
+    if (other.equals(one())) return this;
+    if (this.equals(one())) return other;
+     if (other.equals(zero()) || this.equals(zero())) {
+      return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
     Set<? extends Transition> otherTransitions = func.values;
@@ -87,26 +87,28 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    if (!(other instanceof TransitionFunction)) {
-      throw new RuntimeException();
-    }
-    if (other == TransitionFunctionZero.zero()) {
-      return this;
-    }
-    Weight one = TransitionFunctionOne.one();
-    TransitionFunction func = (TransitionFunction) other;
-    Set<Transition> transitions = new HashSet<>(values);
-    HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
-    if (other == one) {
+    if (!(other instanceof TransitionFunction)) { throw new RuntimeException();}
+   if (this.equals(zero())) return other;
+    if (other.equals(zero())) return this;
+    if (other.equals(one()) && this.equals(one())) {return one();}
+
+    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+     if (other.equals(one()) || this.equals(one())) {
+      Set<Transition> transitions = new HashSet<>((other.equals(one()) ? values : func.values));
       Set<Transition> idTransitions = Sets.newHashSet();
       for (Transition t : transitions) {
         idTransitions.add(new TransitionImpl(t.from(), t.from()));
       }
       transitions.addAll(idTransitions);
-    } else {
-      transitions.addAll(func.getValues());
-      newStateChangeStmts.addAll(func.getStateChangeStatements());
+      return new TransitionFunctionImpl(
+          transitions,
+          Sets.newHashSet(
+              (other.equals(one()) ? stateChangeStatements : func.stateChangeStatements)));
     }
+    Set<Transition> transitions = new HashSet<>(func.values);
+    transitions.addAll(values);
+    HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
+    newStateChangeStmts.addAll(func.stateChangeStatements);
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
   }
 
