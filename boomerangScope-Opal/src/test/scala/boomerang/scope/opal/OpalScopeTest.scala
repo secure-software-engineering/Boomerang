@@ -1,14 +1,12 @@
-package scope.opal
+package boomerang.scope.opal
 
-import boomerang.scope.Method
 import boomerang.scope.opal.tac.OpalMethod
-import boomerang.scope.test.{BoomerangScopeTests, MethodSignature}
 import boomerang.scope.test.targets.{A, ParameterLocals}
+import boomerang.scope.test.{BoomerangScopeTests, MethodSignature}
 import org.junit.{Assert, Test}
 import org.opalj.br.IntegerType
 
 import java.util
-import java.util.List
 
 class OpalScopeTest extends BoomerangScopeTests {
 

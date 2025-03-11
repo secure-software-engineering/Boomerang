@@ -1,20 +1,31 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.test.targets;
 
 public class ParameterLocals {
 
-    public static void main(String[] args) {
-        ParameterLocals parameterLocals = new ParameterLocals();
+  public static void main(String[] args) {
+    ParameterLocals parameterLocals = new ParameterLocals();
 
-        parameterLocals.noParameters();
-        parameterLocals.oneParameter(10);
+    parameterLocals.noParameters();
+    parameterLocals.oneParameter(10);
 
-        A a = new A();
-        parameterLocals.twoParameters(20, a);
-    }
+    A a = new A();
+    parameterLocals.twoParameters(20, a);
+  }
 
-    public void noParameters() {}
+  public void noParameters() {}
 
-    public void oneParameter(@SuppressWarnings("unused") int i) {}
+  public void oneParameter(@SuppressWarnings("unused") int i) {}
 
-    public void twoParameters(@SuppressWarnings("unused")int i, @SuppressWarnings("unused") A a) {}
+  public void twoParameters(@SuppressWarnings("unused") int i, @SuppressWarnings("unused") A a) {}
 }

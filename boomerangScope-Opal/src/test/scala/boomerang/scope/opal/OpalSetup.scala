@@ -1,4 +1,4 @@
-package scope.opal
+package boomerang.scope.opal
 
 import boomerang.scope.test.{MethodSignature, TargetClassPath}
 import org.opalj.br.analyses.Project

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import test.setup.MethodWrapper;
-import test.setup.OpalTestSetup;
+import test.setup.SootTestSetup;
 import test.setup.TestSetup;
 
 public class TestingFramework {
@@ -30,7 +30,7 @@ public class TestingFramework {
 
   public TestingFramework() {
     // TODO Parameterize
-    this.testSetup = new OpalTestSetup();
+    this.testSetup = new SootTestSetup();
   }
 
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {
