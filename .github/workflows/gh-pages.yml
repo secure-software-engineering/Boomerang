@@ -51,4 +51,4 @@ on:
 
         - name: Deploy Doc Version for New Release
           if: github.event_name == 'push' && github.base_ref == 'master'
-          run: mike deploy "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/[^([[:alnum:]_.-]/_/g" )" --push
+          run: mike deploy "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/[^a-zA-Z0-9._-]/_/g" )" --push
