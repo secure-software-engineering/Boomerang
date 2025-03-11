@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class SetDomainZero implements SetDomainInterface {
+public class SetDomainZero implements SetDomain {
 
   @Nonnull private static final SetDomainZero zero = new SetDomainZero();
 

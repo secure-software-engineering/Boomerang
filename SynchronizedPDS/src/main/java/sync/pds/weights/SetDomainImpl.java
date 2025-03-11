@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
+public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
   @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
 

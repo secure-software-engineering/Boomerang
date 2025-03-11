@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class SetDomainOne implements SetDomainInterface {
+public class SetDomainOne implements SetDomain {
   @Nonnull private static final SetDomainOne one = new SetDomainOne();
 
   public static Weight one() {

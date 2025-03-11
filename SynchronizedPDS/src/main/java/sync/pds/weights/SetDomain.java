@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public interface SetDomainInterface<N, Stmt, Fact> extends Weight {
+public interface SetDomain<N, Stmt, Fact> extends Weight {
   @Nonnull
   Weight extendWith(@Nonnull Weight other);
 
