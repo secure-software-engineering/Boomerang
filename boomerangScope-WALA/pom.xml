@@ -8,7 +8,7 @@
         <version>3.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>boomerangScope-WALA</artifactId>
+    <artifactId>BoomerangScope-WALA</artifactId>
 
     <properties>
         <wala.version>1.6.9</wala.version>

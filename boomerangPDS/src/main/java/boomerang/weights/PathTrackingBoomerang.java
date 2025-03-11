@@ -18,10 +18,9 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
+import javax.annotation.Nonnull;
 import sync.pds.solver.OneWeightFunctions;
 import sync.pds.solver.WeightFunctions;
-
-import javax.annotation.Nonnull;
 
 public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPathWeight> {
 
