@@ -24,7 +24,7 @@ import java.util.Set;
 import static sync.pds.weights.SetDomainOne.one;
 import static sync.pds.weights.SetDomainZero.zero;
 
-public class SetDomainImpl<N, Stmt, Fact> implements SetDomainInterface {
+public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
   @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
 
