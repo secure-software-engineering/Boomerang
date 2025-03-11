@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.fraunhofer.iem</groupId>
-    <artifactId>SPDS</artifactId>
+    <artifactId>Boomerang-Parent</artifactId>
     <version>3.2.4-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>SPDS</name>
-    <description>Sparsified Synchronized Pushdown Systems for Pointer and Data-Flow Analysis</description>
-    <url>https://github.com/secure-software-engineering/SparseBoomerang</url>
+    <name>Boomerang-Parent</name>
+    <description>Parent project that holds all definitions for Synchronized and Weighted Pushdown Systems, Boomerang, and IDEal</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
 
     <licenses>
         <license>
-            <name>Eclipse Public License - v 2.0</name>
+            <name>Eclipse Public License - v2.0</name>
             <url>https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
-    <scm>
-        <connection>scm:git:git@github.com:secure-software-engineering/SparseBoomerang.git</connection>
-        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/SparseBoomerang.git
-        </developerConnection>
-        <url>https://github.com/secure-software-engineering/SparseBoomerang</url>
-    </scm>
     <developers>
         <developer>
             <name>Boomerang development team</name>
@@ -32,6 +26,7 @@
             <organizationUrl>https://www.hni.uni-paderborn.de/sse</organizationUrl>
         </developer>
     </developers>
+
     <contributors>
         <contributor>
             <name>Johannes Spaeth</name>
@@ -44,6 +39,7 @@
             <organizationUrl>https://codeshield.de/</organizationUrl>
         </contributor>
     </contributors>
+
     <modules>
         <module>PDS</module>
         <module>WPDS</module>
@@ -57,145 +53,37 @@
         <module>boomerangScope-WALA</module>
         <!--<module>SparseBoomerangCorrectness</module>-->
     </modules>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <soot.version>4.3.0-SNAPSHOT</soot.version>
-        <fmt-maven-plugin.version>2.13</fmt-maven-plugin.version>
-        <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
-        <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
-        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <maven-deploy-plugin.version>3.5.2</maven-deploy-plugin.version>
+        <java.version>11</java.version>
         <enforced-maven-version>3.6.1</enforced-maven-version>
-        <skipFormat>true</skipFormat>
+        <license.dir>${project.basedir}</license.dir>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <configuration>
-                    <argLine>-Xmx8G -Xss128m</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${maven-enforcer-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>${enforced-maven-version}</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.coveo</groupId>
-                <artifactId>fmt-maven-plugin</artifactId>
-                <version>${fmt-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>format</id>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
-                <configuration>
-                    <source>8</source>
-                    <additionalOptions>
-                        <additionalOption>-Xdoclint:none</additionalOption>
-                    </additionalOptions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.18.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>2.0.17</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>2.0.17</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>33.4.0-jre</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>de.fraunhofer.iem</groupId>
                 <artifactId>pathexpression</artifactId>
                 <version>1.0.5</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.17.0</version>
             </dependency>
             <dependency>
                 <groupId>de.fraunhofer.iem</groupId>
@@ -211,12 +99,6 @@
                 <groupId>de.fraunhofer.iem</groupId>
                 <artifactId>synchronizedPDS</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>testCore</artifactId>
-                <version>${project.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.fraunhofer.iem</groupId>
@@ -244,64 +126,195 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>soot</artifactId>
-                <version>4.6.0</version>
+                <groupId>de.fraunhofer.iem</groupId>
+                <artifactId>testCore</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
             </dependency>
-
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.core</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.java.core</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.java.sourcecode</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.java.bytecode</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.jimple.parser</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.callgraph</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.soot-oss</groupId>
-                <artifactId>sootup.analysis</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.4.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Plugin that is used to update the version for the next snapshot -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.18.0</version>
+                </plugin>
+
+                <!-- Plugin to format pom files and source code -->
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>2.44.3</version>
+                    <configuration>
+                        <pom>
+                            <sortPom>
+                                <encoding>UTF-8</encoding>
+                                <keepBlankLines>true</keepBlankLines>
+                                <nrOfIndentSpace>4</nrOfIndentSpace>
+                                <indentBlankLines>false</indentBlankLines>
+                                <indentAttribute>schemaLocation</indentAttribute>
+                                <expandEmptyElements>false</expandEmptyElements>
+                            </sortPom>
+                        </pom>
+                        <java>
+                            <googleJavaFormat>
+                                <style>GOOGLE</style>
+                            </googleJavaFormat>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <removeUnusedImports/>
+                            <importOrder/>
+                            <licenseHeader>
+                                <file>${license.dir}/license_header.txt</file>
+                            </licenseHeader>
+                        </java>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.8.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>${enforced-maven-version}</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <configuration>
+                    <!-- Disable warnings regarding missing comments etc. -->
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none</additionalOption>
+                    </additionalOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <argLine>-Xmx8G -Xss128m</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>ossrh</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <phase>clean</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <!-- This profile is used to avoid running the deployment in non-deployment
-            contexts because they require specific keys from the Github remote. Include
+            contexts because they require specific keys from the GitHub remote. Include
             this profile by setting the -Pdeployment flag. -->
         <profile>
             <id>deployment</id>
@@ -314,10 +327,10 @@
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
-                                <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <phase>verify</phase>
                                 <configuration>
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
@@ -343,23 +356,6 @@
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://s01.oss.sonatype.org</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>ci</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <!--skip formatting in ci and perform check in extra stage explicitly-->
-                        <groupId>com.coveo</groupId>
-                        <artifactId>fmt-maven-plugin</artifactId>
-                        <configuration>
-                            <!-- pretty sure this has to work nicer. dont wanna waste more time into it, though -->
-                            <skip>${skipFormat}</skip>
                         </configuration>
                     </plugin>
                 </plugins>
