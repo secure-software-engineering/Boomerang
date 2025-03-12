@@ -11,12 +11,11 @@
  */
 package tests;
 
-import de.fraunhofer.iem.Location;
 import wpds.impl.Weight;
 
 import javax.annotation.Nonnull;
 
-public class NumWeightOne implements NumWeightInterface {
+public class NumWeightOne implements NumWeight {
 
   @Nonnull private static final NumWeightOne one = new NumWeightOne();
 
@@ -25,8 +24,6 @@ public class NumWeightOne implements NumWeightInterface {
   public static NumWeightOne one() {
     return one;
   }
-
-
 
   @Nonnull
   @Override
@@ -43,11 +40,9 @@ public class NumWeightOne implements NumWeightInterface {
     return other;
   }
 
-
-
   @Override
   public String toString() {
-    return "ONE";
+    return "<ONE>";
   }
 
 

@@ -50,10 +50,10 @@ public class TestHelper {
     return aut;
   }
 
-  static WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> waccepts(
-      int a, String c, NumWeight weight) {
-    WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> aut =
-        new WeightedPAutomaton<StackSymbol, Abstraction, NumWeight>() {
+  static WeightedPAutomaton<StackSymbol, Abstraction, NumWeightImpl> waccepts(
+      int a, String c, NumWeightImpl weight) {
+    WeightedPAutomaton<StackSymbol, Abstraction, NumWeightImpl> aut =
+        new WeightedPAutomaton<StackSymbol, Abstraction, NumWeightImpl>() {
 
           @Override
           public Abstraction createState(Abstraction d, StackSymbol loc) {
@@ -66,7 +66,7 @@ public class TestHelper {
           }
 
           @Override
-          public NumWeight getOne() {
+          public NumWeightImpl getOne() {
            throw new IllegalStateException("provided NumWeightOne as return type");
           }
 
@@ -125,18 +125,18 @@ public class TestHelper {
     return new UPopRule<StackSymbol, Abstraction>(a(a), s(n), a(b));
   }
 
-  static NormalRule<StackSymbol, Abstraction, NumWeight> wnormal(
-      int a, String n, int b, String m, NumWeight w) {
-    return new NormalRule<StackSymbol, Abstraction, NumWeight>(a(a), s(n), a(b), s(m), w);
+  static NormalRule<StackSymbol, Abstraction, NumWeightImpl> wnormal(
+      int a, String n, int b, String m, NumWeightImpl w) {
+    return new NormalRule<StackSymbol, Abstraction, NumWeightImpl>(a(a), s(n), a(b), s(m), w);
   }
 
-  static PushRule<StackSymbol, Abstraction, NumWeight> wpush(
-      int a, String n, int b, String m, String l, NumWeight w) {
-    return new PushRule<StackSymbol, Abstraction, NumWeight>(a(a), s(n), a(b), s(m), s(l), w);
+  static PushRule<StackSymbol, Abstraction, NumWeightImpl> wpush(
+      int a, String n, int b, String m, String l, NumWeightImpl w) {
+    return new PushRule<StackSymbol, Abstraction, NumWeightImpl>(a(a), s(n), a(b), s(m), s(l), w);
   }
 
-  static PopRule<StackSymbol, Abstraction, NumWeight> wpop(int a, String n, int b, NumWeight w) {
-    return new PopRule<StackSymbol, Abstraction, NumWeight>(a(a), s(n), a(b), w);
+  static PopRule<StackSymbol, Abstraction, NumWeightImpl> wpop(int a, String n, int b, NumWeightImpl w) {
+    return new PopRule<StackSymbol, Abstraction, NumWeightImpl>(a(a), s(n), a(b), w);
   }
 
   static class Abstraction implements State {
