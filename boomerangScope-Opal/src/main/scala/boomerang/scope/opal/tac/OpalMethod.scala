@@ -44,43 +44,16 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
   override def isThisLocal(fact: Val): Boolean = {
     if (isStatic) return false
 
-    val thisLocal = isThisLocalDefined
-    if (thisLocal.isDefined) {
-      return thisLocal.get.equals(fact)
-    }
-
-    // TODO This might not be enough
-    false
+    val thisLocal = getThisLocal
+    thisLocal.equals(fact)
   }
 
   override def getThisLocal: Val = {
     if (!isStatic) {
-      val thisLocal = isThisLocalDefined
-      if (thisLocal.isDefined) {
-        return thisLocal.get
-      }
-
-      // TODO Replace corresponding places
-      throw new RuntimeException("this local is not used in method. Use #isThisLocal for comparisons")
+      return new OpalParameterLocal(delegate.classFile.thisType, -1, this)
     }
 
     throw new RuntimeException("Static method does not have a 'this' local")
-  }
-
-  private def isThisLocalDefined: Option[Val] = {
-    val locals = getLocals
-    for (local <- locals.asScala) {
-      val opalVal = local.asInstanceOf[OpalVal]
-      val valDelegate = opalVal.delegate
-
-      if (valDelegate.isInstanceOf[UVar[_]]) {
-        if (valDelegate.asVar.definedBy.head == -1) {
-          return Some(local)
-        }
-      }
-    }
-
-    None
   }
 
   override def getLocals: util.Set[Val] = {
@@ -135,28 +108,20 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
     if (parameterLocalCache.isEmpty) {
       parameterLocalCache = Some(new util.ArrayList[Val]())
 
-      delegate.parameterTypes.foreach(param => {
-        val parameterLocal = new OpalParameterLocal(param, this)
+      val tac = OpalClient.getTacForMethod(delegate)
+
+      delegate.parameterTypes.indices.foreach(i => {
+        val paramType = delegate.parameterTypes(i)
+        val index = tac.params.parameters(i + 1).origin
+
+        val parameterLocal = new OpalParameterLocal(paramType, index, this)
         parameterLocalCache.get.add(parameterLocal)
       })
-    }
 
-    if (parameterLocalCache.isEmpty) {
-      parameterLocalCache = Some(new util.ArrayList[Val]())
-
-      val locals = getLocals
-      for (local <- locals.asScala) {
-        if (local.isLocal) {
-          val opalVal = local.asInstanceOf[OpalVal]
-          val valDelegate = opalVal.delegate
-
-          if (valDelegate.isInstanceOf[UVar[_]]) {
-            if (valDelegate.asVar.definedBy.head < 0) {
-              parameterLocalCache.get.add(local)
-            }
-          }
-        }
-      }
+      /*delegate.parameterTypes.foreach(param => {
+        val parameterLocal = new OpalParameterLocal(param, this)
+        parameterLocalCache.get.add(parameterLocal)
+      })*/
     }
 
     parameterLocalCache.get

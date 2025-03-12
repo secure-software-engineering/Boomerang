@@ -74,8 +74,8 @@ class OpalArrayRef(val arrayRef: Expr[DUVar[ValueInformation]], val index: Int, 
 
   override def getVariableName: String = {
     arrayRef match {
-      case dVar: DVar[_] => s"var${}[$index]" // TODO insert origin
-      case uVar: UVar[_] => s"var${uVar.definedBy.head}[$index]"
+      case dVar: DVar[_] => s"var(D)[$index]" // TODO insert origin
+      case uVar: UVar[_] => s"var(${uVar.definedBy.head})[$index]"
       case _ => arrayRef.toString
     }
   }

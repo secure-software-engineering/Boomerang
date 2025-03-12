@@ -6,6 +6,8 @@ import org.opalj.br.ObjectType
 import org.opalj.tac.{DUVar, DVar, Expr, UVar}
 import org.opalj.value.ValueInformation
 
+import java.util.Objects
+
 class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   if (!delegate.isVar) {
@@ -89,16 +91,16 @@ class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod,
   override def getArrayBase: Pair[Val, Integer] = throw new RuntimeException("Opal local is not array reference")
 
   override def getVariableName: String = delegate match {
-    case dVar: DVar[_] => s"var${}" // TODO Add origin
-    case uVar: UVar[_] => s"var${uVar.definedBy.head}"
+    case dVar: DVar[_] => s"var(D)" // TODO Add origin
+    case uVar: UVar[_] => s"var(${uVar.definedBy.head})"
     case _ => delegate.toString
   }
 
-  override def hashCode(): Int = delegate match {
+  override def hashCode: Int = delegate match {
     case uVar: UVar[_] =>
       if (uVar.definedBy.head < 0) {
-        // Parameters have no real definition statement
-        return 31 * super.hashCode() + delegate.hashCode()
+        // Parameters have no real definition statement, so we just use their definition site index
+        return Objects.hash(super.hashCode(), uVar.definedBy.head)
       }
 
       // UVars should reference their DVar to keep the comparisons consistent
@@ -106,12 +108,12 @@ class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod,
       val defStmt = tac.stmts(uVar.definedBy.head)
 
       if (!defStmt.isAssignment) {
-        return 31 * super.hashCode() + delegate.hashCode()
+        return Objects.hash(super.hashCode(), delegate.hashCode())
       }
 
       val targetVar = defStmt.asAssignment.targetVar
-      31 * super.hashCode() + targetVar.hashCode()
-    case dVar: DVar[_] => 31 * super.hashCode() + dVar.hashCode()
+      Objects.hash(super.hashCode(), targetVar.hashCode())
+    case dVar: DVar[_] => Objects.hash(super.hashCode(), dVar.hashCode())
     case _ => throw new RuntimeException("Cannot compute hashCode for non variables")
   }
 
@@ -152,6 +154,12 @@ class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod,
         case _: UVar[_] if other.delegate.isInstanceOf[UVar[_]] =>
           super.equals(other) && this.delegate.hashCode() == other.delegate.hashCode()
         case _ => throw new RuntimeException("Cannot compare a variable with a non variable")
+      }
+    case other: OpalParameterLocal =>
+      this.delegate match {
+        case uVar: UVar[_] =>
+          Objects.equals(m, other.m) && uVar.definedBy.head == other.index;
+        case _ => false
       }
     case _ => false
   }

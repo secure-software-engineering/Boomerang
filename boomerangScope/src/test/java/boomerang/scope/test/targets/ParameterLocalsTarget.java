@@ -11,7 +11,21 @@
  */
 package boomerang.scope.test.targets;
 
-public class A {
+public class ParameterLocalsTarget {
 
-  public void methodCall(@SuppressWarnings("unused") int i) {}
+  public static void main(String[] args) {
+    ParameterLocalsTarget parameterLocalsTarget = new ParameterLocalsTarget();
+
+    parameterLocalsTarget.noParameters();
+    parameterLocalsTarget.oneParameter(10);
+
+    A a = new A();
+    parameterLocalsTarget.twoParameters(20, a);
+  }
+
+  public void noParameters() {}
+
+  public void oneParameter(@SuppressWarnings("unused") int i) {}
+
+  public void twoParameters(@SuppressWarnings("unused") int i, @SuppressWarnings("unused") A a) {}
 }

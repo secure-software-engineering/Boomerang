@@ -149,6 +149,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
       case stringConst: StringConst => "\"" + stringConst.value + "\""
       case intConst: IntConst => intConst.value.toString
       case longConst: LongConst => longConst.value.toString
+      case newExpr: New => s"new ${newExpr.tpe.toJava}"
       case _ => delegate.toString
     }
   }

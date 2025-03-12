@@ -217,12 +217,12 @@ public class AllocVal extends Val {
   @Override
   public String toString() {
     return "AllocVal{"
-        + "delegate="
+        + "delegate: "
         + delegate
-        + ", allocStatement="
+        + ", allocStatement: "
         + allocStatement
-        + ", allocationVal="
+        + ", allocationVal: "
         + allocationVal
-        + '}';
+        + "}";
   }
 }

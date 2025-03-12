@@ -16,6 +16,7 @@ class OpalSetup {
     OPALLogger.updateLogger(GlobalLogContext, DevNullLogger)
     val project = Project(new File(TargetClassPath.TARGET_CLASS_PATH))
 
+    OpalClient.init(project)
     targetClass = project.classFile(ObjectType(targetClassName.replace(".", "/")))
   }
 

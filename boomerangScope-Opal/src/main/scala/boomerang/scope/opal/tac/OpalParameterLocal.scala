@@ -2,8 +2,11 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.{ControlFlowGraph, Method, Pair, Type, Val}
 import org.opalj.br.FieldType
+import org.opalj.tac.UVar
 
-class OpalParameterLocal(parameterType: FieldType, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
+import java.util.Objects
+
+class OpalParameterLocal(val parameterType: FieldType, val index: Int, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   override def getType: Type = OpalType(parameterType)
 
@@ -13,7 +16,7 @@ class OpalParameterLocal(parameterType: FieldType, method: OpalMethod, unbalance
 
   override def getNewExprType: Type = throw new RuntimeException("Parameter local is not a new expression")
 
-  override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalParameterLocal(parameterType, method, stmt)
+  override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalParameterLocal(parameterType, index, method, stmt)
 
   override def isLocal: Boolean = true
 
@@ -51,7 +54,7 @@ class OpalParameterLocal(parameterType: FieldType, method: OpalMethod, unbalance
 
   override def getClassConstantType: Type = throw new RuntimeException("Parameter local is not a class constant")
 
-  override def withNewMethod(callee: Method): Val = new OpalParameterLocal(parameterType, callee.asInstanceOf[OpalMethod])
+  override def withNewMethod(callee: Method): Val = new OpalParameterLocal(parameterType, index, callee.asInstanceOf[OpalMethod])
 
   override def isLongConstant: Boolean = false
 
@@ -61,5 +64,19 @@ class OpalParameterLocal(parameterType: FieldType, method: OpalMethod, unbalance
 
   override def getArrayBase: Pair[Val, Integer] = throw new RuntimeException("Parameter local is not an array ref")
 
-  override def getVariableName: String = ???
+  override def getVariableName: String = s"var($index)"
+
+  override def hashCode: Int = Objects.hash(super.hashCode(), index)
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: OpalParameterLocal => Objects.equals(m, other.m) && index == other.index
+    case local: OpalLocal =>
+      local.delegate match {
+        case uVar: UVar[_] => Objects.equals(m, local.m) && index == uVar.definedBy.head
+        case _ => false
+      }
+    case _ => false
+  }
+
+  override def toString: String = getVariableName
 }

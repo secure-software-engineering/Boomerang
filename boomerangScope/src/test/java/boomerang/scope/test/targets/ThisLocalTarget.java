@@ -11,21 +11,20 @@
  */
 package boomerang.scope.test.targets;
 
-public class ParameterLocals {
+public class ThisLocalTarget {
 
   public static void main(String[] args) {
-    ParameterLocals parameterLocals = new ParameterLocals();
-
-    parameterLocals.noParameters();
-    parameterLocals.oneParameter(10);
-
-    A a = new A();
-    parameterLocals.twoParameters(20, a);
+    ThisLocalTarget thisLocalTarget = new ThisLocalTarget();
+    thisLocalTarget.call();
   }
 
-  public void noParameters() {}
+  /**
+   * Method to test the 'this' local. The call to {@link #callWithThis()} is resolved to
+   * 'this.callWithThis()'.
+   */
+  public void call() {
+    callWithThis();
+  }
 
-  public void oneParameter(@SuppressWarnings("unused") int i) {}
-
-  public void twoParameters(@SuppressWarnings("unused") int i, @SuppressWarnings("unused") A a) {}
+  public void callWithThis() {}
 }
