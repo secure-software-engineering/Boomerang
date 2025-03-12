@@ -1,6 +1,17 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package wpds.impl;
 
-import wpds.interfaces.Location;
+import de.fraunhofer.iem.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
 
@@ -49,7 +60,7 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
 
   private class Import extends WPAStateListener<N, D, W> {
 
-    private D flowTarget;
+    private final D flowTarget;
 
     public Import(D state, D flowTarget) {
       super(state);
@@ -84,9 +95,8 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
       Import other = (Import) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (flowTarget == null) {
-        if (other.flowTarget != null) return false;
-      } else if (!flowTarget.equals(other.flowTarget)) return false;
-      return true;
+        return other.flowTarget == null;
+      } else return flowTarget.equals(other.flowTarget);
     }
 
     private PrefixImport getOuterType() {
@@ -96,9 +106,9 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
 
   private class IntersectionListener extends WPAStateListener<N, D, W> {
 
-    private D flowState;
-    private N label;
-    private IntersectionCallback callback;
+    private final D flowState;
+    private final N label;
+    private final IntersectionCallback callback;
 
     public IntersectionListener(D baseState, D flowState, N label, IntersectionCallback callback) {
       super(baseState);
@@ -139,9 +149,8 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
         if (other.flowState != null) return false;
       } else if (!flowState.equals(other.flowState)) return false;
       if (label == null) {
-        if (other.label != null) return false;
-      } else if (!label.equals(other.label)) return false;
-      return true;
+        return other.label == null;
+      } else return label.equals(other.label);
     }
 
     private PrefixImport getOuterType() {
@@ -189,9 +198,8 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
       HasOutTransWithSameLabel other = (HasOutTransWithSameLabel) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (baseT == null) {
-        if (other.baseT != null) return false;
-      } else if (!baseT.equals(other.baseT)) return false;
-      return true;
+        return other.baseT == null;
+      } else return baseT.equals(other.baseT);
     }
 
     private PrefixImport getOuterType() {
@@ -201,8 +209,8 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
 
   private class IntersectionListenerNoLabel extends WPAStateListener<N, D, W> {
 
-    private D flowState;
-    private IntersectionCallback callback;
+    private final D flowState;
+    private final IntersectionCallback callback;
 
     public IntersectionListenerNoLabel(D baseState, D flowState, IntersectionCallback callback) {
       super(baseState);
@@ -237,9 +245,8 @@ public class PrefixImport<N extends Location, D extends State, W extends Weight>
       IntersectionListenerNoLabel other = (IntersectionListenerNoLabel) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (flowState == null) {
-        if (other.flowState != null) return false;
-      } else if (!flowState.equals(other.flowState)) return false;
-      return true;
+        return other.flowState == null;
+      } else return flowState.equals(other.flowState);
     }
 
     private PrefixImport getOuterType() {

@@ -1,13 +1,24 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.results;
 
 import boomerang.BackwardQuery;
 import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.Util;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Type;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
+import boomerang.scope.Type;
+import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -32,8 +43,8 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
   private Map<ForwardQuery, Context> allocationSites;
   private final boolean timedout;
   private final IBoomerangStats<W> stats;
-  private Stopwatch analysisWatch;
-  private long maxMemory;
+  private final Stopwatch analysisWatch;
+  private final long maxMemory;
 
   public BackwardBoomerangResults(
       BackwardQuery query,
@@ -77,7 +88,7 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
         fw.getValue()
             .getFieldAutomaton()
             .registerListener(
-                new ExtractAllocationSiteStateListener<W>(node, query, (ForwardQuery) fw.getKey()) {
+                new ExtractAllocationSiteStateListener<W>(node, query, fw.getKey()) {
 
                   @Override
                   protected void allocationSiteFound(

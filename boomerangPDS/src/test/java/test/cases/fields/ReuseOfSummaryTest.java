@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -16,30 +16,10 @@ import test.core.AbstractBoomerangTest;
 
 public class ReuseOfSummaryTest extends AbstractBoomerangTest {
 
+  private final String target = ReuseOfSummaryTarget.class.getName();
+
   @Test
   public void summaryTest() {
-    A a = new A();
-    A b = new A();
-
-    Object c = new Alloc(); // o1
-    foo(a, b, c);
-    foo(a, a, c);
-
-    /**
-     * the test case extracts all allocated object of type Alloc and assumes these objects to flow
-     * as argument to queryFor(var). In this example var and a.f point to o1
-     */
-    Object var = a.f;
-    queryFor(var);
-  }
-
-  private void foo(A c, A d, Object f) {
-    d.f = f;
-  }
-
-  private static class A {
-    Object f;
-
-    public A() {}
+    analyze(target, testName.getMethodName());
   }
 }

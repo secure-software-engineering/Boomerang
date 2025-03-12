@@ -1,87 +1,100 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.guided;
 
 import boomerang.BackwardQuery;
 import boomerang.Boomerang;
-import boomerang.DefaultBoomerangOptions;
 import boomerang.ForwardQuery;
-import boomerang.flowfunction.IBackwardFlowFunction;
-import boomerang.flowfunction.IForwardFlowFunction;
+import boomerang.flowfunction.DefaultBackwardFlowFunctionOptions;
+import boomerang.flowfunction.DefaultForwardFlowFunctionOptions;
 import boomerang.guided.flowfunction.CustomBackwardFlowFunction;
 import boomerang.guided.flowfunction.CustomForwardFlowFunction;
+import boomerang.guided.targets.CustomFlowFunctionIntTarget;
 import boomerang.guided.targets.CustomFlowFunctionTarget;
+import boomerang.options.BoomerangOptions;
+import boomerang.options.IntAndStringAllocationSite;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.AllocVal;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.SootDataFlowScope;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.BoomerangPretransformer;
-import boomerang.scene.jimple.IntAndStringBoomerangOptions;
-import boomerang.scene.jimple.JimpleMethod;
-import boomerang.scene.jimple.SootCallGraph;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
-import soot.G;
-import soot.PackManager;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.options.Options;
+import test.TestingFramework;
+import test.setup.MethodWrapper;
 import wpds.impl.Weight.NoWeight;
 
 public class CustomFlowFunctionTest {
 
-  public static String CG = "cha";
-
   @Test
   public void killOnSystemExitBackwardTestInteger() {
-    setupSoot(CustomFlowFunctionTarget.class);
-    SootMethod m =
-        Scene.v()
-            .getMethod(
-                "<boomerang.guided.targets.CustomFlowFunctionIntTarget: void main(java.lang.String[])>");
+    TestingFramework testingFramework = new TestingFramework();
+
+    MethodWrapper methodWrapper =
+        new MethodWrapper(
+            CustomFlowFunctionIntTarget.class.getName(),
+            "main",
+            MethodWrapper.VOID,
+            List.of("java.lang.String[]"));
+    FrameworkScope frameworkScope = testingFramework.getFrameworkScope(methodWrapper);
+
+    Method m = testingFramework.getTestMethod();
     BackwardQuery query = selectQueryForStatement(m);
 
-    SootCallGraph sootCallGraph = new SootCallGraph();
-    Boomerang solver =
-        new Boomerang(
-            sootCallGraph,
-            SootDataFlowScope.make(Scene.v()),
-            new CustomIntAndStringBoomerangOptions());
+    Boomerang solver = new Boomerang(frameworkScope, customOptions());
 
     System.out.println("Solving query: " + query);
     BackwardBoomerangResults<NoWeight> backwardQueryResults = solver.solve(query);
     for (BackwardBoomerangSolver bw : solver.getBackwardSolvers().values()) {
-      Assert.assertEquals(true, bw.getCallAutomaton().getTransitions().size() < 3);
+      Assert.assertTrue(bw.getCallAutomaton().getTransitions().size() < 3);
     }
     System.out.println(backwardQueryResults.getAllocationSites());
 
     // For the query no allocation site is found, as between queryFor and the allocation site there
     // exists a System.exit call.
-    Assert.assertEquals(true, backwardQueryResults.isEmpty());
+    Assert.assertTrue(backwardQueryResults.isEmpty());
   }
 
+  /*
+  soot uses 1829 classes here:
+  methodname: <init>
+  methodname: exit
+  methodname: queryFor
+  Solving query: BackwardQuery: (z (boomerang.guided.targets.CustomFlowFunctionTarget.<boomerang.guided.targets.CustomFlowFunctionTarget: void main(java.lang.String[])>),exit(y) -> queryFor(z))
+  {}
+  * */
   @Test
   public void killOnSystemExitBackwardTest() {
-    setupSoot(CustomFlowFunctionTarget.class);
-    SootMethod m =
-        Scene.v()
-            .getMethod(
-                "<boomerang.guided.targets.CustomFlowFunctionTarget: void main(java.lang.String[])>");
+    TestingFramework testingFramework = new TestingFramework();
+
+    MethodWrapper methodWrapper =
+        new MethodWrapper(
+            CustomFlowFunctionTarget.class.getName(),
+            "main",
+            MethodWrapper.VOID,
+            List.of("java.lang.String[]"));
+    FrameworkScope frameworkScope = testingFramework.getFrameworkScope(methodWrapper);
+
+    Method m = testingFramework.getTestMethod();
     BackwardQuery query = selectQueryForStatement(m);
 
-    SootCallGraph sootCallGraph = new SootCallGraph();
-    Boomerang solver =
-        new Boomerang(
-            sootCallGraph, SootDataFlowScope.make(Scene.v()), new CustomBoomerangOptions());
+    Boomerang solver = new Boomerang(frameworkScope, customOptions());
 
     System.out.println("Solving query: " + query);
     BackwardBoomerangResults<NoWeight> backwardQueryResults = solver.solve(query);
@@ -89,22 +102,25 @@ public class CustomFlowFunctionTest {
 
     // For the query no allocation site is found, as between queryFor and the allocation site there
     // exists a System.exit call.
-    Assert.assertEquals(true, backwardQueryResults.isEmpty());
+    Assert.assertTrue(backwardQueryResults.isEmpty());
   }
 
   @Test
   public void killOnSystemExitForwardTest() {
-    setupSoot(CustomFlowFunctionTarget.class);
-    SootMethod m =
-        Scene.v()
-            .getMethod(
-                "<boomerang.guided.targets.CustomFlowFunctionTarget: void main(java.lang.String[])>");
+    TestingFramework testingFramework = new TestingFramework();
+
+    MethodWrapper methodWrapper =
+        new MethodWrapper(
+            CustomFlowFunctionTarget.class.getName(),
+            "main",
+            MethodWrapper.VOID,
+            List.of("java.lang.String[]"));
+    FrameworkScope frameworkScope = testingFramework.getFrameworkScope(methodWrapper);
+
+    Method m = testingFramework.getTestMethod();
     ForwardQuery query = selectFirstIntAssignment(m);
 
-    SootCallGraph sootCallGraph = new SootCallGraph();
-    Boomerang solver =
-        new Boomerang(
-            sootCallGraph, SootDataFlowScope.make(Scene.v()), new CustomBoomerangOptions());
+    Boomerang solver = new Boomerang(frameworkScope, customOptions());
 
     System.out.println("Solving query: " + query);
     ForwardBoomerangResults<NoWeight> res = solver.solve(query);
@@ -117,105 +133,65 @@ public class CustomFlowFunctionTest {
                 statement ->
                     statement.containsInvokeExpr()
                         && statement.getInvokeExpr().getMethod().getName().equals("queryFor"));
-    Assert.assertEquals(false, t);
+    Assert.assertFalse(t);
   }
 
-  public static BackwardQuery selectQueryForStatement(SootMethod m) {
-    Method method = JimpleMethod.of(m);
-    method.getStatements().stream().filter(x -> x.containsInvokeExpr()).forEach(x -> x.toString());
-    Statement queryStatement =
+  public static BackwardQuery selectQueryForStatement(Method method) {
+    Optional<Statement> queryStatement =
         method.getStatements().stream()
-            .filter(x -> x.containsInvokeExpr())
-            .filter(x -> x.getInvokeExpr().getMethod().getName().equals("queryFor"))
-            .findFirst()
-            .get();
-    Val arg = queryStatement.getInvokeExpr().getArg(0);
+            .filter(Statement::containsInvokeExpr)
+            .filter(
+                x -> {
+                  System.out.println("methodname: " + x.getInvokeExpr().getMethod().getName());
+                  return x.getInvokeExpr().getMethod().getName().equals("queryFor");
+                })
+            .findFirst();
+    if (queryStatement.isEmpty()) {
+      Assert.fail("No query statement found in method " + method.getName());
+    }
+    Val arg = queryStatement.get().getInvokeExpr().getArg(0);
 
-    Statement predecessor =
-        method.getControlFlowGraph().getPredsOf(queryStatement).stream().findFirst().get();
-    Edge cfgEdge = new Edge(predecessor, queryStatement);
+    Optional<Statement> predecessor =
+        method.getControlFlowGraph().getPredsOf(queryStatement.get()).stream().findFirst();
+    if (predecessor.isEmpty()) {
+      Assert.fail("No predecessor found for " + queryStatement);
+    }
+
+    Edge cfgEdge = new Edge(predecessor.get(), queryStatement.get());
     return BackwardQuery.make(cfgEdge, arg);
   }
 
-  public static ForwardQuery selectFirstIntAssignment(SootMethod m) {
-    Method method = JimpleMethod.of(m);
-    method.getStatements().stream().forEach(x -> System.out.println(x.toString()));
-    Statement intAssignStmt =
+  public static ForwardQuery selectFirstIntAssignment(Method method) {
+    method.getStatements().forEach(x -> System.out.println(x.toString()));
+    Optional<Statement> intAssignStmt =
         method.getStatements().stream()
-            .filter(x -> x.isAssign() && !x.getLeftOp().getType().isRefType())
-            .findFirst()
-            .get();
-    Val arg = new AllocVal(intAssignStmt.getLeftOp(), intAssignStmt, intAssignStmt.getRightOp());
+            .filter(x -> x.isAssignStmt() && !x.getLeftOp().getType().isRefType())
+            .findFirst();
+    if (intAssignStmt.isEmpty()) {
+      Assert.fail("No assignment found in method " + method.getName());
+    }
 
-    Statement succs =
-        method.getControlFlowGraph().getSuccsOf(intAssignStmt).stream().findFirst().get();
-    Edge cfgEdge = new Edge(intAssignStmt, succs);
+    AllocVal arg =
+        new AllocVal(
+            intAssignStmt.get().getLeftOp(), intAssignStmt.get(), intAssignStmt.get().getRightOp());
+
+    Optional<Statement> succs =
+        method.getControlFlowGraph().getSuccsOf(intAssignStmt.get()).stream().findFirst();
+    if (succs.isEmpty()) {
+      Assert.fail("No successor found for " + intAssignStmt);
+    }
+
+    Edge cfgEdge = new Edge(intAssignStmt.get(), succs.get());
     return new ForwardQuery(cfgEdge, arg);
   }
 
-  protected void setupSoot(Class cls) {
-    G.v().reset();
-    setupSoot();
-    setApplicationClass(cls);
-    PackManager.v().runPacks();
-    BoomerangPretransformer.v().reset();
-    BoomerangPretransformer.v().apply();
-  }
-
-  private void setupSoot() {
-    Options.v().set_whole_program(true);
-    Options.v().setPhaseOption("cg." + CG, "on");
-    Options.v().setPhaseOption("cg." + CG, "verbose:true");
-    Options.v().set_output_format(Options.output_format_none);
-    Options.v().set_no_bodies_for_excluded(true);
-    Options.v().set_allow_phantom_refs(true);
-    Options.v().setPhaseOption("jb", "use-original-names:true");
-    Options.v().set_keep_line_number(true);
-    Options.v().set_prepend_classpath(true);
-    Options.v().set_process_dir(getProcessDir());
-  }
-
-  private void setApplicationClass(Class cls) {
-    Scene.v().loadNecessaryClasses();
-    List<SootMethod> eps = Lists.newArrayList();
-    for (SootClass sootClass : Scene.v().getClasses()) {
-      if (sootClass.toString().equals(cls.getName())
-          || (sootClass.toString().contains(cls.getName() + "$"))) {
-        sootClass.setApplicationClass();
-        eps.addAll(sootClass.getMethods());
-      }
-    }
-    Scene.v().setEntryPoints(eps);
-  }
-
-  private List<String> getProcessDir() {
-    Path path = Paths.get("target/test-classes");
-    return Lists.newArrayList(path.toAbsolutePath().toString());
-  }
-
-  private class CustomBoomerangOptions extends DefaultBoomerangOptions {
-
-    @Override
-    public IForwardFlowFunction getForwardFlowFunctions() {
-      return new CustomForwardFlowFunction(this);
-    }
-
-    @Override
-    public IBackwardFlowFunction getBackwardFlowFunction() {
-      return new CustomBackwardFlowFunction(this);
-    }
-  }
-
-  private class CustomIntAndStringBoomerangOptions extends IntAndStringBoomerangOptions {
-
-    @Override
-    public IForwardFlowFunction getForwardFlowFunctions() {
-      return new CustomForwardFlowFunction(this);
-    }
-
-    @Override
-    public IBackwardFlowFunction getBackwardFlowFunction() {
-      return new CustomBackwardFlowFunction(this);
-    }
+  private static BoomerangOptions customOptions() {
+    return BoomerangOptions.builder()
+        .withAllocationSite(new IntAndStringAllocationSite())
+        .withForwardFlowFunction(
+            new CustomForwardFlowFunction(DefaultForwardFlowFunctionOptions.DEFAULT()))
+        .withBackwardFlowFunction(
+            new CustomBackwardFlowFunction(DefaultBackwardFlowFunctionOptions.DEFAULT()))
+        .build();
   }
 }

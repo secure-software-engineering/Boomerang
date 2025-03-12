@@ -2575,7 +2575,7 @@ function defineDegreeFunction( callback ){
 
       return degree;
     } else {
-      return;
+
     }
   };
 }
@@ -7843,7 +7843,7 @@ var corefn = ({
       };
     }
 
-    return;
+
   },
 
   minZoom: function( zoom ){
@@ -9413,7 +9413,7 @@ BreadthFirstLayout.prototype.run = function(){
     var ele = nodes[ i ];
 
     if( foundByBfs[ ele.id() ] ){
-      continue;
+
     } else {
       orphanNodes.push( ele );
     }
@@ -10339,7 +10339,7 @@ CoseLayout.prototype.run = function(){
       // s += "\nForceX: " + forceX + " ForceY: " + forceY;
       // logDebug(s);
 
-      return;
+
     };
 
     /**
@@ -10762,7 +10762,7 @@ CoseLayout.prototype.run = function(){
 
       // s += ". No changes in boundaries/position of parent node " + p.id;
       // logDebug(s);
-      return;
+
     };
 
     var separateComponents = function( layutInfo, options ){
@@ -11179,7 +11179,7 @@ var findLCA_aux = function( node1, node2, graphIx, layoutInfo ){
     var result = findLCA_aux( node1, node2, childGraphIx, layoutInfo );
     if( 0 === result.count ){
       // Neither node1 nor node2 are present in this subgraph
-      continue;
+
     } else if( 1 === result.count ){
       // One of (node1, node2) is present in this subgraph
       c++;
@@ -11258,7 +11258,7 @@ var printLayoutInfo = function( layoutInfo ){
   s += '\ntemperature: ' + layoutInfo.temperature;
   console.debug( s );
 
-  return;
+
   /* eslint-enable */
 };
 
@@ -14679,7 +14679,7 @@ BRp.load = function(){
       r.hoverData.tapholdTimeout = setTimeout( function(){
 
         if( r.hoverData.tapholdCancelled ){
-          return;
+
         } else {
           var ele = r.hoverData.down;
 
@@ -21675,7 +21675,7 @@ math.solveCubic = function( a, b, c, d, result ){
   result[2] = -term1 + r13 * Math.cos( (dum1 + 2.0 * Math.PI) / 3.0 );
   result[4] = -term1 + r13 * Math.cos( (dum1 + 4.0 * Math.PI) / 3.0 );
 
-  return;
+
 };
 
 math.sqdistToQuadraticBezier = function(
@@ -21808,7 +21808,7 @@ math.pointInsidePolygonPoints = function( x, y, points ){
       }
 
     } else {
-      continue;
+
     }
 
   }

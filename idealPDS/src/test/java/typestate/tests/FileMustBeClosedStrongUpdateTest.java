@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -15,42 +15,24 @@ import org.junit.Test;
 import test.IDEALTestingFramework;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
-import typestate.test.helper.File;
-import typestate.test.helper.ObjectWithField;
+import typestate.targets.FileMustBeClosedStrongUpdate;
 
 public class FileMustBeClosedStrongUpdateTest extends IDEALTestingFramework {
+
+  private final String target = FileMustBeClosedStrongUpdate.class.getName();
+
+  @Override
+  public TypeStateMachineWeightFunctions getStateMachine() {
+    return new FileMustBeClosedStateMachine();
+  }
+
   @Test
   public void noStrongUpdatePossible() {
-    File b = null;
-    File a = new File();
-    a.open();
-    File e = new File();
-    e.open();
-    if (staticallyUnknown()) {
-      b = a;
-    } else {
-      b = e;
-    }
-    b.close();
-    mayBeInErrorState(a);
-    mustBeInAcceptingState(b);
+    analyze(target, testName.getMethodName(), 2, 2);
   }
 
   @Test
   public void aliasSensitive() {
-    ObjectWithField a = new ObjectWithField();
-    ObjectWithField b = a;
-    File file = new File();
-    file.open();
-    a.field = file;
-    File loadedFromAlias = b.field;
-    loadedFromAlias.close();
-    mustBeInAcceptingState(file);
-    mustBeInAcceptingState(a.field);
-  }
-
-  @Override
-  protected TypeStateMachineWeightFunctions getStateMachine() {
-    return new FileMustBeClosedStateMachine();
+    analyze(target, testName.getMethodName(), 2, 1);
   }
 }

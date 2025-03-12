@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,7 +43,6 @@ import wpds.impl.Transition;
 import wpds.impl.Weight;
 import wpds.impl.WeightedPAutomaton;
 import wpds.impl.WeightedPushdownSystem;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
 import wpds.interfaces.WPAUpdateListener;
@@ -61,13 +61,13 @@ public abstract class SyncPDSSolver<
   protected final WeightedPushdownSystem<Stmt, INode<Fact>, W> callingPDS =
       new WeightedPushdownSystem<Stmt, INode<Fact>, W>() {
         public String toString() {
-          return "Call " + SyncPDSSolver.this.toString();
+          return "Call " + SyncPDSSolver.this;
         }
       };
   protected final WeightedPushdownSystem<Field, INode<Node<Stmt, Fact>>, W> fieldPDS =
       new WeightedPushdownSystem<Field, INode<Node<Stmt, Fact>>, W>() {
         public String toString() {
-          return "Field " + SyncPDSSolver.this.toString();
+          return "Field " + SyncPDSSolver.this;
         }
       };
   private final Set<Node<Stmt, Fact>> reachedStates = Sets.newHashSet();
@@ -206,7 +206,7 @@ public abstract class SyncPDSSolver<
   private class FieldAddEpsilonToInitialStateListener
       extends WPAStateListener<Field, INode<Node<Stmt, Fact>>, W> {
 
-    private WeightedPAutomaton<Field, INode<Node<Stmt, Fact>>, W> parent;
+    private final WeightedPAutomaton<Field, INode<Node<Stmt, Fact>>, W> parent;
 
     public FieldAddEpsilonToInitialStateListener(
         INode<Node<Stmt, Fact>> state,
@@ -249,9 +249,8 @@ public abstract class SyncPDSSolver<
       FieldAddEpsilonToInitialStateListener other = (FieldAddEpsilonToInitialStateListener) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (parent == null) {
-        if (other.parent != null) return false;
-      } else if (!parent.equals(other.parent)) return false;
-      return true;
+        return other.parent == null;
+      } else return parent.equals(other.parent);
     }
 
     private SyncPDSSolver getOuterType() {
@@ -261,7 +260,7 @@ public abstract class SyncPDSSolver<
 
   private class FieldOnOutTransitionAddToStateListener
       extends WPAStateListener<Field, INode<Node<Stmt, Fact>>, W> {
-    private Transition<Field, INode<Node<Stmt, Fact>>> nestedT;
+    private final Transition<Field, INode<Node<Stmt, Fact>>> nestedT;
 
     public FieldOnOutTransitionAddToStateListener(
         INode<Node<Stmt, Fact>> state, Transition<Field, INode<Node<Stmt, Fact>>> nestedT) {
@@ -300,9 +299,8 @@ public abstract class SyncPDSSolver<
       FieldOnOutTransitionAddToStateListener other = (FieldOnOutTransitionAddToStateListener) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (nestedT == null) {
-        if (other.nestedT != null) return false;
-      } else if (!nestedT.equals(other.nestedT)) return false;
-      return true;
+        return other.nestedT == null;
+      } else return nestedT.equals(other.nestedT);
     }
 
     private SyncPDSSolver getOuterType() {
@@ -323,7 +321,7 @@ public abstract class SyncPDSSolver<
 
   private class AddEpsilonToInitialStateListener extends WPAStateListener<Stmt, INode<Fact>, W> {
 
-    private WeightedPAutomaton<Stmt, INode<Fact>, W> parent;
+    private final WeightedPAutomaton<Stmt, INode<Fact>, W> parent;
 
     public AddEpsilonToInitialStateListener(
         INode<Fact> state, WeightedPAutomaton<Stmt, INode<Fact>, W> parent) {
@@ -364,9 +362,8 @@ public abstract class SyncPDSSolver<
       AddEpsilonToInitialStateListener other = (AddEpsilonToInitialStateListener) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (parent == null) {
-        if (other.parent != null) return false;
-      } else if (!parent.equals(other.parent)) return false;
-      return true;
+        return other.parent == null;
+      } else return parent.equals(other.parent);
     }
 
     private SyncPDSSolver getOuterType() {
@@ -375,7 +372,7 @@ public abstract class SyncPDSSolver<
   }
 
   private class OnOutTransitionAddToStateListener extends WPAStateListener<Stmt, INode<Fact>, W> {
-    private Transition<Stmt, INode<Fact>> nestedT;
+    private final Transition<Stmt, INode<Fact>> nestedT;
 
     public OnOutTransitionAddToStateListener(
         INode<Fact> state, Transition<Stmt, INode<Fact>> nestedT) {
@@ -416,9 +413,8 @@ public abstract class SyncPDSSolver<
       OnOutTransitionAddToStateListener other = (OnOutTransitionAddToStateListener) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (nestedT == null) {
-        if (other.nestedT != null) return false;
-      } else if (!nestedT.equals(other.nestedT)) return false;
-      return true;
+        return other.nestedT == null;
+      } else return nestedT.equals(other.nestedT);
     }
 
     private SyncPDSSolver getOuterType() {

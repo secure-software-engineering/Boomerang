@@ -1,14 +1,26 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.core;
 
 import boomerang.BackwardQuery;
 import boomerang.Query;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Val;
 import java.util.Optional;
 
 public class FirstArgumentOf implements ValueOfInterestInUnit {
 
-  private String methodNameMatcher;
+  private final String methodNameMatcher;
 
   public FirstArgumentOf(String methodNameMatcher) {
     this.methodNameMatcher = methodNameMatcher;
@@ -17,7 +29,7 @@ public class FirstArgumentOf implements ValueOfInterestInUnit {
   @Override
   public Optional<? extends Query> test(Edge stmt) {
     if (!(stmt.getStart().containsInvokeExpr())) return Optional.empty();
-    boomerang.scene.InvokeExpr invokeExpr = stmt.getStart().getInvokeExpr();
+    InvokeExpr invokeExpr = stmt.getStart().getInvokeExpr();
     if (!invokeExpr.getMethod().getName().matches(methodNameMatcher)) return Optional.empty();
     Val param = invokeExpr.getArg(0);
     if (!param.isLocal()) return Optional.empty();

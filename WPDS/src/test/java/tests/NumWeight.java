@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,8 +11,8 @@
  */
 package tests;
 
+import de.fraunhofer.iem.Location;
 import wpds.impl.Weight;
-import wpds.interfaces.Location;
 
 public class NumWeight extends Weight {
 
@@ -99,7 +99,6 @@ public class NumWeight extends Weight {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     NumWeight other = (NumWeight) obj;
-    if (i != other.i) return false;
-    return true;
+    return i == other.i;
   }
 }

@@ -1,16 +1,27 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.core;
 
 import boomerang.ForwardQuery;
 import boomerang.Query;
-import boomerang.scene.AllocVal;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Type;
-import boomerang.scene.Val;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
+import boomerang.scope.Type;
+import boomerang.scope.Val;
 import java.util.Optional;
 
 class AllocationSiteOf implements ValueOfInterestInUnit {
-  private String type;
+  private final String type;
 
   public AllocationSiteOf(String type) {
     this.type = type;
@@ -18,14 +29,14 @@ class AllocationSiteOf implements ValueOfInterestInUnit {
 
   public Optional<Query> test(Edge cfgEdge) {
     Statement stmt = cfgEdge.getStart();
-    if (stmt.isAssign()) {
+    if (stmt.isAssignStmt()) {
       if (stmt.getLeftOp().isLocal() && stmt.getRightOp().isNewExpr()) {
         Type expr = stmt.getRightOp().getNewExprType();
         if (expr.isSubtypeOf(type)) {
           Val local = stmt.getLeftOp();
           ForwardQuery forwardQuery =
               new ForwardQuery(cfgEdge, new AllocVal(local, stmt, stmt.getRightOp()));
-          return Optional.<Query>of(forwardQuery);
+          return Optional.of(forwardQuery);
         }
       }
     }

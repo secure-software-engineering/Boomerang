@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,14 +11,13 @@
  */
 package boomerang.weights;
 
-import boomerang.BoomerangOptions;
 import boomerang.ForwardQuery;
 import boomerang.WeightedBoomerang;
-import boomerang.scene.CallGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.options.BoomerangOptions;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.Val;
 import sync.pds.solver.OneWeightFunctions;
 import sync.pds.solver.WeightFunctions;
 
@@ -27,12 +26,12 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
   private OneWeightFunctions<Edge, Val, Field, DataFlowPathWeight> fieldWeights;
   private PathTrackingWeightFunctions callWeights;
 
-  public PathTrackingBoomerang(CallGraph cg, DataFlowScope scope) {
-    super(cg, scope);
+  public PathTrackingBoomerang(FrameworkScope frameworkScope) {
+    super(frameworkScope);
   }
 
-  public PathTrackingBoomerang(CallGraph cg, DataFlowScope scope, BoomerangOptions opt) {
-    super(cg, scope, opt);
+  public PathTrackingBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
+    super(frameworkScope, options);
   }
 
   @Override

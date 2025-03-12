@@ -1,25 +1,28 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.controlflowgraph;
 
-import boomerang.BoomerangOptions;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.JimpleMethod;
-import boomerang.scene.jimple.JimpleStatement;
-import boomerang.scene.sparse.SootAdapter;
-import boomerang.scene.sparse.SparseAliasingCFG;
-import boomerang.scene.sparse.SparseCFGCache;
-import boomerang.scene.sparse.eval.PropagationCounter;
-import java.util.*;
-import soot.SootMethod;
-import soot.Unit;
-import soot.jimple.Stmt;
+import boomerang.options.BoomerangOptions;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
+import sparse.SparsificationStrategy;
 
 public class StaticCFG implements ObservableControlFlowGraph {
 
-  private SparseCFGCache.SparsificationStrategy sparsificationStrategy;
+  private final SparsificationStrategy<? extends Method, ? extends Statement>
+      sparsificationStrategy;
 
-  private BoomerangOptions options;
+  private final BoomerangOptions options;
 
   private Val currentVal;
 
@@ -43,7 +46,9 @@ public class StaticCFG implements ObservableControlFlowGraph {
   public void addSuccsOfListener(SuccessorListener l) {
     Method method = l.getCurr().getMethod();
     Statement curr = l.getCurr();
-    if (sparsificationStrategy != SparseCFGCache.SparsificationStrategy.NONE) {
+    /*
+    TODO: [ms] reenable sparsification
+     if (sparsificationStrategy != SparsificationStrategy.NONE) {
       SparseAliasingCFG sparseCFG = getSparseCFG(method, curr, currentVal);
       if (sparseCFG != null) {
         propagateSparse(l, method, curr, sparseCFG);
@@ -52,27 +57,33 @@ public class StaticCFG implements ObservableControlFlowGraph {
       } else {
         propagateDefault(l); // back up when not found
       }
-    } else {
+    } else */
+    {
       propagateDefault(l);
     }
   }
 
+  /*
+  TODO: [ms] reenable sparsification
   private void propagateSparse(
       SuccessorListener l, Method method, Statement curr, SparseAliasingCFG sparseCFG) {
     Set<Unit> successors = sparseCFG.getGraph().successors(SootAdapter.asStmt(curr));
     for (Unit succ : successors) {
-      PropagationCounter.getInstance(sparsificationStrategy).countForward();
+      sparsificationStrategy.getCounter().countForward();
       l.getSuccessor(SootAdapter.asStatement(succ, method));
     }
   }
+  */
 
   private void propagateDefault(SuccessorListener l) {
     for (Statement s : l.getCurr().getMethod().getControlFlowGraph().getSuccsOf(l.getCurr())) {
-      PropagationCounter.getInstance(sparsificationStrategy).countForward();
+      sparsificationStrategy.getCounter().countForwardPropagation();
       l.getSuccessor(s);
     }
   }
 
+  /*
+  TODO: [ms] reenable sparsification
   private SparseAliasingCFG getSparseCFG(Method method, Statement stmt, Val currentVal) {
     SootMethod sootMethod = ((JimpleMethod) method).getDelegate();
     Stmt sootStmt = ((JimpleStatement) stmt).getDelegate();
@@ -83,6 +94,7 @@ public class StaticCFG implements ObservableControlFlowGraph {
         sparseCFGCache.getSparseCFGForForwardPropagation(sootMethod, sootStmt, currentVal);
     return sparseCFG;
   }
+  */
 
   @Override
   public void step(Statement curr, Statement succ) {}

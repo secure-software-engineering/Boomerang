@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,14 +11,15 @@
  */
 package ideal;
 
-import boomerang.BoomerangOptions;
-import boomerang.DefaultBoomerangOptions;
 import boomerang.WeightedForwardQuery;
 import boomerang.debugger.Debugger;
-import boomerang.scene.CallGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.Val;
+import boomerang.options.BoomerangOptions;
+import boomerang.scope.CallGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DataFlowScope;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.Val;
+import boomerang.solver.Strategies;
 import java.util.Collection;
 import sync.pds.solver.WeightFunctions;
 import wpds.impl.Weight;
@@ -30,9 +31,8 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
    * To place a seed, a pair of access graph and an edge function must be specified. From this node
    * the analysis starts its analysis.
    *
-   * @param method
    * @param stmt The statement over which is iterated over
-   * @return
+   * @return the generated seeds
    */
   public abstract Collection<WeightedForwardQuery<W>> generate(Edge stmt);
 
@@ -43,7 +43,9 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
    */
   public abstract WeightFunctions<Edge, Val, Edge, W> weightFunctions();
 
-  public abstract CallGraph callGraph();
+  public CallGraph callGraph() {
+    return getFrameworkFactory().getCallGraph();
+  }
 
   public boolean enableStrongUpdates() {
     return true;
@@ -64,22 +66,19 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
   public abstract Debugger<W> debugger(IDEALSeedSolver<W> idealSeedSolver);
 
   public BoomerangOptions boomerangOptions() {
-    return new DefaultBoomerangOptions() {
-      @Override
-      public StaticFieldStrategy getStaticFieldStrategy() {
-        return StaticFieldStrategy.FLOW_SENSITIVE;
-      }
-
-      @Override
-      public boolean allowMultipleQueries() {
-        return true;
-      }
-    };
+    return BoomerangOptions.builder()
+        .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
+        .enableAllowMultipleQueries(true)
+        .build();
   }
 
   public IDEALResultHandler getResultHandler() {
     return new IDEALResultHandler();
   }
 
-  protected abstract DataFlowScope getDataFlowScope();
+  protected DataFlowScope getDataFlowScope() {
+    return getFrameworkFactory().getDataFlowScope();
+  }
+
+  public abstract FrameworkScope getFrameworkFactory();
 }

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -18,17 +18,18 @@ import boomerang.Util;
 import boomerang.WeightedBoomerang;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Field.ArrayField;
-import boomerang.scene.Method;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Field.ArrayField;
+import boomerang.scope.Method;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,42 +47,42 @@ import sync.pds.solver.nodes.Node;
 import wpds.impl.Rule;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStats<W> {
 
-  private Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
-  private Set<WeightedTransition<Field, INode<Node<Edge, Val>>, W>> globalFieldTransitions =
+  private final Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
+  private final Set<WeightedTransition<Field, INode<Node<Edge, Val>>, W>> globalFieldTransitions =
       Sets.newHashSet();
   private int fieldTransitionCollisions;
-  private Set<WeightedTransition<Edge, INode<Val>, W>> globalCallTransitions = Sets.newHashSet();
+  private final Set<WeightedTransition<Edge, INode<Val>, W>> globalCallTransitions =
+      Sets.newHashSet();
   private int callTransitionCollisions;
-  private Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules = Sets.newHashSet();
+  private final Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules = Sets.newHashSet();
   private int fieldRulesCollisions;
-  private Set<Rule<Edge, INode<Val>, W>> globalCallRules = Sets.newHashSet();
+  private final Set<Rule<Edge, INode<Val>, W>> globalCallRules = Sets.newHashSet();
   private int callRulesCollisions;
-  private Set<Node<Edge, Val>> reachedForwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedForwardNodes = Sets.newHashSet();
   private int reachedForwardNodeCollisions;
 
-  private Set<Node<Edge, Val>> reachedBackwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedBackwardNodes = Sets.newHashSet();
   private int reachedBackwardNodeCollisions;
-  private Set<Method> callVisitedMethods = Sets.newHashSet();
-  private Set<Method> fieldVisitedMethods = Sets.newHashSet();
-  private Set<Edge> callVisitedStmts = Sets.newHashSet();
-  private Set<Edge> fieldVisitedStmts = Sets.newHashSet();
-  private Set<INode<Node<Edge, Val>>> fieldGeneratedStates = Sets.newHashSet();
-  private Set<INode<Val>> callGeneratedStates = Sets.newHashSet();
+  private final Set<Method> callVisitedMethods = Sets.newHashSet();
+  private final Set<Method> fieldVisitedMethods = Sets.newHashSet();
+  private final Set<Edge> callVisitedStmts = Sets.newHashSet();
+  private final Set<Edge> fieldVisitedStmts = Sets.newHashSet();
+  private final Set<INode<Node<Edge, Val>>> fieldGeneratedStates = Sets.newHashSet();
+  private final Set<INode<Val>> callGeneratedStates = Sets.newHashSet();
   private int arrayFlows;
   private int staticFlows;
   private int fieldWritePOIs;
   private int fieldReadPOIs;
 
-  private String outputFileName;
+  private final String outputFileName;
   private static final String CSV_SEPARATOR = ";";
-  private List<String> headers = Lists.newArrayList();
-  private Map<String, String> headersToValues = Maps.newHashMap();
-  private long memoryBefore;
+  private final List<String> headers = Lists.newArrayList();
+  private final Map<String, String> headersToValues = Maps.newHashMap();
+  private final long memoryBefore;
 
   private enum Headers {
     Query,
@@ -235,7 +236,7 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
     s +=
         String.format(
             "Queries (Forward/Backward/Total): \t\t %s/%s/%s\n",
-            forwardQuery, backwardQuery, queries.keySet().size());
+            forwardQuery, backwardQuery, queries.size());
     s +=
         String.format(
             "Visited Methods (Field/Call): \t\t %s/%s\n",
@@ -292,7 +293,7 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
       }
       max = Math.max(size, max);
     }
-    float average = ((float) totalReached) / queries.keySet().size();
+    float average = ((float) totalReached) / queries.size();
     String s = String.format("Reachable nodes (Min/Avg/Max): \t\t%s/%s/%s\n", min, average, max);
     s += String.format("Maximal Query: \t\t%s\n", maxQuery);
     return s;
@@ -326,9 +327,8 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
         if (other.t != null) return false;
       } else if (!t.equals(other.t)) return false;
       if (w == null) {
-        if (other.w != null) return false;
-      } else if (!w.equals(other.w)) return false;
-      return true;
+        return other.w == null;
+      } else return w.equals(other.w);
     }
   }
 

@@ -1,47 +1,27 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.cases.callgraph;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import test.cases.fields.Alloc;
 import test.core.AbstractBoomerangTest;
 
 public class ContextSensitivityTest extends AbstractBoomerangTest {
 
-  public void wrongContext() {
-    SuperClass type = new WrongSubclass();
-    method(type);
-  }
-
-  public Object method(SuperClass type) {
-    Alloc alloc = new Alloc();
-    type.foo(alloc);
-    return alloc;
-  }
+  private final String target = ContextSensitivityTarget.class.getName();
 
   @Ignore
   @Test
   public void testOnlyCorrectContextInCallGraph() {
-    wrongContext();
-    SuperClass type = new CorrectSubclass();
-    Object alloc = method(type);
-    queryFor(alloc);
-  }
-
-  public class SuperClass {
-
-    public void foo(Object o) {
-      unreachable(o);
-    }
-  }
-
-  class CorrectSubclass extends SuperClass {
-    public void foo(Object o) {}
-  }
-
-  class WrongSubclass extends SuperClass {
-
-    public void foo(Object o) {
-      unreachable(o);
-    }
+    analyze(target, testName.getMethodName());
   }
 }

@@ -1,10 +1,21 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang;
 
-import boomerang.scene.Statement;
+import boomerang.scope.Statement;
 import java.util.Collection;
 
 public interface IContextRequester {
-  public Collection<Context> getCallSiteOf(Context child);
+  Collection<Context> getCallSiteOf(Context child);
 
-  public Context initialContext(Statement stmt);
+  Context initialContext(Statement stmt);
 }

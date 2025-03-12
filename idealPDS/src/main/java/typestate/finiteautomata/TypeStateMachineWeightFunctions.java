@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -12,24 +12,20 @@
 package typestate.finiteautomata;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.AllocVal;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soot.Scene;
-import soot.SootClass;
 import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.Node;
 import typestate.TransitionFunction;
@@ -129,6 +125,8 @@ public abstract class TypeStateMachineWeightFunctions
     return new TransitionFunction(res, Collections.singleton(transitionEdge));
   }
 
+  /*
+  // TODO: [ms] re-enable
   protected List<SootClass> getSubclassesOf(String className) {
     SootClass sootClass = Scene.v().getSootClass(className);
     List<SootClass> list = Scene.v().getActiveHierarchy().getSubclassesOfIncluding(sootClass);
@@ -138,10 +136,11 @@ public abstract class TypeStateMachineWeightFunctions
     }
     return res;
   }
+  */
 
   protected Collection<WeightedForwardQuery<TransitionFunction>> getLeftSideOf(Edge edge) {
     Statement s = edge.getStart();
-    if (s.isAssign()) {
+    if (s.isAssignStmt()) {
       return Collections.singleton(
           new WeightedForwardQuery<>(
               edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition()));
@@ -152,9 +151,9 @@ public abstract class TypeStateMachineWeightFunctions
   protected Collection<WeightedForwardQuery<TransitionFunction>> generateAtAllocationSiteOf(
       Edge edge, Class allocationSuperType) {
     Statement s = edge.getStart();
-    if (s.isAssign()) {
+    if (s.isAssignStmt()) {
       if (s.getRightOp().isNewExpr()) {
-        boomerang.scene.Type newExprType = s.getRightOp().getNewExprType();
+        boomerang.scope.Type newExprType = s.getRightOp().getNewExprType();
         if (newExprType.isSubtypeOf(allocationSuperType.getName())) {
           return Collections.singleton(
               new WeightedForwardQuery<>(

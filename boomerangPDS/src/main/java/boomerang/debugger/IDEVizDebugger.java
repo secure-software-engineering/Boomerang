@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -19,10 +19,10 @@ import boomerang.callgraph.CallerListener;
 import boomerang.callgraph.ObservableICFG;
 import boomerang.controlflowgraph.ObservableControlFlowGraph;
 import boomerang.controlflowgraph.SuccessorListener;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.util.RegExAccessPath;
 import com.google.common.base.Stopwatch;
@@ -56,12 +56,13 @@ import wpds.impl.Weight;
 
 public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
 
-  private static boolean ONLY_CFG = false;
+  private static final boolean ONLY_CFG = false;
   private static final Logger logger = LoggerFactory.getLogger(IDEVizDebugger.class);
-  private File ideVizFile;
+  private final File ideVizFile;
   private ObservableICFG<Statement, Method> icfg;
-  private Table<Query, Method, Set<Rule<Edge, INode<Val>, W>>> rules = HashBasedTable.create();
-  private Map<Object, Integer> objectToInteger = new HashMap<>();
+  private final Table<Query, Method, Set<Rule<Edge, INode<Val>, W>>> rules =
+      HashBasedTable.create();
+  private final Map<Object, Integer> objectToInteger = new HashMap<>();
   private int charSize;
   private ObservableControlFlowGraph cfg;
 
@@ -129,7 +130,6 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
       queryJSON.put("methods", data);
       eventualData.add(queryJSON);
     }
-    ;
     logger.info("Computing visualization took: {}", watch.elapsed());
     try (FileWriter file = new FileWriter(ideVizFile)) {
       logger.info("Writing visualization to file {}", ideVizFile.getAbsolutePath());

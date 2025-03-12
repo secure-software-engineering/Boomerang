@@ -1,8 +1,19 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.weights;
 
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Map;
@@ -96,7 +107,7 @@ public class PathConditionWeight extends Weight {
       for (Map.Entry<Val, ConditionDomain> v : newVals.entrySet()) {
         if (returnVals.contains(v.getKey())) {
           Statement s = calleeToCallSite.get(v.getKey().m());
-          if (s != null && s.isAssign()) {
+          if (s != null && s.isAssignStmt()) {
             Val leftOp = s.getLeftOp();
             returnToAssignedVariableMap.put(leftOp, v.getValue());
           }
@@ -160,7 +171,7 @@ public class PathConditionWeight extends Weight {
       for (Map.Entry<Val, ConditionDomain> v : newVals.entrySet()) {
         if (returnVals.contains(v.getKey())) {
           Statement s = calleeToCallSite.get(v.getKey().m());
-          if (s != null && s.isAssign()) {
+          if (s != null && s.isAssignStmt()) {
             Val leftOp = s.getLeftOp();
             returnToAssignedVariableMap.put(leftOp, v.getValue());
           }
@@ -213,13 +224,8 @@ public class PathConditionWeight extends Weight {
       return false;
     }
     if (rep == null) {
-      if (other.rep != null) {
-        return false;
-      }
-    } else if (!rep.equals(other.rep)) {
-      return false;
-    }
-    return true;
+      return other.rep == null;
+    } else return rep.equals(other.rep);
   }
 
   public Map<Statement, ConditionDomain> getConditions() {

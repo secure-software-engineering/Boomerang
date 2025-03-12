@@ -1,13 +1,24 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.callgraph;
 
-import boomerang.scene.CallGraph.Edge;
+import boomerang.scope.CallGraph.Edge;
 import java.util.Collection;
 
 /**
  * An interprocedural control-flow graph, for which caller-callee edges can be observed using {@link
  * CalleeListener} and {@link CallerListener}. Can be used for demand-driven call graph generation.
  *
- * @param <N> Nodes in the CFG, typically {@link Unit} or {@link Block}
+ * @param <N> Nodes in the CFG
  * @param <M> Method representation
  * @author Melanie Bruns on 04.05.2018
  */

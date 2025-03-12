@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.callgraph;
 
 import boomerang.BackwardQuery;
@@ -7,16 +18,16 @@ import boomerang.Query;
 import boomerang.SolverCreationListener;
 import boomerang.WeightedBoomerang;
 import boomerang.results.ExtractAllocationSiteStateListener;
-import boomerang.scene.CallGraph;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Type;
-import boomerang.scene.Val;
-import boomerang.scene.WrappedClass;
+import boomerang.scope.CallGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Type;
+import boomerang.scope.Val;
+import boomerang.scope.WrappedClass;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.HashMultimap;
@@ -34,7 +45,7 @@ import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
-  public static final Factory FACTORY = (solver, cg) -> new BoomerangResolver(solver, cg);
+  public static final Factory FACTORY = BoomerangResolver::new;
 
   private static final Logger logger = LoggerFactory.getLogger(BoomerangResolver.class);
 
@@ -47,17 +58,19 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
   private static final String THREAD_START_SIGNATURE = "<java.lang.Thread: void start()>";
   private static final String THREAD_RUN_SUB_SIGNATURE = "void run()";
 
-  private static NoCalleeFoundFallbackOptions FALLBACK_OPTION = NoCalleeFoundFallbackOptions.BYPASS;
-  private static Multimap<DeclaredMethod, WrappedClass> didNotFindMethodLog = HashMultimap.create();
+  private static final NoCalleeFoundFallbackOptions FALLBACK_OPTION =
+      NoCalleeFoundFallbackOptions.BYPASS;
+  private static final Multimap<DeclaredMethod, WrappedClass> didNotFindMethodLog =
+      HashMultimap.create();
 
-  private CallGraph precomputedCallGraph;
-  private WeightedBoomerang<? extends Weight> solver;
-  private Set<Statement> queriedInvokeExprAndAllocationSitesFound = Sets.newHashSet();
-  private Set<Statement> queriedInvokeExpr = Sets.newHashSet();
+  private final CallGraph precomputedCallGraph;
+  private final WeightedBoomerang<? extends Weight> solver;
+  private final Set<Statement> queriedInvokeExprAndAllocationSitesFound = Sets.newHashSet();
+  private final Set<Statement> queriedInvokeExpr = Sets.newHashSet();
 
-  public BoomerangResolver(CallGraph cg, DataFlowScope scope) {
-    this.solver = new Boomerang(cg, scope);
-    this.precomputedCallGraph = cg;
+  public BoomerangResolver(FrameworkScope frameworkScope) {
+    this.solver = new Boomerang(frameworkScope);
+    this.precomputedCallGraph = frameworkScope.getCallGraph();
   }
 
   public BoomerangResolver(WeightedBoomerang<? extends Weight> solver, CallGraph initialCallGraph) {
@@ -84,7 +97,9 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
           for (CallGraph.Edge e : precomputedCallGraph.edgesOutOf(s)) {
             // TODO Refactor. Should not be required, if the backward analysis is sound (data-flow
             // of static fields)
-            observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+            if (e.tgt().isDefined()) {
+              observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+            }
           }
         }
         if (FALLBACK_OPTION == NoCalleeFoundFallbackOptions.BYPASS) {
@@ -268,9 +283,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
         if (other.query != null) return false;
       } else if (!query.equals(other.query)) return false;
       if (invokeExpr == null) {
-        if (other.invokeExpr != null) return false;
-      } else if (!invokeExpr.equals(other.invokeExpr)) return false;
-      return true;
+        return other.invokeExpr == null;
+      } else return invokeExpr.equals(other.invokeExpr);
     }
 
     private BoomerangResolver getOuterType() {

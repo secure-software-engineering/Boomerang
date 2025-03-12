@@ -1,7 +1,18 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.util;
 
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.scope.Field;
+import boomerang.scope.Val;
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Set;
@@ -29,7 +40,6 @@ public class AccessPath {
   @Override
   public String toString() {
     return val.toString()
-        + ""
         + (fieldChain.isEmpty() ? "" : fieldChain.toString())
         + (isOverApproximated() ? "*" : "");
   }
@@ -88,12 +98,7 @@ public class AccessPath {
       return false;
     }
     if (val == null) {
-      if (other.val != null) {
-        return false;
-      }
-    } else if (!val.equals(other.val)) {
-      return false;
-    }
-    return true;
+      return other.val == null;
+    } else return val.equals(other.val);
   }
 }

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -53,9 +53,8 @@ public class Node<Stmt, Fact> implements State {
       if (other.stmt != null) return false;
     } else if (!stmt.equals(other.stmt)) return false;
     if (variable == null) {
-      if (other.variable != null) return false;
-    } else if (!variable.equals(other.variable)) return false;
-    return true;
+      return other.variable == null;
+    } else return variable.equals(other.variable);
   }
 
   @Override

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -14,13 +14,13 @@ package wpds.impl;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
+import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.HashSet;
 import java.util.Set;
 import wpds.interfaces.IPushdownSystem;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 import wpds.interfaces.WPDSUpdateListener;
-import wpds.wildcard.Wildcard;
 
 public class WeightedPushdownSystem<N extends Location, D extends State, W extends Weight>
     implements IPushdownSystem<N, D, W> {

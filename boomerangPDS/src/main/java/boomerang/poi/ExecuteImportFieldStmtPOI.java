@@ -1,9 +1,20 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.poi;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ControlFlowEdgeBasedCallTransitionListener;
 import boomerang.solver.ControlFlowEdgeBasedFieldTransitionListener;
@@ -28,8 +39,8 @@ import wpds.interfaces.WPAUpdateListener;
 public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteImportFieldStmtPOI.class);
   private static final int MAX_IMPORT_DEPTH = -1;
-  private Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
-  private Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
+  private final Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
+  private final Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
       HashMultimap.create();
   protected final ForwardBoomerangSolver<W> baseSolver;
   protected final ForwardBoomerangSolver<W> flowSolver;
@@ -63,9 +74,9 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       extends ControlFlowEdgeBasedCallTransitionListener<W> {
 
     private final INode<Val> start;
-    private AbstractBoomerangSolver<W> flowSolver;
-    private INode<Val> target;
-    private W w;
+    private final AbstractBoomerangSolver<W> flowSolver;
+    private final INode<Val> target;
+    private final W w;
 
     public ImportTransitionFromCall(
         AbstractBoomerangSolver<W> flowSolver,
@@ -122,14 +133,13 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
         if (other.target != null) return false;
       } else if (!target.equals(other.target)) return false;
       if (w == null) {
-        if (other.w != null) return false;
-      } else if (!w.equals(other.w)) return false;
-      return true;
+        return other.w == null;
+      } else return w.equals(other.w);
     }
   }
 
   private final class ImportOnReachStatement extends ControlFlowEdgeBasedCallTransitionListener<W> {
-    private AbstractBoomerangSolver<W> flowSolver;
+    private final AbstractBoomerangSolver<W> flowSolver;
 
     private ImportOnReachStatement(AbstractBoomerangSolver<W> flowSolver, Edge callSiteOrExitStmt) {
       super(callSiteOrExitStmt);
@@ -163,14 +173,13 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       ImportOnReachStatement other = (ImportOnReachStatement) obj;
       if (flowSolver == null) {
-        if (other.flowSolver != null) return false;
-      } else if (!flowSolver.equals(other.flowSolver)) return false;
-      return true;
+        return other.flowSolver == null;
+      } else return flowSolver.equals(other.flowSolver);
     }
   }
 
   private class ForAnyCallSiteOrExitStmt implements WPAUpdateListener<Edge, INode<Val>, W> {
-    private AbstractBoomerangSolver<W> baseSolver;
+    private final AbstractBoomerangSolver<W> baseSolver;
 
     public ForAnyCallSiteOrExitStmt(AbstractBoomerangSolver<W> baseSolver) {
       this.baseSolver = baseSolver;
@@ -196,7 +205,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
           .asUnbalanced(null)
           .equals(t.getTarget().fact().asUnbalanced(null))) return;*/
       if (callSite.containsInvokeExpr()) {
-        if (callSite.isAssign() && callSite.getLeftOp().equals(t.getStart().fact())) return;
+        if (callSite.isAssignStmt() && callSite.getLeftOp().equals(t.getStart().fact())) return;
         if (callSite.uses(t.getStart().fact())) {
           importSolvers(edge, t.getStart(), t.getTarget(), w);
         }
@@ -229,9 +238,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       ForAnyCallSiteOrExitStmt other = (ForAnyCallSiteOrExitStmt) obj;
       if (baseSolver == null) {
-        if (other.baseSolver != null) return false;
-      } else if (!baseSolver.equals(other.baseSolver)) return false;
-      return true;
+        return other.baseSolver == null;
+      } else return baseSolver.equals(other.baseSolver);
     }
   }
 
@@ -244,7 +252,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
 
   private class BaseVarPointsTo extends ControlFlowEdgeBasedFieldTransitionListener<W> {
 
-    private ExecuteImportFieldStmtPOI<W> poi;
+    private final ExecuteImportFieldStmtPOI<W> poi;
 
     public BaseVarPointsTo(Edge curr, ExecuteImportFieldStmtPOI<W> executeImportFieldStmtPOI) {
       super(curr);
@@ -278,9 +286,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       BaseVarPointsTo other = (BaseVarPointsTo) obj;
       if (poi == null) {
-        if (other.poi != null) return false;
-      } else if (!poi.equals(other.poi)) return false;
-      return true;
+        return other.poi == null;
+      } else return poi.equals(other.poi);
     }
   }
 
@@ -308,7 +315,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   private final class ImportIndirectCallAliases
       extends ControlFlowEdgeBasedCallTransitionListener<W> {
 
-    private AbstractBoomerangSolver<W> flowSolver;
+    private final AbstractBoomerangSolver<W> flowSolver;
 
     public ImportIndirectCallAliases(Edge stmt, AbstractBoomerangSolver<W> flowSolver) {
       super(stmt);
@@ -338,17 +345,16 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       ImportIndirectCallAliases other = (ImportIndirectCallAliases) obj;
       if (flowSolver == null) {
-        if (other.flowSolver != null) return false;
-      } else if (!flowSolver.equals(other.flowSolver)) return false;
-      return true;
+        return other.flowSolver == null;
+      } else return flowSolver.equals(other.flowSolver);
     }
   }
 
   private final class ImportIndirectCallAliasesAtSucc
       extends ControlFlowEdgeBasedCallTransitionListener<W> {
 
-    private INode<Val> target;
-    private W w;
+    private final INode<Val> target;
+    private final W w;
 
     public ImportIndirectCallAliasesAtSucc(Edge succ, INode<Val> target, W w) {
       super(succ);
@@ -385,16 +391,15 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
         if (other.target != null) return false;
       } else if (!target.equals(other.target)) return false;
       if (w == null) {
-        if (other.w != null) return false;
-      } else if (!w.equals(other.w)) return false;
-      return true;
+        return other.w == null;
+      } else return w.equals(other.w);
     }
   }
 
   private final class ImportIndirectAliases extends ControlFlowEdgeBasedFieldTransitionListener<W> {
 
-    private AbstractBoomerangSolver<W> flowSolver;
-    private AbstractBoomerangSolver<W> baseSolver;
+    private final AbstractBoomerangSolver<W> flowSolver;
+    private final AbstractBoomerangSolver<W> baseSolver;
 
     public ImportIndirectAliases(
         Edge succ, AbstractBoomerangSolver<W> flowSolver, AbstractBoomerangSolver<W> baseSolver) {
@@ -432,18 +437,17 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
         if (other.baseSolver != null) return false;
       } else if (!baseSolver.equals(other.baseSolver)) return false;
       if (flowSolver == null) {
-        if (other.flowSolver != null) return false;
+        return other.flowSolver == null;
       } else return flowSolver.equals(other.flowSolver);
-      return true;
     }
   }
 
   private final class CallSiteOrExitStmtFieldImport
       extends ControlFlowEdgeBasedFieldTransitionListener<W> {
 
-    private AbstractBoomerangSolver<W> flowSolver;
-    private AbstractBoomerangSolver<W> baseSolver;
-    private Val fact;
+    private final AbstractBoomerangSolver<W> flowSolver;
+    private final AbstractBoomerangSolver<W> baseSolver;
+    private final Val fact;
 
     private CallSiteOrExitStmtFieldImport(
         AbstractBoomerangSolver<W> flowSolver,
@@ -489,9 +493,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
         if (other.flowSolver != null) return false;
       } else if (!flowSolver.equals(other.flowSolver)) return false;
       if (fact == null) {
-        if (other.fact != null) return false;
-      } else if (!fact.equals(other.fact)) return false;
-      return true;
+        return other.fact == null;
+      } else return fact.equals(other.fact);
     }
   }
 
@@ -559,8 +562,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   private final class ImportFieldTransitionsFrom
       extends WPAStateListener<Field, INode<Node<Edge, Val>>, W> {
 
-    private AbstractBoomerangSolver<W> flowSolver;
-    private int importDepth;
+    private final AbstractBoomerangSolver<W> flowSolver;
+    private final int importDepth;
 
     public ImportFieldTransitionsFrom(
         INode<Node<Edge, Val>> target, AbstractBoomerangSolver<W> flowSolver, int importDepth) {
@@ -599,9 +602,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       ImportFieldTransitionsFrom other = (ImportFieldTransitionsFrom) obj;
       if (flowSolver == null) {
-        if (other.flowSolver != null) return false;
-      } else if (!flowSolver.equals(other.flowSolver)) return false;
-      return true;
+        return other.flowSolver == null;
+      } else return flowSolver.equals(other.flowSolver);
     }
   }
 
@@ -628,9 +630,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (other.flowSolver != null) return false;
     } else if (!flowSolver.equals(other.flowSolver)) return false;
     if (curr == null) {
-      if (other.curr != null) return false;
-    } else if (!curr.equals(other.curr)) return false;
-    return true;
+      return other.curr == null;
+    } else return curr.equals(other.curr);
   }
 
   private class InsertFieldTransitionCallback {
@@ -660,9 +661,8 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       InsertFieldTransitionCallback other = (InsertFieldTransitionCallback) obj;
       if (trans == null) {
-        if (other.trans != null) return false;
-      } else if (!trans.equals(other.trans)) return false;
-      return true;
+        return other.trans == null;
+      } else return trans.equals(other.trans);
     }
   }
 }

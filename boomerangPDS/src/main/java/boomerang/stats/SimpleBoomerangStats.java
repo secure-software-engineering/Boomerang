@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -17,9 +17,9 @@ import boomerang.Query;
 import boomerang.WeightedBoomerang;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Method;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -36,9 +36,9 @@ import wpds.interfaces.WPAUpdateListener;
 /** Created by johannesspath on 06.12.17. */
 public class SimpleBoomerangStats<W extends Weight> implements IBoomerangStats<W> {
 
-  private Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
-  private Set<Method> callVisitedMethods = Sets.newHashSet();
-  private Set<Method> fieldVisitedMethods = Sets.newHashSet();
+  private final Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
+  private final Set<Method> callVisitedMethods = Sets.newHashSet();
+  private final Set<Method> fieldVisitedMethods = Sets.newHashSet();
 
   @Override
   public void registerSolver(Query key, final AbstractBoomerangSolver<W> solver) {
@@ -80,7 +80,7 @@ public class SimpleBoomerangStats<W extends Weight> implements IBoomerangStats<W
     s +=
         String.format(
             "Queries (Forward/Backward/Total): \t\t %s/%s/%s\n",
-            forwardQuery, backwardQuery, queries.keySet().size());
+            forwardQuery, backwardQuery, queries.size());
     s +=
         String.format(
             "Visited Methods (Field/Call): \t\t %s/%s/(%s/%s)\n",

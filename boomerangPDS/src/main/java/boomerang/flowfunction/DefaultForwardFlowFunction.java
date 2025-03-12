@@ -1,15 +1,25 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.flowfunction;
 
-import boomerang.BoomerangOptions;
 import boomerang.ForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.InvokeExpr;
-import boomerang.scene.Method;
-import boomerang.scene.Pair;
-import boomerang.scene.Statement;
-import boomerang.scene.StaticFieldVal;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Pair;
+import boomerang.scope.Statement;
+import boomerang.scope.StaticFieldVal;
+import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
@@ -28,12 +38,11 @@ import wpds.interfaces.State;
 
 public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
-  private final BoomerangOptions options;
+  private final DefaultForwardFlowFunctionOptions options;
   private Strategies strategies;
-  private ForwardBoomerangSolver solver;
 
-  public DefaultForwardFlowFunction(BoomerangOptions opts) {
-    this.options = opts;
+  public DefaultForwardFlowFunction(DefaultForwardFlowFunctionOptions options) {
+    this.options = options;
   }
 
   @Override
@@ -109,14 +118,14 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
     } else {
       out.add(new ExclusionNode<>(nextEdge, fact, succ.getWrittenField()));
     }
-    if (succ.isAssign()) {
+    if (succ.isAssignStmt()) {
       Val leftOp = succ.getLeftOp();
       Val rightOp = succ.getRightOp();
       if (rightOp.equals(fact)) {
         if (succ.isFieldStore()) {
           Pair<Val, Field> ifr = succ.getFieldStore();
           if (options.trackFields()) {
-            if (!options.ignoreInnerClassFields() || !ifr.getY().isInnerClassField()) {
+            if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
               out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
             }
           }
@@ -179,23 +188,19 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
       return true;
     }
 
-    if (curr.isAssign()) {
+    if (curr.isAssignStmt()) {
       // Kill x at any statement x = * during propagation.
       if (curr.getLeftOp().equals(value)) {
         // But not for a statement x = x.f
         if (curr.isFieldLoad()) {
           Pair<Val, Field> ifr = curr.getFieldLoad();
-          if (ifr.getX().equals(value)) {
-            return false;
-          }
+          return !ifr.getX().equals(value);
         }
         return true;
       }
       if (curr.isStaticFieldStore()) {
         StaticFieldVal sf = curr.getStaticField();
-        if (value.isStatic() && value.equals(sf)) {
-          return true;
-        }
+        return value.isStatic() && value.equals(sf);
       }
     }
     return false;
@@ -220,10 +225,15 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
   @Override
   public void setSolver(
-      ForwardBoomerangSolver solver,
+      ForwardBoomerangSolver<?> solver,
       Multimap<Field, Statement> fieldLoadStatements,
       Multimap<Field, Statement> fieldStoreStatements) {
-    this.solver = solver;
-    this.strategies = new Strategies<>(options, solver, fieldLoadStatements, fieldStoreStatements);
+    this.strategies =
+        new Strategies(
+            options.getStaticFieldStrategy(),
+            options.getArrayStrategy(),
+            solver,
+            fieldLoadStatements,
+            fieldStoreStatements);
   }
 }

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,23 +11,24 @@
  */
 package test;
 
-import boomerang.BoomerangOptions;
-import boomerang.DefaultBoomerangOptions;
+import assertions.Assertions;
+import assertions.MayBeInAcceptingState;
+import assertions.MayBeInErrorState;
+import assertions.MustBeInAcceptingState;
+import assertions.MustBeInErrorState;
+import assertions.ShouldNotBeAnalyzed;
 import boomerang.WeightedForwardQuery;
 import boomerang.debugger.Debugger;
-import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.CallGraph;
-import boomerang.scene.CallGraph.Edge;
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.Method;
-import boomerang.scene.SootDataFlowScope;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.BoomerangPretransformer;
-import boomerang.scene.jimple.JimpleMethod;
-import boomerang.scene.jimple.SootCallGraph;
-import com.google.common.collect.Lists;
+import boomerang.options.BoomerangOptions;
+import boomerang.scope.CallGraph;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.InvokeExpr;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
+import boomerang.solver.Strategies;
 import ideal.IDEALAnalysis;
 import ideal.IDEALAnalysisDefinition;
 import ideal.IDEALResultHandler;
@@ -35,54 +36,94 @@ import ideal.IDEALSeedSolver;
 import ideal.StoreIDEALResultHandler;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import soot.Scene;
-import soot.SceneTransformer;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
-import test.ExpectedResults.InternalState;
-import test.core.selfrunning.AbstractTestingFramework;
-import test.core.selfrunning.ImprecisionException;
+import test.setup.MethodWrapper;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
-public abstract class IDEALTestingFramework extends AbstractTestingFramework {
-  private static final boolean FAIL_ON_IMPRECISE = false;
-  protected StoreIDEALResultHandler<TransitionFunction> resultHandler =
-      new StoreIDEALResultHandler<>();
-  protected CallGraph callGraph;
-  protected DataFlowScope dataFlowScope;
+public abstract class IDEALTestingFramework extends TestingFramework {
 
-  protected abstract TypeStateMachineWeightFunctions getStateMachine();
+  private static final Logger LOGGER = LoggerFactory.getLogger(IDEALTestingFramework.class);
 
-  protected IDEALAnalysis<TransitionFunction> createAnalysis() {
+  @Rule public TestName testName = new TestName();
+
+  private final StoreIDEALResultHandler<TransitionFunction> resultHandler;
+
+  protected IDEALTestingFramework() {
+    this.resultHandler = new StoreIDEALResultHandler<>();
+  }
+
+  public void analyze(
+      String targetClassName, String targetMethodName, int expectedAssertions, int expectedSeeds) {
+    LOGGER.info(
+        "Running '{}' in class '{}' with {} assertions",
+        targetMethodName,
+        targetClassName,
+        expectedAssertions);
+
+    // Set up the framework scope
+    MethodWrapper methodWrapper = new MethodWrapper(targetClassName, targetMethodName);
+    FrameworkScope frameworkScope = super.getFrameworkScope(methodWrapper);
+    Method testMethod = super.getTestMethod();
+
+    // Collect the expected assertions
+    Collection<Assertion> assertions =
+        parseExpectedQueryResults(frameworkScope.getCallGraph(), testMethod);
+    if (assertions.size() != expectedAssertions) {
+      Assert.fail(
+          "Unexpected number of assertions in target program. Expected "
+              + expectedAssertions
+              + ", got "
+              + assertions.size());
+    }
+    TestingResultReporter resultReporter = new TestingResultReporter(assertions);
+
+    // Run IDEal
+    IDEALAnalysis<TransitionFunction> idealAnalysis = createAnalysis(frameworkScope);
+    idealAnalysis.run();
+
+    // Update results
+    Collection<WeightedForwardQuery<TransitionFunction>> seeds =
+        resultHandler.getResults().keySet();
+    if (seeds.size() != expectedSeeds) {
+      Assert.fail(
+          "Unexpected number of seeds. Expected " + expectedSeeds + ", got " + seeds.size());
+    }
+
+    for (WeightedForwardQuery<TransitionFunction> seed : seeds) {
+      resultReporter.onSeedFinished(seed.asNode(), resultHandler.getResults().get(seed));
+    }
+
+    // Assert the assertions
+    assertResults(assertions);
+  }
+
+  protected IDEALAnalysis<TransitionFunction> createAnalysis(FrameworkScope frameworkScope) {
     return new IDEALAnalysis<>(
-        new IDEALAnalysisDefinition<TransitionFunction>() {
+        new IDEALAnalysisDefinition<>() {
 
           @Override
           public Collection<WeightedForwardQuery<TransitionFunction>> generate(
               ControlFlowGraph.Edge stmt) {
-            return IDEALTestingFramework.this.getStateMachine().generateSeed(stmt);
+            return getStateMachine().generateSeed(stmt);
           }
 
           @Override
           public WeightFunctions<
                   ControlFlowGraph.Edge, Val, ControlFlowGraph.Edge, TransitionFunction>
               weightFunctions() {
-            return IDEALTestingFramework.this.getStateMachine();
+            return getStateMachine();
           }
 
           @Override
           public Debugger<TransitionFunction> debugger(IDEALSeedSolver<TransitionFunction> solver) {
-            return
-            /**
-             * VISUALIZATION ? new IDEVizDebugger<>(new File(
-             * ideVizFile.getAbsolutePath().replace(".json", " " + solver.getSeed() + ".json")),
-             * callGraph) :
-             */
-            new Debugger<>();
+            return new Debugger<>();
           }
 
           @Override
@@ -92,145 +133,80 @@ public abstract class IDEALTestingFramework extends AbstractTestingFramework {
 
           @Override
           public BoomerangOptions boomerangOptions() {
-            return new DefaultBoomerangOptions() {
-
-              @Override
-              public boolean onTheFlyCallGraph() {
-                return false;
-              }
-
-              public StaticFieldStrategy getStaticFieldStrategy() {
-                return StaticFieldStrategy.FLOW_SENSITIVE;
-              }
-
-              @Override
-              public boolean allowMultipleQueries() {
-                return true;
-              }
-            };
+            return BoomerangOptions.builder()
+                .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
+                .withAnalysisTimeout(-1)
+                .enableAllowMultipleQueries(true)
+                .build();
           }
 
           @Override
-          public CallGraph callGraph() {
-            return callGraph;
-          }
-
-          @Override
-          protected DataFlowScope getDataFlowScope() {
-            return dataFlowScope;
+          public FrameworkScope getFrameworkFactory() {
+            return frameworkScope;
           }
         });
   }
 
-  @Override
-  protected SceneTransformer createAnalysisTransformer() throws ImprecisionException {
-    return new SceneTransformer() {
-      protected void internalTransform(
-          String phaseName, @SuppressWarnings("rawtypes") Map options) {
-        BoomerangPretransformer.v().reset();
-        BoomerangPretransformer.v().apply();
-        callGraph = new SootCallGraph();
-        dataFlowScope = SootDataFlowScope.make(Scene.v());
-        analyze(JimpleMethod.of(sootTestMethod));
-      }
-    };
-  }
+  protected abstract TypeStateMachineWeightFunctions getStateMachine();
 
-  protected void analyze(Method m) {
-    Set<Assertion> expectedResults = parseExpectedQueryResults(m);
-    TestingResultReporter testingResultReporter = new TestingResultReporter(expectedResults);
+  private Collection<Assertion> parseExpectedQueryResults(CallGraph callGraph, Method testMethod) {
+    Collection<Assertion> results = new HashSet<>();
+    parseExpectedQueryResults(callGraph, testMethod, results, new HashSet<>());
 
-    Map<WeightedForwardQuery<TransitionFunction>, ForwardBoomerangResults<TransitionFunction>>
-        seedToSolvers = executeAnalysis();
-    for (Entry<
-            WeightedForwardQuery<TransitionFunction>, ForwardBoomerangResults<TransitionFunction>>
-        e : seedToSolvers.entrySet()) {
-      testingResultReporter.onSeedFinished(e.getKey().asNode(), e.getValue());
-    }
-    List<Assertion> unsound = Lists.newLinkedList();
-    List<Assertion> imprecise = Lists.newLinkedList();
-    for (Assertion r : expectedResults) {
-      if (r instanceof ShouldNotBeAnalyzed) {
-        throw new RuntimeException(r.toString());
-      }
-    }
-    for (Assertion r : expectedResults) {
-      if (!r.isSatisfied()) {
-        unsound.add(r);
-      }
-    }
-    for (Assertion r : expectedResults) {
-      if (r.isImprecise()) {
-        imprecise.add(r);
-      }
-    }
-    if (!unsound.isEmpty()) throw new RuntimeException("Unsound results: " + unsound);
-    if (!imprecise.isEmpty() && FAIL_ON_IMPRECISE) {
-      throw new ImprecisionException("Imprecise results: " + imprecise);
-    }
-  }
-
-  protected Map<
-          WeightedForwardQuery<TransitionFunction>, ForwardBoomerangResults<TransitionFunction>>
-      executeAnalysis() {
-    IDEALTestingFramework.this.createAnalysis().run();
-    return resultHandler.getResults();
-  }
-
-  private Set<Assertion> parseExpectedQueryResults(Method sootTestMethod) {
-    Set<Assertion> results = new HashSet<>();
-    parseExpectedQueryResults(sootTestMethod, results, new HashSet<>());
     return results;
   }
 
-  private void parseExpectedQueryResults(Method m, Set<Assertion> queries, Set<Method> visited) {
-    if (visited.contains(m)) return;
-    visited.add(m);
+  private void parseExpectedQueryResults(
+      CallGraph callGraph, Method testMethod, Collection<Assertion> queries, Set<Method> visited) {
+    if (visited.contains(testMethod)) {
+      return;
+    }
+    visited.add(testMethod);
 
-    for (Statement stmt : m.getStatements()) {
-      if (!(stmt.containsInvokeExpr())) continue;
-      for (Edge callSite : callGraph.edgesOutOf(stmt)) {
-        parseExpectedQueryResults(callSite.tgt(), queries, visited);
+    for (Statement stmt : testMethod.getStatements()) {
+      if (!stmt.containsInvokeExpr()) {
+        continue;
       }
-      boomerang.scene.InvokeExpr invokeExpr = stmt.getInvokeExpr();
+
+      for (CallGraph.Edge callSite : callGraph.edgesOutOf(stmt)) {
+        if (callSite.tgt().isDefined()) {
+          parseExpectedQueryResults(callGraph, callSite.tgt(), queries, visited);
+        }
+      }
+
+      InvokeExpr invokeExpr = stmt.getInvokeExpr();
+      DeclaredMethod declaredMethod = invokeExpr.getMethod();
+
+      String assertionsName = Assertions.class.getName();
+      if (!declaredMethod.getDeclaringClass().getFullyQualifiedName().equals(assertionsName)) {
+        continue;
+      }
+
       String invocationName = invokeExpr.getMethod().getName();
+
       if (invocationName.equals("shouldNotBeAnalyzed")) {
         queries.add(new ShouldNotBeAnalyzed(stmt));
       }
-      if (!invocationName.startsWith("mayBeIn") && !invocationName.startsWith("mustBeIn")) continue;
-      Val val = invokeExpr.getArg(0);
-      if (invocationName.startsWith("mayBeIn")) {
-        if (invocationName.contains("Error"))
-          queries.add(new MayBe(stmt, val, InternalState.ERROR));
-        else queries.add(new MayBe(stmt, val, InternalState.ACCEPTING));
-      } else if (invocationName.startsWith("mustBeIn")) {
-        if (invocationName.contains("Error"))
-          queries.add(new MustBe(stmt, val, InternalState.ERROR));
-        else queries.add(new MustBe(stmt, val, InternalState.ACCEPTING));
+
+      if (invocationName.equals("mustBeInAcceptingState")) {
+        Val seed = invokeExpr.getArg(0);
+        queries.add(new MustBeInAcceptingState(stmt, seed));
+      }
+
+      if (invocationName.equals("mustBeInErrorState")) {
+        Val seed = invokeExpr.getArg(0);
+        queries.add(new MustBeInErrorState(stmt, seed));
+      }
+
+      if (invocationName.equals("mayBeInAcceptingState")) {
+        Val seed = invokeExpr.getArg(0);
+        queries.add(new MayBeInAcceptingState(stmt, seed));
+      }
+
+      if (invocationName.equals("mayBeInErrorState")) {
+        Val seed = invokeExpr.getArg(0);
+        queries.add(new MayBeInErrorState(stmt, seed));
       }
     }
-  }
-
-  /**
-   * The methods parameter describes the variable that a query is issued for. Note: We misuse
-   * the @Deprecated annotation to highlight the method in the Code.
-   */
-  protected static void mayBeInErrorState(Object variable) {}
-
-  protected static void mustBeInErrorState(Object variable) {}
-
-  protected static void mayBeInAcceptingState(Object variable) {}
-
-  protected static void mustBeInAcceptingState(Object variable) {}
-
-  protected static void shouldNotBeAnalyzed() {}
-
-  /**
-   * This method can be used in test cases to create branching. It is not optimized away.
-   *
-   * @return
-   */
-  protected boolean staticallyUnknown() {
-    return true;
   }
 }

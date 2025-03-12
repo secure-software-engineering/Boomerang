@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,12 +11,12 @@
  */
 package wpds.impl;
 
-import wpds.interfaces.Location;
+import de.fraunhofer.iem.Location;
 import wpds.interfaces.State;
 
 public class Configuration<N extends Location, D extends State> {
-  private D state;
-  private N location;
+  private final D state;
+  private final N location;
 
   public Configuration(N location, D state) {
     this.location = location;
@@ -42,8 +42,7 @@ public class Configuration<N extends Location, D extends State> {
       if (other.location != null) return false;
     } else if (!location.equals(other.location)) return false;
     if (state == null) {
-      if (other.state != null) return false;
-    } else if (!state.equals(other.state)) return false;
-    return true;
+      return other.state == null;
+    } else return state.equals(other.state);
   }
 }

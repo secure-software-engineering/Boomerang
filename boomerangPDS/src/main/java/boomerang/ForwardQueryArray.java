@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2020
- * CodeShield GmbH, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,15 +11,15 @@
  */
 package boomerang;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.base.Objects;
 
 public class ForwardQueryArray extends ForwardQuery {
 
   private final Integer index;
 
-  public ForwardQueryArray(Edge stmt, Val variable, Integer index) {
+  public ForwardQueryArray(Edge stmt, AllocVal variable, Integer index) {
     super(stmt, variable);
     this.index = index;
   }

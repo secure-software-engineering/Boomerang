@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import aliasing.SparseAliasManager;
 import boomerang.scene.jimple.BoomerangPretransformer;
-import boomerang.scene.sparse.SparseCFGCache;
 import boomerang.util.AccessPath;
 import com.google.common.base.Predicate;
 import java.io.File;
@@ -32,7 +31,7 @@ public class AliasingTestSetUp {
       String targetClassName,
       String targetMethod,
       String queryLHS,
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy,
+      SparsificationStrategy sparsificationStrategy,
       boolean ignoreAfterQuery) {
     setupSoot(targetClassName);
     registerSootTransformers(queryLHS, sparsificationStrategy, targetMethod, ignoreAfterQuery);
@@ -78,7 +77,7 @@ public class AliasingTestSetUp {
   public Set<AccessPath> getAliases(
       SootMethod method,
       String queryLHS,
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy,
+      SparsificationStrategy sparsificationStrategy,
       boolean ignoreAfterQuery) {
     String[] split = queryLHS.split("\\.");
     Optional<Unit> unitOp;
@@ -117,7 +116,7 @@ public class AliasingTestSetUp {
 
   protected Transformer createAnalysisTransformer(
       String queryLHS,
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy,
+      SparsificationStrategy sparsificationStrategy,
       String targetMethod,
       boolean ignoreAfterQuery) {
     return new SceneTransformer() {
@@ -153,7 +152,7 @@ public class AliasingTestSetUp {
 
   protected void registerSootTransformers(
       String queryLHS,
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy,
+      SparsificationStrategy sparsificationStrategy,
       String targetMethod,
       boolean ignoreAfterQuery) {
     Transform transform =
@@ -175,66 +174,43 @@ public class AliasingTestSetUp {
 
   protected void runAnalyses(String queryLHS, String targetClass, String targetMethod) {
     Set<AccessPath> nonSparseAliases =
-        getAliases(
-            targetClass, queryLHS, targetMethod, SparseCFGCache.SparsificationStrategy.NONE, true);
+        getAliases(targetClass, queryLHS, targetMethod, SparsificationStrategy.NONE, true);
     Set<AccessPath> typeBasedSparseAliases =
-        getAliases(
-            targetClass,
-            queryLHS,
-            targetMethod,
-            SparseCFGCache.SparsificationStrategy.TYPE_BASED,
-            true);
+        getAliases(targetClass, queryLHS, targetMethod, SparsificationStrategy.TYPE_BASED, true);
     Set<AccessPath> aliasAwareSparseAliases =
-        getAliases(
-            targetClass,
-            queryLHS,
-            targetMethod,
-            SparseCFGCache.SparsificationStrategy.ALIAS_AWARE,
-            true);
-    checkResults(
-        SparseCFGCache.SparsificationStrategy.TYPE_BASED, typeBasedSparseAliases, nonSparseAliases);
-    checkResults(
-        SparseCFGCache.SparsificationStrategy.ALIAS_AWARE,
-        aliasAwareSparseAliases,
-        nonSparseAliases);
+        getAliases(targetClass, queryLHS, targetMethod, SparsificationStrategy.ALIAS_AWARE, true);
+    checkResults(SparsificationStrategy.TYPE_BASED, typeBasedSparseAliases, nonSparseAliases);
+    checkResults(SparsificationStrategy.ALIAS_AWARE, aliasAwareSparseAliases, nonSparseAliases);
   }
 
   protected void runAnalyses(
       String queryLHS, String targetClass, String targetMethod, boolean ignoreAfterQuery) {
     Set<AccessPath> nonSparseAliases =
         getAliases(
-            targetClass,
-            queryLHS,
-            targetMethod,
-            SparseCFGCache.SparsificationStrategy.NONE,
-            ignoreAfterQuery);
+            targetClass, queryLHS, targetMethod, SparsificationStrategy.NONE, ignoreAfterQuery);
     Set<AccessPath> typeBasedSparseAliases =
         getAliases(
             targetClass,
             queryLHS,
             targetMethod,
-            SparseCFGCache.SparsificationStrategy.TYPE_BASED,
+            SparsificationStrategy.TYPE_BASED,
             ignoreAfterQuery);
     Set<AccessPath> aliasAwareSparseAliases =
         getAliases(
             targetClass,
             queryLHS,
             targetMethod,
-            SparseCFGCache.SparsificationStrategy.ALIAS_AWARE,
+            SparsificationStrategy.ALIAS_AWARE,
             ignoreAfterQuery);
-    checkResults(
-        SparseCFGCache.SparsificationStrategy.TYPE_BASED, typeBasedSparseAliases, nonSparseAliases);
-    checkResults(
-        SparseCFGCache.SparsificationStrategy.ALIAS_AWARE,
-        aliasAwareSparseAliases,
-        nonSparseAliases);
+    checkResults(SparsificationStrategy.TYPE_BASED, typeBasedSparseAliases, nonSparseAliases);
+    checkResults(SparsificationStrategy.ALIAS_AWARE, aliasAwareSparseAliases, nonSparseAliases);
   }
 
   protected Set<AccessPath> getAliases(
       String targetClass,
       String queryLHS,
       String targetMethod,
-      SparseCFGCache.SparsificationStrategy sparsificationStrategy,
+      SparsificationStrategy sparsificationStrategy,
       boolean ignoreAfterQuery) {
     Set<AccessPath> aliases =
         executeStaticAnalysis(
@@ -243,7 +219,7 @@ public class AliasingTestSetUp {
   }
 
   protected void checkResults(
-      SparseCFGCache.SparsificationStrategy strategy,
+      SparsificationStrategy strategy,
       Set<AccessPath> sparseAliases,
       Set<AccessPath> nonSparseAliases) {
     List<String> nonSparse =

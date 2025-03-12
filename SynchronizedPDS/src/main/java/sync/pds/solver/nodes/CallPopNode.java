@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -41,8 +41,7 @@ public class CallPopNode<Location, Stmt> extends PopNode<Location> {
     if (getClass() != obj.getClass()) return false;
     CallPopNode other = (CallPopNode) obj;
     if (returnSite == null) {
-      if (other.returnSite != null) return false;
-    } else if (!returnSite.equals(other.returnSite)) return false;
-    return true;
+      return other.returnSite == null;
+    } else return returnSite.equals(other.returnSite);
   }
 }

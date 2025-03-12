@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -12,7 +12,7 @@
 package sync.pds.solver.nodes;
 
 public class SingleNode<Fact> implements INode<Fact> {
-  private Fact fact;
+  private final Fact fact;
   private int hashCode = 0;
 
   public SingleNode(Fact fact) {
@@ -36,9 +36,8 @@ public class SingleNode<Fact> implements INode<Fact> {
     if (getClass() != obj.getClass()) return false;
     SingleNode other = (SingleNode) obj;
     if (fact == null) {
-      if (other.fact != null) return false;
-    } else if (!fact.equals(other.fact)) return false;
-    return true;
+      return other.fact == null;
+    } else return fact.equals(other.fact);
   }
 
   @Override

@@ -1,23 +1,28 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.controlflowgraph;
 
 import boomerang.ForwardQuery;
-import boomerang.scene.ControlFlowGraph;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.JimpleMethod;
-import boomerang.scene.jimple.JimpleStatement;
-import boomerang.scene.sparse.SparseAliasingCFG;
-import boomerang.scene.sparse.SparseCFGCache;
+import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import java.util.Collection;
-import soot.SootMethod;
-import soot.jimple.Stmt;
 import sync.pds.solver.nodes.Node;
 import wpds.interfaces.State;
 
 /**
- * To replace the anonymous impl in ForwardSolver, so that we can access the Edge fiel of the outer
+ * To replace the anonymous impl in ForwardSolver, so that we can access the Edge field of the outer
  * method
  */
 public class ForwardSolverSuccessorListener extends SuccessorListener {
@@ -119,6 +124,7 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
     }
   }
 
+  /* [ms] method was unused?
   private SparseAliasingCFG getSparseCFG(Method method, Statement stmt, Val currentVal) {
     SootMethod sootMethod = ((JimpleMethod) method).getDelegate();
     Stmt sootStmt = ((JimpleStatement) stmt).getDelegate();
@@ -128,4 +134,5 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
         sparseCFGCache.getSparseCFGForForwardPropagation(sootMethod, sootStmt, currentVal);
     return sparseCFG;
   }
+  */
 }

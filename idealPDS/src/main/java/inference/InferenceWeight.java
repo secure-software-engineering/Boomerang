@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,7 +11,7 @@
  */
 package inference;
 
-import boomerang.scene.Method;
+import boomerang.scope.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -92,8 +92,7 @@ public class InferenceWeight extends Weight {
       if (other.rep != null) return false;
     } else if (!rep.equals(other.rep)) return false;
     if (invokedMethods == null) {
-      if (other.invokedMethods != null) return false;
-    } else if (!invokedMethods.equals(other.invokedMethods)) return false;
-    return true;
+      return other.invokedMethods == null;
+    } else return invokedMethods.equals(other.invokedMethods);
   }
 }

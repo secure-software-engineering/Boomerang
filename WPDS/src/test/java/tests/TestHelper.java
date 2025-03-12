@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,6 +11,7 @@
  */
 package tests;
 
+import de.fraunhofer.iem.Location;
 import wpds.impl.NormalRule;
 import wpds.impl.PAutomaton;
 import wpds.impl.PopRule;
@@ -20,7 +21,6 @@ import wpds.impl.UNormalRule;
 import wpds.impl.UPopRule;
 import wpds.impl.UPushRule;
 import wpds.impl.WeightedPAutomaton;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class TestHelper {
@@ -175,9 +175,8 @@ public class TestHelper {
       Abstraction other = (Abstraction) obj;
       if (a != other.a) return false;
       if (s == null) {
-        if (other.s != null) return false;
-      } else if (!s.equals(other.s)) return false;
-      return true;
+        return other.s == null;
+      } else return s.equals(other.s);
     }
   }
 
@@ -203,9 +202,8 @@ public class TestHelper {
       if (getClass() != obj.getClass()) return false;
       StackSymbol other = (StackSymbol) obj;
       if (s == null) {
-        if (other.s != null) return false;
-      } else if (!s.equals(other.s)) return false;
-      return true;
+        return other.s == null;
+      } else return s.equals(other.s);
     }
 
     @Override

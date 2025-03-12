@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -17,16 +17,17 @@ import boomerang.Query;
 import boomerang.WeightedBoomerang;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Field.ArrayField;
-import boomerang.scene.Method;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Field.ArrayField;
+import boomerang.scope.Method;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -37,36 +38,36 @@ import sync.pds.solver.nodes.Node;
 import wpds.impl.Rule;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats<W> {
 
-  private Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
-  private Set<WeightedTransition<Field, INode<Node<Edge, Val>>, W>> globalFieldTransitions =
+  private final Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
+  private final Set<WeightedTransition<Field, INode<Node<Edge, Val>>, W>> globalFieldTransitions =
       Sets.newHashSet();
   private int fieldTransitionCollisions;
-  private Set<WeightedTransition<Edge, INode<Val>, W>> globalCallTransitions = Sets.newHashSet();
+  private final Set<WeightedTransition<Edge, INode<Val>, W>> globalCallTransitions =
+      Sets.newHashSet();
   private int callTransitionCollisions;
-  private Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules = Sets.newHashSet();
+  private final Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules = Sets.newHashSet();
   private int fieldRulesCollisions;
-  private Set<Rule<Edge, INode<Val>, W>> globalCallRules = Sets.newHashSet();
+  private final Set<Rule<Edge, INode<Val>, W>> globalCallRules = Sets.newHashSet();
   private int callRulesCollisions;
-  private Set<Node<Edge, Val>> reachedForwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedForwardNodes = Sets.newHashSet();
   private int reachedForwardNodeCollisions;
 
-  private Set<Node<Edge, Val>> reachedBackwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedBackwardNodes = Sets.newHashSet();
   private int reachedBackwardNodeCollisions;
-  private Set<Method> callVisitedMethods = Sets.newHashSet();
-  private Set<Method> fieldVisitedMethods = Sets.newHashSet();
+  private final Set<Method> callVisitedMethods = Sets.newHashSet();
+  private final Set<Method> fieldVisitedMethods = Sets.newHashSet();
   private int arrayFlows;
   private int staticFlows;
-  private boolean COUNT_TOP_METHODS = false;
-  private Map<String, Integer> backwardFieldMethodsRules = new TreeMap<>();
-  private Map<String, Integer> backwardCallMethodsRules = new TreeMap<>();
+  private final boolean COUNT_TOP_METHODS = false;
+  private final Map<String, Integer> backwardFieldMethodsRules = new TreeMap<>();
+  private final Map<String, Integer> backwardCallMethodsRules = new TreeMap<>();
 
-  private Map<String, Integer> forwardFieldMethodsRules = new TreeMap<>();
-  private Map<String, Integer> forwardCallMethodsRules = new TreeMap<>();
+  private final Map<String, Integer> forwardFieldMethodsRules = new TreeMap<>();
+  private final Map<String, Integer> forwardCallMethodsRules = new TreeMap<>();
 
   public static <K> Map<K, Integer> sortByValues(final Map<K, Integer> map) {
     Comparator<K> valueComparator =
@@ -159,7 +160,7 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
   private void increaseMethod(String method, Map<String, Integer> map) {
     Integer i = map.get(method);
     if (i == null) {
-      i = new Integer(0);
+      i = Integer.valueOf(0);
     }
     map.put(method, ++i);
   }
@@ -179,7 +180,7 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
     s +=
         String.format(
             "Queries (Forward/Backward/Total): \t\t %s/%s/%s\n",
-            forwardQuery, backwardQuery, queries.keySet().size());
+            forwardQuery, backwardQuery, queries.size());
     s +=
         String.format(
             "Visited Methods (Field/Call): \t\t %s/%s\n",
@@ -258,7 +259,7 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
       }
       max = Math.max(size, max);
     }
-    float average = ((float) totalReached) / queries.keySet().size();
+    float average = ((float) totalReached) / queries.size();
     String s = String.format("Reachable nodes (Min/Avg/Max): \t\t%s/%s/%s\n", min, average, max);
     s += String.format("Maximal Query: \t\t%s\n", maxQuery);
     return s;
@@ -292,9 +293,8 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
         if (other.t != null) return false;
       } else if (!t.equals(other.t)) return false;
       if (w == null) {
-        if (other.w != null) return false;
-      } else if (!w.equals(other.w)) return false;
-      return true;
+        return other.w == null;
+      } else return w.equals(other.w);
     }
   }
 

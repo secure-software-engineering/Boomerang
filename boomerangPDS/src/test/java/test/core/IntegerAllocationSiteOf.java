@@ -1,20 +1,31 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.core;
 
 import boomerang.ForwardQuery;
 import boomerang.Query;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
 import java.util.Optional;
 
 class IntegerAllocationSiteOf implements ValueOfInterestInUnit {
   public Optional<? extends Query> test(Edge cfgEdge) {
     Statement stmt = cfgEdge.getStart();
-    if (stmt.isAssign()) {
+    if (stmt.isAssignStmt()) {
       if (stmt.getLeftOp().toString().contains("allocation")) {
         if (stmt.getLeftOp().isLocal() && stmt.getRightOp().isIntConstant()) {
-          Val local = stmt.getLeftOp();
-          ForwardQuery forwardQuery = new ForwardQuery(cfgEdge, local);
+          AllocVal allocVal = new AllocVal(stmt.getLeftOp(), stmt, stmt.getRightOp());
+          ForwardQuery forwardQuery = new ForwardQuery(cfgEdge, allocVal);
           return Optional.of(forwardQuery);
         }
       }

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -12,16 +12,12 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.AllocVal;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.Statement;
+import boomerang.scope.AllocVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.Statement;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import soot.SootClass;
-import soot.SootMethod;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.MatcherTransition;
 import typestate.finiteautomata.MatcherTransition.Parameter;
@@ -31,10 +27,9 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
 public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
 
-  private static String LOAD_METHOD = ".* load.*";
+  private static final String LOAD_METHOD = ".* load.*";
 
-  public static enum States implements State {
-    NONE,
+  public enum States implements State {
     INIT,
     LOADED,
     ERROR;
@@ -46,13 +41,12 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
 
     @Override
     public boolean isInitialState() {
-      // TODO Auto-generated method stub
-      return false;
+      return this == INIT;
     }
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == LOADED;
     }
   }
 
@@ -74,6 +68,8 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
             States.ERROR, LOAD_METHOD, true, Parameter.This, States.ERROR, Type.OnCallToReturn));
   }
 
+  /*
+  // TODO: [ms] re-enable
   private Set<SootMethod> keyStoreConstructor() {
     List<SootClass> subclasses = getSubclassesOf("java.security.KeyStore");
     Set<SootMethod> out = new HashSet<>();
@@ -83,11 +79,12 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
     }
     return out;
   }
+  */
 
   @Override
   public Set<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
     Statement unit = edge.getStart();
-    if (unit.isAssign() && unit.containsInvokeExpr()) {
+    if (unit.isAssignStmt() && unit.containsInvokeExpr()) {
       if (isKeyStoreConstructor(unit.getInvokeExpr().getMethod())) {
         return Collections.singleton(
             new WeightedForwardQuery<>(

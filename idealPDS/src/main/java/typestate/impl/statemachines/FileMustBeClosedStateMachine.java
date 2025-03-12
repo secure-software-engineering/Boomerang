@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -12,7 +12,7 @@
 package typestate.impl.statemachines;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
+import boomerang.scope.ControlFlowGraph.Edge;
 import java.util.Collection;
 import java.util.Collections;
 import typestate.TransitionFunction;
@@ -24,7 +24,7 @@ import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
 public class FileMustBeClosedStateMachine extends TypeStateMachineWeightFunctions {
 
-  public static enum States implements State {
+  public enum States implements State {
     INIT,
     OPENED,
     CLOSED;
@@ -41,7 +41,7 @@ public class FileMustBeClosedStateMachine extends TypeStateMachineWeightFunction
 
     @Override
     public boolean isAccepting() {
-      return false;
+      return this == CLOSED;
     }
   }
 
@@ -64,7 +64,7 @@ public class FileMustBeClosedStateMachine extends TypeStateMachineWeightFunction
   @Override
   public Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge unit) {
     try {
-      return generateAtAllocationSiteOf(unit, Class.forName("typestate.test.helper.File"));
+      return generateAtAllocationSiteOf(unit, Class.forName("typestate.targets.helper.File"));
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }

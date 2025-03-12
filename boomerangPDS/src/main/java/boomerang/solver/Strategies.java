@@ -1,42 +1,65 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.solver;
 
-import boomerang.BoomerangOptions;
 import boomerang.arrays.ArrayHandlingStrategy;
 import boomerang.arrays.ArrayIndexInsensitiveStrategy;
 import boomerang.arrays.ArrayIndexSensitiveStrategy;
 import boomerang.arrays.IgnoreArrayStrategy;
-import boomerang.scene.Field;
-import boomerang.scene.Statement;
+import boomerang.scope.Field;
+import boomerang.scope.Statement;
 import boomerang.staticfields.FlowSensitiveStaticFieldStrategy;
 import boomerang.staticfields.IgnoreStaticFieldStrategy;
 import boomerang.staticfields.SingletonStaticFieldStrategy;
-import boomerang.staticfields.StaticFieldStrategy;
+import boomerang.staticfields.StaticFieldHandlingStrategy;
 import com.google.common.collect.Multimap;
-import wpds.impl.Weight;
 
-public class Strategies<W extends Weight> {
-  private final StaticFieldStrategy<W> staticFieldStrategy;
-  private final ArrayHandlingStrategy<W> arrayHandlingStrategy;
+public class Strategies {
+
+  private final StaticFieldHandlingStrategy staticFieldHandlingStrategy;
+  private final ArrayHandlingStrategy arrayHandlingStrategy;
+
+  public enum StaticFieldStrategy {
+    IGNORE,
+    SINGLETON,
+    FLOW_SENSITIVE
+  }
+
+  public enum ArrayStrategy {
+    DISABLED,
+    INDEX_INSENSITIVE,
+    INDEX_SENSITIVE
+  }
 
   public Strategies(
-      BoomerangOptions opts,
-      AbstractBoomerangSolver solver,
+      StaticFieldStrategy staticFieldStrategy,
+      ArrayStrategy arrayStrategy,
+      AbstractBoomerangSolver<?> solver,
       Multimap<Field, Statement> fieldLoadStatements,
       Multimap<Field, Statement> fieldStoreStatements) {
-    switch (opts.getStaticFieldStrategy()) {
+    switch (staticFieldStrategy) {
       case IGNORE:
-        staticFieldStrategy = new IgnoreStaticFieldStrategy();
+        staticFieldHandlingStrategy = new IgnoreStaticFieldStrategy();
         break;
       case SINGLETON:
-        staticFieldStrategy =
-            new SingletonStaticFieldStrategy<>(solver, fieldLoadStatements, fieldStoreStatements);
+        staticFieldHandlingStrategy =
+            new SingletonStaticFieldStrategy(solver, fieldLoadStatements, fieldStoreStatements);
         break;
       case FLOW_SENSITIVE:
       default:
-        staticFieldStrategy = new FlowSensitiveStaticFieldStrategy();
+        staticFieldHandlingStrategy = new FlowSensitiveStaticFieldStrategy();
         break;
     }
-    switch (opts.getArrayStrategy()) {
+    switch (arrayStrategy) {
       case DISABLED:
         arrayHandlingStrategy = new IgnoreArrayStrategy();
         break;
@@ -50,11 +73,11 @@ public class Strategies<W extends Weight> {
     }
   }
 
-  public StaticFieldStrategy<W> getStaticFieldStrategy() {
-    return staticFieldStrategy;
+  public StaticFieldHandlingStrategy getStaticFieldStrategy() {
+    return staticFieldHandlingStrategy;
   }
 
-  public ArrayHandlingStrategy<W> getArrayHandlingStrategy() {
+  public ArrayHandlingStrategy getArrayHandlingStrategy() {
     return arrayHandlingStrategy;
   }
 }

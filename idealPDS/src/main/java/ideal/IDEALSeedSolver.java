@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -17,10 +17,10 @@ import boomerang.Query;
 import boomerang.WeightedBoomerang;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Stopwatch;
@@ -52,7 +52,7 @@ import wpds.interfaces.WPAUpdateListener;
 
 public class IDEALSeedSolver<W extends Weight> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(IDEALSeedSolver.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IDEALSeedSolver.class);
   private final IDEALAnalysisDefinition<W> analysisDefinition;
   private final ForwardQuery seed;
   private final IDEALWeightFunctions<W> idealWeightFunctions;
@@ -60,8 +60,8 @@ public class IDEALSeedSolver<W extends Weight> {
   private final WeightedBoomerang<W> phase1Solver;
   private final WeightedBoomerang<W> phase2Solver;
   private final Stopwatch analysisStopwatch = Stopwatch.createUnstarted();
-  private Multimap<Node<Edge, Val>, Edge> affectedStrongUpdateStmt = HashMultimap.create();
-  private Set<Node<Edge, Val>> weakUpdates = Sets.newHashSet();
+  private final Multimap<Node<Edge, Val>, Edge> affectedStrongUpdateStmt = HashMultimap.create();
+  private final Set<Node<Edge, Val>> weakUpdates = Sets.newHashSet();
   private int killedRules;
 
   private final class AddIndirectFlowAtCallSite implements WPAUpdateListener<Edge, INode<Val>, W> {
@@ -104,9 +104,8 @@ public class IDEALSeedSolver<W extends Weight> {
         if (other.callSite != null) return false;
       } else if (!callSite.equals(other.callSite)) return false;
       if (returnedFact == null) {
-        if (other.returnedFact != null) return false;
-      } else if (!returnedFact.equals(other.returnedFact)) return false;
-      return true;
+        return other.returnedFact == null;
+      } else return returnedFact.equals(other.returnedFact);
     }
 
     private IDEALSeedSolver getOuterType() {
@@ -193,7 +192,7 @@ public class IDEALSeedSolver<W extends Weight> {
                                     }
                                   }
                                   if (returnedFact.isReturnLocal()) {
-                                    if (callSite.isAssign()) {
+                                    if (callSite.isAssignStmt()) {
                                       solver
                                           .getCallAutomaton()
                                           .registerListener(
@@ -266,7 +265,7 @@ public class IDEALSeedSolver<W extends Weight> {
   public enum Phases {
     ObjectFlow,
     ValueFlow
-  };
+  }
 
   public IDEALSeedSolver(IDEALAnalysisDefinition<W> analysisDefinition, ForwardQuery seed) {
     this.analysisDefinition = analysisDefinition;
@@ -301,10 +300,8 @@ public class IDEALSeedSolver<W extends Weight> {
   }
 
   private WeightedBoomerang<W> createSolver(Phases phase) {
-    return new WeightedBoomerang<W>(
-        analysisDefinition.callGraph(),
-        analysisDefinition.getDataFlowScope(),
-        analysisDefinition.boomerangOptions()) {
+    return new WeightedBoomerang<>(
+        analysisDefinition.getFrameworkFactory(), analysisDefinition.boomerangOptions()) {
 
       @Override
       protected WeightFunctions<Edge, Val, Edge, W> getForwardCallWeights(
@@ -331,9 +328,7 @@ public class IDEALSeedSolver<W extends Weight> {
       @Override
       public boolean preventCallRuleAdd(ForwardQuery sourceQuery, Rule<Edge, INode<Val>, W> rule) {
         if (phase.equals(Phases.ValueFlow) && sourceQuery.equals(seed)) {
-          if (preventStrongUpdateFlows(rule)) {
-            return true;
-          }
+          return preventStrongUpdateFlows(rule);
         }
         return false;
       }

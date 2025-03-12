@@ -1,12 +1,23 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package tests;
 
 import static org.junit.Assert.assertTrue;
 
+import de.fraunhofer.iem.Location;
 import org.junit.Test;
 import wpds.impl.PAutomaton;
 import wpds.impl.PrefixImport;
 import wpds.impl.Transition;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public class PrefixImportTests {
@@ -92,7 +103,7 @@ public class PrefixImportTests {
   }
 
   class StringState implements State {
-    private String rep;
+    private final String rep;
 
     public StringState(String string) {
       rep = string;
@@ -119,9 +130,8 @@ public class PrefixImportTests {
       StringState other = (StringState) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (rep == null) {
-        if (other.rep != null) return false;
-      } else if (!rep.equals(other.rep)) return false;
-      return true;
+        return other.rep == null;
+      } else return rep.equals(other.rep);
     }
 
     @Override
@@ -153,12 +163,11 @@ public class PrefixImportTests {
       StringLoc other = (StringLoc) obj;
       if (!getOuterType().equals(other.getOuterType())) return false;
       if (rep == null) {
-        if (other.rep != null) return false;
-      } else if (!rep.equals(other.rep)) return false;
-      return true;
+        return other.rep == null;
+      } else return rep.equals(other.rep);
     }
 
-    private String rep;
+    private final String rep;
 
     public StringLoc(String string) {
       rep = string;

@@ -1,12 +1,24 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.results;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.util.AccessPath;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import de.fraunhofer.iem.Empty;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -17,14 +29,13 @@ import sync.pds.solver.nodes.Node;
 import wpds.impl.Transition;
 import wpds.impl.Weight;
 import wpds.impl.WeightedPAutomaton;
-import wpds.interfaces.Empty;
 import wpds.interfaces.WPAStateListener;
 import wpds.interfaces.WPAUpdateListener;
 
 public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateListener<Edge, Val> {
   private final Set<AccessPath> results;
   private final Edge stmt;
-  private AbstractBoomerangSolver<W> fwSolver;
+  private final AbstractBoomerangSolver<W> fwSolver;
 
   public ExtractAllAliasListener(
       AbstractBoomerangSolver<W> fwSolver, Set<AccessPath> results, Edge stmt) {
@@ -74,10 +85,10 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
 
   class ExtractAccessPathStateListener extends WPAStateListener<Field, INode<Node<Edge, Val>>, W> {
 
-    private INode<Node<Edge, Val>> allocNode;
-    private Collection<Transition<Field, INode<Node<Edge, Val>>>> fields;
-    private Set<AccessPath> results;
-    private Val base;
+    private final INode<Node<Edge, Val>> allocNode;
+    private final Collection<Transition<Field, INode<Node<Edge, Val>>>> fields;
+    private final Set<AccessPath> results;
+    private final Val base;
 
     public ExtractAccessPathStateListener(
         INode<Node<Edge, Val>> state,
@@ -157,14 +168,13 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
         if (other.allocNode != null) return false;
       } else if (!allocNode.equals(other.allocNode)) return false;
       if (base == null) {
-        if (other.base != null) return false;
-      } else if (!base.equals(other.base)) return false;
+        return other.base == null;
+      } else return base.equals(other.base);
       // if (fields == null) {
       // if (other.fields != null)
       // return false;
       // } else if (!fields.equals(other.fields))
       // return false;
-      return true;
     }
 
     private ExtractAllAliasListener getOuterType() {
@@ -191,8 +201,7 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
       if (other.fwSolver != null) return false;
     } else if (!fwSolver.equals(other.fwSolver)) return false;
     if (stmt == null) {
-      if (other.stmt != null) return false;
-    } else if (!stmt.equals(other.stmt)) return false;
-    return true;
+      return other.stmt == null;
+    } else return stmt.equals(other.stmt);
   }
 }

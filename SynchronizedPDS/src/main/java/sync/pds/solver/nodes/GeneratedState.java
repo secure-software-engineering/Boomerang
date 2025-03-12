@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -13,8 +13,8 @@ package sync.pds.solver.nodes;
 
 public class GeneratedState<L, N> implements INode<L> {
 
-  private INode<L> node;
-  private N loc;
+  private final INode<L> node;
+  private final N loc;
 
   public GeneratedState(INode<L> node, N loc) {
     this.node = node;
@@ -59,8 +59,7 @@ public class GeneratedState<L, N> implements INode<L> {
       if (other.loc != null) return false;
     } else if (!loc.equals(other.loc)) return false;
     if (node == null) {
-      if (other.node != null) return false;
-    } else if (!node.equals(other.node)) return false;
-    return true;
+      return other.node == null;
+    } else return node.equals(other.node);
   }
 }

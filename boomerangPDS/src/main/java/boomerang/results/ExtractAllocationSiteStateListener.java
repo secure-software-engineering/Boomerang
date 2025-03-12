@@ -1,10 +1,21 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.results;
 
 import boomerang.BackwardQuery;
 import boomerang.ForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Val;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Transition;
@@ -16,9 +27,9 @@ public abstract class ExtractAllocationSiteStateListener<W extends Weight>
     extends WPAStateListener<Field, INode<Node<Edge, Val>>, W> {
 
   /** */
-  private ForwardQuery query;
+  private final ForwardQuery query;
 
-  private BackwardQuery bwQuery;
+  private final BackwardQuery bwQuery;
 
   public ExtractAllocationSiteStateListener(
       INode<Node<Edge, Val>> state, BackwardQuery bwQuery, ForwardQuery query) {

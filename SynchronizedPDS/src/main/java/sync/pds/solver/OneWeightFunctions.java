@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -16,7 +16,7 @@ import wpds.impl.Weight;
 
 public class OneWeightFunctions<Stmt, Fact, Field, W extends Weight>
     implements WeightFunctions<Stmt, Fact, Field, W> {
-  private W one;
+  private final W one;
 
   public OneWeightFunctions(W one) {
     this.one = one;

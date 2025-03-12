@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.weights;
 
 import wpds.impl.Weight;
@@ -63,9 +74,8 @@ public class MinDistanceWeight extends Weight {
       if (other.minDistance != null) return false;
     } else if (!minDistance.equals(other.minDistance)) return false;
     if (rep == null) {
-      if (other.rep != null) return false;
-    } else if (!rep.equals(other.rep)) return false;
-    return true;
+      return other.rep == null;
+    } else return rep.equals(other.rep);
   }
 
   @Override

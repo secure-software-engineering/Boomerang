@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,8 +11,8 @@
  */
 package ideal;
 
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Val;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -30,15 +30,15 @@ import wpds.impl.Weight;
 public class IDEALWeightFunctions<W extends Weight> implements WeightFunctions<Edge, Val, Edge, W> {
 
   private static final Logger logger = LoggerFactory.getLogger(IDEALWeightFunctions.class);
-  private WeightFunctions<Edge, Val, Edge, W> delegate;
-  private Set<NonOneFlowListener> listeners = Sets.newHashSet();
-  private Set<Edge> potentialStrongUpdates = Sets.newHashSet();
-  private Set<Edge> weakUpdates = Sets.newHashSet();
-  private Set<Node<Edge, Val>> nonOneFlowNodes = Sets.newHashSet();
+  private final WeightFunctions<Edge, Val, Edge, W> delegate;
+  private final Set<NonOneFlowListener> listeners = Sets.newHashSet();
+  private final Set<Edge> potentialStrongUpdates = Sets.newHashSet();
+  private final Set<Edge> weakUpdates = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> nonOneFlowNodes = Sets.newHashSet();
   private Phases phase;
-  private boolean strongUpdates;
-  private Multimap<Node<Edge, Val>, Node<Edge, Val>> indirectAlias = HashMultimap.create();
-  private Set<Node<Edge, Val>> nodesWithStrongUpdate = Sets.newHashSet();
+  private final boolean strongUpdates;
+  private final Multimap<Node<Edge, Val>, Node<Edge, Val>> indirectAlias = HashMultimap.create();
+  private final Set<Node<Edge, Val>> nodesWithStrongUpdate = Sets.newHashSet();
 
   public IDEALWeightFunctions(WeightFunctions<Edge, Val, Edge, W> delegate, boolean strongUpdates) {
     this.delegate = delegate;

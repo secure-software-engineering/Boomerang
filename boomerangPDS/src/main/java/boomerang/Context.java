@@ -1,17 +1,28 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang;
 
-import boomerang.scene.Statement;
+import boomerang.scope.Statement;
 
 /**
  * A context is stored within the context graph. And must at least have a statement associated with
- * it. This will be used by the {@link ContextRequester} to retrieve more contexts upon need.
+ * it. This will be used by the {@link IContextRequester} to retrieve more contexts upon need.
  *
  * @author "Johannes Spaeth"
  */
 public interface Context {
-  public Statement getStmt();
+  Statement getStmt();
 
-  public int hashCode();
+  int hashCode();
 
-  public boolean equals(Object obj);
+  boolean equals(Object obj);
 }

@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -13,8 +13,8 @@ package sync.pds.solver.nodes;
 
 public class NodeWithLocation<Stmt, Fact, Location> implements INode<Node<Stmt, Fact>> {
 
-  private Location loc;
-  private Node<Stmt, Fact> fact;
+  private final Location loc;
+  private final Node<Stmt, Fact> fact;
 
   public NodeWithLocation(Stmt stmt, Fact variable, Location loc) {
     this.fact = new Node<>(stmt, variable);
@@ -49,9 +49,8 @@ public class NodeWithLocation<Stmt, Fact, Location> implements INode<Node<Stmt, 
       if (other.fact != null) return false;
     } else if (!fact.equals(other.fact)) return false;
     if (loc == null) {
-      if (other.loc != null) return false;
-    } else if (!loc.equals(other.loc)) return false;
-    return true;
+      return other.loc == null;
+    } else return loc.equals(other.loc);
   }
 
   @Override

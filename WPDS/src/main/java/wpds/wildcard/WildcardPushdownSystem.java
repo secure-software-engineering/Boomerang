@@ -1,8 +1,8 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
  *
  * <p>SPDX-License-Identifier: EPL-2.0
  *
@@ -11,6 +11,8 @@
  */
 package wpds.wildcard;
 
+import de.fraunhofer.iem.Location;
+import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.HashSet;
 import java.util.Set;
 import wpds.impl.NormalRule;
@@ -22,7 +24,6 @@ import wpds.impl.UNormalRule;
 import wpds.impl.UPopRule;
 import wpds.impl.UPushRule;
 import wpds.impl.Weight.NoWeight;
-import wpds.interfaces.Location;
 import wpds.interfaces.State;
 
 public abstract class WildcardPushdownSystem<N extends Location, D extends State>

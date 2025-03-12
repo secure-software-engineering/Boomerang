@@ -1,11 +1,22 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.flowfunction;
 
 import boomerang.ForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Field;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Field;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
@@ -48,8 +59,7 @@ public interface IForwardFlowFunction {
    *
    * @param edge The control-flow graph edge that will be propagated next.
    * @param fact The incoming data-flow fact that reaches the edge.
-   * @return A set of data-flow states (states in the pushdown system, typically of type
-   *     Node<Edge,Val>).
+   * @return A set of data-flow states (states in the pushdown system).
    */
   Collection<State> normalFlow(ForwardQuery query, Edge edge, Val fact);
 
@@ -64,13 +74,12 @@ public interface IForwardFlowFunction {
    * @param edge Edge that bypasses the call site. edge.getStart() is the call site,
    *     edge.getTarget() is any succsessor
    * @param fact The fact that by-passes the call site.
-   * @return A set of data-flow states (states in the pushdown system, typically of type
-   *     Node<Edge,Val>)
+   * @return A set of data-flow states (states in the pushdown system)
    */
   Collection<State> callToReturnFlow(ForwardQuery query, Edge edge, Val fact);
 
   void setSolver(
-      ForwardBoomerangSolver solver,
+      ForwardBoomerangSolver<?> solver,
       Multimap<Field, Statement> fieldLoadStatements,
       Multimap<Field, Statement> fieldStoreStatements);
 }

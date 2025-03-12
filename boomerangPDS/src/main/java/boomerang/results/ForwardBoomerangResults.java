@@ -1,3 +1,14 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.results;
 
 import boomerang.ForwardQuery;
@@ -6,15 +17,15 @@ import boomerang.callgraph.CallerListener;
 import boomerang.callgraph.ObservableICFG;
 import boomerang.controlflowgraph.ObservableControlFlowGraph;
 import boomerang.controlflowgraph.PredecessorListener;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DeclaredMethod;
-import boomerang.scene.Field;
-import boomerang.scene.IfStatement;
-import boomerang.scene.IfStatement.Evaluation;
-import boomerang.scene.Method;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.JimpleVal;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.DeclaredMethod;
+import boomerang.scope.Field;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.IfStatement;
+import boomerang.scope.IfStatement.Evaluation;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -34,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import soot.jimple.IntConstant;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -45,19 +55,21 @@ import wpds.interfaces.State;
 
 public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerangResults<W> {
 
+  private final FrameworkScope scopeFactory;
   private final ForwardQuery query;
   private final boolean timedout;
   private final IBoomerangStats<W> stats;
-  private Stopwatch analysisWatch;
-  private long maxMemory;
-  private ObservableICFG<Statement, Method> icfg;
-  private Set<Method> visitedMethods;
+  private final Stopwatch analysisWatch;
+  private final long maxMemory;
+  private final ObservableICFG<Statement, Method> icfg;
+  private final Set<Method> visitedMethods;
   private final boolean trackDataFlowPath;
   private final boolean pruneContradictoryDataFlowPath;
-  private ObservableControlFlowGraph cfg;
-  private boolean pruneImplictFlows;
+  private final ObservableControlFlowGraph cfg;
+  private final boolean pruneImplictFlows;
 
   public ForwardBoomerangResults(
+      FrameworkScope scopeFactory,
       ForwardQuery query,
       ObservableICFG<Statement, Method> icfg,
       ObservableControlFlowGraph cfg,
@@ -70,6 +82,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       boolean pruneContradictoryDataFlowPath,
       boolean pruneImplictFlows) {
     super(queryToSolvers);
+    this.scopeFactory = scopeFactory;
     this.query = query;
     this.icfg = icfg;
     this.cfg = cfg;
@@ -338,14 +351,15 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       if (pruneImplictFlows) {
         for (Entry<Val, ConditionDomain> e : evaluationMap.entrySet()) {
 
-          if (ifStmt1.uses(e.getKey())) {
+          Val key = e.getKey();
+          if (ifStmt1.uses(key)) {
             Evaluation eval = null;
             if (e.getValue().equals(ConditionDomain.TRUE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(new JimpleVal(IntConstant.v(1), e.getKey().m()));
+              eval = ifStmt1.evaluate(scopeFactory.getTrueValue(key.m()));
             } else if (e.getValue().equals(ConditionDomain.FALSE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(new JimpleVal(IntConstant.v(0), e.getKey().m()));
+              eval = ifStmt1.evaluate(scopeFactory.getFalseValue(key.m()));
             }
             if (eval != null) {
               if (mustBeVal.equals(ConditionDomain.FALSE)) {

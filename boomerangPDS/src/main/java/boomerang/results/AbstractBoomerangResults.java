@@ -1,9 +1,20 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.results;
 
 import boomerang.ForwardQuery;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.Statement;
-import boomerang.scene.Val;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.util.DefaultValueMap;
@@ -69,9 +80,9 @@ public class AbstractBoomerangResults<W extends Weight> {
   private static class OpeningCallStackExtracter<W extends Weight>
       extends WPAStateListener<Edge, INode<Val>, W> {
 
-    private AbstractBoomerangSolver<W> solver;
-    private INode<Val> source;
-    private Context context;
+    private final AbstractBoomerangSolver<W> solver;
+    private final INode<Val> source;
+    private final Context context;
 
     public OpeningCallStackExtracter(
         INode<Val> state, INode<Val> source, Context context, AbstractBoomerangSolver<W> solver) {
@@ -135,18 +146,17 @@ public class AbstractBoomerangResults<W extends Weight> {
         if (other.solver != null) return false;
       } else if (!solver.equals(other.solver)) return false;
       if (source == null) {
-        if (other.source != null) return false;
-      } else if (!source.equals(other.source)) return false;
-      return true;
+        return other.source == null;
+      } else return source.equals(other.source);
     }
   }
 
   private static class ClosingCallStackExtracter<W extends Weight>
       extends WPAStateListener<Edge, INode<Val>, W> {
 
-    private AbstractBoomerangSolver<W> solver;
-    private INode<Val> source;
-    private Context context;
+    private final AbstractBoomerangSolver<W> solver;
+    private final INode<Val> source;
+    private final Context context;
 
     public ClosingCallStackExtracter(
         INode<Val> state, INode<Val> source, Context context, AbstractBoomerangSolver<W> solver) {
@@ -197,9 +207,8 @@ public class AbstractBoomerangResults<W extends Weight> {
         if (other.solver != null) return false;
       } else if (!solver.equals(other.solver)) return false;
       if (source == null) {
-        if (other.source != null) return false;
-      } else if (!source.equals(other.source)) return false;
-      return true;
+        return other.source == null;
+      } else return source.equals(other.source);
     }
   }
 
@@ -265,9 +274,8 @@ public class AbstractBoomerangResults<W extends Weight> {
       if (getClass() != obj.getClass()) return false;
       Context other = (Context) obj;
       if (node == null) {
-        if (other.node != null) return false;
-      } else if (!node.equals(other.node)) return false;
-      return true;
+        return other.node == null;
+      } else return node.equals(other.node);
     }
 
     public PAutomaton<Edge, INode<Val>> getOpeningContext() {

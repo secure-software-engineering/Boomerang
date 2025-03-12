@@ -1,39 +1,41 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.guided;
 
 import boomerang.BackwardQuery;
 import boomerang.Boomerang;
-import boomerang.BoomerangOptions;
 import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.QueryGraph;
 import boomerang.guided.Specification.QueryDirection;
+import boomerang.options.BoomerangOptions;
 import boomerang.results.AbstractBoomerangResults.Context;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
-import boomerang.scene.ControlFlowGraph.Edge;
-import boomerang.scene.DataFlowScope;
-import boomerang.scene.SootDataFlowScope;
-import boomerang.scene.Val;
-import boomerang.scene.jimple.SootCallGraph;
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
+import boomerang.scope.Val;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import soot.Scene;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight.NoWeight;
 
 public class DemandDrivenGuidedAnalysis {
 
-  private final BoomerangOptions customBoomerangOptions;
   private final IDemandDrivenGuidedManager spec;
-  private final DataFlowScope scope;
-  private final SootCallGraph callGraph;
   private final LinkedList<QueryWithContext> queryQueue = Lists.newLinkedList();
   private final Set<Query> visited = Sets.newHashSet();
   private final Boomerang solver;
@@ -42,21 +44,13 @@ public class DemandDrivenGuidedAnalysis {
   public DemandDrivenGuidedAnalysis(
       IDemandDrivenGuidedManager specification,
       BoomerangOptions options,
-      DataFlowScope dataFlowScope) {
-    spec = specification;
-    callGraph = new SootCallGraph();
-    scope = dataFlowScope;
+      FrameworkScope frameworkScope) {
+    this.spec = specification;
     if (!options.allowMultipleQueries()) {
       throw new RuntimeException(
           "Boomerang options allowMultipleQueries is set to false. Please enable it.");
     }
-    customBoomerangOptions = options;
-    solver = new Boomerang(callGraph, scope, customBoomerangOptions);
-  }
-
-  public DemandDrivenGuidedAnalysis(
-      IDemandDrivenGuidedManager specification, BoomerangOptions options) {
-    this(specification, options, SootDataFlowScope.make(Scene.v()));
+    this.solver = new Boomerang(frameworkScope, options);
   }
 
   /**
@@ -78,6 +72,7 @@ public class DemandDrivenGuidedAnalysis {
     }
     triggered = true;
     queryQueue.add(new QueryWithContext(query));
+
     while (!queryQueue.isEmpty()) {
       QueryWithContext pop = queryQueue.pop();
       if (pop.query instanceof ForwardQuery) {
@@ -92,7 +87,7 @@ public class DemandDrivenGuidedAnalysis {
         Table<Edge, Val, NoWeight> forwardResults =
             results.asEdgeValWeightTable((ForwardQuery) pop.query);
         // Any ForwardQuery may trigger additional ForwardQuery under its own scope.
-        triggerNewBackwardQueries(forwardResults, currentQuery, QueryDirection.FORWARD);
+        triggerNewQueries(forwardResults, currentQuery, QueryDirection.FORWARD);
       } else {
         BackwardBoomerangResults<NoWeight> results;
         if (pop.parentQuery == null) {
@@ -102,14 +97,16 @@ public class DemandDrivenGuidedAnalysis {
               solver.solveUnderScope(
                   (BackwardQuery) pop.query, pop.triggeringNode, pop.parentQuery);
         }
+
         Table<Edge, Val, NoWeight> backwardResults =
             solver.getBackwardSolvers().get(query).asEdgeValWeightTable();
-
-        triggerNewBackwardQueries(backwardResults, pop.query, QueryDirection.BACKWARD);
+        // TODO: [ms] figure out why its structurally
+        // different than with Forwardqueries - potential?
+        triggerNewQueries(backwardResults, pop.query, QueryDirection.BACKWARD);
         Map<ForwardQuery, Context> allocationSites = results.getAllocationSites();
 
         for (Entry<ForwardQuery, Context> entry : allocationSites.entrySet()) {
-          triggerNewBackwardQueries(
+          triggerNewQueries(
               results.asEdgeValWeightTable(entry.getKey()), entry.getKey(), QueryDirection.FORWARD);
         }
       }
@@ -131,7 +128,7 @@ public class DemandDrivenGuidedAnalysis {
     return solver;
   }
 
-  private void triggerNewBackwardQueries(
+  private void triggerNewQueries(
       Table<Edge, Val, NoWeight> backwardResults, Query lastQuery, QueryDirection direction) {
     for (Cell<Edge, Val, NoWeight> cell : backwardResults.cellSet()) {
       Edge triggeringEdge = cell.getRowKey();
@@ -145,14 +142,12 @@ public class DemandDrivenGuidedAnalysis {
             spec.onBackwardFlow((BackwardQuery) lastQuery, cell.getRowKey(), cell.getColumnKey());
       }
       for (Query q : queries) {
-        addToQueue(new QueryWithContext(q, new Node<>(triggeringEdge, fact), lastQuery));
+        if (visited.add(q)) {
+          QueryWithContext nextQuery =
+              new QueryWithContext(q, new Node<>(triggeringEdge, fact), lastQuery);
+          queryQueue.add(nextQuery);
+        }
       }
-    }
-  }
-
-  private void addToQueue(QueryWithContext nextQuery) {
-    if (visited.add(nextQuery.query)) {
-      queryQueue.add(nextQuery);
     }
   }
 
