@@ -27,15 +27,31 @@
     <dependencies>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
-            <artifactId>testCore</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangScope</artifactId>
         </dependency>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>synchronizedPDS</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>WPDS</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>PDS</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>testCore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>pathexpression</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
