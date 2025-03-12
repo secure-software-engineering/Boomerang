@@ -38,6 +38,10 @@
             <organization>CodeShield GmbH</organization>
             <organizationUrl>https://codeshield.de/</organizationUrl>
         </contributor>
+        <contributor>
+            <name>Sven Meyer</name>
+            <email>s.v.meyer@online.de</email>
+        </contributor>
     </contributors>
 
     <modules>
