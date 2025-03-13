@@ -1,5 +1,11 @@
 name: Deploy Documentation
 
+permissions:
+  pages: write
+  deployments: write
+  contents: write
+  pull-requests: write
+
 on:
   push:
     branches:
@@ -21,15 +27,9 @@ on:
         - '.github/workflows/gh-pages.yml'
 concurrency: pages
 
-permissions:
-  pages: write
-  deployments: write
-  contents: write
-  pull-requests: write
-
 jobs:
   deploy:
-    uses: secure-software-engineering/actions/.github/workflows/gh-pages/gh-pages.yml@develop
+    uses: secure-software-engineering/actions/gh-pages/gh-pages.yml@develop
     with:
       workflow_name: "Deploy Boomerang Documentation"
       deploy_branch: ${{ github.ref_name }}
