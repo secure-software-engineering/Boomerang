@@ -22,6 +22,12 @@ import wpds.impl.Weight;
 
 public interface DataFlowPathWeight extends Weight {
   @Nonnull
+  PathTrackingWeight getPath();
+
+  @Nonnull
+  PathConditionWeight getCondition();
+
+  @Nonnull
   Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
 
   @Nonnull

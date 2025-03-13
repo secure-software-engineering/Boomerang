@@ -38,6 +38,7 @@ public class PathConditionWeight implements Weight {
     this.calleeToCallSite.put(callee, callSite);
   }
 
+  @Deprecated // FIXME
   public static PathConditionWeight one() {
     if (one == null) {
       one = new PathConditionWeight("ONE");

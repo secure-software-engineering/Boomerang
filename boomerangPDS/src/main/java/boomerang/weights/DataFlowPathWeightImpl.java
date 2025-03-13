@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public class DataFlowPathWeightImpl implements Weight, DataFlowPathWeight {
+public class DataFlowPathWeightImpl implements DataFlowPathWeight {
 
   private final PathTrackingWeight path;
   private final PathConditionWeight condition;
@@ -53,7 +53,7 @@ public class DataFlowPathWeightImpl implements Weight, DataFlowPathWeight {
     this.condition = new PathConditionWeight(ifStatement, condition);
   }
 
-  private DataFlowPathWeightImpl(PathTrackingWeightImpl path, PathConditionWeight condition) {
+  DataFlowPathWeightImpl(PathTrackingWeight path, PathConditionWeight condition) {
     this.path = path;
     this.condition = condition;
   }
@@ -66,6 +66,18 @@ public class DataFlowPathWeightImpl implements Weight, DataFlowPathWeight {
   public DataFlowPathWeightImpl(Val returnVal) {
     this.path = PathTrackingWeightOne.one();
     this.condition = new PathConditionWeight(returnVal);
+  }
+
+  @Nonnull
+  @Override
+  public PathTrackingWeight getPath() {
+    return path;
+  }
+
+  @Nonnull
+  @Override
+  public PathConditionWeight getCondition() {
+    return condition;
   }
 
   @Override
