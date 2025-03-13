@@ -29,7 +29,7 @@ concurrency: pages
 
 jobs:
   deploy:
-    uses: secure-software-engineering/actions/gh-pages/gh-pages.yml@develop
+    uses: secure-software-engineering/actions/gh-pages/gh-pages.yml@roshansamantaray-patch-1
     with:
       workflow_name: "Deploy Boomerang Documentation"
       deploy_branch: ${{ github.ref_name }}
