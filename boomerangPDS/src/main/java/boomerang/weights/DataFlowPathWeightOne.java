@@ -54,13 +54,13 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
 
     @Nonnull
     @Override
-    public Map<Statement, PathConditionWeight.ConditionDomain> getConditions() {
+    public Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions() {
         throw new IllegalStateException("MinDistanceWeight.getAllStatements() - don't");
     }
 
     @Nonnull
     @Override
-    public Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap() {
+    public Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap() {
         throw new IllegalStateException("MinDistanceWeight.getEvaluationMap() - don't");
     }
 
@@ -68,7 +68,7 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
     @Override
     public Weight extendWith(@Nonnull Weight other) {
         PathTrackingWeight pathTrackingWeight = (PathTrackingWeight) PathTrackingWeightOne.one().extendWith(((DataFlowPathWeight) other).getPath());
-        PathConditionWeight pathConditionWeight = (PathConditionWeight) PathConditionWeight.one().extendWith(((DataFlowPathWeight) other).getCondition());
+        PathConditionWeight pathConditionWeight = (PathConditionWeight) PathConditionWeightOne.one().extendWith(((DataFlowPathWeight) other).getCondition());
         return new DataFlowPathWeightImpl(pathTrackingWeight, pathConditionWeight);
     }
 
@@ -76,7 +76,8 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
     @Override
     public Weight combineWith(@Nonnull Weight other) {
         PathTrackingWeight pathTrackingWeight = (PathTrackingWeight) PathTrackingWeightOne.one().combineWith(((DataFlowPathWeightOne) other).getPath());
-        PathConditionWeight pathConditionWeight = (PathConditionWeight) PathConditionWeight.one().combineWith(((DataFlowPathWeightOne) other).getCondition());
+        PathConditionWeight pathConditionWeight = (PathConditionWeight) PathConditionWeightOne.one().combineWith(((DataFlowPathWeightOne) other).getCondition());
         return new DataFlowPathWeightImpl(pathTrackingWeight, pathConditionWeight);
     }
 }
+

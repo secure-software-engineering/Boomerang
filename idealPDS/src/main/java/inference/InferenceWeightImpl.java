@@ -23,6 +23,11 @@ import static inference.InferenceWeightZero.zero;
 
 public class InferenceWeightImpl implements InferenceWeight {
 
+  @Nonnull
+  public Set<Method> getInvokedMethods() {
+    return invokedMethods;
+  }
+
   @Nonnull private final Set<Method> invokedMethods;
 
   private InferenceWeightImpl(@Nonnull Set<Method> res) {

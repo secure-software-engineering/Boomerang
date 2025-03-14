@@ -31,8 +31,8 @@ public interface DataFlowPathWeight extends Weight {
   Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
 
   @Nonnull
-  Map<Statement, PathConditionWeight.ConditionDomain> getConditions();
+  Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions();
 
   @Nonnull
-  Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap();
+  Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap();
 }

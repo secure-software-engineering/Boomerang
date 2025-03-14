@@ -29,7 +29,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
 
 
-  private SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
+  public SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
 

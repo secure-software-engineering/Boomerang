@@ -30,27 +30,27 @@ public class DataFlowPathWeightImpl implements DataFlowPathWeight {
 
   private DataFlowPathWeightImpl() {
     path = PathTrackingWeightOne.one();
-    condition = PathConditionWeight.one();
+    condition = PathConditionWeightOne.one();
   }
 
   public DataFlowPathWeightImpl(Node<Edge, Val> path) {
     this.path = new PathTrackingWeightImpl(path);
-    this.condition = PathConditionWeight.one();
+    this.condition = PathConditionWeightOne.one();
   }
 
   public DataFlowPathWeightImpl(Node<Edge, Val> path, Statement callSite, Method callee) {
     this.path = new PathTrackingWeightImpl(path);
-    this.condition = new PathConditionWeight(callSite, callee);
+    this.condition = new PathConditionWeightImpl(callSite, callee);
   }
 
   public DataFlowPathWeightImpl(Statement callSite, Method callee) {
     this.path = PathTrackingWeightOne.one();
-    this.condition = new PathConditionWeight(callSite, callee);
+    this.condition = new PathConditionWeightImpl(callSite, callee);
   }
 
   public DataFlowPathWeightImpl(Statement ifStatement, Boolean condition) {
     this.path = PathTrackingWeightOne.one();
-    this.condition = new PathConditionWeight(ifStatement, condition);
+    this.condition = new PathConditionWeightImpl(ifStatement, condition);
   }
 
   DataFlowPathWeightImpl(PathTrackingWeight path, PathConditionWeight condition) {
@@ -60,12 +60,12 @@ public class DataFlowPathWeightImpl implements DataFlowPathWeight {
 
   public DataFlowPathWeightImpl(Val leftOp, ConditionDomain conditionVal) {
     this.path = PathTrackingWeightOne.one();
-    this.condition = new PathConditionWeight(leftOp, conditionVal);
+    this.condition = new PathConditionWeightImpl(leftOp, conditionVal);
   }
 
   public DataFlowPathWeightImpl(Val returnVal) {
     this.path = PathTrackingWeightOne.one();
-    this.condition = new PathConditionWeight(returnVal);
+    this.condition = new PathConditionWeightImpl(returnVal);
   }
 
   @Nonnull

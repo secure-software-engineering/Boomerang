@@ -23,7 +23,14 @@ package inference;
  * *****************************************************************************
  */
 import javax.annotation.Nonnull;
+
+import boomerang.scope.Method;
 import wpds.impl.Weight;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static inference.InferenceWeightZero.zero;
 
 public class InferenceWeightOne implements InferenceWeight {
 
@@ -32,13 +39,24 @@ public class InferenceWeightOne implements InferenceWeight {
   private InferenceWeightOne() {}
 
   @Nonnull
+  public Set<Method> getInvokedMethods() {
+    throw new IllegalStateException("InferenceWeightOne.getInvoke -dont");
+  }
+
+
+  @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    InferenceWeightOne one = one();
-    if (other == one) {
-      return this;
+    if (other.equals(one())) return this;
+    if (this.equals(one())) return other;
+    if (other.equals(zero()) || this.equals(zero())) {
+      return zero();
     }
-    return other;
+    InferenceWeight func = (InferenceWeightImpl) other;
+    Set<Method> otherInvokedMethods = ((InferenceWeightImpl) func).getInvokedMethods();
+    Set<Method> res = new HashSet<>(getInvokedMethods());
+    res.addAll(otherInvokedMethods);
+    return new InferenceWeightImpl((Method) res);
   }
 
   @Nonnull

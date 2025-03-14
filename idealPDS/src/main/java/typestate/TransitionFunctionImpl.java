@@ -68,11 +68,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
     Set<Edge> newStateChangeStatements = new HashSet<>();
     for (Transition first : values) {
       for (Transition second : otherTransitions) {
-        TransitionIdentity identity = TransitionIdentity.identity();
-        if (second == identity) {
+
+        if (second.equals(TransitionIdentity.identity())) {
           ress.add(first);
           newStateChangeStatements.addAll(stateChangeStatements);
-        } else if (first == identity) {
+        } else if (first.equals(TransitionIdentity.identity())) {
           ress.add(second);
           newStateChangeStatements.addAll(func.stateChangeStatements);
         } else if (first.to().equals(second.from())) {
