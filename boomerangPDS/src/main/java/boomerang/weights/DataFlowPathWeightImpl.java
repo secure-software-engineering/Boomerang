@@ -1,0 +1,122 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
+ *
+ * <p>SPDX-License-Identifier: EPL-2.0
+ *
+ * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
+package boomerang.weights;
+
+import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
+import boomerang.weights.PathConditionWeight.ConditionDomain;
+import com.google.common.base.Objects;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import sync.pds.solver.nodes.Node;
+import wpds.impl.Weight;
+
+public class DataFlowPathWeightImpl implements Weight, DataFlowPathWeight {
+
+  private final PathTrackingWeight path;
+  private final PathConditionWeight condition;
+
+  private DataFlowPathWeightImpl() {
+    path = PathTrackingWeightOne.one();
+    condition = PathConditionWeight.one();
+  }
+
+  public DataFlowPathWeightImpl(Node<Edge, Val> path) {
+    this.path = new PathTrackingWeightImpl(path);
+    this.condition = PathConditionWeight.one();
+  }
+
+  public DataFlowPathWeightImpl(Node<Edge, Val> path, Statement callSite, Method callee) {
+    this.path = new PathTrackingWeightImpl(path);
+    this.condition = new PathConditionWeight(callSite, callee);
+  }
+
+  public DataFlowPathWeightImpl(Statement callSite, Method callee) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(callSite, callee);
+  }
+
+  public DataFlowPathWeightImpl(Statement ifStatement, Boolean condition) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(ifStatement, condition);
+  }
+
+  private DataFlowPathWeightImpl(PathTrackingWeightImpl path, PathConditionWeight condition) {
+    this.path = path;
+    this.condition = condition;
+  }
+
+  public DataFlowPathWeightImpl(Val leftOp, ConditionDomain conditionVal) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(leftOp, conditionVal);
+  }
+
+  public DataFlowPathWeightImpl(Val returnVal) {
+    this.path = PathTrackingWeightOne.one();
+    this.condition = new PathConditionWeight(returnVal);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    DataFlowPathWeightImpl that = (DataFlowPathWeightImpl) o;
+    return Objects.equal(path, that.path) && Objects.equal(condition, that.condition);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(path, condition);
+  }
+
+  @Nonnull
+  @Override
+  public Set<Node<Edge, Val>> getAllStatements() {
+    return path.getShortestPathWitness();
+  }
+
+  @Nonnull
+  @Override
+  public Map<Statement, ConditionDomain> getConditions() {
+    return condition.getConditions();
+  }
+
+  @Nonnull
+  @Override
+  public Map<Val, ConditionDomain> getEvaluationMap() {
+    return condition.getEvaluationMap();
+  }
+
+  @Override
+  public String toString() {
+    return /*"PATH" + path +*/ " COND: " + condition;
+  }
+
+  @Nonnull
+  @Override
+  public Weight extendWith(@Nonnull Weight other) {
+    return new DataFlowPathWeightImpl(
+        (PathTrackingWeightImpl) path.extendWith(((DataFlowPathWeightImpl) other).path),
+        (PathConditionWeight) condition.extendWith(((DataFlowPathWeightImpl) other).condition));
+  }
+
+  @Nonnull
+  @Override
+  public Weight combineWith(@Nonnull Weight other) {
+    return new DataFlowPathWeightImpl(
+        (PathTrackingWeightImpl) path.combineWith(((DataFlowPathWeightImpl) other).path),
+        (PathConditionWeight) condition.combineWith(((DataFlowPathWeightImpl) other).condition));
+  }
+}

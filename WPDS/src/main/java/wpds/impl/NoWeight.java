@@ -11,17 +11,35 @@
  */
 package wpds.impl;
 
-import de.fraunhofer.iem.Location;
-import wpds.interfaces.State;
+import javax.annotation.Nonnull;
 
-public class UPopRule<N extends Location, D extends State> extends PopRule<N, D, NoWeight> {
+public class NoWeight implements Weight {
 
-  public UPopRule(D s1, N l1, D s2) {
-    super(s1, l1, s2, NoWeight.getInstance());
+  private static final NoWeight INSTANCE = new NoWeight();
+
+  private NoWeight() {
+    /* Singleton */
+  }
+
+  @Nonnull
+  public static NoWeight getInstance() {
+    return INSTANCE;
+  }
+
+  @Nonnull
+  @Override
+  public Weight extendWith(@Nonnull Weight other) {
+    return other;
+  }
+
+  @Nonnull
+  @Override
+  public Weight combineWith(@Nonnull Weight other) {
+    return other;
   }
 
   @Override
   public String toString() {
-    return "<" + s1 + ";" + l1 + ">-><" + s2 + ">";
+    return "";
   }
 }

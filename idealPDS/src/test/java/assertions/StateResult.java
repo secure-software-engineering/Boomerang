@@ -18,8 +18,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import test.Assertion;
 import typestate.TransitionFunction;
-import typestate.finiteautomata.ITransition;
 import typestate.finiteautomata.State;
+import typestate.finiteautomata.Transition;
 
 public abstract class StateResult implements Assertion {
 
@@ -48,7 +48,7 @@ public abstract class StateResult implements Assertion {
   public void computedResults(TransitionFunction function) {
     Collection<State> states = new HashSet<>();
 
-    for (ITransition transition : function.values()) {
+    for (Transition transition : function.getValues()) {
       states.add(transition.to());
     }
 

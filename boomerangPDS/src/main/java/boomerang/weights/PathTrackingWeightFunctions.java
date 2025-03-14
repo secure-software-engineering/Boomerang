@@ -36,36 +36,36 @@ public class PathTrackingWeightFunctions
     if (trackDataFlowPath && !curr.fact().isStatic()) {
       if (callSite.getStart().uses(curr.fact())) {
         if (implicitBooleanCondition && callSite.getTarget().isAssignStmt()) {
-          return new DataFlowPathWeight(
+          return new DataFlowPathWeightImpl(
               new Node<>(callSite, curr.fact()), callSite.getStart(), succ.stmt().getMethod());
         }
-        return new DataFlowPathWeight(new Node<>(callSite, curr.fact()));
+        return new DataFlowPathWeightImpl(new Node<>(callSite, curr.fact()));
       }
       if (implicitBooleanCondition && callSite.getStart().isAssignStmt()) {
-        return new DataFlowPathWeight(callSite.getStart(), succ.stmt().getMethod());
+        return new DataFlowPathWeightImpl(callSite.getStart(), succ.stmt().getMethod());
       }
     }
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 
   @Override
   public DataFlowPathWeight normal(Node<Edge, Val> curr, Node<Edge, Val> succ) {
     if (trackDataFlowPath
         && curr.stmt().getMethod().getControlFlowGraph().getStartPoints().contains(curr.stmt())) {
-      return new DataFlowPathWeight(curr);
+      return new DataFlowPathWeightImpl(curr);
     }
     if (trackDataFlowPath && !curr.fact().equals(succ.fact())) {
-      return new DataFlowPathWeight(succ);
+      return new DataFlowPathWeightImpl(succ);
     }
     if (trackDataFlowPath
         && succ.stmt().getTarget().isReturnStmt()
         && succ.stmt().getTarget().getReturnOp().equals(succ.fact())) {
-      return new DataFlowPathWeight(succ);
+      return new DataFlowPathWeightImpl(succ);
     }
     if (implicitBooleanCondition
         && curr.stmt().getTarget().isAssignStmt()
         && curr.stmt().getTarget().getLeftOp().getType().isBooleanType()) {
-      return new DataFlowPathWeight(
+      return new DataFlowPathWeightImpl(
           curr.stmt().getTarget().getLeftOp(),
           curr.stmt().getTarget().getRightOp().toString().equals("0")
               ? ConditionDomain.FALSE
@@ -73,25 +73,25 @@ public class PathTrackingWeightFunctions
     }
 
     if (implicitBooleanCondition && succ.stmt().getTarget().isReturnStmt()) {
-      return new DataFlowPathWeight(succ.stmt().getTarget().getReturnOp());
+      return new DataFlowPathWeightImpl(succ.stmt().getTarget().getReturnOp());
     }
 
     if (trackPathConditions && curr.stmt().getTarget().isIfStmt()) {
       if (curr.stmt().getTarget().getIfStmt().getTarget().equals(succ.stmt())) {
-        return new DataFlowPathWeight(curr.stmt().getTarget(), true);
+        return new DataFlowPathWeightImpl(curr.stmt().getTarget(), true);
       }
-      return new DataFlowPathWeight(curr.stmt().getTarget(), false);
+      return new DataFlowPathWeightImpl(curr.stmt().getTarget(), false);
     }
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 
   @Override
   public DataFlowPathWeight pop(Node<Edge, Val> curr) {
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 
   @Override
   public DataFlowPathWeight getOne() {
-    return DataFlowPathWeight.one();
+    return DataFlowPathWeightOne.one();
   }
 }

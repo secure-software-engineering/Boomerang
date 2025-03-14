@@ -13,7 +13,6 @@ package wpds.impl;
 
 import de.fraunhofer.iem.Location;
 import pathexpression.LabeledGraph;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.State;
 
 public abstract class PAutomaton<N extends Location, D extends State>
@@ -21,6 +20,6 @@ public abstract class PAutomaton<N extends Location, D extends State>
 
   @Override
   public NoWeight getOne() {
-    return NoWeight.NO_WEIGHT_ONE;
+    return NoWeight.getInstance();
   }
 }

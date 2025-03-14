@@ -11,22 +11,31 @@
  */
 package boomerang.weights;
 
-import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Statement;
-import boomerang.scope.Val;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nonnull;
-import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public interface DataFlowPathWeight extends Weight {
-  @Nonnull
-  Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
+public class MinDistanceWeightOne implements MinDistanceWeight {
+
+  private static final MinDistanceWeightOne one = new MinDistanceWeightOne();
+
+  public static MinDistanceWeightOne one() {
+    return one;
+  }
 
   @Nonnull
-  Map<Statement, PathConditionWeight.ConditionDomain> getConditions();
+  @Override
+  public Weight extendWith(@Nonnull Weight o) {
+    throw new IllegalStateException("MinDistanceWeight.extendWith() - don't");
+  }
 
   @Nonnull
-  Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap();
+  @Override
+  public Weight combineWith(@Nonnull Weight o) {
+    throw new IllegalStateException("MinDistanceWeight.combineWith() - don't");
+  }
+
+  @Override
+  public Integer getMinDistance() {
+    throw new IllegalStateException("MinDistanceWeight.minDistance() - don't");
+  }
 }

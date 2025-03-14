@@ -56,7 +56,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
 import test.setup.MethodWrapper;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 public class DemandDrivenGuidedAnalysisTest {
 

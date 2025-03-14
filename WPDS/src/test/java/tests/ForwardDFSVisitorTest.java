@@ -28,11 +28,11 @@ import org.junit.Before;
 import org.junit.Test;
 import tests.TestHelper.Abstraction;
 import tests.TestHelper.StackSymbol;
+import wpds.impl.NoWeight;
 import wpds.impl.PAutomaton;
 import wpds.impl.PushdownSystem;
 import wpds.impl.SummaryNestedWeightedPAutomatons;
 import wpds.impl.Transition;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.ReachabilityListener;
 
 public class ForwardDFSVisitorTest {

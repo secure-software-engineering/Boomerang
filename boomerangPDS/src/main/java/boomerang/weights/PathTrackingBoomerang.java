@@ -18,6 +18,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
+import javax.annotation.Nonnull;
 import sync.pds.solver.OneWeightFunctions;
 import sync.pds.solver.WeightFunctions;
 
@@ -26,11 +27,11 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
   private OneWeightFunctions<Edge, Val, Field, DataFlowPathWeight> fieldWeights;
   private PathTrackingWeightFunctions callWeights;
 
-  public PathTrackingBoomerang(FrameworkScope frameworkScope) {
+  public PathTrackingBoomerang(@Nonnull FrameworkScope frameworkScope) {
     super(frameworkScope);
   }
 
-  public PathTrackingBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
+  public PathTrackingBoomerang(@Nonnull FrameworkScope frameworkScope, BoomerangOptions options) {
     super(frameworkScope, options);
   }
 
@@ -55,13 +56,15 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
     return getOrCreateCallWeights();
   }
 
+  @Nonnull
   private WeightFunctions<Edge, Val, Field, DataFlowPathWeight> getOrCreateFieldWeights() {
     if (fieldWeights == null) {
-      fieldWeights = new OneWeightFunctions<>(DataFlowPathWeight.one());
+      fieldWeights = new OneWeightFunctions<>(DataFlowPathWeightOne.one());
     }
     return fieldWeights;
   }
 
+  @Nonnull
   private WeightFunctions<Edge, Val, Edge, DataFlowPathWeight> getOrCreateCallWeights() {
     if (callWeights == null) {
       callWeights =
