@@ -28,6 +28,8 @@ public class NumWeightOne implements NumWeight {
 
   }
 
+
+
   public static NumWeightOne one() {
     return one;
   }
@@ -41,7 +43,7 @@ public class NumWeightOne implements NumWeight {
 
 
      NumWeightOne o = (NumWeightOne) other;
-    return new NumWeightImpl(o.getI() + getI());
+    return new NumWeightOne(o.getI() + getI());
     
   }
 

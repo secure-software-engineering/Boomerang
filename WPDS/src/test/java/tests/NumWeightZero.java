@@ -27,7 +27,9 @@ public class NumWeightZero implements NumWeight {
   public static NumWeightZero zero() {
     return zero;
   }
+  public NumWeightZero(int i) {
 
+  }
 
 
 
@@ -38,10 +40,14 @@ public class NumWeightZero implements NumWeight {
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
 
-    throw new IllegalStateException("nope");
-    /*NumWeightOne o = (NumWeightOne) other;
-    return new NumWeightOne(o.i + i);
-    */
+
+     NumWeightZero o = (NumWeightZero) other;
+    return new NumWeightZero(o.getI() + getI());
+
+  }
+
+  private int getI() {
+  return 0;
   }
 
   @Nonnull
@@ -49,13 +55,9 @@ public class NumWeightZero implements NumWeight {
   public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
-    throw new IllegalStateException("nope");
-/*
-    NumWeightOne o = (NumWeightOne) other;
-    if (o.i == i) return o;
-    return zero();
-    *
- */
+    NumWeightZero o = (NumWeightZero) other;
+    return new NumWeightZero(o.getI() + getI());
+
   }
 
 
