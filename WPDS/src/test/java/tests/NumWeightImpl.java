@@ -21,7 +21,7 @@ import static tests.NumWeightZero.zero;
 
 public class NumWeightImpl implements NumWeight {
 
-  private int i;
+  int i;
 
   public NumWeightImpl(int i) {
     this.i = i;

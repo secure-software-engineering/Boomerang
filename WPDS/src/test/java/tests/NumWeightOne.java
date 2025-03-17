@@ -47,10 +47,8 @@ public class NumWeightOne implements NumWeight {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
 
-
-    NumWeightOne o = (NumWeightOne) other;
-    if (o.i == i) return o;
-    return zero();
+NumWeightImpl o = (NumWeightImpl) other;
+    return new NumWeightImpl(o.i + i);
 
 
   }
