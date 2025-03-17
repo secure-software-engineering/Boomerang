@@ -11,24 +11,16 @@
  */
 package tests;
 
-import wpds.impl.Weight;
+import static tests.NumWeightZero.zero;
 
 import javax.annotation.Nonnull;
-
-import static tests.NumWeightZero.zero;
+import wpds.impl.Weight;
 
 public class NumWeightOne implements NumWeight {
 
   @Nonnull private static final NumWeightOne one = new NumWeightOne();
 
-
-  public NumWeightOne() {}
-
-  public NumWeightOne(int i) {
-
-  }
-
-
+  private NumWeightOne() {}
 
   public static NumWeightOne one() {
     return one;
@@ -41,10 +33,8 @@ public class NumWeightOne implements NumWeight {
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
 
-
-     NumWeightOne o = (NumWeightOne) other;
-    return new NumWeightOne(o.getI() + getI());
-    
+    NumWeightOne o = (NumWeightOne) other;
+    return new NumWeightOne();
   }
 
   @Nonnull
@@ -52,11 +42,9 @@ public class NumWeightOne implements NumWeight {
   public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
-
-    NumWeightOne o = (NumWeightOne) other;
-    return new NumWeightOne(o.getI() + getI());
-
-
+    NumWeightImpl o = (NumWeightImpl) other;
+    if (o.getI() == getI()) return o;
+    return zero();
   }
 
   private int getI() {
@@ -67,6 +55,4 @@ public class NumWeightOne implements NumWeight {
   public String toString() {
     return "<ONE>";
   }
-
-
 }

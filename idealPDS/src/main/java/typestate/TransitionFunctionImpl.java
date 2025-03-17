@@ -11,6 +11,9 @@
  */
 package typestate;
 
+import static typestate.TransitionFunctionOne.one;
+import static typestate.TransitionFunctionZero.zero;
+
 import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -23,9 +26,6 @@ import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
 import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
-
-import static typestate.TransitionFunctionOne.one;
-import static typestate.TransitionFunctionZero.zero;
 
 public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull private final Set<? extends Transition> values;
@@ -59,7 +59,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
   public Weight extendWith(@Nonnull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
-     if (other.equals(zero()) || this.equals(zero())) {
+    if (other.equals(zero()) || this.equals(zero())) {
       return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -87,13 +87,17 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    if (!(other instanceof TransitionFunction)) { throw new RuntimeException();}
-   if (this.equals(zero())) return other;
+    if (!(other instanceof TransitionFunction)) {
+      throw new RuntimeException();
+    }
+    if (this.equals(zero())) return other;
     if (other.equals(zero())) return this;
-    if (other.equals(one()) && this.equals(one())) {return one();}
+    if (other.equals(one()) && this.equals(one())) {
+      return one();
+    }
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-     if (other.equals(one()) || this.equals(one())) {
+    if (other.equals(one()) || this.equals(one())) {
       Set<Transition> transitions = new HashSet<>((other.equals(one()) ? values : func.values));
       Set<Transition> idTransitions = Sets.newHashSet();
       for (Transition t : transitions) {

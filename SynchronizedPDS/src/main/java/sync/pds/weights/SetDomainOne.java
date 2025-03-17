@@ -11,18 +11,12 @@
  */
 package sync.pds.weights;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import javax.annotation.Nonnull;
-
-import com.google.common.collect.Sets;
-import sync.pds.solver.nodes.Node;
-import wpds.impl.Weight;
-
 import static sync.pds.weights.SetDomainZero.zero;
 
-
+import java.util.Collection;
+import javax.annotation.Nonnull;
+import sync.pds.solver.nodes.Node;
+import wpds.impl.Weight;
 
 public class SetDomainOne implements SetDomain {
   @Nonnull private static final SetDomainOne one = new SetDomainOne();
@@ -53,9 +47,9 @@ public class SetDomainOne implements SetDomain {
 
     if (other instanceof SetDomainOne) {
       throw new IllegalStateException("SetDomainOne.CombineWith-Dont");
-//      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(getNodes());
-//      merged.addAll(((SetDomainImpl) other).getNodes());
-//      return new SetDomainImpl<N, Stmt, Fact>(merged);
+      //      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(getNodes());
+      //      merged.addAll(((SetDomainImpl) other).getNodes());
+      //      return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
     return zero();
   }

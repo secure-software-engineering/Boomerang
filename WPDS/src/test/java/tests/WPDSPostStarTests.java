@@ -43,8 +43,8 @@ public class WPDSPostStarTests {
     pds.addRule(wnormal(2, "b", 3, "c", w(3)));
     WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(fa.getTransitions().size(), 3);
-    assertEquals(fa.getStates().size(), 4);
+    assertEquals(3, fa.getTransitions().size());
+    assertEquals(4, fa.getStates().size());
     assertEquals(fa.getWeightFor(t(3, "c", ACC)), w(5));
   }
 

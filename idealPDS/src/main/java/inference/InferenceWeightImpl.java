@@ -11,15 +11,15 @@
  */
 package inference;
 
+import static inference.InferenceWeightOne.one;
+import static inference.InferenceWeightZero.zero;
+
 import boomerang.scope.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import wpds.impl.Weight;
-
-import static inference.InferenceWeightOne.one;
-import static inference.InferenceWeightZero.zero;
 
 public class InferenceWeightImpl implements InferenceWeight {
 
@@ -39,7 +39,7 @@ public class InferenceWeightImpl implements InferenceWeight {
   }
 
   @Nonnull
-@Override
+  @Override
   public Weight extendWith(@Nonnull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;

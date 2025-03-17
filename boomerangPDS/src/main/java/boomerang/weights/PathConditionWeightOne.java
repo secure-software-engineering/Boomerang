@@ -16,41 +16,37 @@ import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import wpds.impl.Weight;
-
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import wpds.impl.Weight;
 
 public class PathConditionWeightOne implements PathConditionWeight {
 
-
   @Nonnull private static final PathConditionWeightOne one = new PathConditionWeightOne();
 
-  public PathConditionWeightOne(Map<Statement, ConditionDomain> newIfs, Map<Val, ConditionDomain> newVals, Set<Val> newReturnVals, Map<Method, Statement> calleeToCallSiteMapping) {
+  public PathConditionWeightOne(
+      Map<Statement, ConditionDomain> newIfs,
+      Map<Val, ConditionDomain> newVals,
+      Set<Val> newReturnVals,
+      Map<Method, Statement> calleeToCallSiteMapping) {
     throw new IllegalStateException("PathConditionWeightOne.ExtendWeight called");
   }
 
   public Map<? extends Statement, ? extends ConditionDomain> getIfStatements() {
     throw new IllegalStateException("PathConditionWeightOne.getIfStatements() - don't");
-
   }
 
   public Map<? extends Val, ? extends ConditionDomain> getVariableToValue() {
     throw new IllegalStateException("PathConditionWeightOne.getVariableToValue() - don't");
-
   }
-
 
   public Set<Val> getReturnVals() {
     throw new IllegalStateException("PathConditionWeightOne.getReturnVals() - don't");
-
   }
-
 
   public Map<Method, Statement> getCalleeToCallSite() {
     throw new IllegalStateException("PathConditionWeightOne.getCalleeToCallSite() - don't");
-
   }
 
   public PathConditionWeightOne() {}
@@ -59,18 +55,13 @@ public class PathConditionWeightOne implements PathConditionWeight {
     return one;
   }
 
-
   public PathConditionWeightOne(Statement callSite, Method callee) {
     this.getCalleeToCallSite().put(callee, callSite);
   }
 
-
-
   public PathConditionWeightOne(Val returnVal) {
     this.getReturnVals().add(returnVal);
   }
-
-
 
   public enum ConditionDomain {
     TRUE,
@@ -88,7 +79,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
     Map<Statement, ConditionDomain> newIfs = Maps.newHashMap();
 
     newIfs.putAll(getIfStatements());
-    for (Map.Entry<? extends Statement, ? extends ConditionDomain> e : other.getIfStatements().entrySet()) {
+    for (Map.Entry<? extends Statement, ? extends ConditionDomain> e :
+        other.getIfStatements().entrySet()) {
       if (newIfs.containsKey(e.getKey()) && e.getValue().equals(ConditionDomain.TOP)) {
         newIfs.put(e.getKey(), ConditionDomain.TOP);
       } else {
@@ -99,7 +91,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
     Map<Val, ConditionDomain> newVals = Maps.newHashMap();
 
     newVals.putAll(getVariableToValue());
-    for (Map.Entry<? extends Val, ? extends ConditionDomain> e : other.getVariableToValue().entrySet()) {
+    for (Map.Entry<? extends Val, ? extends ConditionDomain> e :
+        other.getVariableToValue().entrySet()) {
       if (newVals.containsKey(e.getKey()) && e.getValue().equals(ConditionDomain.TOP)) {
         newVals.put(e.getKey(), ConditionDomain.TOP);
       } else {
@@ -136,7 +129,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
     }
     PathConditionWeightOne other = (PathConditionWeightOne) o;
     Map<Statement, ConditionDomain> newIfs = Maps.newHashMap();
-    for (Map.Entry<? extends Statement, ? extends ConditionDomain> e : getIfStatements().entrySet()) {
+    for (Map.Entry<? extends Statement, ? extends ConditionDomain> e :
+        getIfStatements().entrySet()) {
       if (other.getIfStatements().containsKey(e.getKey())) {
         ConditionDomain otherVal = other.getIfStatements().get(e.getKey());
         if (e.getValue().equals(otherVal)) {
@@ -148,7 +142,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
         newIfs.put(e.getKey(), e.getValue());
       }
     }
-    for (Map.Entry<? extends Statement, ? extends ConditionDomain> e : other.getIfStatements().entrySet()) {
+    for (Map.Entry<? extends Statement, ? extends ConditionDomain> e :
+        other.getIfStatements().entrySet()) {
       if (!getIfStatements().containsKey(e.getKey())) {
         newIfs.put(e.getKey(), e.getValue());
       }
@@ -167,7 +162,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
         newVals.put(e.getKey(), e.getValue());
       }
     }
-    for (Map.Entry<? extends Val, ? extends ConditionDomain> e : other.getVariableToValue().entrySet()) {
+    for (Map.Entry<? extends Val, ? extends ConditionDomain> e :
+        other.getVariableToValue().entrySet()) {
       if (!getVariableToValue().containsKey(e.getKey())) {
         newVals.put(e.getKey(), e.getValue());
       }
@@ -198,7 +194,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((getIfStatements() == null) ? 0 : getIfStatements().hashCode());
-    result = prime * result + ((getVariableToValue() == null) ? 0 : getVariableToValue().hashCode());
+    result =
+        prime * result + ((getVariableToValue() == null) ? 0 : getVariableToValue().hashCode());
     return result;
   }
 

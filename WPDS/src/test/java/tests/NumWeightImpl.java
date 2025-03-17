@@ -11,26 +11,24 @@
  */
 package tests;
 
+import static tests.NumWeightOne.one;
+import static tests.NumWeightZero.zero;
+
 import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
-import static tests.NumWeightOne.one;
-
-import static tests.NumWeightZero.zero;
-
-
 public class NumWeightImpl implements NumWeight {
-
-
 
   private int i;
 
   public NumWeightImpl(int i) {
     this.i = i;
   }
+
   public int getI() {
     return i;
   }
+
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
@@ -50,12 +48,6 @@ public class NumWeightImpl implements NumWeight {
     if (o.i == i) return o;
     return zero();
   }
-
-
-
-
-
-
 
   @Override
   public String toString() {

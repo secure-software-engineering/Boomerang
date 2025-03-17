@@ -11,27 +11,21 @@
  */
 package tests;
 
-import wpds.impl.Weight;
+import static tests.NumWeightOne.one;
 
 import javax.annotation.Nonnull;
-
-import static tests.NumWeightOne.one;
+import wpds.impl.Weight;
 
 public class NumWeightZero implements NumWeight {
 
   @Nonnull private static final NumWeightZero zero = new NumWeightZero();
 
-  public NumWeightZero() {}
+  private NumWeightZero() {}
 
   @Nonnull
   public static NumWeightZero zero() {
     return zero;
   }
-  public NumWeightZero(int i) {
-
-  }
-
-
 
   @Nonnull
   @Override
@@ -40,14 +34,12 @@ public class NumWeightZero implements NumWeight {
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
 
-
-     NumWeightZero o = (NumWeightZero) other;
-    return new NumWeightZero(o.getI() + getI());
-
+    NumWeightZero o = (NumWeightZero) other;
+    return new NumWeightZero();
   }
 
   private int getI() {
-  return 0;
+    return 0;
   }
 
   @Nonnull
@@ -55,18 +47,13 @@ public class NumWeightZero implements NumWeight {
   public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
-    NumWeightZero o = (NumWeightZero) other;
-    return new NumWeightZero(o.getI() + getI());
-
+    NumWeightImpl o = (NumWeightImpl) other;
+    if (o.getI() == getI()) return o;
+    return zero();
   }
-
-
-
 
   @Override
   public String toString() {
     return "<ZERO>";
   }
-
-
 }

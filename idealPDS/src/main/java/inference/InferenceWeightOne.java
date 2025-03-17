@@ -22,15 +22,13 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-import javax.annotation.Nonnull;
+import static inference.InferenceWeightZero.zero;
 
 import boomerang.scope.Method;
-import wpds.impl.Weight;
-
 import java.util.HashSet;
 import java.util.Set;
-
-import static inference.InferenceWeightZero.zero;
+import javax.annotation.Nonnull;
+import wpds.impl.Weight;
 
 public class InferenceWeightOne implements InferenceWeight {
 
@@ -42,7 +40,6 @@ public class InferenceWeightOne implements InferenceWeight {
   public Set<Method> getInvokedMethods() {
     throw new IllegalStateException("InferenceWeightOne.getInvoke -dont");
   }
-
 
   @Nonnull
   @Override

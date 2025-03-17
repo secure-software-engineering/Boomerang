@@ -23,9 +23,6 @@ import wpds.impl.Weight;
 
 public class PathConditionWeightImpl implements PathConditionWeight {
 
-
-
-
   private Map<Statement, ConditionDomain> ifStatements = Maps.newHashMap();
   private Map<Val, ConditionDomain> variableToValue = Maps.newHashMap();
   private Set<Val> returnVals = Sets.newHashSet();
@@ -39,11 +36,9 @@ public class PathConditionWeightImpl implements PathConditionWeight {
     return variableToValue;
   }
 
-
   public Set<Val> getReturnVals() {
     return returnVals;
   }
-
 
   public Map<Method, Statement> getCalleeToCallSite() {
     return calleeToCallSite;
@@ -52,8 +47,6 @@ public class PathConditionWeightImpl implements PathConditionWeight {
   public PathConditionWeightImpl(Statement callSite, Method callee) {
     this.calleeToCallSite.put(callee, callSite);
   }
-
-
 
   public PathConditionWeightImpl(Val returnVal) {
     this.returnVals.add(returnVal);
@@ -78,7 +71,7 @@ public class PathConditionWeightImpl implements PathConditionWeight {
     variableToValue.put(val, c);
   }
 
-    @Nonnull
+  @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight o) {
     if (!(o instanceof PathConditionWeightImpl)) {

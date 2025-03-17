@@ -11,19 +11,18 @@
  */
 package typestate;
 
+import static typestate.TransitionFunctionZero.zero;
+
 import boomerang.scope.ControlFlowGraph;
+import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
-
-import com.google.common.collect.Sets;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
 import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
-
-import static typestate.TransitionFunctionZero.zero;
 
 public class TransitionFunctionOne implements TransitionFunction {
 
@@ -48,7 +47,7 @@ public class TransitionFunctionOne implements TransitionFunction {
         "TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
   }
 
-   @Override
+  @Override
   public Weight extendWith(Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
@@ -80,14 +79,19 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    if (!(other instanceof TransitionFunction)) { throw new RuntimeException();}
-   if (this.equals(zero())) return other;
+    if (!(other instanceof TransitionFunction)) {
+      throw new RuntimeException();
+    }
+    if (this.equals(zero())) return other;
     if (other.equals(zero())) return this;
-    if (other.equals(one()) && this.equals(one())) {return one();}
+    if (other.equals(one()) && this.equals(one())) {
+      return one();
+    }
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-     if (other.equals(one()) || this.equals(one())) {
-      Set<Transition> transitions = new HashSet<>((other.equals(one()) ? getValues() : func.getValues()));
+    if (other.equals(one()) || this.equals(one())) {
+      Set<Transition> transitions =
+          new HashSet<>((other.equals(one()) ? getValues() : func.getValues()));
       Set<Transition> idTransitions = Sets.newHashSet();
       for (Transition t : transitions) {
         idTransitions.add(new TransitionImpl(t.from(), t.from()));
@@ -96,11 +100,14 @@ public class TransitionFunctionOne implements TransitionFunction {
       return new TransitionFunctionImpl(
           transitions,
           Sets.newHashSet(
-              (other.equals(one()) ? getStateChangeStatements() : func.getStateChangeStatements())));
+              (other.equals(one())
+                  ? getStateChangeStatements()
+                  : func.getStateChangeStatements())));
     }
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(getValues());
-    HashSet<ControlFlowGraph.Edge> newStateChangeStmts = Sets.newHashSet(getStateChangeStatements());
+    HashSet<ControlFlowGraph.Edge> newStateChangeStmts =
+        Sets.newHashSet(getStateChangeStatements());
     newStateChangeStmts.addAll(func.getStateChangeStatements());
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
   }
