@@ -20,6 +20,7 @@ import static tests.NumWeightZero.zero;
 public class NumWeightOne implements NumWeight {
 
   @Nonnull private static final NumWeightOne one = new NumWeightOne();
+  private int i;
 
   public NumWeightOne() {}
 
@@ -34,10 +35,10 @@ public class NumWeightOne implements NumWeight {
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
 
-    throw new IllegalStateException("nope");
-    /*NumWeightOne o = (NumWeightOne) other;
-    return new NumWeightOne(o.i + i);
-    */
+
+     NumWeightOne o = (NumWeightOne) other;
+    return new NumWeightImpl(o.i + i);
+    
   }
 
   @Nonnull
@@ -45,13 +46,13 @@ public class NumWeightOne implements NumWeight {
   public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
-    throw new IllegalStateException("nope");
-/*
+
+
     NumWeightOne o = (NumWeightOne) other;
     if (o.i == i) return o;
     return zero();
-    *
- */
+
+
   }
 
   @Override
