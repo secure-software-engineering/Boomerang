@@ -11,18 +11,9 @@
  */
 package tests;
 
-import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
 public interface NumWeight extends Weight {
 
-  int getWeight();
-
-  @Nonnull
-  @Override
-  Weight extendWith(@Nonnull Weight other);
-
-  @Nonnull
-  @Override
-  Weight combineWith(@Nonnull Weight other);
+  int getI();
 }

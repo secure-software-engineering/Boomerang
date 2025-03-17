@@ -19,13 +19,13 @@ import wpds.impl.Weight;
 
 public class NumWeightImpl implements NumWeight {
 
-  private int i;
+  private final int i;
 
   public NumWeightImpl(int i) {
     this.i = i;
   }
 
-  public int getWeight() {
+  public int getI() {
     return i;
   }
 
@@ -35,8 +35,8 @@ public class NumWeightImpl implements NumWeight {
     if (this.equals(one())) return other;
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
-    NumWeightImpl o = (NumWeightImpl) other;
-    return new NumWeightImpl(o.i + i);
+    NumWeight o = (NumWeight) other;
+    return new NumWeightImpl(o.getI() + getI());
   }
 
   @Nonnull
@@ -44,8 +44,8 @@ public class NumWeightImpl implements NumWeight {
   public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
-    NumWeightImpl o = (NumWeightImpl) other;
-    if (o.i == i) return o;
+    NumWeight o = (NumWeight) other;
+    if (o.getI() == getI()) return o;
     return zero();
   }
 

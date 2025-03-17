@@ -27,7 +27,7 @@ public class NumWeightOne implements NumWeight {
   }
 
   @Override
-  public int getWeight() {
+  public int getI() {
     return 0;
   }
 
@@ -37,8 +37,8 @@ public class NumWeightOne implements NumWeight {
     if (this.equals(one())) return other;
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
-    NumWeightImpl o = (NumWeightImpl) other;
-    return new NumWeightImpl(o.getWeight() + getWeight());
+    NumWeight o = (NumWeight) other;
+    return new NumWeightImpl(o.getI() + getI());
   }
 
   @Nonnull
@@ -46,8 +46,8 @@ public class NumWeightOne implements NumWeight {
   public Weight combineWith(@Nonnull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
-    NumWeightImpl o = (NumWeightImpl) other;
-    if (o.getWeight() == getWeight()) return o;
+    NumWeight o = (NumWeight) other;
+    if (o.getI() == getI()) return o;
     return zero();
   }
 
