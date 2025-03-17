@@ -27,19 +27,19 @@ public class NumWeightZero implements NumWeight {
     return zero;
   }
 
+  @Override
+  public int getWeight() {
+    return 0;
+  }
+
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
     if (this.equals(one())) return other;
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
-
-    NumWeightZero o = (NumWeightZero) other;
-    return new NumWeightZero();
-  }
-
-  private int getI() {
-    return 0;
+    NumWeightImpl o = (NumWeightImpl) other;
+    return new NumWeightImpl(o.getWeight() + getWeight());
   }
 
   @Nonnull
@@ -48,7 +48,7 @@ public class NumWeightZero implements NumWeight {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
     NumWeightImpl o = (NumWeightImpl) other;
-    if (o.getI() == getI()) return o;
+    if (o.getWeight() == getWeight()) return o;
     return zero();
   }
 

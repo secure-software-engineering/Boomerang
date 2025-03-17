@@ -25,7 +25,7 @@ public class NumWeightImpl implements NumWeight {
     this.i = i;
   }
 
-  public int getI() {
+  public int getWeight() {
     return i;
   }
 
