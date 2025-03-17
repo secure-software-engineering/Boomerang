@@ -20,9 +20,13 @@ import static tests.NumWeightZero.zero;
 public class NumWeightOne implements NumWeight {
 
   @Nonnull private static final NumWeightOne one = new NumWeightOne();
-  private int i;
+
 
   public NumWeightOne() {}
+
+  public NumWeightOne(int i) {
+
+  }
 
   public static NumWeightOne one() {
     return one;
@@ -37,7 +41,7 @@ public class NumWeightOne implements NumWeight {
 
 
      NumWeightOne o = (NumWeightOne) other;
-    return new NumWeightImpl(o.i + i);
+    return new NumWeightImpl(o.getI() + getI());
     
   }
 
@@ -47,10 +51,14 @@ public class NumWeightOne implements NumWeight {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
 
-NumWeightImpl o = (NumWeightImpl) other;
-    return new NumWeightImpl(o.i + i);
+    NumWeightOne o = (NumWeightOne) other;
+    return new NumWeightOne(o.getI() + getI());
 
 
+  }
+
+  private int getI() {
+    return 0;
   }
 
   @Override

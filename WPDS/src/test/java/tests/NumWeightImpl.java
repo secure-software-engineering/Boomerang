@@ -21,12 +21,16 @@ import static tests.NumWeightZero.zero;
 
 public class NumWeightImpl implements NumWeight {
 
-  int i;
+
+
+  private int i;
 
   public NumWeightImpl(int i) {
     this.i = i;
   }
-
+  public int getI() {
+    return i;
+  }
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
