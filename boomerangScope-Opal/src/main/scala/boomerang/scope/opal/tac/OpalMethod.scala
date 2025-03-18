@@ -2,10 +2,9 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope._
 import boomerang.scope.opal.OpalClient
-import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall, UVar}
+import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall}
 
 import java.util
-import scala.jdk.CollectionConverters._
 
 case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
 

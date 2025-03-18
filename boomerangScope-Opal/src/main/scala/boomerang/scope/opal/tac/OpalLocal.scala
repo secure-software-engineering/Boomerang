@@ -137,20 +137,22 @@ class OpalLocal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod,
         case dVar: DVar[_] if other.delegate.isInstanceOf[UVar[_]] =>
           val otherVar = other.delegate.asInstanceOf[UVar[ValueInformation]]
 
-          // Parameter vars have no corresponding DVar
-          if (otherVar.definedBy.head < 0) {
-            return false
-          }
+          otherVar.definedBy.foreach(defSite => {
+            // Consider only non-parameter DVars
+            if (defSite >= 0) {
+              val tac = OpalClient.getTacForMethod(method.delegate)
+              val defStmt = tac.stmts(defSite)
 
-          val tac = OpalClient.getTacForMethod(method.delegate)
-          val defStmt = tac.stmts(otherVar.definedBy.head)
+              if (defStmt.isAssignment) {
+                val targetVar = defStmt.asAssignment.targetVar
+                if (super.equals(other) && dVar.hashCode() == targetVar.hashCode()) {
+                  return true
+                }
+              }
+            }
+          })
 
-          if (!defStmt.isAssignment) {
-            return false
-          }
-
-          val targetVar = defStmt.asAssignment.targetVar
-          super.equals(other) && dVar.hashCode() == targetVar.hashCode()
+          false
         case _: UVar[_] if other.delegate.isInstanceOf[UVar[_]] =>
           super.equals(other) && this.delegate.hashCode() == other.delegate.hashCode()
         case _ => throw new RuntimeException("Cannot compare a variable with a non variable")

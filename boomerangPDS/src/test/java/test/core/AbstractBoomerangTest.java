@@ -239,7 +239,7 @@ public class AbstractBoomerangTest extends TestingFramework {
       InvokeExpr ie = stmt.getStart().getInvokeExpr();
       Val arg = ie.getArg(1);
       Collection<String> expectedResults = parse(arg);
-      LOGGER.info("Expected results: {}", expectedResults);
+      LOGGER.info("Expected results: {}", String.join("\n - ", expectedResults));
       boolean imprecise = false;
       for (Node<Edge, Val> v : backwardResults) {
         if (v.fact() instanceof AllocVal) {
@@ -308,10 +308,10 @@ public class AbstractBoomerangTest extends TestingFramework {
       Collection<? extends Query> expectedResults,
       Collection<? extends Node<Edge, Val>> results,
       AnalysisMode analysis) {
-    LOGGER.info("Boomerang Results: {}", results);
+    LOGGER.info("Boomerang Results:\n - {}", results.stream().map(r -> r.fact().toString()).collect(Collectors.joining("\n - ")));
     LOGGER.info(
-        "Expected Results: {}",
-        expectedResults.stream().map(Query::var).collect(Collectors.toList()));
+        "Expected Results:\n - {}",
+        expectedResults.stream().map(r -> r.var().toString()).collect(Collectors.joining("\n - ")));
     Collection<Node<Edge, Val>> falseNegativeAllocationSites = new HashSet<>();
     for (Query res : expectedResults) {
       if (!results.contains(res.asNode())) falseNegativeAllocationSites.add(res.asNode());
@@ -349,9 +349,5 @@ public class AbstractBoomerangTest extends TestingFramework {
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);
     }
-  }
-
-  protected DataFlowScope getDataFlowScope() {
-    return null;
   }
 }
