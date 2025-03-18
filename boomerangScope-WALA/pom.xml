@@ -5,10 +5,20 @@
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
         <artifactId>Boomerang-Parent</artifactId>
-        <version>3.2.4-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>boomerangScope-WALA</artifactId>
+
+    <name>BoomerangScope-WALA</name>
+    <description>Scope implementation to run Boomerang and IDEal with WALA</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
 
     <properties>
         <wala.version>1.6.9</wala.version>

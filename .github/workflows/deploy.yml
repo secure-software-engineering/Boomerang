@@ -56,6 +56,6 @@ jobs:
 
       - name: Create PR for SNAPSHOT version
         run: |
-          gh pr create -B develop -H ${{ env.BRANCH_NAME }} -t "Update to next SNAPSHOT version" -b "Update to next SNAPSHOT version"
+          gh pr create --draft -B develop -H ${{ env.BRANCH_NAME }} -t "Update to next SNAPSHOT version" -b "Update to next SNAPSHOT version"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
