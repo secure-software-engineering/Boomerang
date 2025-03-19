@@ -14,7 +14,6 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Field;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
@@ -33,11 +32,6 @@ public class JimpleStaticFieldVal extends StaticFieldVal {
     this.field = field;
   }
 
-  @Override
-  public boolean isStatic() {
-    return true;
-  }
-
   public Field field() {
     return field;
   }
@@ -53,128 +47,8 @@ public class JimpleStaticFieldVal extends StaticFieldVal {
   }
 
   @Override
-  public boolean isNewExpr() {
-    return false;
-  }
-
-  @Override
-  public Type getNewExprType() {
-    throw new RuntimeException("Fault!");
-  }
-
-  @Override
-  public boolean isLocal() {
-    return false;
-  }
-
-  @Override
-  public boolean isArrayAllocationVal() {
-    return false;
-  }
-
-  @Override
-  public Val getArrayAllocationSize() {
-    throw new RuntimeException("Static Val is not an array allocation val");
-  }
-
-  @Override
-  public boolean isNull() {
-    return false;
-  }
-
-  @Override
-  public boolean isStringConstant() {
-    return false;
-  }
-
-  @Override
-  public String getStringValue() {
-    throw new RuntimeException("Fault!");
-  }
-
-  @Override
-  public boolean isStringBufferOrBuilder() {
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return false;
-  }
-
-  @Override
-  public boolean isCast() {
-    return false;
-  }
-
-  @Override
-  public Val getCastOp() {
-    throw new RuntimeException("Fault!");
-  }
-
-  @Override
-  public boolean isArrayRef() {
-    return false;
-  }
-
-  @Override
-  public boolean isInstanceOfExpr() {
-    return false;
-  }
-
-  @Override
-  public Val getInstanceOfOp() {
-    throw new RuntimeException("Fault!");
-  }
-
-  @Override
-  public boolean isLengthExpr() {
-    return false;
-  }
-
-  @Override
-  public Val getLengthOp() {
-    throw new RuntimeException("Fault!");
-  }
-
-  @Override
-  public boolean isIntConstant() {
-    return false;
-  }
-
-  @Override
-  public boolean isClassConstant() {
-    return false;
-  }
-
-  @Override
-  public Type getClassConstantType() {
-    throw new RuntimeException("Fault!");
-  }
-
-  @Override
   public Val withNewMethod(Method callee) {
     return new JimpleStaticFieldVal(field, callee);
-  }
-
-  @Override
-  public boolean isLongConstant() {
-    return false;
-  }
-
-  @Override
-  public int getIntValue() {
-    return -1;
-  }
-
-  @Override
-  public long getLongValue() {
-    return -1;
-  }
-
-  @Override
-  public Pair<Val, Integer> getArrayBase() {
-    return null;
   }
 
   @Override

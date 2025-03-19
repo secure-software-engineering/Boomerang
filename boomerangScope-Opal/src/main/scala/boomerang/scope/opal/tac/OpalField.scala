@@ -1,10 +1,15 @@
 package boomerang.scope.opal.tac
 
-import boomerang.scope.Field
+import boomerang.scope.{Field, Type}
+import org.opalj.br.{FieldType, ObjectType}
 
-case class OpalField(delegate: org.opalj.br.Field) extends Field {
+case class OpalField(declaringClass: ObjectType, fieldType: FieldType, name: String) extends Field {
 
-  override def isInnerClassField: Boolean = delegate.name.contains("$")
+  override def isPredefinedField: Boolean = false
 
-  override def toString: String = delegate.toJava
+  override def isInnerClassField: Boolean = declaringClass.fqn.contains("$")
+
+  override def getType: Type = OpalType(fieldType)
+
+  override def toString: String = s"<${declaringClass.fqn}>.${fieldType.toJava} $name"
 }

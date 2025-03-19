@@ -25,20 +25,4 @@ object OpalClient {
 
   def getTacForMethod(method: Method): AITACode[TACMethodParameter, ValueInformation] = tacCodes.get(method)
 
-  def resolveFieldStore(stmt: FieldWriteAccessStmt[_]): Option[Field] = stmt.resolveField(project.get)
-
-  def resolveFieldLoad(expr: FieldRead[_]): Option[Field] = expr.resolveField(project.get)
-
-  def resolveMethodRef(declaringClass: ReferenceType, name: String, methodDescriptor: MethodDescriptor): Option[DefinedMethod] = {
-    val method = project.get.resolveMethodReference(declaringClass, name, methodDescriptor, forceLookupInSuperinterfacesOnFailure = true)
-
-    if (method.isDefined) {
-      val declaredMethod = declaredMethods.get(method.get)
-
-      return Some(declaredMethod)
-    }
-
-    None
-  }
-
 }

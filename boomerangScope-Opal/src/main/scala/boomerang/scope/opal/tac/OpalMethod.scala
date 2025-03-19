@@ -15,7 +15,7 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
   private var localCache: Option[util.Set[Val]] = None
   private var parameterLocalCache: Option[util.List[Val]] = None
 
-  private val cfg = new OpalControlFlowGraph(this)
+  private val cfg = new OpalControlFlowGraph(delegate)
 
   override def isStaticInitializer: Boolean = delegate.isStaticInitializer
 
@@ -59,45 +59,23 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
     if (localCache.isEmpty) {
       localCache = Some(new util.HashSet[Val]())
 
+      // 'this' local
+      if (!isStatic) {
+        localCache.get.add(getThisLocal)
+      }
+
+      // Parameter locals
+      localCache.get.addAll(getParameterLocals)
+
       val tac = OpalClient.getTacForMethod(delegate)
 
-      for (stmt <- tac.stmts) {
-        if (stmt.isMethodCall) {
-          // Extract the base
-          if (stmt.isInstanceOf[InstanceMethodCall[_]]) {
-            val base = new OpalLocal(stmt.asInstanceMethodCall.receiver, this)
-            localCache.get.add(base)
-          }
-
-          // Parameters of method calls
-          stmt.asMethodCall.params.foreach(param => {
-            if (param.isVar) {
-              localCache.get.add(new OpalLocal(param, this))
-            }
-          })
-        }
-
+      tac.stmts.foreach(stmt => {
+        // Locals are always defined as DVar
         if (stmt.isAssignment) {
-          // Target variable
           val targetVar = stmt.asAssignment.targetVar
           localCache.get.add(new OpalLocal(targetVar, this))
-
-          if (stmt.asAssignment.expr.isFunctionCall) {
-            // Extract the base
-            if (stmt.asAssignment.expr.isInstanceOf[InstanceFunctionCall[_]]) {
-              val base = new OpalLocal(stmt.asAssignment.expr.asInstanceFunctionCall.receiver, this)
-              localCache.get.add(base)
-            }
-
-            // Parameters of function call
-            stmt.asAssignment.expr.asFunctionCall.params.foreach(param => {
-              if (param.isVar) {
-                localCache.get.add(new OpalLocal(param, this))
-              }
-            })
-          }
         }
-      }
+      })
     }
 
     localCache.get
@@ -116,11 +94,6 @@ case class OpalMethod(delegate: org.opalj.br.Method) extends Method {
         val parameterLocal = new OpalParameterLocal(paramType, index, this)
         parameterLocalCache.get.add(parameterLocal)
       })
-
-      /*delegate.parameterTypes.foreach(param => {
-        val parameterLocal = new OpalParameterLocal(param, this)
-        parameterLocalCache.get.add(parameterLocal)
-      })*/
     }
 
     parameterLocalCache.get

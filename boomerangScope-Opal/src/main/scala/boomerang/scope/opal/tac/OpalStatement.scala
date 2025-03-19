@@ -34,17 +34,20 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def getWrittenField: Field = {
     if (isFieldStore) {
-      val resolvedField = OpalClient.resolveFieldStore(delegate.asPutField)
-      return OpalField(resolvedField.get)
+      val fieldStore = delegate.asPutField
+
+      return OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
     }
 
     if (isStaticFieldStore) {
-      val resolvedField = OpalClient.resolveFieldStore(delegate.asPutStatic)
-      return OpalField(resolvedField.get)
+      val fieldStore = delegate.asPutStatic
+
+      return OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
     }
 
     if (isArrayStore) {
       // TODO
+      val arrayStore = delegate.asArrayStore
       //val resolvedField = OpalClient.resolveFieldStore(delegate.asArrayStore)
       //return new OpalField(resolvedField.get)
     }
@@ -67,8 +70,9 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
   override def getLoadedField: Field = {
     // TODO Also array?
     if (isFieldLoad) {
-      val resolvedField = OpalClient.resolveFieldLoad(delegate.asAssignment.expr.asFieldRead)
-      return OpalField(resolvedField.get)
+      val fieldLoad = delegate.asAssignment.expr.asGetField
+
+      return OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
     }
 
     throw new RuntimeException("Statement is not a field load operation")
@@ -76,7 +80,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def isFieldLoadWithBase(base: Val): Boolean = {
     // TODO Also array?
-    if (delegate.isAssignment && isFieldLoad) {
+    if (isFieldLoad) {
       return getFieldLoad.getX.equals(base)
     }
 
@@ -200,47 +204,30 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def isMultiArrayAllocation: Boolean = false
 
-  override def isFieldStore: Boolean = {
-    if (!delegate.isPutField) {
-      return false
-    }
-
-    val field = OpalClient.resolveFieldStore(delegate.asPutField)
-    field.isDefined
-  }
+  override def isFieldStore: Boolean = delegate.isPutField
 
   override def isArrayStore: Boolean = delegate.isArrayStore
 
   override def isArrayLoad: Boolean = {
-    if (!delegate.isAssignment) {
-      return false
+    if (delegate.isAssignment) {
+      delegate.asAssignment.expr.isArrayLoad
     }
 
-    delegate.asAssignment.expr.isArrayLoad
+    false
   }
 
-  override def isFieldLoad: Boolean = {
-    if (!delegate.isAssignment) {
-      return false
-    }
-
-    if (!delegate.asAssignment.expr.isGetField) {
-      return false
-    }
-
-    val field = OpalClient.resolveFieldLoad(delegate.asAssignment.expr.asGetField)
-    field.isDefined
-  }
+  override def isFieldLoad: Boolean = delegate.isAssignment && delegate.asAssignment.expr.isGetField
 
   override def isIdentityStmt: Boolean = false
 
   override def getFieldStore: Pair[Val, Field] = {
     if (isFieldStore) {
-      val resolvedField = OpalClient.resolveFieldStore(delegate.asPutField).get
-      val ref = delegate.asPutField.objRef
+      val fieldStore = delegate.asPutField
 
-      // TODO
-      return new Pair(new OpalVal(ref, m), OpalField(resolvedField))
+      val local = new OpalLocal(fieldStore.objRef, m)
+      val field = OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
+
+      return new Pair(local, field)
     }
 
     throw new RuntimeException("Statement is not a field store operation")
@@ -248,50 +235,33 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def getFieldLoad: Pair[Val, Field] = {
     if (isFieldLoad) {
-      val resolvedField = OpalClient.resolveFieldLoad(delegate.asAssignment.expr.asFieldRead).get
-      val ref = delegate.asAssignment.expr.asGetField.objRef
+      val fieldLoad = delegate.asAssignment.expr.asGetField
 
-      // TODO
-      return new Pair(new OpalVal(ref, m), OpalField(resolvedField))
+      val local = new OpalLocal(fieldLoad.objRef, m)
+      val field = OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
+
+      return new Pair(local, field)
     }
 
     throw new RuntimeException("Statement is not a field load operation")
   }
 
-  override def isStaticFieldLoad: Boolean = {
-    if (!delegate.isAssignment) {
-      return false
-    }
+  override def isStaticFieldLoad: Boolean = delegate.isAssignment && delegate.asAssignment.expr.isGetStatic
 
-    if (!delegate.asAssignment.expr.isGetStatic) {
-      return false
-    }
-
-    val field = OpalClient.resolveFieldLoad(delegate.asAssignment.expr.asGetStatic)
-    field.isDefined
-  }
-
-  override def isStaticFieldStore: Boolean = {
-    if (!delegate.isPutStatic) {
-      return false
-    }
-
-    val field = OpalClient.resolveFieldStore(delegate.asPutStatic)
-    field.isDefined
-  }
+  override def isStaticFieldStore: Boolean = delegate.isPutStatic
 
   override def getStaticField: StaticFieldVal = {
     if (isStaticFieldLoad) {
-      val resolvedField = OpalClient.resolveFieldLoad(delegate.asAssignment.expr.asGetStatic)
-      val staticField = OpalField(resolvedField.get)
+      val staticFieldLoad = delegate.asAssignment.expr.asGetStatic
 
+      val staticField = OpalField(staticFieldLoad.declaringClass, staticFieldLoad.declaredFieldType, staticFieldLoad.name)
       return new OpalStaticFieldVal(staticField, m)
     }
 
     if (isStaticFieldStore) {
-      val resolvedField = OpalClient.resolveFieldStore(delegate.asPutStatic)
-      val staticField = OpalField(resolvedField.get)
+      val staticFieldStore = delegate.asPutStatic
 
+      val staticField = OpalField(staticFieldStore.declaringClass, staticFieldStore.declaredFieldType, staticFieldStore.name)
       return new OpalStaticFieldVal(staticField, m)
     }
 

@@ -12,6 +12,7 @@
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.Field;
+import boomerang.scope.Type;
 import java.util.Objects;
 import soot.SootField;
 
@@ -24,8 +25,18 @@ public class JimpleField extends Field {
   }
 
   @Override
+  public boolean isPredefinedField() {
+    return false;
+  }
+
+  @Override
   public boolean isInnerClassField() {
     return this.delegate.getName().contains("$");
+  }
+
+  @Override
+  public Type getType() {
+    return new JimpleType(delegate.getType());
   }
 
   public SootField getDelegate() {

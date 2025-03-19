@@ -170,7 +170,15 @@ public class Field implements Location {
     return this.equals(other);
   }
 
+  public boolean isPredefinedField() {
+    return true;
+  }
+
   public boolean isInnerClassField() {
     return false;
+  }
+
+  public Type getType() {
+    return null;
   }
 }

@@ -2,19 +2,19 @@ package boomerang.scope.opal
 
 import boomerang.scope.Statement
 import boomerang.scope.opal.tac.OpalMethod
-import boomerang.scope.test.targets.{A, HashCodeEqualsLocalTarget, ParameterLocalsTarget, ThisLocalTarget}
-import boomerang.scope.test.{BoomerangScopeTests, MethodSignature}
+import boomerang.scope.test.targets.{A, HashCodeEqualsLocalTarget, LocalCountTarget, ParameterLocalsTarget, ThisLocalTarget}
+import boomerang.scope.test.MethodSignature
 import org.junit.{Assert, Test}
 import org.opalj.br.IntegerType
 
 import java.util
 
-class OpalScopeTest extends BoomerangScopeTests {
+class OpalLocalTest {
 
   private val integerType = IntegerType.toJVMTypeName
 
   @Test
-  override def thisLocalTest(): Unit = {
+  def thisLocalTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ThisLocalTarget].getName)
 
@@ -42,7 +42,29 @@ class OpalScopeTest extends BoomerangScopeTests {
   }
 
   @Test
-  override def parameterLocalTest(): Unit = {
+  def localCountTest(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[LocalCountTarget].getName)
+
+    // Virtual
+    val virtualSignature = new MethodSignature(classOf[LocalCountTarget].getName, "virtualLocalCount", "Void", util.List.of(integerType, s"L${classOf[A].getName}L"))
+    val virtualMethod = opalSetup.resolveMethod(virtualSignature)
+    val virtualOpalMethod = OpalMethod(virtualMethod)
+
+    val locals = virtualOpalMethod.getLocals
+    Assert.assertEquals(5, locals.size())
+
+    // Static
+    val staticSignature = new MethodSignature(classOf[LocalCountTarget].getName, "staticLocalCount", "Void", util.List.of(integerType, s"L${classOf[A].getName}L"))
+    val staticMethod = opalSetup.resolveMethod(staticSignature)
+    val staticOpalMethod = OpalMethod(staticMethod)
+
+    val locals2 = staticOpalMethod.getLocals
+    Assert.assertEquals(4, locals2.size())
+  }
+
+  @Test
+  def parameterLocalTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ParameterLocalsTarget].getName)
 
@@ -72,7 +94,7 @@ class OpalScopeTest extends BoomerangScopeTests {
   }
 
   @Test
-  override def hashCodeEqualsLocalTest(): Unit = {
+  def hashCodeEqualsLocalTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[HashCodeEqualsLocalTarget].getName)
 

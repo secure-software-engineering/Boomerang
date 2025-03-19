@@ -20,7 +20,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
   }
 
   // TODO
-  override def isStatic: Boolean = ???
+  override def isStatic: Boolean = false
 
   override def isNewExpr: Boolean = delegate.isNew
 

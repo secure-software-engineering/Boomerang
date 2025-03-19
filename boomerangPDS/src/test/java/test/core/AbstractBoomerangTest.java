@@ -308,7 +308,9 @@ public class AbstractBoomerangTest extends TestingFramework {
       Collection<? extends Query> expectedResults,
       Collection<? extends Node<Edge, Val>> results,
       AnalysisMode analysis) {
-    LOGGER.info("Boomerang Results:\n - {}", results.stream().map(r -> r.fact().toString()).collect(Collectors.joining("\n - ")));
+    LOGGER.info(
+        "Boomerang Results:\n - {}",
+        results.stream().map(r -> r.fact().toString()).collect(Collectors.joining("\n - ")));
     LOGGER.info(
         "Expected Results:\n - {}",
         expectedResults.stream().map(r -> r.var().toString()).collect(Collectors.joining("\n - ")));
