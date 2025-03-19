@@ -54,7 +54,7 @@ public class TransitionFunctionOne implements TransitionFunction {
     if (other.equals(zero()) || this.equals(zero())) {
       return zero();
     }
-    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+    TransitionFunction func = (TransitionFunction) other;
     Set<? extends Transition> otherTransitions = (Set<? extends Transition>) func.getValues();
     Set<Transition> ress = new HashSet<>();
     Set<ControlFlowGraph.Edge> newStateChangeStatements = new HashSet<>();
@@ -88,7 +88,7 @@ public class TransitionFunctionOne implements TransitionFunction {
       return one();
     }
 
-    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+    TransitionFunction func = (TransitionFunction) other;
     if (other.equals(one()) || this.equals(one())) {
       Set<Transition> transitions =
           new HashSet<>((other.equals(one()) ? getValues() : func.getValues()));

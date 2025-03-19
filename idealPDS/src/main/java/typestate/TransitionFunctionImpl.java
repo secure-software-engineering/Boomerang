@@ -96,9 +96,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return one();
     }
 
-    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+    TransitionFunction func = (TransitionFunction) other;
     if (other.equals(one()) || this.equals(one())) {
-      Set<Transition> transitions = new HashSet<>((other.equals(one()) ? values : func.values));
+      Set<Transition> transitions =
+          new HashSet<>((other.equals(one()) ? values : func.getValues()));
       Set<Transition> idTransitions = Sets.newHashSet();
       for (Transition t : transitions) {
         idTransitions.add(new TransitionImpl(t.from(), t.from()));
@@ -107,12 +108,12 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return new TransitionFunctionImpl(
           transitions,
           Sets.newHashSet(
-              (other.equals(one()) ? stateChangeStatements : func.stateChangeStatements)));
+              (other.equals(one()) ? stateChangeStatements : func.getStateChangeStatements())));
     }
-    Set<Transition> transitions = new HashSet<>(func.values);
+    Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(values);
     HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
-    newStateChangeStmts.addAll(func.stateChangeStatements);
+    newStateChangeStmts.addAll(func.getStateChangeStatements());
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
   }
 
