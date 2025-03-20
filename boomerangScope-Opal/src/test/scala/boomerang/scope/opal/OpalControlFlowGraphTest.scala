@@ -6,7 +6,7 @@ import boomerang.scope.test.targets.ControlFlowGraphTarget
 import org.junit.{Assert, Test}
 import org.opalj.br.IntegerType
 
-class OpalStatementTest {
+class OpalControlFlowGraphTest {
 
   private val integerType = IntegerType.toJVMTypeName
 

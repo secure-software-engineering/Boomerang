@@ -2,7 +2,7 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope._
 import boomerang.scope.opal.OpalClient
-import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall}
+import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall, Stmt}
 
 import java.util
 

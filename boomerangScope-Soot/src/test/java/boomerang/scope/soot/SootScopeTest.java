@@ -27,10 +27,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import soot.SootMethod;
 
-public class SootScopeTest implements BoomerangScopeTests {
+public class SootScopeTest {
 
   @Test
-  @Override
   public void thisLocalTest() {
     SootSetup sootSetup = new SootSetup();
     sootSetup.setupSoot(ThisLocalTarget.class.getName());
@@ -60,7 +59,6 @@ public class SootScopeTest implements BoomerangScopeTests {
   }
 
   @Test
-  @Override
   public void parameterLocalTest() {
     SootSetup sootSetup = new SootSetup();
     sootSetup.setupSoot(ParameterLocalsTarget.class.getName());
@@ -97,7 +95,6 @@ public class SootScopeTest implements BoomerangScopeTests {
   }
 
   @Test
-  @Override
   public void hashCodeEqualsLocalTest() {
     SootSetup sootSetup = new SootSetup();
     sootSetup.setupSoot(HashCodeEqualsLocalTarget.class.getName());

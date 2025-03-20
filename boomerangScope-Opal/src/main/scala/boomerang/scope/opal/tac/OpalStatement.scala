@@ -1,12 +1,12 @@
 package boomerang.scope.opal.tac
 
-import boomerang.scope.opal.OpalClient
 import boomerang.scope._
 import com.google.common.base.Joiner
 import org.opalj.tac.{DUVar, PrimitiveTypecastExpr, Stmt}
 import org.opalj.value.ValueInformation
 
 import java.util
+import java.util.Objects
 
 class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) extends Statement(m) {
 
@@ -48,8 +48,6 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     if (isArrayStore) {
       // TODO
       val arrayStore = delegate.asArrayStore
-      //val resolvedField = OpalClient.resolveFieldStore(delegate.asArrayStore)
-      //return new OpalField(resolvedField.get)
     }
 
     throw new RuntimeException("Statement is not a field store operation")
@@ -145,7 +143,8 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
       if (isArrayStore) {
         // TODO Distinguish between constant and variable
-        return new OpalVal(delegate.asArrayStore.value, m)
+        val arrayStore = delegate.asArrayStore
+        return new OpalLocal(arrayStore.arrayRef, m)
       }
     }
 
@@ -208,13 +207,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def isArrayStore: Boolean = delegate.isArrayStore
 
-  override def isArrayLoad: Boolean = {
-    if (delegate.isAssignment) {
-      delegate.asAssignment.expr.isArrayLoad
-    }
-
-    false
-  }
+  override def isArrayLoad: Boolean = delegate.isAssignment && delegate.asAssignment.expr.isArrayLoad
 
   override def isFieldLoad: Boolean = delegate.isAssignment && delegate.asAssignment.expr.isGetField
 
@@ -296,7 +289,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def isCatchStmt: Boolean = delegate.isCaughtException
 
-  override def hashCode(): Int = 31 + delegate.hashCode()
+  override def hashCode: Int = Objects.hash(delegate)
 
   private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalStatement]
 
@@ -321,17 +314,14 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
     if (isAssignStmt) {
       if (delegate.isAssignment) {
-        if (getRightOp.isNewExpr) {
-          return s"$getLeftOp = new ${getRightOp.getNewExprType}"
+        if (isFieldStore) {
+          return s"$getLeftOp = ${getFieldStore.getX}.${getFieldStore.getY}"
+        } else if (isArrayStore) {
+          val base = getArrayBase
+          return s"${base.getX.getVariableName}[${base.getY}] = $getRightOp"
         } else {
-          // TODO Array load
           return s"$getLeftOp = $getRightOp"
         }
-      } else if (isFieldStore) {
-        return s"$getLeftOp = $getWrittenField"
-      } else if (isArrayStore) {
-        val base = getArrayBase
-        return s"${base.getX.getVariableName}[${base.getY}] = $getRightOp"
       }
     }
 

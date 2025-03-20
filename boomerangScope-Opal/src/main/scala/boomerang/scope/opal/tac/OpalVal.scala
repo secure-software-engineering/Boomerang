@@ -15,6 +15,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
   override def getType: Type = delegate match {
     case const: Const => OpalType(const.tpe)
     case newExpr: New => OpalType(newExpr.tpe)
+    case newArrayExpr: NewArray[_] => OpalType(newArrayExpr.tpe)
     case functionCall: FunctionCall[_] => OpalType(functionCall.descriptor.returnType)
     case _ => throw new RuntimeException("Type not implemented yet")
   }
@@ -41,7 +42,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
   // TODO Deal with multiple arrays
   override def getArrayAllocationSize: Val = {
     if (isArrayAllocationVal) {
-      return new OpalVal(delegate.asNewArray.counts.head, method)
+      return new OpalLocal(delegate.asNewArray.counts.head, method)
     }
 
     throw new RuntimeException("Value is not an array allocation expression")
@@ -150,6 +151,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
       case intConst: IntConst => intConst.value.toString
       case longConst: LongConst => longConst.value.toString
       case newExpr: New => s"new ${newExpr.tpe.toJava}"
+      case newArrayExpr: NewArray[_] => s"new ${newArrayExpr.tpe.toJava}"
       case _ => delegate.toString
     }
   }

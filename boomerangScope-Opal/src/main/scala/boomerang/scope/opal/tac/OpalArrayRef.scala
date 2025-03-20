@@ -5,6 +5,8 @@ import org.opalj.br.ObjectType
 import org.opalj.tac.{DUVar, DVar, Expr, UVar}
 import org.opalj.value.ValueInformation
 
+import java.util.Objects
+
 class OpalArrayRef(val arrayRef: Expr[DUVar[ValueInformation]], val index: Int, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   if (!arrayRef.isVar) {
@@ -80,9 +82,12 @@ class OpalArrayRef(val arrayRef: Expr[DUVar[ValueInformation]], val index: Int, 
     }
   }
 
-  override def hashCode(): Int = ???
+  override def hashCode: Int = Objects.hash(super.hashCode(), arrayRef, index)
 
-  override def equals(obj: Any): Boolean = ???
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalArrayRef => super.equals(that) && this.arrayRef == that.arrayRef && this.index == that.index
+    case _ => false
+  }
 
   override def toString: String = getVariableName
 }

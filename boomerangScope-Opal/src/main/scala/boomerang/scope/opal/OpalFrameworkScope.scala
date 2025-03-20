@@ -1,14 +1,16 @@
 package boomerang.scope.opal
 
 import boomerang.scope.{CallGraph, DataFlowScope, Field, FrameworkScope, Method, StaticFieldVal, Val}
+import org.opalj.ai.domain
 import org.opalj.br.analyses.Project
+import org.opalj.tac.ComputeTACAIKey
 
 import java.util.stream
 
 class OpalFrameworkScope(project: Project[_], callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[org.opalj.br.Method], dataFlowScope: DataFlowScope) extends FrameworkScope {
 
   OpalClient.init(project)
-  val opalCallGraph = new OpalCallGraph(callGraph, entryPoints)
+  private val opalCallGraph = new OpalCallGraph(callGraph, entryPoints)
 
   override def getCallGraph: CallGraph = opalCallGraph
 
