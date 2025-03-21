@@ -2,16 +2,19 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalClient
 import boomerang.scope.{IfStatement, Statement, Val}
-import org.opalj.tac.{DUVar, If}
+import org.opalj.tac.{DUVar, IdBasedVar, If, Var}
 import org.opalj.value.ValueInformation
 
-class OpalIfStatement(val delegate: If[DUVar[ValueInformation]], method: OpalMethod) extends IfStatement {
+import java.util.Objects
+
+class OpalIfStatement(val delegate: If[IdBasedVar], method: OpalMethod) extends IfStatement {
 
   override def getTarget: Statement = {
-    val tac = OpalClient.getTacForMethod(method.delegate)
+    /*val tac = OpalClient.getTacForMethod(method.delegate)
     val target = delegate.targetStmt
 
-    new OpalStatement(tac.stmts(target), method)
+    new OpalStatement(tac.stmts(target), method)*/
+    ???
   }
 
   override def evaluate(otherVal: Val): IfStatement.Evaluation = IfStatement.Evaluation.UNKNOWN
@@ -27,7 +30,7 @@ class OpalIfStatement(val delegate: If[DUVar[ValueInformation]], method: OpalMet
     otherVal.equals(left) || otherVal.equals(right)
   }
 
-  override def hashCode(): Int = 31 + delegate.hashCode()
+  override def hashCode: Int = Objects.hash(delegate)
 
   private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalIfStatement]
 

@@ -3,12 +3,12 @@ package boomerang.scope.opal.tac
 import boomerang.scope.opal.{OpalClient, OpalFrameworkScope}
 import boomerang.scope.{DeclaredMethod, InvokeExpr, Type, WrappedClass}
 import org.opalj.br.MethodSignature
-import org.opalj.tac.{Call, DUVar}
+import org.opalj.tac.{Call, DUVar, Var}
 import org.opalj.value.ValueInformation
 
 import java.util
 
-case class OpalDeclaredMethod(invokeExpr: InvokeExpr, delegate: Call[DUVar[ValueInformation]]) extends DeclaredMethod(invokeExpr) {
+case class OpalDeclaredMethod[+V <: Var[V]](invokeExpr: InvokeExpr, delegate: Call[V]) extends DeclaredMethod(invokeExpr) {
 
   override def getSubSignature: String = MethodSignature(delegate.name, delegate.descriptor).toJava
 

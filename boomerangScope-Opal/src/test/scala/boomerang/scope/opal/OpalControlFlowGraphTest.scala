@@ -4,7 +4,9 @@ import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ControlFlowGraphTarget
 import org.junit.{Assert, Test}
+import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
 import org.opalj.br.IntegerType
+import org.opalj.tac.TACAI
 
 class OpalControlFlowGraphTest {
 

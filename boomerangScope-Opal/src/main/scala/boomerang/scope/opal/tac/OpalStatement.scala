@@ -2,20 +2,19 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope._
 import com.google.common.base.Joiner
-import org.opalj.tac.{DUVar, PrimitiveTypecastExpr, Stmt}
+import org.opalj.tac.{DUVar, IdBasedVar, PrimitiveTypecastExpr, Stmt, Var}
 import org.opalj.value.ValueInformation
 
 import java.util
 import java.util.Objects
 
-class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) extends Statement(m) {
+class OpalStatement(val delegate: Stmt[IdBasedVar], m: OpalMethod) extends Statement(m) {
 
   override def containsStaticFieldAccess(): Boolean = isStaticFieldLoad || isStaticFieldStore
 
   override def containsInvokeExpr(): Boolean = {
     if (delegate.isMethodCall) return true
     if (delegate.isAssignment && delegate.asAssignment.expr.isFunctionCall) return true
-    if (delegate.isExprStmt && delegate.asExprStmt.isMethodCall) return true
     if (delegate.isExprStmt && delegate.asExprStmt.expr.isFunctionCall) return true
 
     false
@@ -23,10 +22,17 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
 
   override def getInvokeExpr: InvokeExpr = {
     if (containsInvokeExpr()) {
-      if (delegate.isMethodCall) return new OpalMethodInvokeExpr(delegate.asMethodCall, m)
-      if (delegate.isAssignment && delegate.asAssignment.expr.isFunctionCall) return new OpalFunctionInvokeExpr(delegate.asAssignment.expr.asFunctionCall, m)
-      if (delegate.isExprStmt && delegate.asExprStmt.isMethodCall) return new OpalMethodInvokeExpr(delegate.asExprStmt.asMethodCall, m)
-      if (delegate.isExprStmt && delegate.asExprStmt.expr.isFunctionCall) return new OpalFunctionInvokeExpr(delegate.asExprStmt.expr.asFunctionCall, m)
+      if (delegate.isMethodCall) {
+        return new OpalMethodInvokeExpr(delegate.asMethodCall, m)
+      }
+
+      if (delegate.isAssignment && delegate.asAssignment.expr.isFunctionCall) {
+        return new OpalFunctionInvokeExpr(delegate.asAssignment.expr.asFunctionCall, m)
+      }
+
+      if (delegate.isExprStmt && delegate.asExprStmt.expr.isFunctionCall) {
+        return new OpalFunctionInvokeExpr(delegate.asExprStmt.expr.asFunctionCall, m)
+      }
     }
 
     throw new RuntimeException("Statement does not contain an invoke expression")
@@ -104,10 +110,10 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
         val indexValue = delegate.asArrayStore.index
 
         if (!indexValue.isVar) return new OpalArrayRef(base, -1, m)
-        if (!indexValue.asVar.value.isPrimitiveValue) return new OpalArrayRef(base, -1, m)
+        //if (!indexValue.asVar.value.isPrimitiveValue) return new OpalArrayRef(base, -1, m)
 
-        val index = indexValue.asVar.value.asPrimitiveValue.asConstantInteger.intValue()
-        return new OpalArrayRef(base, index, m)
+        //val index = indexValue.asVar.value.asPrimitiveValue.asConstantInteger.intValue()
+        return new OpalArrayRef(base, -1, m)
       }
     }
 
@@ -127,10 +133,14 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
           val indexValue = rightExpr.asArrayLoad.index
 
           if (!indexValue.isVar) return new OpalArrayRef(base, -1, m)
-          if (!indexValue.asVar.value.isPrimitiveValue) return new OpalArrayRef(base, -1, m)
+          //if (!indexValue.asVar.value.isPrimitiveValue) return new OpalArrayRef(base, -1, m)
 
-          val index = indexValue.asVar.value.asPrimitiveValue.asConstantInteger.intValue()
-          return new OpalArrayRef(base, index, m)
+          //val index = indexValue.asVar.value.asPrimitiveValue.asConstantInteger.intValue()
+          return new OpalArrayRef(base, -1, m)
+        }
+
+        if (rightExpr.isVar) {
+          return new OpalLocal(delegate.asAssignment.expr.asVar, m)
         }
 
         return new OpalVal(delegate.asAssignment.expr, m)
@@ -144,7 +154,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
       if (isArrayStore) {
         // TODO Distinguish between constant and variable
         val arrayStore = delegate.asArrayStore
-        return new OpalLocal(arrayStore.arrayRef, m)
+        return new OpalLocal(arrayStore.arrayRef.asVar, m)
       }
     }
 
@@ -217,7 +227,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     if (isFieldStore) {
       val fieldStore = delegate.asPutField
 
-      val local = new OpalLocal(fieldStore.objRef, m)
+      val local = new OpalLocal(fieldStore.objRef.asVar, m)
       val field = OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
 
       return new Pair(local, field)
@@ -230,7 +240,7 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
     if (isFieldLoad) {
       val fieldLoad = delegate.asAssignment.expr.asGetField
 
-      val local = new OpalLocal(fieldLoad.objRef, m)
+      val local = new OpalLocal(fieldLoad.objRef.asVar, m)
       val field = OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
 
       return new Pair(local, field)
@@ -309,18 +319,18 @@ class OpalStatement(val delegate: Stmt[DUVar[ValueInformation]], m: OpalMethod) 
         assign = s"$getLeftOp = "
       }
 
-      return assign + base + getInvokeExpr.getMethod.getName + "(" + Joiner.on(",").join(getInvokeExpr.getArgs) + ")"
+      return s"${delegate.pc}: $assign$base${getInvokeExpr.getMethod.getName}(${Joiner.on(",").join(getInvokeExpr.getArgs)})"
     }
 
     if (isAssignStmt) {
       if (delegate.isAssignment) {
         if (isFieldStore) {
-          return s"$getLeftOp = ${getFieldStore.getX}.${getFieldStore.getY}"
+          return s"${delegate.pc}: $getLeftOp = ${getFieldStore.getX}.${getFieldStore.getY}"
         } else if (isArrayStore) {
           val base = getArrayBase
-          return s"${base.getX.getVariableName}[${base.getY}] = $getRightOp"
+          return s"${delegate.pc}: ${base.getX.getVariableName}[${base.getY}] = $getRightOp"
         } else {
-          return s"$getLeftOp = $getRightOp"
+          return s"${delegate.pc}: $getLeftOp = $getRightOp"
         }
       }
     }

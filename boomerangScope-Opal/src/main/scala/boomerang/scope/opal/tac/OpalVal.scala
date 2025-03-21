@@ -4,9 +4,10 @@ import boomerang.scope.opal.OpalClient
 import boomerang.scope._
 import org.opalj.br.ReferenceType
 import org.opalj.tac._
-import org.opalj.value.ValueInformation
 
-class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
+import java.util.Objects
+
+class OpalVal(val delegate: Expr[IdBasedVar], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
   
   if (delegate.isVar) {
     throw new RuntimeException("OpalVal cannot hold a variable (use OpalLocal)")
@@ -42,7 +43,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
   // TODO Deal with multiple arrays
   override def getArrayAllocationSize: Val = {
     if (isArrayAllocationVal) {
-      return new OpalLocal(delegate.asNewArray.counts.head, method)
+      return new OpalLocal(delegate.asNewArray.counts.head.asVar, method)
     }
 
     throw new RuntimeException("Value is not an array allocation expression")
@@ -156,7 +157,7 @@ class OpalVal(val delegate: Expr[DUVar[ValueInformation]], method: OpalMethod, u
     }
   }
 
-  override def hashCode(): Int = 31 * super.hashCode() + delegate.hashCode()
+  override def hashCode: Int = Objects.hash(super.hashCode(), delegate.hashCode())
 
   private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalVal]
 
