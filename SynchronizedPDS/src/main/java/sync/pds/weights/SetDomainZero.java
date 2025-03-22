@@ -24,15 +24,17 @@ public class SetDomainZero implements SetDomain {
 
   @Nonnull private static final SetDomainZero zero = new SetDomainZero();
 
+
+
+
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other.equals(one())) {
+    SetDomain one = one();
+    if (other== one) {
       return this;
     }
-    if (this.equals(one())) {
-      return other;
-    }
+
     return zero();
   }
 
@@ -40,9 +42,10 @@ public class SetDomainZero implements SetDomain {
   @Override
   public Weight combineWith(@Nonnull Weight other) {
 
-    if (other.equals(zero())) return this;
-    if (this.equals(zero())) return other;
-    if (this.equals(one()) || other.equals(one())) return one();
+    if (other==(zero())) return this;
+    if (this==(zero())) return other;
+    SetDomain one = one();
+    if (other== one) return one;
 
     if (other instanceof SetDomainOne) {
       HashSet<Node> merged = Sets.newHashSet(getNodes());

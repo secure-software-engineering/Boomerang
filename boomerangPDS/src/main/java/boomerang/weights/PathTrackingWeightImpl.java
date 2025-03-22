@@ -28,7 +28,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
    */
   @Nonnull private final LinkedHashSet<Node<Edge, Val>> shortestPathWitness;
 
-  private PathTrackingWeightImpl(LinkedHashSet<Node<Edge, Val>> allStatement) {
+  public PathTrackingWeightImpl(LinkedHashSet<Node<Edge, Val>> allStatement) {
     this.shortestPathWitness = allStatement;
   }
 

@@ -47,13 +47,13 @@ public class TransitionFunctionOne implements TransitionFunction {
         "TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
   }
 
+  @Nonnull
   @Override
-  public Weight extendWith(Weight other) {
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    if (other.equals(zero()) || this.equals(zero())) {
-      return zero();
-    }
+  public Weight extendWith(@Nonnull Weight other) {
+    TransitionFunctionOne one1 = one();
+    if (other==(one1)) return this;
+    if (this==(one1)) return other;
+
     TransitionFunction func = (TransitionFunction) other;
     Set<? extends Transition> otherTransitions = (Set<? extends Transition>) func.getValues();
     Set<Transition> ress = new HashSet<>();
@@ -61,13 +61,13 @@ public class TransitionFunctionOne implements TransitionFunction {
     for (Transition first : getValues()) {
       for (Transition second : otherTransitions) {
 
-        if (second.equals(TransitionIdentity.identity())) {
+        if (second==(TransitionIdentity.identity())) {
           ress.add(first);
           newStateChangeStatements.addAll(getStateChangeStatements());
-        } else if (first.equals(TransitionIdentity.identity())) {
+        } else if (first==(TransitionIdentity.identity())) {
           ress.add(second);
           newStateChangeStatements.addAll(func.getStateChangeStatements());
-        } else if (first.to().equals(second.from())) {
+        } else if (first.to()==(second.from())) {
           ress.add(new TransitionImpl(first.from(), second.to()));
           newStateChangeStatements.addAll(func.getStateChangeStatements());
         }
@@ -82,16 +82,19 @@ public class TransitionFunctionOne implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (this.equals(zero())) return other;
-    if (other.equals(zero())) return this;
-    if (other.equals(one()) && this.equals(one())) {
-      return one();
+    TransitionFunctionZero zero = zero();
+    TransitionFunction one1 = one();
+
+    if (other==(zero)) return this;
+
+    if (other== one1 && this==one1) {
+      return one1;
     }
 
     TransitionFunction func = (TransitionFunction) other;
-    if (other.equals(one()) || this.equals(one())) {
+    if (other==(one1) || this==(one1)) {
       Set<Transition> transitions =
-          new HashSet<>((other.equals(one()) ? getValues() : func.getValues()));
+          new HashSet<>((other==(one1) ? getValues() : func.getValues()));
       Set<Transition> idTransitions = Sets.newHashSet();
       for (Transition t : transitions) {
         idTransitions.add(new TransitionImpl(t.from(), t.from()));
@@ -100,7 +103,7 @@ public class TransitionFunctionOne implements TransitionFunction {
       return new TransitionFunctionImpl(
           transitions,
           Sets.newHashSet(
-              (other.equals(one())
+              (other==(one1)
                   ? getStateChangeStatements()
                   : func.getStateChangeStatements())));
     }
