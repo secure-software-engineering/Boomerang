@@ -39,26 +39,14 @@ public class PathTrackingWeightOne implements PathTrackingWeight {
   @Override
   @Nonnull
   public Weight extendWith(@Nonnull Weight o) {
-    if (!(o instanceof PathTrackingWeightOne)) {
+    if (!(o instanceof PathTrackingWeightImpl)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
     return new PathTrackingWeightImpl(new LinkedHashSet<>());
   }
-
-  @Override
   @Nonnull
   public Weight combineWith(@Nonnull Weight o) {
-
-    if (!(o instanceof PathTrackingWeightOne)) {
-      throw new RuntimeException("Cannot extend to different types of weight!");
-    }
-    PathTrackingWeight other = (PathTrackingWeight) o;
-
-    if (getShortestPathWitness().size() > other.getShortestPathWitness().size()) {
-      return new PathTrackingWeightImpl(new LinkedHashSet<>(other.getShortestPathWitness()));
-    }
-
-    return new PathTrackingWeightImpl(new LinkedHashSet<>(this.getShortestPathWitness()));
+    throw new IllegalStateException("This should not happen!");
   }
 
   @Override

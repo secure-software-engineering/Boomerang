@@ -28,6 +28,8 @@ public class DataFlowPathWeightImpl implements DataFlowPathWeight {
   private final PathTrackingWeight path;
   private final PathConditionWeight condition;
 
+
+
   public DataFlowPathWeightImpl(Node<Edge, Val> path) {
     this.path = new PathTrackingWeightImpl(path);
     this.condition = PathConditionWeightOne.one();

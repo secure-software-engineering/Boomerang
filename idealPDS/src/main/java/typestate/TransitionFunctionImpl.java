@@ -59,15 +59,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
   public Weight extendWith(@Nonnull Weight other) {
     TransitionFunction one = one();
     TransitionFunction zero = zero();
-    if (other == one) return this;
-    if ((other == zero)) {
+    if (other==one) return this;
+    if ((other==zero)) {
       return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+    Set<? extends Transition> otherTransitions = func.values;
     Set<Transition> ress = new HashSet<>();
     Set<Edge> newStateChangeStatements = new HashSet<>();
     for (Transition first : values) {
-      for (Transition second : func.values) {
+      for (Transition second : otherTransitions) {
 
         if (second.equals(TransitionIdentity.identity())) {
           ress.add(first);
@@ -93,10 +94,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
     TransitionFunction zero = zero();
     TransitionFunction one = one();
 
-    if (other == (zero)) return this;
+    if (other==(zero)) return this;
+
 
     TransitionFunction func = (TransitionFunction) other;
-    if (other == one) {
+    if (other==one) {
       Set<Transition> transitions =
           new HashSet<>((other.equals(one()) ? values : func.getValues()));
       Set<Transition> idTransitions = Sets.newHashSet();

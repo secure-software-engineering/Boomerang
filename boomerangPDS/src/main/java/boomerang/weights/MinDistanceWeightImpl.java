@@ -11,12 +11,14 @@
  */
 package boomerang.weights;
 
+
+
 import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
 public class MinDistanceWeightImpl implements MinDistanceWeight {
 
-  private final Integer minDistance;
+  private final Integer minDistance ;
 
   public MinDistanceWeightImpl(Integer minDistance) {
     this.minDistance = minDistance;
@@ -30,6 +32,7 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
     }
     MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
 
+
     Integer newDistance = minDistance + other.minDistance;
     return new MinDistanceWeightImpl(newDistance);
   }
@@ -40,6 +43,8 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
     if (!(o instanceof MinDistanceWeightImpl))
       throw new RuntimeException("Cannot extend to different types of weight!");
     MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
+
+
 
     return new MinDistanceWeightImpl(Math.min(other.minDistance, minDistance));
   }
@@ -67,7 +72,7 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
   @Override
   public String toString() {
 
-    return " Distance: " + minDistance;
+    return  " Distance: " + minDistance;
   }
 
   @Override

@@ -27,9 +27,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
 
   public PathConditionWeightOne(
       Map<Statement, ConditionDomain> newIfs,
-      Map<Val, ConditionDomain> newVals,
-      Set<Val> newReturnVals,
-      Map<Method, Statement> calleeToCallSiteMapping) {
+      Map<Val, ConditionDomain> newVals) {
     throw new IllegalStateException("PathConditionWeightOne.ExtendWeight called");
   }
 
@@ -54,6 +52,10 @@ public class PathConditionWeightOne implements PathConditionWeight {
   public static PathConditionWeightOne one() {
     return one;
   }
+
+
+
+
 
   public enum ConditionDomain {
     TRUE,
@@ -109,7 +111,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
     Set<Val> newReturnVals = Sets.newHashSet(getReturnVals());
     newReturnVals.addAll(other.getReturnVals());
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(getCalleeToCallSite());
-    return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
+    calleeToCallSiteMapping.putAll(other.getCalleeToCallSite());
+    return new PathConditionWeightOne(newIfs, newVals);
   }
 
   @Nonnull
@@ -177,7 +180,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
     newReturnVals.addAll(other.getReturnVals());
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(getCalleeToCallSite());
     calleeToCallSiteMapping.putAll(other.getCalleeToCallSite());
-    return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
+    return new PathConditionWeightOne(newIfs, newVals);
   }
 
   @Override
