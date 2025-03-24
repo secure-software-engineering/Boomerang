@@ -1,30 +1,15 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
+import boomerang.scope.opal.transformer.TacLocal
 import org.opalj.br.ObjectType
-import org.opalj.tac.{DUVar, DVar, Expr, IdBasedVar, SimpleVar, UVar, Var}
-import org.opalj.value.ValueInformation
+import org.opalj.tac.Var
 
 import java.util.Objects
 
-class OpalLocal(val delegate: Var[IdBasedVar], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
+class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
-  override def getType: Type = delegate match {
-    /*case local: SimpleVar =>
-      if (local.value.isReferenceValue) {
-        OpalType(local.value.asReferenceValue.asReferenceType, local.value.asReferenceValue.isNull.isYes)
-      } else if (local.value.isPrimitiveValue) {
-        OpalType(local.value.asPrimitiveValue.primitiveType)
-      } else if (local.value.isVoid) {
-        OpalType(ObjectType.Void)
-      } else if (local.value.isArrayValue.isYes) {
-        OpalType(ObjectType.Array)
-      } else {
-        throw new RuntimeException("Could not determine type " + local.value)
-      }*/
-    case _ => throw new RuntimeException("Cannot compute type of expression that is not a variable")
-
-  }
+  override def getType: Type = OpalType(ObjectType("java/lang/Object"))
 
   override def isStatic: Boolean = false
 
@@ -40,9 +25,7 @@ class OpalLocal(val delegate: Var[IdBasedVar], method: OpalMethod, unbalanced: C
 
   override def getArrayAllocationSize: Val = throw new RuntimeException("Opal local is not an array allocation expression")
 
-  override def isNull: Boolean = {
-    ???
-  }
+  override def isNull: Boolean = false
 
   override def isStringConstant: Boolean = false
 

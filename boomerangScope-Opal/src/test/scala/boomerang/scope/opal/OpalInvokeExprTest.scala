@@ -1,7 +1,6 @@
 package boomerang.scope.opal
 
 import boomerang.scope.opal.tac.OpalMethod
-import boomerang.scope.opal.transformer.TacTransformer
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.InvokeExprTarget
 import org.junit.Test
@@ -16,9 +15,9 @@ class OpalInvokeExprTest {
     val signature = new MethodSignature(classOf[InvokeExprTarget].getName, "alias", "Void")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
+    opalMethod.getControlFlowGraph
 
-    val transformedTac = TacTransformer(opalMethod.tacCode)
-    println(transformedTac.mkString("Array(", "\n", ")"))
+    println(opalMethod.tac.statements.mkString("Array(\n\t", "\n\t", "\n)"))
   }
 
 }

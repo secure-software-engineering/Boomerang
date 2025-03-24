@@ -12,19 +12,17 @@ object TacTransformer {
   private var stackCounter = 0
   private var currentStack = mutable.Map.empty[Int, TacLocal]
 
-  def apply(tacCode: NaiveTACode[_]): Array[Stmt[TacLocal]] = {
+  def apply(method: Method, classHierarchy: ClassHierarchy, optimizations: List[TACOptimization[Param, IdBasedVar, NaiveTACode[Param]]] = List.empty): BoomerangTACode = {
     stackCounter = 0
     currentStack = mutable.Map.empty[Int, TacLocal]
 
-    val updatedTacCode = tacCode.stmts.map(stmt => transformStatement(stmt))
-
-    updatedTacCode
-  }
-
-  def apply(method: Method, classHierarchy: ClassHierarchy, optimizations: List[TACOptimization[Param, IdBasedVar, NaiveTACode[Param]]] = List.empty): BoomerangTACode = {
     val tacNaive = TACNaive(method, classHierarchy, optimizations)
-
     val transformedTac: Array[Stmt[TacLocal]] = tacNaive.stmts.map(stmt => transformStatement(stmt))
+
+    tacNaive.stmts.foreach(stmt => {
+      val locals = method.body.get.localVariablesAt(stmt.pc)
+      println(locals)
+    })
 
     // Update the CFG
     val cfg = CFGFactory(method, classHierarchy)
@@ -85,11 +83,11 @@ object TacTransformer {
     }
 
     if (stmt.astID == Return.ASTID) {
-      return stmt.asReturn
+      return Return(stmt.asReturn.pc)
     }
 
     if (stmt.astID == Nop.ASTID) {
-      return stmt.asNop
+      return Nop(stmt.asNop.pc)
     }
 
     if (stmt.astID == MonitorEnter.ASTID) {
@@ -219,47 +217,47 @@ object TacTransformer {
     }
 
     if (expr.astID == Param.ASTID) {
-      return expr.asParam
+      return Param(expr.asParam.cTpe, expr.asParam.name)
     }
 
     if (expr.astID == MethodTypeConst.ASTID) {
-      return expr.asMethodTypeConst
+      return MethodTypeConst(expr.asMethodTypeConst.pc, expr.asMethodTypeConst.value)
     }
 
     if (expr.astID == MethodHandleConst.ASTID) {
-      return expr.asMethodHandleConst
+      return MethodHandleConst(expr.asMethodHandleConst.pc, expr.asMethodHandleConst.value)
     }
 
     if (expr.astID == IntConst.ASTID) {
-      return expr.asIntConst
+      return IntConst(expr.asIntConst.pc, expr.asIntConst.value)
     }
 
     if (expr.astID == LongConst.ASTID) {
-      return expr.asFloatConst
+      return LongConst(expr.asLongConst.pc, expr.asLongConst.value)
     }
 
     if (expr.astID == FloatConst.ASTID) {
-      return expr.asFloatConst
+      return FloatConst(expr.asFloatConst.pc, expr.asFloatConst.value)
     }
 
     if (expr.astID == DoubleConst.ASTID) {
-      return expr.asDoubleConst
+      return DoubleConst(expr.asDoubleConst.pc, expr.asDoubleConst.value)
     }
 
     if (expr.astID == StringConst.ASTID) {
-      return expr.asStringConst
+      return StringConst(expr.asStringConst.pc, expr.asStringConst.value)
     }
 
     if (expr.astID == ClassConst.ASTID) {
-      return expr.asClassConst
+      return ClassConst(expr.asClassConst.pc, expr.asClassConst.value)
     }
 
     if (expr.astID == DynamicConst.ASTID) {
-      return expr.asDynamicConst
+      return DynamicConst(expr.asDynamicConst.pc, expr.asDynamicConst.bootstrapMethod, expr.asDynamicConst.name, expr.asDynamicConst.descriptor)
     }
 
     if (expr.astID == NullExpr.ASTID) {
-      return expr.asNullExpr
+      return NullExpr(expr.asNullExpr.pc)
     }
 
     if (expr.astID == BinaryExpr.ASTID) {
@@ -286,7 +284,7 @@ object TacTransformer {
     }
 
     if (expr.astID == New.ASTID) {
-      return expr.asNew
+      return New(expr.asNew.pc, expr.asNew.tpe)
     }
 
     if (expr.astID == NewArray.ASTID) {
@@ -320,7 +318,7 @@ object TacTransformer {
     }
 
     if (expr.astID == GetStatic.ASTID) {
-      return expr.asGetStatic
+      return GetStatic(expr.asGetStatic.pc, expr.asGetStatic.declaringClass, expr.asGetStatic.name, expr.asGetStatic.declaredFieldType)
     }
 
     if (expr.astID == InvokedynamicFunctionCall.ASTID) {

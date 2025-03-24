@@ -2,12 +2,13 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalClient
 import boomerang.scope._
+import boomerang.scope.opal.transformer.TacLocal
 import org.opalj.br.ReferenceType
 import org.opalj.tac._
 
 import java.util.Objects
 
-class OpalVal(val delegate: Expr[IdBasedVar], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
+class OpalVal(val delegate: Expr[TacLocal], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
   
   if (delegate.isVar) {
     throw new RuntimeException("OpalVal cannot hold a variable (use OpalLocal)")
@@ -17,6 +18,7 @@ class OpalVal(val delegate: Expr[IdBasedVar], method: OpalMethod, unbalanced: Co
     case const: Const => OpalType(const.tpe)
     case newExpr: New => OpalType(newExpr.tpe)
     case newArrayExpr: NewArray[_] => OpalType(newArrayExpr.tpe)
+    case nullExpr: NullExpr => OpalType(nullExpr.tpe)
     case functionCall: FunctionCall[_] => OpalType(functionCall.descriptor.returnType)
     case _ => throw new RuntimeException("Type not implemented yet")
   }

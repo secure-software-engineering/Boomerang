@@ -1,13 +1,14 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalClient
+import boomerang.scope.opal.transformer.TacLocal
 import boomerang.scope.{IfStatement, Statement, Val}
 import org.opalj.tac.{DUVar, IdBasedVar, If, Var}
 import org.opalj.value.ValueInformation
 
 import java.util.Objects
 
-class OpalIfStatement(val delegate: If[IdBasedVar], method: OpalMethod) extends IfStatement {
+class OpalIfStatement(val delegate: If[TacLocal], method: OpalMethod) extends IfStatement {
 
   override def getTarget: Statement = {
     /*val tac = OpalClient.getTacForMethod(method.delegate)

@@ -4,9 +4,7 @@ import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ControlFlowGraphTarget
 import org.junit.{Assert, Test}
-import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
 import org.opalj.br.IntegerType
-import org.opalj.tac.TACAI
 
 class OpalControlFlowGraphTest {
 
@@ -25,6 +23,10 @@ class OpalControlFlowGraphTest {
     Assert.assertTrue(cfg.getStatements.size() > 0)
     Assert.assertEquals(1, cfg.getStartPoints.size())
     Assert.assertEquals(2, cfg.getEndPoints.size())
+
+    cfg.getEndPoints.forEach(stmt => {
+      Assert.assertTrue(stmt.isReturnStmt)
+    })
   }
 
 }

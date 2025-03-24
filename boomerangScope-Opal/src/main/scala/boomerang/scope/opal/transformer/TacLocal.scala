@@ -6,13 +6,15 @@ import org.opalj.value.ValueInformation
 
 import java.util.Objects
 
-sealed trait TacLocal extends Var[TacLocal] {
+trait TacLocal extends Var[TacLocal] {
 
   def id: Int
 
   def isStackLocal: Boolean
 
   def isRegisterLocal: Boolean
+
+  def cTpe: ComputationalType
 
   final def isSideEffectFree: Boolean = true
 
@@ -35,7 +37,7 @@ class StackLocal(identifier: Int, computationalType: ComputationalType) extends 
 
   override def cTpe: ComputationalType = computationalType
 
-  override def hashCode: Int = Objects.hash(identifier)
+  override def hashCode: Int = Objects.hash(id)
 
   override def equals(other: Any): Boolean = other match {
     case that: StackLocal => this.id == that.id
@@ -57,7 +59,7 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType) exten
 
   override def cTpe: ComputationalType = computationalType
 
-  override def hashCode: Int = Objects.hash(identifier)
+  override def hashCode: Int = Objects.hash(id)
 
   override def equals(other: Any): Boolean = other match {
     case that: RegisterLocal => this.id == that.id

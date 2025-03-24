@@ -2,14 +2,12 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope._
 import boomerang.scope.opal.OpalClient
-import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
-import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
-import org.opalj.tac.{InstanceFunctionCall, InstanceMethodCall, NaiveTACode, SimplePropagation, Stmt, TACAI, TACNaive, TACode}
+import boomerang.scope.opal.transformer.{BoomerangTACode, TacTransformer}
 
 import java.util
 import java.util.Objects
 
-class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTACode[_]) extends Method {
+class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTACode) extends Method {
 
   if (delegate.body.isEmpty) {
     throw new RuntimeException("Cannot build OpalMethod without existing body")
@@ -51,7 +49,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTA
        * is not used within the method, it stays at -1. However, if it is used, there is an additional
        * assignment to an actual variable. Therefore, we have to check first for the usage.
        */
-      tacCode.stmts.foreach(stmt => {
+      tac.statements.foreach(stmt => {
         if (stmt.isAssignment && stmt.asAssignment.expr.isVar) {
           if (stmt.asAssignment.expr.asVar.id == -1) {
             return new OpalLocal(stmt.asAssignment.targetVar, this)
@@ -60,7 +58,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTA
       })
 
       // 'this' local is not used; return just the parameter local
-      tacCode.stmts.foreach(stmt => {
+      tac.statements.foreach(stmt => {
         if (stmt.isAssignment && stmt.asAssignment.targetVar.id == -1) {
           return new OpalLocal(stmt.asAssignment.targetVar, this)
         }
@@ -84,14 +82,11 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTA
       // Parameter locals
       localCache.get.addAll(getParameterLocals)
 
-      tacCode.stmts.foreach(stmt => {
+      tac.statements.foreach(stmt => {
         if (stmt.isAssignment) {
           val targetVar = stmt.asAssignment.targetVar
 
-          // Parameters have been covered above
-          if (targetVar.id >= 0) {
-            localCache.get.add(new OpalLocal(targetVar, this))
-          }
+          localCache.get.add(new OpalLocal(targetVar, this))
         }
       })
     }
@@ -105,7 +100,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTA
 
       val indices = new util.HashSet[Integer]()
 
-      tacCode.stmts.foreach(stmt => {
+      tac.statements.foreach(stmt => {
         if (stmt.isAssignment && stmt.asAssignment.expr.isVar) {
           val param = stmt.asAssignment.expr.asVar
 
@@ -120,7 +115,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTA
       })
 
       // Collect all unused parameter locals
-      tacCode.stmts.foreach(stmt => {
+      tac.statements.foreach(stmt => {
         if (stmt.isAssignment) {
           val target = stmt.asAssignment.targetVar
 
@@ -169,7 +164,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tacCode: NaiveTA
 
 object OpalMethod {
 
-  def apply(delegate: org.opalj.br.Method): OpalMethod = new OpalMethod(delegate, TACNaive(delegate, OpalClient.getClassHierarchy))
+  def apply(delegate: org.opalj.br.Method): OpalMethod = new OpalMethod(delegate, TacTransformer(delegate, OpalClient.getClassHierarchy))
 
-  def apply(delegate: org.opalj.br.Method, tacCode: NaiveTACode[_]): OpalMethod = new OpalMethod(delegate, tacCode)
+  def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod = new OpalMethod(delegate, tac)
 }

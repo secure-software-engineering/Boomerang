@@ -1,12 +1,13 @@
 package boomerang.scope.opal.tac
 
+import boomerang.scope.opal.transformer.TacLocal
 import boomerang.scope.{Val, ValWithFalseVariable}
 import org.opalj.tac.{DUVar, Expr, IdBasedVar, Var}
 import org.opalj.value.ValueInformation
 
 import java.util.Objects
 
-class OpalDoubleVal(delegate: Expr[IdBasedVar], method: OpalMethod, falseVal: Val) extends OpalVal(delegate, method) with ValWithFalseVariable {
+class OpalDoubleVal(delegate: Expr[TacLocal], method: OpalMethod, falseVal: Val) extends OpalVal(delegate, method) with ValWithFalseVariable {
 
   override def getFalseVariable: Val = falseVal
 

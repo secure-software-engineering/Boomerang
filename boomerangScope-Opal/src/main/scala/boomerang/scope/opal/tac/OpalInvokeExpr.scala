@@ -1,12 +1,13 @@
 package boomerang.scope.opal.tac
 
+import boomerang.scope.opal.transformer.TacLocal
 import boomerang.scope.{DeclaredMethod, InvokeExpr, Val}
 import org.opalj.tac._
 
 import java.util
 import java.util.Objects
 
-class OpalMethodInvokeExpr(val delegate: MethodCall[IdBasedVar], method: OpalMethod) extends InvokeExpr {
+class OpalMethodInvokeExpr(val delegate: MethodCall[TacLocal], method: OpalMethod) extends InvokeExpr {
 
   override def getArg(index: Int): Val = getArgs.get(index)
 
@@ -48,7 +49,7 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[IdBasedVar], method: OpalMet
   override def toString: String = delegate.toString
 }
 
-class OpalFunctionInvokeExpr(val delegate: FunctionCall[IdBasedVar], method: OpalMethod) extends InvokeExpr {
+class OpalFunctionInvokeExpr(val delegate: FunctionCall[TacLocal], method: OpalMethod) extends InvokeExpr {
 
   override def getArg(index: Int): Val = getArgs.get(index)
 

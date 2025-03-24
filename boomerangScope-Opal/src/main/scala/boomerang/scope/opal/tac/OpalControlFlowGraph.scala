@@ -50,36 +50,38 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
     if (cacheBuilt) return
 
     var headFound = false
-    method.tacCode.stmts.foreach(stmt => {
+    method.tac.statements.foreach(stmt => {
       // Definition of parameter locals have implicit PC of -1, so they are not part of the actual CFG
       if (stmt.pc != -1) {
         val statement = new OpalStatement(stmt, method)
         statements.add(statement)
 
-        val stmtPc = method.tacCode.pcToIndex(stmt.pc)
+        val stmtPc = method.tac.pcToIndex(stmt.pc)
 
         // The first statement after the parameter local definitions is the head
         if (!headFound) {
-          startPointCache.add(statement)
           headFound = true
+
+          startPointCache.add(statement)
+          predsOfCache.putAll(statement, util.Collections.emptySet())
         } else {
-          val predecessors = method.tacCode.cfg.predecessors(stmtPc)
+          val predecessors = method.tac.cfg.predecessors(stmtPc)
           predecessors.foreach(predecessorPc => {
-            val predecessor = method.tacCode.stmts(predecessorPc)
+            val predecessor = method.tac.statements(predecessorPc)
             val predecessorStatement = new OpalStatement(predecessor, method)
 
             predsOfCache.put(statement, predecessorStatement)
           })
         }
 
-        val successors = method.tacCode.cfg.successors(stmtPc)
+        val successors = method.tac.cfg.successors(stmtPc)
         if (successors.isEmpty) {
           // No successors => Tail statement
-          val tailStmt = new OpalStatement(stmt, method)
-          endPointCache.add(tailStmt)
+          endPointCache.add(statement)
+          succsOfCache.putAll(statement, util.Collections.emptySet())
         } else {
           successors.foreach(successorPc => {
-            val successor = method.tacCode.stmts(successorPc)
+            val successor = method.tac.statements(successorPc)
             val successorStatement = new OpalStatement(successor, method)
 
             succsOfCache.put(statement, successorStatement)

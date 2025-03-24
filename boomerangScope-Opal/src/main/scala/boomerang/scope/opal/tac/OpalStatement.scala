@@ -1,6 +1,7 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
+import boomerang.scope.opal.transformer.TacLocal
 import com.google.common.base.Joiner
 import org.opalj.tac.{DUVar, IdBasedVar, PrimitiveTypecastExpr, Stmt, Var}
 import org.opalj.value.ValueInformation
@@ -8,7 +9,7 @@ import org.opalj.value.ValueInformation
 import java.util
 import java.util.Objects
 
-class OpalStatement(val delegate: Stmt[IdBasedVar], m: OpalMethod) extends Statement(m) {
+class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Statement(m) {
 
   override def containsStaticFieldAccess(): Boolean = isStaticFieldLoad || isStaticFieldStore
 
@@ -96,7 +97,6 @@ class OpalStatement(val delegate: Stmt[IdBasedVar], m: OpalMethod) extends State
   override def getLeftOp: Val = {
     if (isAssignStmt) {
       if (delegate.isAssignment) {
-        // TODO Change to variable
         return new OpalLocal(delegate.asAssignment.targetVar, m)
       }
 
@@ -140,7 +140,7 @@ class OpalStatement(val delegate: Stmt[IdBasedVar], m: OpalMethod) extends State
         }
 
         if (rightExpr.isVar) {
-          return new OpalLocal(delegate.asAssignment.expr.asVar, m)
+          return new OpalLocal(rightExpr.asVar, m)
         }
 
         return new OpalVal(delegate.asAssignment.expr, m)
@@ -308,33 +308,5 @@ class OpalStatement(val delegate: Stmt[IdBasedVar], m: OpalMethod) extends State
     case _ => false
   }
 
-  override def toString: String = {
-    if (containsInvokeExpr()) {
-      var base = ""
-      if (getInvokeExpr.isInstanceInvokeExpr) {
-        base = s"${getInvokeExpr.getBase}."
-      }
-      var assign = ""
-      if (isAssignStmt) {
-        assign = s"$getLeftOp = "
-      }
-
-      return s"${delegate.pc}: $assign$base${getInvokeExpr.getMethod.getName}(${Joiner.on(",").join(getInvokeExpr.getArgs)})"
-    }
-
-    if (isAssignStmt) {
-      if (delegate.isAssignment) {
-        if (isFieldStore) {
-          return s"${delegate.pc}: $getLeftOp = ${getFieldStore.getX}.${getFieldStore.getY}"
-        } else if (isArrayStore) {
-          val base = getArrayBase
-          return s"${delegate.pc}: ${base.getX.getVariableName}[${base.getY}] = $getRightOp"
-        } else {
-          return s"${delegate.pc}: $getLeftOp = $getRightOp"
-        }
-      }
-    }
-
-    delegate.toString
-  }
+  override def toString: String = OpalStatementFormatter(this)
 }

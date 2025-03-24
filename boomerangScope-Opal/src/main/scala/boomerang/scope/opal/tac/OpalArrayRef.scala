@@ -1,13 +1,14 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
+import boomerang.scope.opal.transformer.TacLocal
 import org.opalj.br.ObjectType
 import org.opalj.tac.{DUVar, DVar, Expr, IdBasedVar, UVar, Var}
 import org.opalj.value.ValueInformation
 
 import java.util.Objects
 
-class OpalArrayRef(val arrayRef: Expr[IdBasedVar], val index: Int, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
+class OpalArrayRef(val arrayRef: Expr[TacLocal], val index: Int, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   if (!arrayRef.isVar) {
     throw new RuntimeException("Array Ref has to be a variable")
