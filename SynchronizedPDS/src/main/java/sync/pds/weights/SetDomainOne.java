@@ -25,25 +25,25 @@ public class SetDomainOne implements SetDomain {
     return one;
   }
 
- @Nonnull
+  @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other==(one())) {
+    if (other == (one())) {
       return this;
     }
-    if (this==(one())) {
+    if (this == (one())) {
       return other;
     }
     return zero();
   }
 
   @Nonnull
- @Override
+  @Override
   public Weight combineWith(@Nonnull Weight other) {
 
     SetDomain zero = zero();
-    if (other== zero) return this;
-    if (this==(one()) || other==(one())) return one();
+    if (other == zero) return this;
+    if (this == (one()) || other == (one())) return one();
     if (other instanceof SetDomainOne) {
       throw new IllegalStateException("SetDomainOne.CombineWith-Dont");
       //      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(getNodes());

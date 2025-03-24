@@ -55,10 +55,6 @@ public class PathConditionWeightOne implements PathConditionWeight {
     return one;
   }
 
-
-
-
-
   public enum ConditionDomain {
     TRUE,
     FALSE,
@@ -113,7 +109,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
     Set<Val> newReturnVals = Sets.newHashSet(getReturnVals());
     newReturnVals.addAll(other.getReturnVals());
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(getCalleeToCallSite());
-   return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
+    return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
   }
 
   @Nonnull
@@ -181,8 +177,8 @@ public class PathConditionWeightOne implements PathConditionWeight {
     newReturnVals.addAll(other.getReturnVals());
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(getCalleeToCallSite());
     calleeToCallSiteMapping.putAll(other.getCalleeToCallSite());
- return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
-    }
+    return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
+  }
 
   @Override
   public int hashCode() {

@@ -34,7 +34,6 @@ public class InferenceWeightZero implements Weight {
 
   @Nonnull private static final InferenceWeightZero zero = new InferenceWeightZero();
 
-
   private InferenceWeightZero() {}
 
   @Nonnull
@@ -46,8 +45,8 @@ public class InferenceWeightZero implements Weight {
   @Override
   public Weight extendWith(@Nonnull Weight other) {
     InferenceWeight one = one();
-    if (other==(one)) return this;
-    if (other==(zero()) || this==(zero())) {
+    if (other == (one)) return this;
+    if (other == (zero()) || this == (zero())) {
       return zero();
     }
     InferenceWeightImpl func = (InferenceWeightImpl) other;

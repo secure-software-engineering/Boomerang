@@ -28,9 +28,6 @@ public class PathConditionWeightImpl implements PathConditionWeight {
   private Set<Val> returnVals = Sets.newHashSet();
   private Map<Method, Statement> calleeToCallSite = Maps.newHashMap();
 
-
-
-
   public PathConditionWeightImpl(Statement callSite, Method callee) {
     this.calleeToCallSite.put(callee, callSite);
   }
