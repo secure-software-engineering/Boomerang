@@ -50,9 +50,9 @@ public class TransitionFunctionZero implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    TransitionFunction one = one();
-    if (other==(one)) return this;
-    if (other==(zero()) || this==(zero())) {
+    if (other.equals(one())) return this;
+    if (this.equals(one())) return other;
+    if (other.equals(zero()) || this.equals(zero())) {
       return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -62,13 +62,13 @@ public class TransitionFunctionZero implements TransitionFunction {
     for (Transition first : getValues()) {
       for (Transition second : otherTransitions) {
 
-        if (second==(TransitionIdentity.identity())) {
+        if (second.equals(TransitionIdentity.identity())) {
           ress.add(first);
           newStateChangeStatements.addAll(getStateChangeStatements());
-        } else if (first==(TransitionIdentity.identity())) {
+        } else if (first.equals(TransitionIdentity.identity())) {
           ress.add(second);
           newStateChangeStatements.addAll(func.getStateChangeStatements());
-        } else if (first.to()==(second.from())) {
+        } else if (first.to().equals(second.from())) {
           ress.add(new TransitionImpl(first.from(), second.to()));
           newStateChangeStatements.addAll(func.getStateChangeStatements());
         }
@@ -83,12 +83,29 @@ public class TransitionFunctionZero implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (this==(zero())) return other;
-    if (other==(zero())) return this;
-
+    if (this.equals(zero())) return other;
+    if (other.equals(zero())) return this;
+    if (other.equals(one()) && this.equals(one())) {
+      return one();
+    }
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-      Set<Transition> transitions = new HashSet<>(func.getValues());
+    if (other.equals(one()) || this.equals(one())) {
+      Set<Transition> transitions =
+          new HashSet<>((other.equals(one()) ? getValues() : func.getValues()));
+      Set<Transition> idTransitions = Sets.newHashSet();
+      for (Transition t : transitions) {
+        idTransitions.add(new TransitionImpl(t.from(), t.from()));
+      }
+      transitions.addAll(idTransitions);
+      return new TransitionFunctionImpl(
+          transitions,
+          Sets.newHashSet(
+              (other.equals(one())
+                  ? getStateChangeStatements()
+                  : func.getStateChangeStatements())));
+    }
+    Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(getValues());
     HashSet<ControlFlowGraph.Edge> newStateChangeStmts =
         Sets.newHashSet(getStateChangeStatements());

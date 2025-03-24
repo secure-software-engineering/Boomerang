@@ -57,11 +57,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    TransitionFunction one = one();
-    TransitionFunction zero = zero();
-    if (other==one) return this;
-    if ((other==zero)) {
-      return zero;
+    if (other.equals(one())) return this;
+    if (this.equals(one())) return other;
+    if (other.equals(zero()) || this.equals(zero())) {
+      return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
     Set<? extends Transition> otherTransitions = func.values;
@@ -91,14 +90,14 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    TransitionFunction zero = zero();
-    TransitionFunction one = one();
-
-    if (other==(zero)) return this;
-
+    if (this.equals(zero())) return other;
+    if (other.equals(zero())) return this;
+    if (other.equals(one()) && this.equals(one())) {
+      return one();
+    }
 
     TransitionFunction func = (TransitionFunction) other;
-    if (other==one) {
+    if (other.equals(one()) || this.equals(one())) {
       Set<Transition> transitions =
           new HashSet<>((other.equals(one()) ? values : func.getValues()));
       Set<Transition> idTransitions = Sets.newHashSet();
