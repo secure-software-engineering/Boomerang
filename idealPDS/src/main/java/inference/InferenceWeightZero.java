@@ -33,7 +33,7 @@ import wpds.impl.Weight;
 public class InferenceWeightZero implements Weight {
 
   @NonNull private static final InferenceWeightZero zero = new InferenceWeightZero();
-  ;
+
 
   private InferenceWeightZero() {}
 
@@ -45,13 +45,13 @@ public class InferenceWeightZero implements Weight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    if (other.equals(zero()) || this.equals(zero())) {
+    InferenceWeight one = one();
+    if (other==(one)) return this;
+    if (other==(zero()) || this==(zero())) {
       return zero();
     }
-    InferenceWeight func = (InferenceWeightImpl) other;
-    Set<Method> otherInvokedMethods = ((InferenceWeightImpl) func).getInvokedMethods();
+    InferenceWeightImpl func = (InferenceWeightImpl) other;
+    Set<Method> otherInvokedMethods = (func).getInvokedMethods();
     Set<Method> res = new HashSet<>(getInvokedMethods());
     res.addAll(otherInvokedMethods);
     return new InferenceWeightImpl((Method) res);

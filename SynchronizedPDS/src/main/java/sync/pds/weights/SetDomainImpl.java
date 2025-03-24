@@ -17,7 +17,6 @@ import static sync.pds.weights.SetDomainZero.zero;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
@@ -35,25 +34,25 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   @Override
   public Weight extendWith(@NonNull Weight other) {
     Weight one = one();
-    if (other == (one)) {
+    if (other==(one)) {
       return this;
     }
 
     return zero();
   }
 
- @NonNull
+  @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
 
     SetDomain zero = zero();
-    if (other == zero) return this;
-    SetDomainOne one = (SetDomainOne) one();
-    if (other == one) return one;
+    if (other== zero) return this;
+    SetDomain one = one();
+    if (other== one) return one;
 
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
-      merged.addAll(Objects.requireNonNull(((SetDomainImpl) other).nodes));
+      merged.addAll(((SetDomainImpl) other).nodes);
       return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
     return zero;
@@ -82,6 +81,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   public boolean equals(Object obj) {
     return false;
   }
+
   @NonNull
   @Override
   public Collection<Node<Stmt, Fact>> elements() {
