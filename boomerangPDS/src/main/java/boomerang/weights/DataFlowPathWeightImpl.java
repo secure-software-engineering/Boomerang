@@ -25,13 +25,10 @@ import wpds.impl.Weight;
 
 public class DataFlowPathWeightImpl implements DataFlowPathWeight {
 
-  private final PathTrackingWeight path;
+    private final PathTrackingWeight path;
   private final PathConditionWeight condition;
 
-  private DataFlowPathWeightImpl() {
-    path = PathTrackingWeightOne.one();
-    condition = PathConditionWeightOne.one();
-  }
+
 
   public DataFlowPathWeightImpl(Node<Edge, Val> path) {
     this.path = new PathTrackingWeightImpl(path);

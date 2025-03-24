@@ -21,37 +21,36 @@ import wpds.impl.Weight;
 public class SetDomainOne implements SetDomain {
   @Nonnull private static final SetDomainOne one = new SetDomainOne();
 
-  public static Weight one() {
+  public static SetDomainOne one() {
     return one;
   }
 
-  @Nonnull
+ @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other.equals(one())) {
+    if (other==(one())) {
       return this;
     }
-    if (this.equals(one())) {
+    if (this==(one())) {
       return other;
     }
     return zero();
   }
 
   @Nonnull
-  @Override
+ @Override
   public Weight combineWith(@Nonnull Weight other) {
 
-    if (other.equals(zero())) return this;
-    if (this.equals(zero())) return other;
-    if (this.equals(one()) || other.equals(one())) return one();
-
+    SetDomain zero = zero();
+    if (other== zero) return this;
+    if (this==(one()) || other==(one())) return one();
     if (other instanceof SetDomainOne) {
       throw new IllegalStateException("SetDomainOne.CombineWith-Dont");
       //      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(getNodes());
       //      merged.addAll(((SetDomainImpl) other).getNodes());
       //      return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
-    return zero();
+    return zero;
   }
 
   @Nonnull

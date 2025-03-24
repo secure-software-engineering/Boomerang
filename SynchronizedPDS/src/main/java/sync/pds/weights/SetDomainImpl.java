@@ -30,15 +30,14 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     this.nodes = nodes;
   }
 
-  @Nonnull
+ @Nonnull
   @Override
-  public Weight extendWith(Weight other) {
-    if (other.equals(one())) {
+  public Weight extendWith(@Nonnull Weight other) {
+    Weight one = one();
+    if (other==(one)) {
       return this;
     }
-    if (this.equals(one())) {
-      return other;
-    }
+
     return zero();
   }
 
@@ -46,16 +45,17 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   @Override
   public Weight combineWith(@Nonnull Weight other) {
 
-    if (other.equals(zero())) return this;
-    if (this.equals(zero())) return other;
-    if (this.equals(one()) || other.equals(one())) return one();
+    SetDomain zero = zero();
+    if (other== zero) return this;
+    SetDomain one = one();
+    if (other== one) return one;
 
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
       merged.addAll(((SetDomainImpl) other).nodes);
       return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
-    return zero();
+    return zero;
   }
 
   @Nonnull
@@ -79,9 +79,6 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
     return false;
   }
 
