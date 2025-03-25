@@ -45,22 +45,13 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
 
   override def getThisLocal: Val = {
     if (!isStatic) {
-      /* The 'this' local is implicitly defined as parameter local with id -1. If the 'this' local
-       * is not used within the method, it stays at -1. However, if it is used, there is an additional
-       * assignment to an actual variable. Therefore, we have to check first for the usage.
-       */
       tac.statements.foreach(stmt => {
-        if (stmt.isAssignment && stmt.asAssignment.expr.isVar) {
-          if (stmt.asAssignment.expr.asVar.id == -1) {
-            return new OpalLocal(stmt.asAssignment.targetVar, this)
-          }
-        }
-      })
+        if (stmt.pc == -1) {
+          val targetVar = stmt.asAssignment.targetVar
 
-      // 'this' local is not used; return just the parameter local
-      tac.statements.foreach(stmt => {
-        if (stmt.isAssignment && stmt.asAssignment.targetVar.id == -1) {
-          return new OpalLocal(stmt.asAssignment.targetVar, this)
+          if (targetVar.id == -1) {
+            return new OpalLocal(targetVar, this)
+          }
         }
       })
 
@@ -74,7 +65,8 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
     if (localCache.isEmpty) {
       localCache = Some(new util.HashSet[Val]())
 
-      // 'this' local
+      tac.getLocals.foreach(l => localCache.get.add(new OpalLocal(l, this)))
+      /*// 'this' local
       if (!isStatic) {
         localCache.get.add(getThisLocal)
       }
@@ -88,7 +80,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
 
           localCache.get.add(new OpalLocal(targetVar, this))
         }
-      })
+      })*/
     }
 
     localCache.get
@@ -98,35 +90,12 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
     if (parameterLocalCache.isEmpty) {
       parameterLocalCache = Some(new util.ArrayList[Val]())
 
-      val indices = new util.HashSet[Integer]()
-
-      tac.statements.foreach(stmt => {
-        if (stmt.isAssignment && stmt.asAssignment.expr.isVar) {
-          val param = stmt.asAssignment.expr.asVar
-
-          // Exclude the 'this' local
-          if (param.id < 0 && param.id != -1) {
-            val paramLocal = new OpalLocal(stmt.asAssignment.targetVar, this)
-
-            parameterLocalCache.get.add(paramLocal)
-            indices.add(param.id)
-          }
-        }
-      })
-
-      // Collect all unused parameter locals
-      tac.statements.foreach(stmt => {
-        if (stmt.isAssignment) {
-          val target = stmt.asAssignment.targetVar
-
-          // Exclude 'this' local
-          if (target.id < 0 && target.id != -1) {
-            if (!indices.contains(target.id)) {
-              val paramLocal = new OpalLocal(target, this)
-
-              parameterLocalCache.get.add(paramLocal)
-            }
-          }
+      tac.getParameterLocals.foreach(l => {
+        // Exclude the 'this' local from the parameters if this is an instance method
+        if (isStatic) {
+          parameterLocalCache.get.add(new OpalLocal(l, this))
+        } else if (l.id != -1) {
+          parameterLocalCache.get.add(new OpalLocal(l, this))
         }
       })
     }

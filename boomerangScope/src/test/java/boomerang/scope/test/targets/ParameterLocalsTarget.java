@@ -27,7 +27,7 @@ public class ParameterLocalsTarget {
 
   public void oneParameter(@SuppressWarnings("unused") int i) {}
 
-  public void twoParameters(@SuppressWarnings("unused") int i, @SuppressWarnings("unused") A a) {
+  public void twoParameters(int i, A a) {
     a.methodCall(i);
   }
 }

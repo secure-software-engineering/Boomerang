@@ -14,7 +14,11 @@ trait TacLocal extends Var[TacLocal] {
 
   def isRegisterLocal: Boolean
 
+  def isParameterLocal: Boolean
+
   def cTpe: ComputationalType
+
+  def value: ValueInformation
 
   final def isSideEffectFree: Boolean = true
 
@@ -23,9 +27,11 @@ trait TacLocal extends Var[TacLocal] {
       "TacLocal objects are not expected to inherit from DUVar"
     )
   }
+
+  override def toString: String = name
 }
 
-class StackLocal(identifier: Int, computationalType: ComputationalType) extends TacLocal {
+class StackLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation) extends TacLocal {
 
   override def id: Int = identifier
 
@@ -33,9 +39,13 @@ class StackLocal(identifier: Int, computationalType: ComputationalType) extends 
 
   override def isRegisterLocal: Boolean = false
 
+  override def isParameterLocal: Boolean = false
+
   override def name: String = s"$$s$identifier"
 
   override def cTpe: ComputationalType = computationalType
+
+  override def value: ValueInformation = valueInfo
 
   override def hashCode: Int = Objects.hash(id)
 
@@ -43,11 +53,9 @@ class StackLocal(identifier: Int, computationalType: ComputationalType) extends 
     case that: StackLocal => this.id == that.id
     case _ => false
   }
-
-  override def toString: String = name
 }
 
-class RegisterLocal(identifier: Int, computationalType: ComputationalType) extends TacLocal {
+class RegisterLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation) extends TacLocal {
 
   override def id: Int = identifier
 
@@ -55,9 +63,13 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType) exten
 
   override def isRegisterLocal: Boolean = true
 
+  override def isParameterLocal: Boolean = false
+
   override def name: String = s"r${-identifier - 1}"
 
   override def cTpe: ComputationalType = computationalType
+
+  override def value: ValueInformation = valueInfo
 
   override def hashCode: Int = Objects.hash(id)
 
@@ -65,8 +77,30 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType) exten
     case that: RegisterLocal => this.id == that.id
     case _ => false
   }
-
-  override def toString: String = name
 }
 
+class ParameterLocal(identifier: Int, computationalType: ComputationalType, paramName: String) extends TacLocal {
 
+  override def id: Int = identifier
+
+  override def isStackLocal: Boolean = false
+
+  override def isRegisterLocal: Boolean = false
+
+  override def isParameterLocal: Boolean = true
+
+  override def cTpe: ComputationalType = computationalType
+
+  override def value: ValueInformation = throw new UnsupportedOperationException("No value information available for parameter local")
+
+  override def name: String = paramName
+
+  override def hashCode: Int = Objects.hash(id)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: ParameterLocal => this.id == that.id
+    case _ => false
+  }
+}
+
+// TODO Consider TempLocal in SWAP

@@ -51,11 +51,11 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
 
     var headFound = false
     method.tac.statements.foreach(stmt => {
+      val statement = new OpalStatement(stmt, method)
+      statements.add(statement)
+
       // Definition of parameter locals have implicit PC of -1, so they are not part of the actual CFG
       if (stmt.pc != -1) {
-        val statement = new OpalStatement(stmt, method)
-        statements.add(statement)
-
         val stmtPc = method.tac.pcToIndex(stmt.pc)
 
         // The first statement after the parameter local definitions is the head

@@ -15,10 +15,10 @@ class OpalVal(val delegate: Expr[TacLocal], method: OpalMethod, unbalanced: Cont
   }
 
   override def getType: Type = delegate match {
+    case nullExpr: NullExpr => OpalType(nullExpr.tpe)
     case const: Const => OpalType(const.tpe)
     case newExpr: New => OpalType(newExpr.tpe)
     case newArrayExpr: NewArray[_] => OpalType(newArrayExpr.tpe)
-    case nullExpr: NullExpr => OpalType(nullExpr.tpe)
     case functionCall: FunctionCall[_] => OpalType(functionCall.descriptor.returnType)
     case _ => throw new RuntimeException("Type not implemented yet")
   }

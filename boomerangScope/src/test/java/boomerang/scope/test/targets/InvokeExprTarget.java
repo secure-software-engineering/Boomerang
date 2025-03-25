@@ -40,4 +40,14 @@ public class InvokeExprTarget {
 
     a.methodCall(i);
   }
+
+  public static void alias2() {
+    A alias2 = new A();
+    if (Math.random() > 0.5) {
+      Object alias1 = alias2;
+      alias2 = new A();
+    }
+
+    System.out.println(alias2);
+  }
 }

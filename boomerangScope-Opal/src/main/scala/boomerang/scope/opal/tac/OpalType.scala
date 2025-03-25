@@ -4,9 +4,9 @@ import boomerang.scope.opal.OpalClient
 import boomerang.scope.{AllocVal, Type, Val, WrappedClass}
 import org.opalj.br.ObjectType
 
-case class OpalType(delegate: org.opalj.br.Type, isNull: Boolean = false) extends Type {
+case class OpalType(delegate: org.opalj.br.Type) extends Type {
 
-  override def isNullType: Boolean = isNull
+  override def isNullType: Boolean = false
 
   override def isRefType: Boolean = delegate.isObjectType
 

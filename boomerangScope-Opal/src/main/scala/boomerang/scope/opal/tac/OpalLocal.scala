@@ -9,7 +9,16 @@ import java.util.Objects
 
 class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
-  override def getType: Type = OpalType(ObjectType("java/lang/Object"))
+  override def getType: Type = {
+    val value = delegate.asVar.value
+
+    if (value.isPrimitiveValue) return OpalType(value.asPrimitiveValue.primitiveType)
+    if (value.isReferenceValue) return OpalType(value.asReferenceValue.asReferenceType)
+    if (value.isVoid) return OpalType(ObjectType.Void)
+
+    // TODO Array and illegal types
+    throw new RuntimeException("Type not implemented yet")
+  }
 
   override def isStatic: Boolean = false
 

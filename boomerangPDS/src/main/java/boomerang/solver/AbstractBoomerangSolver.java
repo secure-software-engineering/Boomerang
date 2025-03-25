@@ -522,6 +522,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     }
     if (!(targetVal.isRefType()) || !(sourceVal.isRefType())) {
       // A null pointer cannot be cast to any object
+      // TODO This should be more target.isNull
       return options.killNullAtCast()
           && targetVal.isNullType()
           && isCastNode(
