@@ -54,8 +54,10 @@ object TacTransformer {
       }
 
       if (stmt.astID == Assignment.ASTID) {
-        val target = createNewLocal(stmt.pc, stmt.asAssignment.targetVar)
         val transformedExpr = transformExpr(stmt.asAssignment.expr)
+        val isThisAssignment = !method.isStatic && transformedExpr.isVar && transformedExpr.asVar.id == -1
+
+        val target = createNewLocal(stmt.pc, stmt.asAssignment.targetVar, isThisAssignment)
 
         // Store the current stack and register locals on our own 'stack'
         currentStack(stmt.asAssignment.targetVar.id) = target
@@ -97,7 +99,7 @@ object TacTransformer {
 
         val arrayRef = transformExpr(arrayStore.arrayRef)
         val index = transformExpr(arrayStore.index)
-        val value = transformExpr(arrayStore.index)
+        val value = transformExpr(arrayStore.value)
 
         return ArrayStore(arrayStore.pc, arrayRef, index, value)
       }
@@ -179,7 +181,7 @@ object TacTransformer {
       throw new RuntimeException("Could not transform statement: " + stmt)
     }
 
-    def createNewLocal(pc: Int, idBasedVar: IdBasedVar): TacLocal = {
+    def createNewLocal(pc: Int, idBasedVar: IdBasedVar, isThis: Boolean = false): TacLocal = {
       if (pc == -1) {
         val local = localArray(0)
 
@@ -189,10 +191,15 @@ object TacTransformer {
       val nextPc = tacNaive.stmts(tacNaive.pcToIndex(pc) + 1).pc
 
       if (idBasedVar.id >= 0) {
-        stackCounter += 1
+        if (isThis) {
+          val value = operandsArray(nextPc).head
+          new StackLocal(-1, idBasedVar.cTpe, value)
+        } else {
+          stackCounter += 1
 
-        val value = operandsArray(nextPc).head
-        new StackLocal(stackCounter, idBasedVar.cTpe, value)
+          val value = operandsArray(nextPc).head
+          new StackLocal(stackCounter, idBasedVar.cTpe, value)
+        }
       } else {
         val local = localArray(nextPc)
         new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1))
@@ -276,7 +283,7 @@ object TacTransformer {
 
       if (expr.astID == PrimitiveTypecastExpr.ASTID) {
         val primitiveTypecastExpr = expr.asPrimitiveTypeCastExpr
-        val operand = transformExpr(primitiveTypecastExpr)
+        val operand = transformExpr(primitiveTypecastExpr.operand)
 
         return PrimitiveTypecastExpr(primitiveTypecastExpr.pc, primitiveTypecastExpr.targetTpe, operand)
       }
@@ -357,6 +364,7 @@ object TacTransformer {
     }
 
     val transformedTac: Array[Stmt[TacLocal]] = tacNaive.stmts.map(stmt => transformStatement(stmt))
+    val optimizedTac: Array[Stmt[TacLocal]] = BasicPropagation(transformedTac)
 
     // Update the CFG
     val cfg = CFGFactory(method, classHierarchy)
@@ -364,8 +372,8 @@ object TacTransformer {
       throw new RuntimeException("Could not compute CFG for method " + method.name)
     }
 
-    val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(transformedTac), tacNaive.pcToIndex, i => i, transformedTac.length)
+    val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(optimizedTac), tacNaive.pcToIndex, i => i, optimizedTac.length)
 
-    new BoomerangTACode(tacNaive.params, transformedTac, tacNaive.pcToIndex, tacCfg, tacNaive.exceptionHandlers)
+    new BoomerangTACode(tacNaive.params, optimizedTac, tacNaive.pcToIndex, tacCfg, tacNaive.exceptionHandlers)
   }
 }

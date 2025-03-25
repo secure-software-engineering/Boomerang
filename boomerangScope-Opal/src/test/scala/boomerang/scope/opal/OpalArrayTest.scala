@@ -1,10 +1,12 @@
 package boomerang.scope.opal
 
 import boomerang.scope.opal.tac.OpalMethod
+import boomerang.scope.opal.transformer.{BasicPropagation, TacLocal}
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
 import org.junit.{Assert, Test}
 import org.opalj.br.IntegerType
+import org.opalj.tac.Stmt
 
 import java.util
 
@@ -40,7 +42,7 @@ class OpalArrayTest {
   }
 
   @Test
-  def singleArrayWriteTest(): Unit = {
+  def singleArrayStoreTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
@@ -64,6 +66,18 @@ class OpalArrayTest {
     })
 
     Assert.assertEquals(1, arrayStoreCount)
+  }
+
+  @Test
+  def multiArrayStore(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[ArrayTarget].getName)
+
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "multiArrayStore", "Void")
+    val method = opalSetup.resolveMethod(signature)
+    val opalMethod = OpalMethod(method)
+
+    println(opalMethod.tac.statements.mkString("Array(\n\t", "\n\t", "\n)"))
   }
 
 }

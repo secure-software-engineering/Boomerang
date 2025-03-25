@@ -36,11 +36,13 @@ case class OpalType(delegate: org.opalj.br.Type) extends Type {
     val sourceType = delegate.asReferenceType
     val targetType = targetValType.asInstanceOf[OpalType].delegate.asReferenceType
 
-    target match {
+    false
+
+    /*target match {
       case allocVal: AllocVal if allocVal.getAllocVal.isNewExpr => OpalClient.getClassHierarchy.isSubtypeOf(sourceType, targetType)
 
-      case _ => OpalClient.getClassHierarchy.isSubtypeOf(sourceType, targetType)
-    }
+      case _ => OpalClient.getClassHierarchy.isSubtypeOf(sourceType, targetType) || OpalClient.getClassHierarchy.isSubtypeOf(targetType, sourceType)
+    }*/
   }
 
   override def isSubtypeOf(otherType: String): Boolean = {
