@@ -73,13 +73,11 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(@Nonnull Object obj) {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
+
     if (getClass() != obj.getClass()) {
       return false;
     }

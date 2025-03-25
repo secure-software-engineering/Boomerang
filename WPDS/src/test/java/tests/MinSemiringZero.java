@@ -11,55 +11,53 @@
  */
 package tests;
 
-import static tests.NumWeightOne.one;
-import static tests.NumWeightZero.zero;
+import static tests.MinSemiringOne.one;
 
+import de.fraunhofer.iem.Location;
 import javax.annotation.Nonnull;
 import wpds.impl.Weight;
 
-public class NumWeightImpl implements NumWeight {
+public class MinSemiringZero implements MinSemiring {
 
-  private final int i;
+  private MinSemiringZero() {}
 
-  public NumWeightImpl(int i) {
-    this.i = i;
-  }
-
-  public int getI() {
-    return i;
-  }
+  public MinSemiringZero(int i) {}
 
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    NumWeight one = one();
-    if (other == (one)) return this;
-    NumWeight zero = zero();
-    if (other == zero) return zero;
-    NumWeight o = (NumWeight) other;
-    return new NumWeightImpl(o.getI() + getI());
+    if (other == (one())) return this;
+    if (this == (one())) return other;
+    MinSemiringZero o = (MinSemiringZero) other;
+    return new MinSemiringZero(o.getI() + getI());
   }
 
   @Nonnull
   @Override
   public Weight combineWith(@Nonnull Weight other) {
-    NumWeight zero = zero();
-    if (other == zero) return this;
-    NumWeight o = (NumWeight) other;
-    if (o.getI() == getI()) return o;
+    if (other == (zero())) return this;
+    if (this == (zero())) return other;
+    MinSemiringZero o = (MinSemiringZero) other;
+    return new MinSemiringZero(Math.min(o.getI(), getI()));
+  }
+
+  @Nonnull private static final MinSemiringZero zero = new MinSemiringZero();
+
+  public static <N extends Location> MinSemiring zero() {
+
     return zero;
   }
 
   @Override
   public String toString() {
-    return Integer.toString(i);
+    return Integer.toString(getI());
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + i;
+    result = prime * result + getI();
     return result;
   }
 
@@ -68,7 +66,12 @@ public class NumWeightImpl implements NumWeight {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    NumWeightImpl other = (NumWeightImpl) obj;
-    return i == other.i;
+    MinSemiringZero other = (MinSemiringZero) obj;
+    return getI() == other.getI();
+  }
+
+  @Override
+  public int getI() {
+    return 0;
   }
 }

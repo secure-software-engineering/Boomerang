@@ -64,11 +64,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-    Set<? extends Transition> otherTransitions = func.values;
     Set<Transition> ress = new HashSet<>();
     Set<Edge> newStateChangeStatements = new HashSet<>();
     for (Transition first : values) {
-      for (Transition second : otherTransitions) {
+      for (Transition second : func.values) {
 
         if (second.equals(TransitionIdentity.identity())) {
           ress.add(first);

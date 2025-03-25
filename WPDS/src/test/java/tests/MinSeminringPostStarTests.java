@@ -101,7 +101,7 @@ public class MinSeminringPostStarTests {
   }
 
   private static MinSemiring w(int i) {
-    return new MinSemiring(i);
+    return new MinSemiringImpl(i);
   }
 
   static WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> waccepts(
@@ -121,7 +121,7 @@ public class MinSeminringPostStarTests {
 
           @Override
           public MinSemiring getOne() {
-            return MinSemiring.one();
+            return MinSemiringOne.one();
           }
 
           @Override

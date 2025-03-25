@@ -29,7 +29,7 @@ public class SetDomainZero implements SetDomain {
   @Nonnull
   @Override
   public Weight extendWith(@Nonnull Weight other) {
-    if (other == (one())) {
+    if (other == one()) {
       return this;
     }
 
@@ -40,8 +40,8 @@ public class SetDomainZero implements SetDomain {
   @Override
   public Weight combineWith(@Nonnull Weight other) {
 
-    if (other == (zero())) return this;
-    if (this == (zero())) return other;
+    if (other == zero()) return this;
+    if (this == zero()) return other;
     SetDomain one = one();
     if (other == one) return one;
 

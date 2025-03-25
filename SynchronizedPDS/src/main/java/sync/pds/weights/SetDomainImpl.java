@@ -17,6 +17,7 @@ import static sync.pds.weights.SetDomainZero.zero;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import sync.pds.solver.nodes.Node;
@@ -52,7 +53,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
-      merged.addAll(((SetDomainImpl) other).nodes);
+      merged.addAll(Objects.requireNonNull(((SetDomainImpl) other).nodes));
       return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
     return zero;
