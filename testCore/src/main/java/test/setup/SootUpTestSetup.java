@@ -16,6 +16,7 @@ import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.sootup.BoomerangPreInterceptor;
 import boomerang.scope.sootup.SootUpFrameworkScope;
+import boomerang.scope.sootup.jimple.JimpleUpMethod;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +25,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import sootup.SourceTypeSplittingAnalysisInputLocation;
+import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.RapidTypeAnalysisAlgorithm;
 import sootup.core.frontend.BodySource;
@@ -63,36 +64,23 @@ import sootup.jimple.frontend.JimpleView;
 
 public class SootUpTestSetup implements TestSetup {
 
+  JavaView javaView;
+  protected JavaSootMethod javaTestMethod;
+  List<MethodSignature> entypointSignatures = Lists.newArrayList();
+
   @Override
   public void initialize(
       String classPath,
       MethodWrapper testMethod,
       List<String> includedPackages,
       List<String> excludedPackages) {
-    throw new UnsupportedOperationException("Not implemented yet");
-  }
 
-  @Override
-  public Method getTestMethod() {
-    throw new UnsupportedOperationException("Not implemented yet");
-  }
+    // FIXME: missing parameters!
 
-  @Override
-  public FrameworkScope createFrameworkScope(DataFlowScope dataFlowScope) {
-    throw new UnsupportedOperationException("Not implemented yet");
-  }
+    String className = testMethod.getDeclaringClass();
+    String customEntrypointMethodName = testMethod.getMethodName();
 
-  /** SootUp Framework setup TODO: [ms] refactor me! */
-  private static FrameworkScope getSootUpFrameworkScope(
-      String pathStr,
-      String className,
-      String customEntrypointMethodName,
-      List<String> includedPackages,
-      List<String> excludedPackages) {
-
-    System.out.println("framework:sootup");
-
-    // FIXME add dependent classs from entrypoint
+    /*
     Path testClassesBinRoot = Paths.get(System.getProperty("user.dir") + "/target/test-classes/");
     try {
       Files.walk(testClassesBinRoot)
@@ -107,13 +95,14 @@ public class SootUpTestSetup implements TestSetup {
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
-
+*/
     // configure interceptors
-    // TODO: check if the interceptor needs a reset in between runs
     List<BodyInterceptor> bodyInterceptors =
         new ArrayList<>(
             List.of(new CastAndReturnInliner(), new LocalSplitter(), new TypeAssigner()));
     //     new ArrayList<>(BytecodeBodyInterceptors.Default.getBodyInterceptors());
+
+    // TODO: check if the interceptor needs a reset in between runs
     bodyInterceptors.add(new BoomerangPreInterceptor());
 
     // configure AnalysisInputLocations
@@ -122,9 +111,10 @@ public class SootUpTestSetup implements TestSetup {
     DefaultRuntimeAnalysisInputLocation runtimeInputLocation =
         new DefaultRuntimeAnalysisInputLocation();
 
-    System.out.println("incl" + includedPackages);
-    System.out.println("ex" + excludedPackages);
+//    System.out.println("incl" + includedPackages);
+//    System.out.println("ex" + excludedPackages);
 
+    // FIXME: respect included / excluded packages
     if (true) {
       inputLocations.add(runtimeInputLocation);
     } else {
@@ -143,9 +133,9 @@ public class SootUpTestSetup implements TestSetup {
     }
 
     JavaClassPathAnalysisInputLocation classPathInputLocation =
-        new JavaClassPathAnalysisInputLocation(pathStr, SourceType.Application, bodyInterceptors);
+        new JavaClassPathAnalysisInputLocation(classPath, SourceType.Application, bodyInterceptors);
 
-    if (includedPackages.isEmpty() && excludedPackages.isEmpty()) {
+    if ( true /*includedPackages.isEmpty() && excludedPackages.isEmpty() */) {
       inputLocations.add(classPathInputLocation);
     } else {
       SourceTypeSplittingAnalysisInputLocation.ApplicationAnalysisInputLocation
@@ -169,10 +159,7 @@ public class SootUpTestSetup implements TestSetup {
                     classPathInputLocation, excludedPackages))
      */
 
-    JavaView javaView;
     Collection<JavaSootClass> classes;
-    sootup.callgraph.CallGraph cg;
-    List<MethodSignature> entypointSignatures = Lists.newArrayList();
 
     if (customEntrypointMethodName == null) {
       System.out.println(inputLocations);
@@ -212,132 +199,173 @@ public class SootUpTestSetup implements TestSetup {
 
     } else {
 
-      // build dummy entrypoint class
-      String jimpleClassStr =
-          "class dummyClass\n"
-              + "{\n"
-              + "    public static void main(java.lang.String[])\n"
-              + "    {\n"
-              + "        "
-              + className
-              + " dummyObj;\n"
-              + "        java.lang.String[] l0;\n"
-              + "        l0 := @parameter0: java.lang.String[];\n"
-              + "        dummyObj = new "
-              + className
-              + ";\n"
-              + "        virtualinvoke dummyObj.<"
-              + className
-              + ": void "
-              + customEntrypointMethodName
-              + "()>();\n"
-              + "        return;\n"
-              + "    }\n"
-              + "}";
-
-      JavaClassType dummyClassType = new JavaClassType("dummyClass", new PackageName(""));
-      JimpleStringAnalysisInputLocation jimpleStringAnalysisInputLocation =
-          new JimpleStringAnalysisInputLocation(
-              jimpleClassStr, SourceType.Application, Collections.emptyList());
-      JimpleView jimpleView = new JimpleView(jimpleStringAnalysisInputLocation);
-      Optional<SootClass> aClass = jimpleView.getClass(dummyClassType);
-
-      assert aClass.isPresent();
-      sootup.core.model.SootClass sootClass = aClass.get();
-
-      MethodSignature methodSignature =
-          jimpleView
-              .getIdentifierFactory()
-              .parseMethodSignature("<dummyClass: void main(java.lang.String[])>");
-      BodySource bodySource =
-          new BodySource() {
-            @Override
-            public sootup.core.model.@NonNull Body resolveBody(
-                @NonNull Iterable<MethodModifier> iterable) throws ResolveException, IOException {
-              return sootup.core.model.Body.builder(
-                      new MutableBlockStmtGraph(
-                          sootClass
-                              .getMethod(methodSignature.getSubSignature())
-                              .get()
-                              .getBody()
-                              .getStmtGraph()))
-                  .setMethodSignature(methodSignature)
-                  .build();
-            }
-
-            @Override
-            public Object resolveAnnotationsDefaultValue() {
-              return null;
-            }
-
-            @NonNull
-            @Override
-            public MethodSignature getSignature() {
-              return methodSignature;
-            }
-          };
-      JavaSootMethod method =
-          new JavaSootMethod(
-              bodySource,
-              methodSignature,
-              EnumSet.of(MethodModifier.PUBLIC, MethodModifier.STATIC),
-              Collections.emptySet(),
-              Collections.emptyList(),
-              NoPositionInformation.getInstance());
-
-      OverridingJavaClassSource dummyClassSource =
-          new OverridingJavaClassSource(
-              new EagerInputLocation(),
-              Paths.get("/in-memory"),
-              dummyClassType,
-              null,
-              Collections.emptySet(),
-              null,
-              Collections.emptySet(),
-              Collections.singleton(method),
-              NoPositionInformation.getInstance(),
-              EnumSet.of(ClassModifier.PUBLIC),
-              Collections.emptyList(),
-              Collections.emptyList(),
-              Collections.emptyList());
-
-      inputLocations.add(
-          new EagerInputLocation(
-              Collections.singletonMap(dummyClassType, dummyClassSource), SourceType.Application));
+      DummyClassBuilder dummyClassBuilder = new DummyClassBuilder(className, customEntrypointMethodName);
+      inputLocations.add(dummyClassBuilder.getInputLocation());
 
       javaView = new JavaView(inputLocations);
-      classes = javaView.getClasses().collect(Collectors.toList());
+      MethodSignature callTgtSig = dummyClassBuilder.getCallTgtSig();
+      javaTestMethod = javaView.getMethod(callTgtSig).get();
 
-      MethodSignature dummyEntrypoint =
-          javaView
-              .getIdentifierFactory()
-              .parseMethodSignature("<dummyClass: void main(java.lang.String[])>");
+      MethodSignature dummyEntrypoint = dummyClassBuilder.getMethod().getSignature();
       assert javaView.getMethod(dummyEntrypoint).isPresent();
-
       entypointSignatures.add(dummyEntrypoint);
     }
 
+    /*
     System.out.println(
         "classes: "
-            + classes.size()); // soot has 1911 for boomerang.guided.DemandDrivenGuidedAnalysisTest
+            + result.classes.size()); // soot has 1911 for boomerang.guided.DemandDrivenGuidedAnalysisTest
 
-    classes.stream()
+    result.classes.stream()
         .sorted(Comparator.comparing(sootup.core.model.SootClass::toString))
         .forEach(System.out::println);
+    */
+
+
+  }
+
+  @Override
+  public Method getTestMethod() {
+    return JimpleUpMethod.of(javaTestMethod);
+  }
+
+  @Override
+  public FrameworkScope createFrameworkScope(DataFlowScope dataFlowScope) {
 
     // initialize CallGraphAlgorithm
     // TODO: use spark when available
     CallGraphAlgorithm cga = new RapidTypeAnalysisAlgorithm(javaView);
-    cg = cga.initialize(entypointSignatures);
-
-    cg.exportAsDot();
+    CallGraph cg = cga.initialize(entypointSignatures);
 
     Collection<JavaSootMethod> entryPoints = new HashSet<>();
     for (MethodSignature signature : entypointSignatures) {
       Optional<JavaSootMethod> sootMethod = javaView.getMethod(signature);
       sootMethod.ifPresent(entryPoints::add);
     }
-    return new SootUpFrameworkScope(
-        javaView, cg, entryPoints, DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
+
+    return new SootUpFrameworkScope(javaView, cg, entryPoints, dataFlowScope);
+  }
+
+  private static class DummyClassBuilder {
+    protected final AnalysisInputLocation inputLocation;
+    protected final JavaSootMethod method;
+
+    public MethodSignature getCallTgtSig() {
+      return callTgtSig;
+    }
+
+    protected final MethodSignature callTgtSig;
+
+
+    public DummyClassBuilder(String className, String customEntrypointMethodName) {
+
+      // build dummy entrypoint class
+      String callTgtSignatureStr = "<"+className
+              + ": void "
+              + customEntrypointMethodName
+              + "(java.lang.String[])>";
+
+      String jimpleClassStr =
+              "class dummyClass\n"
+                      + "{\n"
+                      + "    public static void main(java.lang.String[])\n"
+                      + "    {\n"
+                      + "        "
+                      + className
+                      + " dummyObj;\n"
+                      + "        java.lang.String[] l0;\n"
+                      + "        l0 := @parameter0: java.lang.String[];\n"
+                      + "        dummyObj = new "
+                      + className
+                      + ";\n"
+                      + "        virtualinvoke dummyObj."
+                      + callTgtSignatureStr + "(l0);\n"
+                      + "        return;\n"
+                      + "    }\n"
+                      + "}";
+
+      JavaClassType dummyClassType = new JavaClassType("dummyClass", new PackageName(""));
+      JimpleStringAnalysisInputLocation jimpleStringAnalysisInputLocation =
+              new JimpleStringAnalysisInputLocation(
+                      jimpleClassStr, SourceType.Application, Collections.emptyList());
+      JimpleView jimpleView = new JimpleView(jimpleStringAnalysisInputLocation);
+      Optional<SootClass> aClass = jimpleView.getClass(dummyClassType);
+
+      MethodSignature methodSignature =
+              jimpleView
+                      .getIdentifierFactory()
+                      .parseMethodSignature("<dummyClass: void main(java.lang.String[])>");
+
+      callTgtSig =
+              jimpleView
+                      .getIdentifierFactory()
+                      .parseMethodSignature(callTgtSignatureStr);
+
+      assert aClass.isPresent();
+      SootClass sootClass = aClass.get();
+
+      BodySource bodySource =
+              new BodySource() {
+                @Override
+                public sootup.core.model.@NonNull Body resolveBody(
+                        @NonNull Iterable<MethodModifier> iterable) throws ResolveException {
+                  return sootup.core.model.Body.builder(
+                                  new MutableBlockStmtGraph(
+                                          sootClass
+                                                  .getMethod(methodSignature.getSubSignature())
+                                                  .get()
+                                                  .getBody()
+                                                  .getStmtGraph()))
+                          .setMethodSignature(methodSignature)
+                          .build();
+                }
+
+                @Override
+                public Object resolveAnnotationsDefaultValue() {
+                  return null;
+                }
+
+                @NonNull
+                @Override
+                public MethodSignature getSignature() {
+                  return methodSignature;
+                }
+              };
+      method =
+              new JavaSootMethod(
+                      bodySource,
+                      methodSignature,
+                      EnumSet.of(MethodModifier.PUBLIC, MethodModifier.STATIC),
+                      Collections.emptySet(),
+                      Collections.emptyList(),
+                      NoPositionInformation.getInstance());
+
+      OverridingJavaClassSource dummyClassSource =
+              new OverridingJavaClassSource(
+                      new EagerInputLocation(),
+                      Paths.get("/in-memory"),
+                      dummyClassType,
+                      null,
+                      Collections.emptySet(),
+                      null,
+                      Collections.emptySet(),
+                      Collections.singleton(method),
+                      NoPositionInformation.getInstance(),
+                      EnumSet.of(ClassModifier.PUBLIC),
+                      Collections.emptyList(),
+                      Collections.emptyList(),
+                      Collections.emptyList());
+
+      inputLocation = new EagerInputLocation(Collections.singletonMap(dummyClassType, dummyClassSource), SourceType.Application);
+    }
+
+    private JavaSootMethod getMethod() {
+      return method;
+    }
+
+    public AnalysisInputLocation getInputLocation() {
+      return inputLocation;
+    }
+
   }
 }

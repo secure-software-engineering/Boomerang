@@ -14,14 +14,13 @@ package test;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import test.setup.MethodWrapper;
 import test.setup.SootTestSetup;
+import test.setup.SootUpTestSetup;
 import test.setup.TestSetup;
 
 public class TestingFramework {
@@ -29,8 +28,16 @@ public class TestingFramework {
   private final TestSetup testSetup;
 
   public TestingFramework() {
-    // TODO Parameterize
-    this.testSetup = new SootTestSetup();
+    // FIXME Parameterize via env vars
+    String framework = "sootup";
+    switch(framework){
+      case "sootup":
+        this.testSetup = new SootUpTestSetup();
+      break;
+      case "soot":
+      default:
+        this.testSetup = new SootTestSetup();
+    }
   }
 
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {
@@ -104,10 +111,10 @@ public class TestingFramework {
   }
 
   protected List<String> getIncludedPackages() {
-    return Collections.emptyList();
+    return new ArrayList<>();
   }
 
   protected List<String> getExcludedPackages() {
-    return Collections.emptyList();
+    return new ArrayList<>();
   }
 }
