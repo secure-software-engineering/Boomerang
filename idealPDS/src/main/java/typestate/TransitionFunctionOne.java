@@ -53,7 +53,6 @@ public class TransitionFunctionOne implements TransitionFunction {
     TransitionFunctionOne one1 = one();
     if (other == (one1)) return this;
     if (this == (one1)) return other;
-
     TransitionFunction func = (TransitionFunction) other;
     Set<? extends Transition> otherTransitions = (Set<? extends Transition>) func.getValues();
     Set<Transition> ress = new HashSet<>();
@@ -104,6 +103,7 @@ public class TransitionFunctionOne implements TransitionFunction {
           transitions,
           Sets.newHashSet(
               (other == (one1) ? getStateChangeStatements() : func.getStateChangeStatements())));
+
     }
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(getValues());

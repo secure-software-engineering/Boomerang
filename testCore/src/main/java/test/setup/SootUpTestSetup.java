@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.jspecify.annotations.NonNull;
 import sootup.SourceTypeSplittingAnalysisInputLocation;
 import sootup.callgraph.CallGraphAlgorithm;
@@ -254,8 +253,8 @@ public class SootUpTestSetup implements TestSetup {
           new BodySource() {
 
             @Override
-            public sootup.core.model.@NonNull Body resolveBody(@NonNull Iterable<MethodModifier> iterable)
-                throws ResolveException, IOException {
+            public sootup.core.model.@NonNull Body resolveBody(
+                @NonNull Iterable<MethodModifier> iterable) throws ResolveException, IOException {
               return sootup.core.model.Body.builder(
                       new MutableBlockStmtGraph(
                           sootClass

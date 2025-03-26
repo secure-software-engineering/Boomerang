@@ -11,8 +11,58 @@
  */
 package tests;
 
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public interface MinSemiring extends Weight {
-  int getI();
+public class MinSemiringImpl implements Weight, MinSemiring {
+  int i;
+
+  public MinSemiringImpl(int i) {
+    this.i = i;
+  }
+
+  @NonNull
+  @Override
+  public Weight extendWith(@NonNull Weight other) {
+    if (other.equals(MinSemiringOne.one())) return this;
+    if (this.equals(MinSemiringOne.one())) return other;
+    MinSemiringImpl o = (MinSemiringImpl) other;
+    return new MinSemiringImpl(o.i + i);
+  }
+
+  @NonNull
+  @Override
+  public Weight combineWith(@NonNull Weight other) {
+    if (other.equals(MinSemiringZero.zero())) return this;
+    if (this.equals(MinSemiringZero.zero())) return other;
+    MinSemiringImpl o = (MinSemiringImpl) other;
+    return new MinSemiringImpl(Math.min(o.i, i));
+  }
+
+  @Override
+  public String toString() {
+    return Integer.toString(i);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + i;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    MinSemiringImpl other = (MinSemiringImpl) obj;
+    return i == other.i;
+  }
+
+  @Override
+  public int getI() {
+    return 0;
+  }
 }

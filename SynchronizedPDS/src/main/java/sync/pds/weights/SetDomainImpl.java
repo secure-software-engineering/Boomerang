@@ -42,7 +42,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     return zero();
   }
 
-  @NonNull
+ @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
 
@@ -82,7 +82,6 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   public boolean equals(Object obj) {
     return false;
   }
-
   @NonNull
   @Override
   public Collection<Node<Stmt, Fact>> elements() {

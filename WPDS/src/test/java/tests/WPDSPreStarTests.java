@@ -39,7 +39,7 @@ public class WPDSPreStarTests {
     pds.prestar(fa);
     assertEquals(3, fa.getTransitions().size());
     assertEquals(4, fa.getStates().size());
-        assertEquals(fa.getWeightFor(t(1, "a", ACC)), w(5));
+    assertEquals(fa.getWeightFor(t(1, "a", ACC)), w(5));
   }
 
   @Test

@@ -45,7 +45,6 @@ public class NumWeightOne implements NumWeight {
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-
     if (other == zero()) return this;
     NumWeight o = (NumWeight) other;
     if (o.getI() == getI()) return o;

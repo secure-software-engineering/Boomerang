@@ -35,6 +35,7 @@ public class NumWeightZero implements NumWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
+
     if (other == (one())) return this;
     if (this == (zero()) || other == (zero())) return zero();
     NumWeight o = (NumWeight) other;
@@ -44,7 +45,6 @@ public class NumWeightZero implements NumWeight {
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-
     if (other == zero()) return this;
     if (this == zero()) return other;
     NumWeight o = (NumWeight) other;

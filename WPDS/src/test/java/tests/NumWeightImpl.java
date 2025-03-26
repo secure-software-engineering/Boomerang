@@ -36,6 +36,7 @@ public class NumWeightImpl implements NumWeight {
     if (other == (one)) return this;
     NumWeight zero = zero();
     if (other == zero) return zero;
+
     NumWeight o = (NumWeight) other;
     return new NumWeightImpl(o.getI() + getI());
   }
