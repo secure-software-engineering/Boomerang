@@ -1,0 +1,28 @@
+name: Branch Documentation Snapshot
+
+permissions:
+  pages: write
+  deployments: write
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - release/*
+
+    paths:
+      - 'mkdocs.yml'
+      - 'docs/**'
+      - '.github/workflows/deploy-branch-snapshot.yml'
+
+concurrency: pages
+
+jobs:
+  deploy-snapshot:
+    uses: secure-software-engineering/actions/documentation-workflows/pages-branch-snapshot.yml@roshansamantaray-patch-1
+    with:
+      latest_branch: develop
+      version: "maven"
