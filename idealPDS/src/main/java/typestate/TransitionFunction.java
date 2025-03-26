@@ -19,15 +19,11 @@ import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
 public interface TransitionFunction extends Weight {
-  @NonNull
-  Collection<Transition> getValues();
+  @NonNull Collection<Transition> getValues();
 
-  @NonNull
-  Set<ControlFlowGraph.Edge> getStateChangeStatements();
+  @NonNull Set<ControlFlowGraph.Edge> getStateChangeStatements();
 
-  @NonNull
-  Weight extendWith(@NonNull Weight other);
+  @NonNull Weight extendWith(@NonNull Weight other);
 
-  @NonNull
-  Weight combineWith(@NonNull Weight other);
+  @NonNull Weight combineWith(@NonNull Weight other);
 }

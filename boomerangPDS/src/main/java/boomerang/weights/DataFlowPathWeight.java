@@ -21,18 +21,13 @@ import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public interface DataFlowPathWeight extends Weight {
-  @NonNull
-  PathTrackingWeight getPath();
+  @NonNull PathTrackingWeight getPath();
 
-  @NonNull
-  PathConditionWeight getCondition();
+  @NonNull PathConditionWeight getCondition();
 
-  @NonNull
-  Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
+  @NonNull Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
 
-  @NonNull
-  Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions();
+  @NonNull Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions();
 
-  @NonNull
-  Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap();
+  @NonNull Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap();
 }

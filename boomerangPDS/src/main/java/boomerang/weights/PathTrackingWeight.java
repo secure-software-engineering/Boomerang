@@ -19,6 +19,5 @@ import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public interface PathTrackingWeight extends Weight {
-  @NonNull
-  Set<Node<ControlFlowGraph.Edge, Val>> getShortestPathWitness();
+  @NonNull Set<Node<ControlFlowGraph.Edge, Val>> getShortestPathWitness();
 }

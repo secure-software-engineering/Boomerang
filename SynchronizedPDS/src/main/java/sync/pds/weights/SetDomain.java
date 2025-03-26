@@ -18,9 +18,7 @@ import wpds.impl.Weight;
 
 public interface SetDomain<N, Stmt, Fact> extends Weight {
 
-  @NonNull
-  Collection<Node<Stmt, Fact>> getNodes();
+  @NonNull Collection<Node<Stmt, Fact>> getNodes();
 
-  @NonNull
-  Collection<Node<Stmt, Fact>> elements();
+  @NonNull Collection<Node<Stmt, Fact>> elements();
 }

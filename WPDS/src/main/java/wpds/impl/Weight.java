@@ -14,9 +14,7 @@ package wpds.impl;
 import org.jspecify.annotations.NonNull;
 
 public interface Weight {
-  @NonNull
-  Weight extendWith(@NonNull Weight other);
+  @NonNull Weight extendWith(@NonNull Weight other);
 
-  @NonNull
-  Weight combineWith(@NonNull Weight other);
+  @NonNull Weight combineWith(@NonNull Weight other);
 }
