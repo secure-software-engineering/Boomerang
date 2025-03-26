@@ -42,13 +42,13 @@ public class InferenceWeightImpl implements InferenceWeight {
   @Override
   public Weight extendWith(@NonNull Weight other) {
     InferenceWeight one = one();
-    if (other==(one)) return this;
+    if (other == (one)) return this;
     InferenceWeight zero = (InferenceWeight) zero();
-    if (other== zero) {
+    if (other == zero) {
       return zero;
     }
     InferenceWeightImpl func = (InferenceWeightImpl) other;
-      Set<Method> res = new HashSet<>(invokedMethods);
+    Set<Method> res = new HashSet<>(invokedMethods);
     res.addAll((func).invokedMethods);
     return new InferenceWeightImpl(res);
   }

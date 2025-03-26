@@ -26,8 +26,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
   @NonNull private static final PathConditionWeightOne one = new PathConditionWeightOne();
 
   public PathConditionWeightOne(
-      Map<Statement, ConditionDomain> newIfs,
-      Map<Val, ConditionDomain> newVals) {
+      Map<Statement, ConditionDomain> newIfs, Map<Val, ConditionDomain> newVals) {
     throw new IllegalStateException("PathConditionWeightOne.ExtendWeight called");
   }
 
@@ -52,10 +51,6 @@ public class PathConditionWeightOne implements PathConditionWeight {
   public static PathConditionWeightOne one() {
     return one;
   }
-
-
-
-
 
   public enum ConditionDomain {
     TRUE,

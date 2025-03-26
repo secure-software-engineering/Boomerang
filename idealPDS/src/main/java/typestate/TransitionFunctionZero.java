@@ -51,8 +51,8 @@ public class TransitionFunctionZero implements TransitionFunction {
   @Override
   public Weight extendWith(@NonNull Weight other) {
     TransitionFunction one = one();
-    if (other==(one)) return this;
-    if (other==(zero()) || this==(zero())) {
+    if (other == (one)) return this;
+    if (other == (zero()) || this == (zero())) {
       return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -62,13 +62,13 @@ public class TransitionFunctionZero implements TransitionFunction {
     for (Transition first : getValues()) {
       for (Transition second : otherTransitions) {
 
-        if (second==(TransitionIdentity.identity())) {
+        if (second == (TransitionIdentity.identity())) {
           ress.add(first);
           newStateChangeStatements.addAll(getStateChangeStatements());
-        } else if (first==(TransitionIdentity.identity())) {
+        } else if (first == (TransitionIdentity.identity())) {
           ress.add(second);
           newStateChangeStatements.addAll(func.getStateChangeStatements());
-        } else if (first.to()==(second.from())) {
+        } else if (first.to() == (second.from())) {
           ress.add(new TransitionImpl(first.from(), second.to()));
           newStateChangeStatements.addAll(func.getStateChangeStatements());
         }
@@ -83,12 +83,11 @@ public class TransitionFunctionZero implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (this==(zero())) return other;
-    if (other==(zero())) return this;
-
+    if (this == (zero())) return other;
+    if (other == (zero())) return this;
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-      Set<Transition> transitions = new HashSet<>(func.getValues());
+    Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(getValues());
     HashSet<ControlFlowGraph.Edge> newStateChangeStmts =
         Sets.newHashSet(getStateChangeStatements());

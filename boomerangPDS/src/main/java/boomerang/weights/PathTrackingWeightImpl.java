@@ -78,7 +78,6 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
       return true;
     }
 
-
     if (getClass() != obj.getClass()) {
       return false;
     }

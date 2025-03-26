@@ -50,9 +50,9 @@ public class WPDSPreStarTests {
     pds.addRule(wnormal(1, "d", 1, "c", w(3)));
     WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> fa = waccepts(1, "c", w(0));
     pds.prestar(fa);
-        assertEquals(fa.getWeightFor(t(1, "a", ACC)), w(6));
-        assertEquals(fa.getWeightFor(t(1, "b", ACC)), w(4));
-        assertEquals(fa.getWeightFor(t(1, "d", ACC)), w(3));
+    assertEquals(fa.getWeightFor(t(1, "a", ACC)), w(6));
+    assertEquals(fa.getWeightFor(t(1, "b", ACC)), w(4));
+    assertEquals(fa.getWeightFor(t(1, "d", ACC)), w(3));
   }
 
   @Test
@@ -64,9 +64,9 @@ public class WPDSPreStarTests {
     pds.addRule(wnormal(1, "d", 1, "f", w(6)));
     WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> fa = waccepts(1, "f", w(0));
     pds.prestar(fa);
-        assertEquals(fa.getWeightFor(t(1, "a", ACC)), w(17));
-        assertEquals(fa.getWeightFor(t(1, "b", ACC)), w(15));
-        assertEquals(fa.getWeightFor(t(1, "c", 1)), w(6));
+    assertEquals(fa.getWeightFor(t(1, "a", ACC)), w(17));
+    assertEquals(fa.getWeightFor(t(1, "b", ACC)), w(15));
+    assertEquals(fa.getWeightFor(t(1, "c", 1)), w(6));
   }
 
   private static NumWeightImpl w(int i) {
