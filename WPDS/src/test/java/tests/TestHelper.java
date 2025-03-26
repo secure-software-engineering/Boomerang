@@ -67,7 +67,7 @@ public class TestHelper {
 
           @Override
           public NumWeight getOne() {
-            return NumWeight.one();
+            return NumWeightOne.one();
           }
 
           @Override

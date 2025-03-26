@@ -32,7 +32,7 @@ public class NormalRule<N extends Location, D extends State, W extends Weight>
         + ";"
         + l2
         + ">"
-        + ((w instanceof Weight.NoWeight) ? "" : "(" + w + ")");
+        + ((w instanceof NoWeight) ? "" : "(" + w + ")");
   }
 
   public boolean canBeApplied(Transition<N, D> t, W weight) {

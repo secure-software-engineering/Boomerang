@@ -33,8 +33,8 @@ import sync.pds.solver.nodes.NodeWithLocation;
 import sync.pds.solver.nodes.PopNode;
 import sync.pds.solver.nodes.PushNode;
 import sync.pds.solver.nodes.SingleNode;
+import wpds.impl.NoWeight;
 import wpds.impl.SummaryNestedWeightedPAutomatons;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.State;
 
 public class DoublePDSTest {
@@ -150,12 +150,12 @@ public class DoublePDSTest {
 
     @Override
     public WeightFunctions<Statement, Variable, FieldRef, NoWeight> getFieldWeights() {
-      return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+      return new OneWeightFunctions<>(NoWeight.getInstance());
     }
 
     @Override
     public WeightFunctions<Statement, Variable, Statement, NoWeight> getCallWeights() {
-      return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+      return new OneWeightFunctions<>(NoWeight.getInstance());
     }
   }
 

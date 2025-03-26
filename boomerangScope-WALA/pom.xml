@@ -8,7 +8,7 @@
         <version>4.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>boomerangScope-WALA</artifactId>
+    <artifactId>BoomerangScope-WALA</artifactId>
 
     <name>BoomerangScope-WALA</name>
     <description>Scope implementation to run Boomerang and IDEal with WALA</description>

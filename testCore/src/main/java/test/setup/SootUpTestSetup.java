@@ -17,7 +17,6 @@ import boomerang.scope.Method;
 import boomerang.scope.sootup.BoomerangPreInterceptor;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import sootup.SourceTypeSplittingAnalysisInputLocation;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.RapidTypeAnalysisAlgorithm;
@@ -251,10 +251,9 @@ public class SootUpTestSetup implements TestSetup {
               .parseMethodSignature("<dummyClass: void main(java.lang.String[])>");
       BodySource bodySource =
           new BodySource() {
-            @Nonnull
             @Override
-            public sootup.core.model.Body resolveBody(@Nonnull Iterable<MethodModifier> iterable)
-                throws ResolveException, IOException {
+            public sootup.core.model.@NonNull Body resolveBody(
+                @NonNull Iterable<MethodModifier> iterable) throws ResolveException, IOException {
               return sootup.core.model.Body.builder(
                       new MutableBlockStmtGraph(
                           sootClass
@@ -271,7 +270,7 @@ public class SootUpTestSetup implements TestSetup {
               return null;
             }
 
-            @Nonnull
+            @NonNull
             @Override
             public MethodSignature getSignature() {
               return methodSignature;

@@ -54,8 +54,8 @@ import test.TestingFramework;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
 import test.setup.MethodWrapper;
+import wpds.impl.NoWeight;
 import wpds.impl.Transition;
-import wpds.impl.Weight.NoWeight;
 import wpds.impl.WeightedPAutomaton;
 import wpds.interfaces.WPAStateListener;
 
@@ -161,23 +161,23 @@ public class AbstractBoomerangTest extends TestingFramework {
 
           @Override
           protected WeightFunctions<Edge, Val, Field, NoWeight> getForwardFieldWeights() {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
 
           @Override
           protected WeightFunctions<Edge, Val, Field, NoWeight> getBackwardFieldWeights() {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
 
           @Override
           protected WeightFunctions<Edge, Val, Edge, NoWeight> getBackwardCallWeights() {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
 
           @Override
           protected WeightFunctions<Edge, Val, Edge, NoWeight> getForwardCallWeights(
               ForwardQuery sourceQuery) {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
         };
     solver.wholeProgramAnalysis();

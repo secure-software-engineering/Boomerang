@@ -12,7 +12,6 @@
 package wpds.impl;
 
 import de.fraunhofer.iem.Location;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.State;
 
 public class PushdownSystem<N extends Location, D extends State>

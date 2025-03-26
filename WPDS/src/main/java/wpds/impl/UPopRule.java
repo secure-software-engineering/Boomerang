@@ -12,13 +12,12 @@
 package wpds.impl;
 
 import de.fraunhofer.iem.Location;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.State;
 
 public class UPopRule<N extends Location, D extends State> extends PopRule<N, D, NoWeight> {
 
   public UPopRule(D s1, N l1, D s2) {
-    super(s1, l1, s2, NoWeight.NO_WEIGHT_ONE);
+    super(s1, l1, s2, NoWeight.getInstance());
   }
 
   @Override

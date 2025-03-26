@@ -30,7 +30,7 @@ import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
 import boomerang.util.DefaultValueMap;
-import boomerang.weights.DataFlowPathWeight;
+import boomerang.weights.DataFlowPathWeightImpl;
 import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
@@ -38,13 +38,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -265,7 +260,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     for (Node<Edge, Val> r : res) {
       // Context context = constructContextGraph(query, r);
       if (trackDataFlowPath) {
-        DataFlowPathWeight dataFlowPath = getDataFlowPathWeight(query, r);
+        DataFlowPathWeightImpl dataFlowPath = getDataFlowPathWeight(query, r);
         if (isValidPath(dataFlowPath)) {
           List<PathElement> p = transformPath(dataFlowPath.getAllStatements(), r);
           resWithContext.add(new NullPointerDereference(query, r.stmt(), r.fact(), null, null, p));
@@ -281,7 +276,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return nullPointerResult;
   }
 
-  private boolean isValidPath(DataFlowPathWeight dataFlowPath) {
+  private boolean isValidPath(DataFlowPathWeightImpl dataFlowPath) {
     if (!pruneContradictoryDataFlowPath) {
       return true;
     }
@@ -294,7 +289,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return true;
   }
 
-  private DataFlowPathWeight getDataFlowPathWeight(
+  private DataFlowPathWeightImpl getDataFlowPathWeight(
       ForwardQuery query, Node<Edge, Val> sinkLocation) {
     WeightedPAutomaton<Edge, INode<Val>, W> callAut =
         queryToSolvers.getOrCreate(query).getCallAutomaton();
@@ -311,8 +306,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       }
       if (t.getStart().fact().equals(sinkLocation.fact())
           && t.getLabel().equals(sinkLocation.stmt())) {
-        if (e.getValue() instanceof DataFlowPathWeight) {
-          DataFlowPathWeight v = (DataFlowPathWeight) e.getValue();
+        if (e.getValue() instanceof DataFlowPathWeightImpl) {
+          DataFlowPathWeightImpl v = (DataFlowPathWeightImpl) e.getValue();
           return v;
         }
       }
@@ -380,7 +375,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   private List<PathElement> transformPath(
-      List<Node<Edge, Val>> allStatements, Node<Edge, Val> sinkLocation) {
+      Set<Node<Edge, Val>> allStatements, Node<Edge, Val> sinkLocation) {
     List<PathElement> res = Lists.newArrayList();
     int index = 0;
     for (Node<Edge, Val> x : allStatements) {

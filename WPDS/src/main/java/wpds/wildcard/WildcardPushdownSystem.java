@@ -15,6 +15,7 @@ import de.fraunhofer.iem.Location;
 import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.HashSet;
 import java.util.Set;
+import wpds.impl.NoWeight;
 import wpds.impl.NormalRule;
 import wpds.impl.PopRule;
 import wpds.impl.PushRule;
@@ -23,7 +24,6 @@ import wpds.impl.Rule;
 import wpds.impl.UNormalRule;
 import wpds.impl.UPopRule;
 import wpds.impl.UPushRule;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.State;
 
 public abstract class WildcardPushdownSystem<N extends Location, D extends State>
