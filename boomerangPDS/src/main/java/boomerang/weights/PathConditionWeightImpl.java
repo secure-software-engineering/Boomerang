@@ -18,7 +18,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class PathConditionWeightImpl implements PathConditionWeight {
@@ -71,9 +71,9 @@ public class PathConditionWeightImpl implements PathConditionWeight {
     variableToValue.put(val, c);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight o) {
+  public Weight extendWith(@NonNull Weight o) {
     if (!(o instanceof PathConditionWeightImpl)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
@@ -121,9 +121,9 @@ public class PathConditionWeightImpl implements PathConditionWeight {
     return new PathConditionWeightImpl(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight o) {
+  public Weight combineWith(@NonNull Weight o) {
     if (!(o instanceof PathConditionWeightImpl)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }

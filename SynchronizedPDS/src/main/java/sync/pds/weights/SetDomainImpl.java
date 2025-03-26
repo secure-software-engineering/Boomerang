@@ -17,48 +17,49 @@ import static sync.pds.weights.SetDomainZero.zero;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
-  @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
+  @NonNull private final Collection<? extends Node<Stmt, Fact>> nodes;
 
   public SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(Weight other) {
-    if (other.equals(one())) {
+  public Weight extendWith(@NonNull Weight other) {
+    Weight one = one();
+    if (other == (one)) {
       return this;
     }
-    if (this.equals(one())) {
-      return other;
-    }
+
     return zero();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
 
-    if (other.equals(zero())) return this;
-    if (this.equals(zero())) return other;
-    if (this.equals(one()) || other.equals(one())) return one();
+    SetDomain zero = zero();
+    if (other == zero) return this;
+    SetDomainOne one = (SetDomainOne) one();
+    if (other == one) return one;
 
     if (other instanceof SetDomainImpl) {
       Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
-      merged.addAll(((SetDomainImpl) other).nodes);
+      merged.addAll(Objects.requireNonNull(((SetDomainImpl) other).nodes));
       return new SetDomainImpl<N, Stmt, Fact>(merged);
     }
-    return zero();
+    return zero;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Node> getNodes() {
     return Lists.newArrayList(nodes);
@@ -79,13 +80,10 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
     return false;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Node<Stmt, Fact>> elements() {
     return Sets.newHashSet(nodes);

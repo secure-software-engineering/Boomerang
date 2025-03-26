@@ -11,13 +11,13 @@
  */
 package typestate.finiteautomata;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public class TransitionIdentity implements Transition {
 
-  @Nonnull private static final TransitionIdentity instance = new TransitionIdentity();
+  @NonNull private static final TransitionIdentity instance = new TransitionIdentity();
 
-  @Nonnull
+  @NonNull
   public static TransitionIdentity identity() {
     return instance;
   }
@@ -27,13 +27,13 @@ public class TransitionIdentity implements Transition {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public State from() {
     throw new IllegalStateException("TransitionIdentity.from() - don't");
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public State to() {
     throw new IllegalStateException("TransitionIdentity.to() - don't");
   }
@@ -44,7 +44,7 @@ public class TransitionIdentity implements Transition {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public String toString() {
     return "ID -> ID";
   }

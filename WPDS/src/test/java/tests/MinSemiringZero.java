@@ -14,7 +14,7 @@ package tests;
 import static tests.MinSemiringOne.one;
 
 import de.fraunhofer.iem.Location;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class MinSemiringZero implements MinSemiring {
@@ -23,25 +23,25 @@ public class MinSemiringZero implements MinSemiring {
 
   public MinSemiringZero(int i) {}
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other == (one())) return this;
     if (this == (one())) return other;
     MinSemiringZero o = (MinSemiringZero) other;
     return new MinSemiringZero(o.getI() + getI());
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (other == (zero())) return this;
     if (this == (zero())) return other;
     MinSemiringZero o = (MinSemiringZero) other;
     return new MinSemiringZero(Math.min(o.getI(), getI()));
   }
 
-  @Nonnull private static final MinSemiringZero zero = new MinSemiringZero();
+  @NonNull private static final MinSemiringZero zero = new MinSemiringZero();
 
   public static <N extends Location> MinSemiring zero() {
 

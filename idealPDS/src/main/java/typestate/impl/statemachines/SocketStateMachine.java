@@ -16,7 +16,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DeclaredMethod;
 import java.net.Socket;
 import java.util.Collection;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.MatcherTransition;
 import typestate.finiteautomata.MatcherTransition.Parameter;
@@ -99,7 +99,7 @@ public class SocketStateMachine extends TypeStateMachineWeightFunctions {
     }
 
     @Override
-    public boolean matches(@Nonnull DeclaredMethod declaredMethod) {
+    public boolean matches(@NonNull DeclaredMethod declaredMethod) {
       if (super.matches(declaredMethod)) {
         return false;
       }

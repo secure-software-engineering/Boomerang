@@ -18,29 +18,29 @@ import boomerang.scope.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class InferenceWeightImpl implements InferenceWeight {
 
-  @Nonnull
+  @NonNull
   public Set<Method> getInvokedMethods() {
     return invokedMethods;
   }
 
-  @Nonnull private final Set<Method> invokedMethods;
+  @NonNull private final Set<Method> invokedMethods;
 
-  private InferenceWeightImpl(@Nonnull Set<Method> res) {
+  private InferenceWeightImpl(@NonNull Set<Method> res) {
     this.invokedMethods = res;
   }
 
-  public InferenceWeightImpl(@Nonnull Method m) {
+  public InferenceWeightImpl(@NonNull Method m) {
     this.invokedMethods = Collections.singleton(m);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
     if (other.equals(zero()) || this.equals(zero())) {
@@ -53,9 +53,9 @@ public class InferenceWeightImpl implements InferenceWeight {
     return new InferenceWeightImpl(res);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     return extendWith(other);
   }
 

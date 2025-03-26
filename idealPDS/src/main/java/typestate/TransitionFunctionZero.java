@@ -18,7 +18,7 @@ import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
 import typestate.finiteautomata.TransitionImpl;
@@ -26,30 +26,30 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionZero implements TransitionFunction {
 
-  @Nonnull private static final TransitionFunctionZero zero = new TransitionFunctionZero();
+  @NonNull private static final TransitionFunctionZero zero = new TransitionFunctionZero();
 
   public TransitionFunctionZero() {}
 
-  @Nonnull
+  @NonNull
   public static TransitionFunctionZero zero() {
     return zero;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Transition> getValues() {
     throw new IllegalStateException("TransitionZero.getValues() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
     throw new IllegalStateException("This should not happen!");
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
     if (other.equals(zero()) || this.equals(zero())) {
@@ -77,9 +77,9 @@ public class TransitionFunctionZero implements TransitionFunction {
     return new TransitionFunctionImpl(ress, newStateChangeStatements);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }

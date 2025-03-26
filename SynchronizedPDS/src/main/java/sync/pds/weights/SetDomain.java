@@ -12,15 +12,13 @@
 package sync.pds.weights;
 
 import java.util.Collection;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public interface SetDomain<N, Stmt, Fact> extends Weight {
 
-  @Nonnull
-  Collection<Node<Stmt, Fact>> getNodes();
+  @NonNull Collection<Node<Stmt, Fact>> getNodes();
 
-  @Nonnull
-  Collection<Node<Stmt, Fact>> elements();
+  @NonNull Collection<Node<Stmt, Fact>> elements();
 }

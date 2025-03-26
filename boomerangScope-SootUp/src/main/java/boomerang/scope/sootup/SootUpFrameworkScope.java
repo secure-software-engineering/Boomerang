@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sootup.core.inputlocation.EagerInputLocation;
 import sootup.core.jimple.basic.NoPositionInformation;
 import sootup.core.jimple.common.constant.IntConstant;
@@ -48,10 +48,10 @@ public class SootUpFrameworkScope implements FrameworkScope {
   protected DataFlowScope dataflowScope;
 
   public SootUpFrameworkScope(
-      @Nonnull JavaView view,
-      @Nonnull sootup.callgraph.CallGraph callGraph,
-      @Nonnull Collection<JavaSootMethod> entryPoints,
-      @Nonnull DataFlowScope dataFlowScope) {
+      @NonNull JavaView view,
+      sootup.callgraph.@NonNull CallGraph callGraph,
+      @NonNull Collection<JavaSootMethod> entryPoints,
+      @NonNull DataFlowScope dataFlowScope) {
     INSTANCE = this; // FIXME! [ms] this hack is disgusting!
 
     this.view = view;
@@ -70,19 +70,19 @@ public class SootUpFrameworkScope implements FrameworkScope {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public Val getTrueValue(Method m) {
     return new JimpleUpVal(IntConstant.getInstance(1), m);
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public Val getFalseValue(Method m) {
     return new JimpleUpVal(IntConstant.getInstance(0), m);
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
     JimpleUpStaticFieldVal val = ((JimpleUpStaticFieldVal) fact);
     ClassType declaringClassType =
@@ -94,7 +94,7 @@ public class SootUpFrameworkScope implements FrameworkScope {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public StaticFieldVal newStaticFieldVal(Field field, Method m) {
     return new JimpleUpStaticFieldVal((JimpleUpField) field, m);
   }

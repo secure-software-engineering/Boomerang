@@ -19,7 +19,7 @@ import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Objects;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
@@ -68,13 +68,13 @@ public class DataFlowPathWeightImpl implements DataFlowPathWeight {
     this.condition = new PathConditionWeightImpl(returnVal);
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public PathTrackingWeight getPath() {
     return path;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public PathConditionWeight getCondition() {
     return condition;
@@ -93,19 +93,19 @@ public class DataFlowPathWeightImpl implements DataFlowPathWeight {
     return Objects.hashCode(path, condition);
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Set<Node<Edge, Val>> getAllStatements() {
     return path.getShortestPathWitness();
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Map<Statement, ConditionDomain> getConditions() {
     return condition.getConditions();
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Map<Val, ConditionDomain> getEvaluationMap() {
     return condition.getEvaluationMap();
@@ -116,17 +116,17 @@ public class DataFlowPathWeightImpl implements DataFlowPathWeight {
     return /*"PATH" + path +*/ " COND: " + condition;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     return new DataFlowPathWeightImpl(
         (PathTrackingWeightImpl) path.extendWith(((DataFlowPathWeightImpl) other).path),
         (PathConditionWeight) condition.extendWith(((DataFlowPathWeightImpl) other).condition));
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     return new DataFlowPathWeightImpl(
         (PathTrackingWeightImpl) path.combineWith(((DataFlowPathWeightImpl) other).path),
         (PathConditionWeight) condition.combineWith(((DataFlowPathWeightImpl) other).condition));

@@ -13,7 +13,7 @@ package boomerang.scope.sootup;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sootup.core.graph.MutableStmtGraph;
 import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
@@ -46,7 +46,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   @Override
-  public void interceptBody(@Nonnull Body.BodyBuilder bodyBuilder, @Nonnull View view) {
+  public void interceptBody(Body.@NonNull BodyBuilder bodyBuilder, @NonNull View view) {
     addNopStatementsToMethod(bodyBuilder);
 
     if (TRANSFORM_CONSTANTS_SETTINGS) {

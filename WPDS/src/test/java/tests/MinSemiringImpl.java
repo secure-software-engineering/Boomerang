@@ -11,7 +11,7 @@
  */
 package tests;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class MinSemiringImpl implements Weight, MinSemiring {
@@ -21,18 +21,18 @@ public class MinSemiringImpl implements Weight, MinSemiring {
     this.i = i;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(MinSemiringOne.one())) return this;
     if (this.equals(MinSemiringOne.one())) return other;
     MinSemiringImpl o = (MinSemiringImpl) other;
     return new MinSemiringImpl(o.i + i);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (other.equals(MinSemiringZero.zero())) return this;
     if (this.equals(MinSemiringZero.zero())) return other;
     MinSemiringImpl o = (MinSemiringImpl) other;

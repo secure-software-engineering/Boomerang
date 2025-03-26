@@ -16,13 +16,13 @@ import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class DataFlowPathWeightOne implements DataFlowPathWeight {
 
-  @Nonnull private static final DataFlowPathWeightOne one = new DataFlowPathWeightOne();
+  @NonNull private static final DataFlowPathWeightOne one = new DataFlowPathWeightOne();
 
   public DataFlowPathWeightOne() {}
 
@@ -30,39 +30,39 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
     return one;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public PathTrackingWeight getPath() {
     throw new IllegalStateException("MinDistanceWeight.getpath() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public PathConditionWeight getCondition() {
     throw new IllegalStateException("MinDistanceWeight.getcondition() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements() {
     throw new IllegalStateException("MinDistanceWeight.getAllStatements() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions() {
     throw new IllegalStateException("MinDistanceWeight.getAllStatements() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap() {
     throw new IllegalStateException("MinDistanceWeight.getEvaluationMap() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     PathTrackingWeight pathTrackingWeight =
         (PathTrackingWeight)
             PathTrackingWeightOne.one().extendWith(((DataFlowPathWeight) other).getPath());
@@ -72,9 +72,9 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
     return new DataFlowPathWeightImpl(pathTrackingWeight, pathConditionWeight);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     PathTrackingWeight pathTrackingWeight =
         (PathTrackingWeight)
             PathTrackingWeightOne.one().combineWith(((DataFlowPathWeightOne) other).getPath());

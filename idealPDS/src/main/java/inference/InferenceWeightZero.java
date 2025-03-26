@@ -27,24 +27,24 @@ import static inference.InferenceWeightOne.one;
 import boomerang.scope.Method;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class InferenceWeightZero implements Weight {
 
-  @Nonnull private static final InferenceWeightZero zero = new InferenceWeightZero();
+  @NonNull private static final InferenceWeightZero zero = new InferenceWeightZero();
   ;
 
   private InferenceWeightZero() {}
 
-  @Nonnull
+  @NonNull
   public Set<Method> getInvokedMethods() {
     throw new IllegalStateException("InferenceWeightZero.getInvoke -dont");
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
     if (other.equals(zero()) || this.equals(zero())) {
@@ -57,13 +57,13 @@ public class InferenceWeightZero implements Weight {
     return new InferenceWeightImpl((Method) res);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     return extendWith(other);
   }
 
-  @Nonnull
+  @NonNull
   public static InferenceWeightZero zero() {
     return zero;
   }

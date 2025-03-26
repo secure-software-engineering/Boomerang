@@ -16,17 +16,17 @@ import static sync.pds.weights.SetDomainOne.one;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.HashSet;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class SetDomainZero implements SetDomain {
 
-  @Nonnull private static final SetDomainZero zero = new SetDomainZero();
+  @NonNull private static final SetDomainZero zero = new SetDomainZero();
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) {
       return this;
     }
@@ -36,9 +36,9 @@ public class SetDomainZero implements SetDomain {
     return zero();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
 
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
@@ -53,7 +53,7 @@ public class SetDomainZero implements SetDomain {
     return zero();
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Node> getNodes() {
     throw new IllegalStateException("SetDomain.getNodes() - don't");
@@ -63,7 +63,7 @@ public class SetDomainZero implements SetDomain {
     return zero;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Node> elements() {
     throw new IllegalStateException("SetDomainZero.elements() - don't");
