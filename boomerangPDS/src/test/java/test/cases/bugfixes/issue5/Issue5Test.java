@@ -119,7 +119,7 @@ public class Issue5Test {
       methodCalledOnFoo.add(methodWrapper);
     }
 
-    Assert.assertEquals(methodCalledOnFoo, Set.of(expectedCalledMethodsOnFoo));
+    Assert.assertEquals(Set.of(expectedCalledMethodsOnFoo), methodCalledOnFoo);
   }
 
   private static Collection<Statement> getMethodsInvokedFromInstanceInStatement(

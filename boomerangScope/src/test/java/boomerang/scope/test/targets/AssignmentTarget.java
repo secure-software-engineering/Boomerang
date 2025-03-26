@@ -18,6 +18,7 @@ public class AssignmentTarget {
   public static void main(String[] args) {
     arrayAllocation();
     constantAssignment();
+    fieldStoreAssignment();
   }
 
   public static void arrayAllocation() {
@@ -32,5 +33,12 @@ public class AssignmentTarget {
     String s = "test";
 
     System.out.println(i + l + " " + s);
+  }
+
+  public static void fieldStoreAssignment() {
+    FieldClass fieldClass = new FieldClass();
+    fieldClass.i = 10;
+
+    System.out.println(fieldClass.i);
   }
 }

@@ -18,6 +18,7 @@ import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleMethod;
 import boomerang.scope.test.MethodSignature;
 import boomerang.scope.test.targets.A;
+import boomerang.scope.test.targets.AssignmentTarget;
 import boomerang.scope.test.targets.HashCodeEqualsLocalTarget;
 import boomerang.scope.test.targets.ParameterLocalsTarget;
 import boomerang.scope.test.targets.ThisLocalTarget;
@@ -135,6 +136,29 @@ public class SootScopeTest {
 
     if (!checked) {
       Assert.fail("Did not check equals and hashCode methods for parameter locals");
+    }
+  }
+
+  @Test
+  public void fieldStoreAssignmentTest() {
+    SootSetup sootSetup = new SootSetup();
+    sootSetup.setupSoot(AssignmentTarget.class.getName());
+
+    // Parameter locals
+    MethodSignature signature =
+        new MethodSignature(AssignmentTarget.class.getName(), "fieldStoreAssignment");
+    SootMethod method = sootSetup.resolveMethod(signature);
+    Method jimpleMethod = JimpleMethod.of(method);
+
+    for (Statement stmt : jimpleMethod.getStatements()) {
+      if (stmt.isFieldStore()) {
+        Assert.assertTrue(stmt.isAssignStmt());
+
+        Val leftOp = stmt.getLeftOp();
+        Val rightOp = stmt.getRightOp();
+
+        System.out.println();
+      }
     }
   }
 }

@@ -78,4 +78,25 @@ class OpalAssignmentTest {
 
     Assert.assertEquals(3, constantCount)
   }
+
+  @Test
+  def fieldStoreAssignmentTest(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[AssignmentTarget].getName)
+
+    val signature = new MethodSignature(classOf[AssignmentTarget].getName, "fieldStoreAssignment", "Void")
+    val method = opalSetup.resolveMethod(signature)
+    val opalMethod = OpalMethod(method)
+
+    opalMethod.getStatements.forEach(stmt => {
+      if (stmt.isFieldStore) {
+        Assert.assertTrue(stmt.isAssignStmt)
+
+        val leftOp = stmt.getLeftOp
+        val rightOp = stmt.getRightOp
+
+        println()
+      }
+    })
+  }
 }

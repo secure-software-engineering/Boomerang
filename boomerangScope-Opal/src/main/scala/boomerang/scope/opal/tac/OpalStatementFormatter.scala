@@ -1,7 +1,7 @@
 package boomerang.scope.opal.tac
 
 import com.google.common.base.Joiner
-import org.opalj.tac.{Nop, Return}
+import org.opalj.tac.{Nop, PutField, Return}
 
 object OpalStatementFormatter {
 
@@ -18,28 +18,32 @@ object OpalStatementFormatter {
         assign = s"${stmt.getLeftOp} = "
       }
 
-      return s"${delegate.pc}: $assign$base${stmt.getInvokeExpr.getMethod.getName}(${Joiner.on(",").join(stmt.getInvokeExpr.getArgs)})"
+      return s"$assign$base${stmt.getInvokeExpr.getMethod.getName}(${Joiner.on(",").join(stmt.getInvokeExpr.getArgs)})"
     }
 
     if (stmt.isAssignStmt) {
       if (delegate.isAssignment) {
         if (stmt.isFieldStore) {
-          return s"${delegate.pc}: ${stmt.getLeftOp} = ${stmt.getFieldStore.getX}.${stmt.getFieldStore.getY}"
+          return s"${stmt.getLeftOp} = ${stmt.getFieldStore.getX}.${stmt.getFieldStore.getY}"
         } else if (stmt.isArrayStore) {
           val base = stmt.getArrayBase
-          return s"${delegate.pc}: ${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
+          return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
         } else {
-          return s"${delegate.pc}: ${stmt.getLeftOp} = ${stmt.getRightOp}"
+          return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
         }
       }
     }
 
+    if (delegate.astID == PutField.ASTID) {
+      return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+    }
+
     if (delegate.astID == Nop.ASTID) {
-      return s"${delegate.pc}: nop"
+      return "nop"
     }
 
     if (delegate.astID == Return.ASTID) {
-      return s"${delegate.pc}: return"
+      return "return"
     }
 
     if (stmt.isReturnStmt) {

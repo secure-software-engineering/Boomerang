@@ -12,9 +12,26 @@ class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: Con
   override def getType: Type = {
     val value = delegate.asVar.value
 
-    if (value.isPrimitiveValue) return OpalType(value.asPrimitiveValue.primitiveType)
-    if (value.isReferenceValue) return OpalType(value.asReferenceValue.asReferenceType)
-    if (value.isVoid) return OpalType(ObjectType.Void)
+    if (value.isPrimitiveValue) {
+      return OpalType(value.asPrimitiveValue.primitiveType)
+    }
+
+    if (value.isReferenceValue) {
+      if (value.asReferenceValue.isPrecise) {
+        if (value.asReferenceValue.isNull.isYes) {
+          return OpalNullType
+        } else {
+          return OpalType(value.asReferenceValue.asReferenceType)
+        }
+      }
+
+      // Over approximation: Same behavior as in Soot
+      return OpalType(ObjectType("java/lang/Object"))
+    }
+
+    if (value.isVoid) {
+      return OpalType(ObjectType.Void)
+    }
 
     // TODO Array and illegal types
     throw new RuntimeException("Type not implemented yet")
@@ -79,7 +96,7 @@ class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: Con
   override def hashCode: Int = Objects.hash(delegate.asVar.id)
 
   override def equals(other: Any): Boolean = other match {
-    case that: OpalLocal => super.equals(that) && this.delegate.asVar.id == that.delegate.asVar.id
+    case that: OpalLocal => super.equals(that) && this.delegate == that.delegate
     case _ => false
   }
 

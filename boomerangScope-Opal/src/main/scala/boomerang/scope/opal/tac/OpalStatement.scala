@@ -101,8 +101,9 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       }
 
       if (isFieldStore) {
-        // TODO Is it correct?
-        return new OpalVal(delegate.asPutField.objRef, m)
+        val fieldStore = delegate.asPutField
+
+        return OpalInstanceFieldRef(fieldStore.objRef.asVar, fieldStore.declaredFieldType, fieldStore.name, m)
       }
 
       if (isArrayStore) {
@@ -125,8 +126,11 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       if (delegate.isAssignment) {
         val rightExpr = delegate.asAssignment.expr
 
-        // TODO
-        if (rightExpr.isGetField) {}
+        if (rightExpr.isGetField) {
+          val getField = rightExpr.asGetField
+
+          return OpalInstanceFieldRef(getField.objRef.asVar, getField.declaredFieldType, getField.name, m)
+        }
 
         if (rightExpr.isArrayLoad) {
           val base = rightExpr.asArrayLoad.arrayRef
@@ -147,8 +151,13 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       }
 
       if (isFieldStore) {
-        // TODO Distinguish between constant and variable
-        return new OpalVal(delegate.asPutField.value, m)
+        val fieldStore = delegate.asPutField
+
+        if (fieldStore.value.isVar) {
+          return new OpalLocal(delegate.asPutField.value.asVar, m)
+        } else {
+          return new OpalVal(delegate.asPutField.value, m)
+        }
       }
 
       if (isArrayStore) {
@@ -205,7 +214,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def getReturnOp: Val = {
     if (isReturnStmt) {
-      return new OpalVal(delegate.asReturnValue.expr, m)
+      return new OpalLocal(delegate.asReturnValue.expr.asVar, m)
     }
 
     throw new RuntimeException("Statement is not a return statement")

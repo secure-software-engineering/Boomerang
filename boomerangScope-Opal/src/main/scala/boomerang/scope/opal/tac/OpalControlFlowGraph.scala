@@ -2,6 +2,7 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.{ControlFlowGraph, Statement}
 import com.google.common.collect.{HashMultimap, Multimap}
+import org.opalj.tac.Nop
 
 import java.util
 
@@ -49,44 +50,50 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
   private def buildCache(): Unit = {
     if (cacheBuilt) return
 
-    var headFound = false
-    method.tac.statements.foreach(stmt => {
+    // Definition of parameter locals
+    method.tac.statements.filter(stmt => stmt.pc == -1).foreach(stmt => {
+      val statement = new OpalStatement(stmt, method)
+      statements.add(statement)
+    })
+
+    val head = new OpalStatement(Nop(-1), method)
+    statements.add(head)
+    startPointCache.add(head)
+
+    var headAdded = false
+    method.tac.statements.filter(stmt => stmt.pc >= 0).foreach(stmt => {
       val statement = new OpalStatement(stmt, method)
       statements.add(statement)
 
-      // Definition of parameter locals have implicit PC of -1, so they are not part of the actual CFG
-      if (stmt.pc != -1) {
-        val stmtPc = method.tac.pcToIndex(stmt.pc)
+      val stmtPc = method.tac.pcToIndex(stmt.pc)
 
-        // The first statement after the parameter local definitions is the head
-        if (!headFound) {
-          headFound = true
+      if (!headAdded) {
+        headAdded = true
 
-          startPointCache.add(statement)
-          predsOfCache.putAll(statement, util.Collections.emptySet())
-        } else {
-          val predecessors = method.tac.cfg.predecessors(stmtPc)
-          predecessors.foreach(predecessorPc => {
-            val predecessor = method.tac.statements(predecessorPc)
-            val predecessorStatement = new OpalStatement(predecessor, method)
+        predsOfCache.put(statement, head)
+        succsOfCache.put(head, statement)
+      } else {
+        val predecessors = method.tac.cfg.predecessors(stmtPc)
+        predecessors.foreach(predecessorPc => {
+          val predecessor = method.tac.statements(predecessorPc)
+          val predecessorStatement = new OpalStatement(predecessor, method)
 
-            predsOfCache.put(statement, predecessorStatement)
-          })
-        }
+          predsOfCache.put(statement, predecessorStatement)
+        })
+      }
 
-        val successors = method.tac.cfg.successors(stmtPc)
-        if (successors.isEmpty) {
-          // No successors => Tail statement
-          endPointCache.add(statement)
-          succsOfCache.putAll(statement, util.Collections.emptySet())
-        } else {
-          successors.foreach(successorPc => {
-            val successor = method.tac.statements(successorPc)
-            val successorStatement = new OpalStatement(successor, method)
+      val successors = method.tac.cfg.successors(stmtPc)
+      if (successors.isEmpty) {
+        // No successors => Tail statement
+        endPointCache.add(statement)
+        succsOfCache.putAll(statement, util.Collections.emptySet())
+      } else {
+        successors.foreach(successorPc => {
+          val successor = method.tac.statements(successorPc)
+          val successorStatement = new OpalStatement(successor, method)
 
-            succsOfCache.put(statement, successorStatement)
-          })
-        }
+          succsOfCache.put(statement, successorStatement)
+        })
       }
     })
 

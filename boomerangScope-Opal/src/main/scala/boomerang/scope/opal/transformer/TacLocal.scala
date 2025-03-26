@@ -53,7 +53,7 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def value: ValueInformation = valueInfo
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
 
   override def equals(other: Any): Boolean = other match {
     case that: StackLocal => this.id == that.id
@@ -77,7 +77,7 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType, value
 
   override def value: ValueInformation = valueInfo
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
 
   override def equals(other: Any): Boolean = other match {
     case that: RegisterLocal => this.id == that.id
@@ -101,7 +101,7 @@ class ParameterLocal(identifier: Int, computationalType: ComputationalType, para
 
   override def name: String = paramName
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
 
   override def equals(other: Any): Boolean = other match {
     case that: ParameterLocal => this.id == that.id

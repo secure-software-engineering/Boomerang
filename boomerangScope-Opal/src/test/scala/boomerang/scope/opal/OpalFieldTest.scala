@@ -26,11 +26,11 @@ class OpalFieldTest {
         Assert.assertFalse(field.isInnerClassField)
 
         val fieldLoad = stmt.getFieldLoad
-        //Assert.assertTrue(fieldLoad.getX.getType.toString.equals(classOf[FieldClass].getName))
+        Assert.assertTrue(fieldLoad.getX.getType.toString.equals(classOf[FieldClass].getName))
 
         val fieldType = fieldLoad.getY.getType.toString
         Assert.assertFalse(fieldLoad.getY.isPredefinedField)
-        //Assert.assertTrue(fieldType.equals("int") || fieldType.equals(classOf[A].getName))
+        Assert.assertTrue(fieldType.equals("int") || fieldType.equals(classOf[A].getName))
       }
     })
 
@@ -57,7 +57,7 @@ class OpalFieldTest {
         val fieldType = fieldStore.getY.getType.toString
         Assert.assertFalse(fieldStore.getY.isPredefinedField)
         Assert.assertFalse(fieldStore.getY.isInnerClassField)
-        //Assert.assertTrue(fieldType.equals("int") || fieldType.equals(classOf[A].getName))
+        Assert.assertTrue(fieldType.equals("int") || fieldType.equals(classOf[A].getName))
       }
     })
 

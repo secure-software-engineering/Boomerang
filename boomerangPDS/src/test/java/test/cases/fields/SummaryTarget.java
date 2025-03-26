@@ -15,6 +15,7 @@ import test.TestMethod;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
+@SuppressWarnings("unused")
 public class SummaryTarget {
 
   @TestMethod

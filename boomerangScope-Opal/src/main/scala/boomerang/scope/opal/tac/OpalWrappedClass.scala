@@ -2,7 +2,7 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalClient
 import boomerang.scope.{Method, Type, WrappedClass}
-import org.opalj.br.{ClassFile, ReferenceType}
+import org.opalj.br.ClassFile
 
 import java.util
 
@@ -38,7 +38,7 @@ case class OpalWrappedClass(delegate: ClassFile) extends WrappedClass {
 
   override def isApplicationClass: Boolean = OpalClient.isApplicationClass(delegate)
 
-  override def getFullyQualifiedName: String = delegate.fqn
+  override def getFullyQualifiedName: String = delegate.fqn.replace("/", ".")
 
   override def isPhantom: Boolean = false
 
