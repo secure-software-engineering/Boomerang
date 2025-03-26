@@ -16,7 +16,7 @@ import boomerang.scope.Val;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
@@ -26,7 +26,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
    * This set keeps track of all statements on a shortest path that use an alias from source to
    * sink.
    */
-  @Nonnull private final LinkedHashSet<Node<Edge, Val>> shortestPathWitness;
+  @NonNull private final LinkedHashSet<Node<Edge, Val>> shortestPathWitness;
 
   private PathTrackingWeightImpl(LinkedHashSet<Node<Edge, Val>> allStatement) {
     this.shortestPathWitness = allStatement;
@@ -37,9 +37,9 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
     this.shortestPathWitness.add(relevantStatement);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight o) {
+  public Weight extendWith(@NonNull Weight o) {
     if (!(o instanceof PathTrackingWeightImpl)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
@@ -52,9 +52,9 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
     return new PathTrackingWeightImpl(newAllStatements);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight o) {
+  public Weight combineWith(@NonNull Weight o) {
     if (!(o instanceof PathTrackingWeightImpl)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
@@ -92,7 +92,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
     return "\nAll statements: " + shortestPathWitness;
   }
 
-  @Nonnull
+  @NonNull
   public Set<Node<Edge, Val>> getShortestPathWitness() {
     return Collections.unmodifiableSet(shortestPathWitness);
   }

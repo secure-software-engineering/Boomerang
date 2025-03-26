@@ -16,23 +16,23 @@ import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public interface DataFlowPathWeight extends Weight {
-  @Nonnull
+  @NonNull
   PathTrackingWeight getPath();
 
-  @Nonnull
+  @NonNull
   PathConditionWeight getCondition();
 
-  @Nonnull
+  @NonNull
   Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
 
-  @Nonnull
+  @NonNull
   Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions();
 
-  @Nonnull
+  @NonNull
   Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap();
 }

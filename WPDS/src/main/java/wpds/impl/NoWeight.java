@@ -11,7 +11,7 @@
  */
 package wpds.impl;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public class NoWeight implements Weight {
 
@@ -21,20 +21,20 @@ public class NoWeight implements Weight {
     /* Singleton */
   }
 
-  @Nonnull
+  @NonNull
   public static NoWeight getInstance() {
     return INSTANCE;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     return other;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     return other;
   }
 

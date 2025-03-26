@@ -14,20 +14,20 @@ package typestate;
 import boomerang.scope.ControlFlowGraph;
 import java.util.Collection;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
 public interface TransitionFunction extends Weight {
-  @Nonnull
+  @NonNull
   Collection<Transition> getValues();
 
-  @Nonnull
+  @NonNull
   Set<ControlFlowGraph.Edge> getStateChangeStatements();
 
-  @Nonnull
-  Weight extendWith(@Nonnull Weight other);
+  @NonNull
+  Weight extendWith(@NonNull Weight other);
 
-  @Nonnull
-  Weight combineWith(@Nonnull Weight other);
+  @NonNull
+  Weight combineWith(@NonNull Weight other);
 }

@@ -14,7 +14,7 @@ package tests;
 import static tests.NumWeightOne.one;
 import static tests.NumWeightZero.zero;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class NumWeightImpl implements NumWeight {
@@ -29,9 +29,9 @@ public class NumWeightImpl implements NumWeight {
     return i;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (this.equals(one())) return other;
     if (other.equals(one())) return this;
     if (this.equals(zero()) || other.equals(zero())) return zero();
@@ -39,9 +39,9 @@ public class NumWeightImpl implements NumWeight {
     return new NumWeightImpl(o.getI() + getI());
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
     NumWeight o = (NumWeight) other;

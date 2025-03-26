@@ -14,13 +14,13 @@ package boomerang.weights;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Val;
 import java.util.LinkedHashSet;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class PathTrackingWeightOne implements PathTrackingWeight {
 
-  @Nonnull private static final PathTrackingWeightOne one = new PathTrackingWeightOne();
+  @NonNull private static final PathTrackingWeightOne one = new PathTrackingWeightOne();
 
   private PathTrackingWeightOne() {
     /*  Singleton */
@@ -30,21 +30,21 @@ public class PathTrackingWeightOne implements PathTrackingWeight {
     return one;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public LinkedHashSet<Node<Edge, Val>> getShortestPathWitness() {
     throw new IllegalStateException("don't!");
   }
 
   @Override
-  @Nonnull
-  public Weight extendWith(@Nonnull Weight o) {
+  @NonNull
+  public Weight extendWith(@NonNull Weight o) {
     throw new IllegalStateException("This should not happen!");
   }
 
   @Override
-  @Nonnull
-  public Weight combineWith(@Nonnull Weight o) {
+  @NonNull
+  public Weight combineWith(@NonNull Weight o) {
     throw new IllegalStateException("This should not happen!");
   }
 

@@ -12,25 +12,25 @@
 package typestate.finiteautomata;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public class TransitionImpl implements Transition {
-  @Nonnull private final State from;
-  @Nonnull private final State to;
+  @NonNull private final State from;
+  @NonNull private final State to;
 
-  public TransitionImpl(@Nonnull State from, @Nonnull State to) {
+  public TransitionImpl(@NonNull State from, @NonNull State to) {
     this.from = from;
     this.to = to;
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public State from() {
     return from;
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public State to() {
     return to;
   }
@@ -59,7 +59,7 @@ public class TransitionImpl implements Transition {
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public String toString() {
     return from + " -> " + to;
   }

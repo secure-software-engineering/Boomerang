@@ -21,42 +21,42 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
 import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
-  @Nonnull private final Set<? extends Transition> values;
-  @Nonnull private final Set<Edge> stateChangeStatements;
+  @NonNull private final Set<? extends Transition> values;
+  @NonNull private final Set<Edge> stateChangeStatements;
 
   public TransitionFunctionImpl(
-      @Nonnull Set<? extends Transition> trans, @Nonnull Set<Edge> stateChangeStatements) {
+      @NonNull Set<? extends Transition> trans, @NonNull Set<Edge> stateChangeStatements) {
     this.stateChangeStatements = stateChangeStatements;
     this.values = trans;
   }
 
   public TransitionFunctionImpl(
-      @Nonnull Transition trans, @Nonnull Set<Edge> stateChangeStatements) {
+      @NonNull Transition trans, @NonNull Set<Edge> stateChangeStatements) {
     this(Collections.singleton(trans), stateChangeStatements);
   }
 
   @Override
-  @Nonnull
+  @NonNull
   public Collection<Transition> getValues() {
     return Lists.newArrayList(values);
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Set<Edge> getStateChangeStatements() {
     return stateChangeStatements;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
     if (other.equals(zero()) || this.equals(zero())) {
@@ -84,9 +84,9 @@ public class TransitionFunctionImpl implements TransitionFunction {
     return new TransitionFunctionImpl(ress, newStateChangeStatements);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }

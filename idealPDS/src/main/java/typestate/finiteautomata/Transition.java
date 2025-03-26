@@ -11,12 +11,12 @@
  */
 package typestate.finiteautomata;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public interface Transition {
-  @Nonnull
+  @NonNull
   State from();
 
-  @Nonnull
+  @NonNull
   State to();
 }

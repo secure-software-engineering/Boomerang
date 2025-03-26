@@ -18,19 +18,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
 
-  @Nonnull private final Collection<? extends Node<Stmt, Fact>> nodes;
+  @NonNull private final Collection<? extends Node<Stmt, Fact>> nodes;
 
   public SetDomainImpl(Collection<Node<Stmt, Fact>> nodes) {
     this.nodes = nodes;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Weight extendWith(Weight other) {
     if (other.equals(one())) {
@@ -42,9 +42,9 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     return zero();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
 
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
@@ -58,7 +58,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     return zero();
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Node> getNodes() {
     return Lists.newArrayList(nodes);
@@ -85,7 +85,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     return false;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Node<Stmt, Fact>> elements() {
     return Sets.newHashSet(nodes);

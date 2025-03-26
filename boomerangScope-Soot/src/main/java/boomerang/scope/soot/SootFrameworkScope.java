@@ -24,7 +24,7 @@ import boomerang.scope.soot.jimple.JimpleStaticFieldVal;
 import boomerang.scope.soot.jimple.JimpleVal;
 import java.util.Collection;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import soot.Scene;
 import soot.SootMethod;
 import soot.jimple.IntConstant;
@@ -36,10 +36,10 @@ public class SootFrameworkScope implements FrameworkScope {
   protected DataFlowScope dataFlowScope;
 
   public SootFrameworkScope(
-      @Nonnull Scene scene,
-      @Nonnull soot.jimple.toolkits.callgraph.CallGraph callGraph,
-      @Nonnull Collection<SootMethod> entryPoints,
-      @Nonnull DataFlowScope dataFlowScope) {
+      @NonNull Scene scene,
+      soot.jimple.toolkits.callgraph.@NonNull CallGraph callGraph,
+      @NonNull Collection<SootMethod> entryPoints,
+      @NonNull DataFlowScope dataFlowScope) {
     this.scene = scene;
 
     this.sootCallGraph = new SootCallGraph(callGraph, entryPoints);

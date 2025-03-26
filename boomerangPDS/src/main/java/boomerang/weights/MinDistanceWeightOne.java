@@ -11,7 +11,7 @@
  */
 package boomerang.weights;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class MinDistanceWeightOne implements MinDistanceWeight {
@@ -22,9 +22,9 @@ public class MinDistanceWeightOne implements MinDistanceWeight {
     return one;
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight extendWith(@Nonnull Weight o) {
+  public Weight extendWith(@NonNull Weight o) {
     if (!(o instanceof MinDistanceWeightImpl)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
@@ -35,9 +35,9 @@ public class MinDistanceWeightOne implements MinDistanceWeight {
     return new MinDistanceWeightImpl(newDistance);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight o) {
+  public Weight combineWith(@NonNull Weight o) {
     if (!(o instanceof MinDistanceWeightImpl))
       throw new RuntimeException("Cannot extend to different types of weight!");
     MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;

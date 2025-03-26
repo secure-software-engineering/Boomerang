@@ -18,7 +18,7 @@ import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
 import typestate.finiteautomata.TransitionImpl;
@@ -26,7 +26,7 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionOne implements TransitionFunction {
 
-  @Nonnull private static final TransitionFunctionOne one = new TransitionFunctionOne();
+  @NonNull private static final TransitionFunctionOne one = new TransitionFunctionOne();
 
   public TransitionFunctionOne() {}
 
@@ -34,13 +34,13 @@ public class TransitionFunctionOne implements TransitionFunction {
     return one;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Collection<Transition> getValues() {
     throw new IllegalStateException("TransitionFunctionOne.getValues() - don't");
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
     throw new IllegalStateException(
@@ -76,9 +76,9 @@ public class TransitionFunctionOne implements TransitionFunction {
     return new TransitionFunctionImpl(ress, newStateChangeStatements);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Weight combineWith(@Nonnull Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }

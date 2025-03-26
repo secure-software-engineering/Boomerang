@@ -13,15 +13,15 @@ package typestate.finiteautomata;
 
 import boomerang.scope.DeclaredMethod;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MatcherTransition extends TransitionImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(MatcherTransition.class);
-  @Nonnull private final Type type;
-  @Nonnull private final Parameter param;
-  @Nonnull private final Pattern methodMatcher;
+  @NonNull private final Type type;
+  @NonNull private final Parameter param;
+  @NonNull private final Pattern methodMatcher;
   private final boolean negate;
 
   public enum Type {
@@ -38,21 +38,21 @@ public class MatcherTransition extends TransitionImpl {
   }
 
   public MatcherTransition(
-      @Nonnull State from,
-      @Nonnull String methodMatcher,
-      @Nonnull Parameter param,
-      @Nonnull State to,
-      @Nonnull Type type) {
+      @NonNull State from,
+      @NonNull String methodMatcher,
+      @NonNull Parameter param,
+      @NonNull State to,
+      @NonNull Type type) {
     this(from, methodMatcher, false, param, to, type);
   }
 
   public MatcherTransition(
-      @Nonnull State from,
-      @Nonnull String methodMatcher,
+      @NonNull State from,
+      @NonNull String methodMatcher,
       boolean negate,
-      @Nonnull Parameter param,
-      @Nonnull State to,
-      @Nonnull Type type) {
+      @NonNull Parameter param,
+      @NonNull State to,
+      @NonNull Type type) {
     super(from, to);
     this.methodMatcher = Pattern.compile(methodMatcher);
     this.negate = negate;
@@ -60,7 +60,7 @@ public class MatcherTransition extends TransitionImpl {
     this.param = param;
   }
 
-  public boolean matches(@Nonnull DeclaredMethod declaredMethod) {
+  public boolean matches(@NonNull DeclaredMethod declaredMethod) {
     boolean matches = methodMatcher.matcher(declaredMethod.getSubSignature()).matches();
     if (matches) {
       LOGGER.debug(
@@ -69,12 +69,12 @@ public class MatcherTransition extends TransitionImpl {
     return negate != matches;
   }
 
-  @Nonnull
+  @NonNull
   public Type getType() {
     return type;
   }
 
-  @Nonnull
+  @NonNull
   public Parameter getParam() {
     return param;
   }

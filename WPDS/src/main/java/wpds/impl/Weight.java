@@ -11,12 +11,12 @@
  */
 package wpds.impl;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public interface Weight {
-  @Nonnull
-  Weight extendWith(@Nonnull Weight other);
+  @NonNull
+  Weight extendWith(@NonNull Weight other);
 
-  @Nonnull
-  Weight combineWith(@Nonnull Weight other);
+  @NonNull
+  Weight combineWith(@NonNull Weight other);
 }
