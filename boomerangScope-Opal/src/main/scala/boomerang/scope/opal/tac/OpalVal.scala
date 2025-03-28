@@ -155,6 +155,7 @@ class OpalVal(val delegate: Expr[TacLocal], method: OpalMethod, unbalanced: Cont
       case longConst: LongConst => longConst.value.toString
       case newExpr: New => s"new ${newExpr.tpe.toJava}"
       case newArrayExpr: NewArray[_] => s"new ${newArrayExpr.tpe.toJava}"
+      case _: NullExpr => "null"
       case _ => delegate.toString
     }
   }

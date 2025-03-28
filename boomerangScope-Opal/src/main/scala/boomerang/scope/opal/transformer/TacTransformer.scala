@@ -6,7 +6,7 @@ import org.opalj.ai.{AIResult, BaseAI}
 import org.opalj.br.{ClassHierarchy, Method}
 import org.opalj.br.cfg.CFGFactory
 import org.opalj.collection.immutable.IntIntPair
-import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, CaughtException, Checkcast, ClassConst, Compare, DoubleConst, DynamicConst, Expr, ExprStmt, FloatConst, GetField, GetStatic, Goto, IdBasedVar, If, IntConst, InvokedynamicFunctionCall, InvokedynamicMethodCall, JSR, LongConst, MethodHandleConst, MethodTypeConst, MonitorEnter, MonitorExit, NaiveTACode, New, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, NullExpr, Param, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, Ret, Return, ReturnValue, StaticFunctionCall, StaticMethodCall, Stmt, StringConst, Switch, TACNaive, TACOptimization, TACStmts, Throw, VirtualFunctionCall, VirtualMethodCall}
+import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, CaughtException, Checkcast, ClassConst, Compare, DoubleConst, DynamicConst, Expr, ExprStmt, FloatConst, GetField, GetStatic, Goto, IdBasedVar, If, InstanceOf, IntConst, InvokedynamicFunctionCall, InvokedynamicMethodCall, JSR, LongConst, MethodHandleConst, MethodTypeConst, MonitorEnter, MonitorExit, NaiveTACode, New, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, NullExpr, Param, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, Ret, Return, ReturnValue, StaticFunctionCall, StaticMethodCall, Stmt, StringConst, Switch, TACNaive, TACOptimization, TACStmts, Throw, VirtualFunctionCall, VirtualMethodCall}
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ object TacTransformer {
     var stackCounter = -1
     val currentStack = mutable.Map.empty[Int, TacLocal]
 
-    val aiResult: AIResult = BaseAI(method, new PrimitiveTACAIDomain(OpalClient.getClassHierarchy, method))
+    val aiResult: AIResult = BaseAI(method, new PrimitiveTACAIDomain(classHierarchy, method))
     val operandsArray: aiResult.domain.OperandsArray = aiResult.operandsArray
     val localArray = aiResult.localsArray
 
@@ -62,7 +62,7 @@ object TacTransformer {
         // Store the current stack and register locals on our own 'stack'
         currentStack(stmt.asAssignment.targetVar.id) = target
 
-        return new Assignment[TacLocal](stmt.pc, target, transformedExpr)
+        return new Assignment(stmt.pc, target, transformedExpr)
       }
 
       if (stmt.astID == ReturnValue.ASTID) {
@@ -191,15 +191,15 @@ object TacTransformer {
       val nextPc = tacNaive.stmts(tacNaive.pcToIndex(pc) + 1).pc
 
       if (idBasedVar.id >= 0) {
-        if (isThis) {
+        /*if (isThis) {
           val value = operandsArray(nextPc).head
           new StackLocal(-1, idBasedVar.cTpe, value)
-        } else {
+        } else {*/
           stackCounter += 1
 
           val value = operandsArray(nextPc).head
           new StackLocal(stackCounter, idBasedVar.cTpe, value)
-        }
+        //}
       } else {
         val local = localArray(nextPc)
         new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1))
@@ -209,6 +209,13 @@ object TacTransformer {
     def transformExpr(expr: Expr[IdBasedVar]): Expr[TacLocal] = {
       if (expr.isVar) {
         return currentStack.getOrElse(expr.asVar.id, throw new RuntimeException("No local on stack"))
+      }
+
+      if (expr.astID == InstanceOf.ASTID) {
+        val instanceOf = expr.asInstanceOf
+        val value = transformExpr(instanceOf.value)
+
+        return InstanceOf(instanceOf.pc, value, instanceOf.cmpTpe)
       }
 
       if (expr.astID == Compare.ASTID) {

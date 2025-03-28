@@ -103,7 +103,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       if (isFieldStore) {
         val fieldStore = delegate.asPutField
 
-        return OpalInstanceFieldRef(fieldStore.objRef.asVar, fieldStore.declaredFieldType, fieldStore.name, m)
+        return new OpalInstanceFieldRef(fieldStore.objRef.asVar, fieldStore.declaredFieldType, fieldStore.name, m)
       }
 
       if (isArrayStore) {
@@ -129,7 +129,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         if (rightExpr.isGetField) {
           val getField = rightExpr.asGetField
 
-          return OpalInstanceFieldRef(getField.objRef.asVar, getField.declaredFieldType, getField.name, m)
+          return new OpalInstanceFieldRef(getField.objRef.asVar, getField.declaredFieldType, getField.name, m)
         }
 
         if (rightExpr.isArrayLoad) {

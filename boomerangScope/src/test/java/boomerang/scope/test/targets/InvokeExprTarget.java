@@ -50,4 +50,12 @@ public class InvokeExprTarget {
 
     System.out.println(alias2);
   }
+
+  public void cast() {
+    A alias1 = new Subclass();
+    Subclass alias2 = (Subclass) alias1;
+    System.out.println(alias2);
+  }
+
+  public static class Subclass extends A {}
 }

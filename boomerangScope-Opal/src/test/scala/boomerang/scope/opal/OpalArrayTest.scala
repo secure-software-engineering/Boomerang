@@ -1,7 +1,7 @@
 package boomerang.scope.opal
 
 import boomerang.scope.opal.tac.OpalMethod
-import boomerang.scope.opal.transformer.{BasicPropagation, TacLocal}
+import boomerang.scope.opal.transformer.{BasicPropagationOld, TacLocal}
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
 import org.junit.{Assert, Test}

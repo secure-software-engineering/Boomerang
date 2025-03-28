@@ -14,6 +14,7 @@ package boomerang.scope.test.targets;
 public class SingleTarget {
 
   public static void main(String[] args) {
+    getAndSetField();
     identityTest();
   }
 
@@ -26,5 +27,15 @@ public class SingleTarget {
   private static A identity(A param) {
     A mapped = param;
     return mapped;
+  }
+
+  private static void getAndSetField() {
+    FieldClass c = new FieldClass();
+    A a = new A();
+
+    c.setA(a);
+    A query = c.getA();
+
+    System.out.println(query);
   }
 }

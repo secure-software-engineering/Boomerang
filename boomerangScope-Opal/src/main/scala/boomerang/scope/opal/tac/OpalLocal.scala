@@ -23,6 +23,8 @@ class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: Con
         } else {
           return OpalType(value.asReferenceValue.asReferenceType)
         }
+      } else {
+        return OpalType(value.asReferenceValue.upperTypeBound.head)
       }
 
       // Over approximation: Same behavior as in Soot

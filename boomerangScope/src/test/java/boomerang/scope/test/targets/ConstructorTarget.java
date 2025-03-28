@@ -11,35 +11,28 @@
  */
 package boomerang.scope.test.targets;
 
-public class FieldClass {
+public class ConstructorTarget {
 
-  public int i;
-  public A a;
-
-  public static int si = 20;
-  public static A sa = new A();
-
-  public FieldClass() {
-    i = 10;
-    a = new A();
+  public static void main(String[] args) {
+    definedConstructor();
+    undefinedConstructor();
   }
 
-  public A getA() {
-    return a;
+  public static void definedConstructor() {
+    ClassWithDefinedField defined = new ClassWithDefinedField();
+    System.out.println(defined.a);
   }
 
-  public void setA(A a) {
-    this.a = a;
+  public static void undefinedConstructor() {
+    ClassWithUndefinedField undefined = new ClassWithUndefinedField();
+    System.out.println(undefined.a);
   }
 
-  public static class InnerFieldClass {
+  private static class ClassWithDefinedField {
+    A a = new A();
+  }
 
-    public int innerI;
-    public A innerA;
-
-    public InnerFieldClass() {
-      innerI = 30;
-      innerA = new A();
-    }
+  private static class ClassWithUndefinedField {
+    A a;
   }
 }

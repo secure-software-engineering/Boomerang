@@ -11,5 +11,5 @@ case class OpalField(declaringClass: ObjectType, fieldType: FieldType, name: Str
 
   override def getType: Type = OpalType(fieldType)
 
-  override def toString: String = s"<${declaringClass.fqn}>.${fieldType.toJava} $name"
+  override def toString: String = s"${declaringClass.fqn}.${fieldType.toJava} $name"
 }

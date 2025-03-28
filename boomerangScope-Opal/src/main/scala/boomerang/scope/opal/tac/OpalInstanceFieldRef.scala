@@ -3,7 +3,9 @@ package boomerang.scope.opal.tac
 import boomerang.scope.{ControlFlowGraph, Method, Pair, Type, Val}
 import boomerang.scope.opal.transformer.TacLocal
 
-case class OpalInstanceFieldRef(base: TacLocal, fieldType: org.opalj.br.Type, fieldName: String, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
+import java.util.Objects
+
+class OpalInstanceFieldRef(val base: TacLocal, val fieldType: org.opalj.br.Type, val fieldName: String, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   override def getType: Type = OpalType(fieldType)
 
@@ -13,7 +15,7 @@ case class OpalInstanceFieldRef(base: TacLocal, fieldType: org.opalj.br.Type, fi
 
   override def getNewExprType: Type = throw new RuntimeException("Instance field ref is not a new expression")
 
-  override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = OpalInstanceFieldRef(base, fieldType, fieldName, method, stmt)
+  override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalInstanceFieldRef(base, fieldType, fieldName, method, stmt)
 
   override def isLocal: Boolean = false
 
@@ -51,7 +53,7 @@ case class OpalInstanceFieldRef(base: TacLocal, fieldType: org.opalj.br.Type, fi
 
   override def getClassConstantType: Type = throw new RuntimeException("Instance field ref is not a class constant")
 
-  override def withNewMethod(callee: Method): Val = OpalInstanceFieldRef(base, fieldType, fieldName, callee.asInstanceOf[OpalMethod])
+  override def withNewMethod(callee: Method): Val = new OpalInstanceFieldRef(base, fieldType, fieldName, callee.asInstanceOf[OpalMethod])
 
   override def isLongConstant: Boolean = false
 
@@ -62,6 +64,13 @@ case class OpalInstanceFieldRef(base: TacLocal, fieldType: org.opalj.br.Type, fi
   override def getArrayBase: Pair[Val, Integer] = throw new RuntimeException("Instance field ref has no array base")
 
   override def getVariableName: String = s"$base.$fieldName"
+
+  override def hashCode: Int = Objects.hash(base, fieldType, fieldName)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalInstanceFieldRef => super.equals(other) && this.base == that.base && this.fieldType == that.fieldType && this.fieldName == that.fieldName
+    case _ => false
+  }
 
   override def toString: String = getVariableName
 }
