@@ -14,7 +14,7 @@ package typestate;
 import static typestate.TransitionFunctionOne.one;
 
 import boomerang.scope.ControlFlowGraph;
-import com.google.common.collect.Sets;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,7 +52,7 @@ public class TransitionFunctionZero implements TransitionFunction {
   public Weight extendWith(@NonNull Weight other) {
     TransitionFunction one = one();
     if (other == (one)) return this;
-    if (other == (zero()) || this == (zero())) {
+    if (other == zero()) {
       return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -83,16 +83,8 @@ public class TransitionFunctionZero implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (this == (zero())) return other;
-    if (other == (zero())) return this;
-
-    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-    Set<Transition> transitions = new HashSet<>(func.getValues());
-    transitions.addAll(getValues());
-    HashSet<ControlFlowGraph.Edge> newStateChangeStmts =
-        Sets.newHashSet(getStateChangeStatements());
-    newStateChangeStmts.addAll(func.getStateChangeStatements());
-    return new TransitionFunctionImpl(transitions, newStateChangeStmts);
+    if (other == zero()) return this;
+    return other;
   }
 
   public String toString() {

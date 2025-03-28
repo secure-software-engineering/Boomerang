@@ -37,7 +37,7 @@ public class NumWeightZero implements NumWeight {
   public Weight extendWith(@NonNull Weight other) {
 
     if (other == (one())) return this;
-    if (this == (zero()) || other == (zero())) return zero();
+    if (other == (zero())) return zero();
     NumWeight o = (NumWeight) other;
     return new NumWeightImpl(o.getI() + getI());
   }
@@ -46,10 +46,8 @@ public class NumWeightZero implements NumWeight {
   @Override
   public Weight combineWith(@NonNull Weight other) {
     if (other == zero()) return this;
-    if (this == zero()) return other;
-    NumWeight o = (NumWeight) other;
-    if (o.getI() == getI()) return o;
-    return zero();
+    return other;
+
   }
 
   @Override

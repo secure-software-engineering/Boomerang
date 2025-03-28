@@ -26,17 +26,14 @@ public class MinSemiringOne implements MinSemiring {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other == (one())) return this;
-    if (this == (one())) return other;
-    MinSemiringOne o = (MinSemiringOne) other;
-    return new MinSemiringOne(o.getI() + getI());
+    if (other == one()) return this;
+    return other;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    if (other == (zero())) return this;
-    if (this == (zero())) return other;
+    if (other == zero()) return this;
     MinSemiring o = (MinSemiring) other;
     return new MinSemiringOne(Math.min(o.getI(), getI()));
   }

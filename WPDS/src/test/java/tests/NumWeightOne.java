@@ -34,12 +34,7 @@ public class NumWeightOne implements NumWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    NumWeightOne one1 = one();
-    if (this == (one1)) return other;
-    if (other == (one1)) return this;
-    if (other == (zero())) return zero();
-    NumWeight o = (NumWeight) other;
-    return new NumWeightImpl(o.getI() + getI());
+    return other;
   }
 
   @NonNull

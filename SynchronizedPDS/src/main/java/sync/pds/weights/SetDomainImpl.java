@@ -45,17 +45,13 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   @Override
   public Weight combineWith(@NonNull Weight other) {
 
-    SetDomain zero = zero();
-    if (other == zero) return this;
+    SetDomainZero zero = zero();
     SetDomain one = one();
+    if (other == zero) return this;
     if (other == one) return one;
-
-    if (other instanceof SetDomainImpl) {
-      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
+    Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
       merged.addAll(((SetDomainImpl) other).nodes);
       return new SetDomainImpl<N, Stmt, Fact>(merged);
-    }
-    return zero;
   }
 
   @NonNull
