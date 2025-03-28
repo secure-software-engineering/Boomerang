@@ -28,15 +28,15 @@ public class TestingFramework {
   private final TestSetup testSetup;
 
   public TestingFramework() {
-    // FIXME Parameterize via env vars
-    String framework = "sootup";
+
+    String framework = System.getProperty("framework");
     switch(framework){
-      case "sootup":
-        this.testSetup = new SootUpTestSetup();
-      break;
       case "soot":
-      default:
         this.testSetup = new SootTestSetup();
+        break;
+      case "sootup":
+      default:
+        this.testSetup = new SootUpTestSetup();
     }
   }
 
