@@ -20,19 +20,21 @@ public class ConstructorTarget {
 
   public static void definedConstructor() {
     ClassWithDefinedField defined = new ClassWithDefinedField();
-    System.out.println(defined.a);
+    System.out.println(defined.a + " " + defined.i);
   }
 
   public static void undefinedConstructor() {
     ClassWithUndefinedField undefined = new ClassWithUndefinedField();
-    System.out.println(undefined.a);
+    System.out.println(undefined.a + " " + undefined.i);
   }
 
   private static class ClassWithDefinedField {
     A a = new A();
+    int i;
   }
 
   private static class ClassWithUndefinedField {
     A a;
+    int i = 10;
   }
 }

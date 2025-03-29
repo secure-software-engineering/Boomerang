@@ -41,13 +41,7 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def isParameterLocal: Boolean = false
 
-  override def name: String = {
-    if (identifier == -1) {
-      "this"
-    } else {
-      s"$$s$identifier"
-    }
-  }
+  override def name: String = s"$$s$identifier"
 
   override def cTpe: ComputationalType = computationalType
 

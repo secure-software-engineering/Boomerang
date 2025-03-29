@@ -1,12 +1,10 @@
 package boomerang.scope.opal
 
 import boomerang.scope.opal.tac.OpalMethod
-import boomerang.scope.opal.transformer.{BasicPropagationOld, TacLocal}
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
 import org.junit.{Assert, Test}
 import org.opalj.br.IntegerType
-import org.opalj.tac.Stmt
 
 import java.util
 

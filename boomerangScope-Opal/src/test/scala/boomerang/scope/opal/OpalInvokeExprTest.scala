@@ -26,8 +26,7 @@ class OpalInvokeExprTest {
     val opalMethod = OpalMethod(method)
     opalMethod.getControlFlowGraph
 
-    // Update the project's config to set the test method as the (single) entry point
-    // See
+    // Update the project's config to set the test method as the (single) entry point. See
     // https://github.com/opalj/opal/blob/ff01c1c9e696946a88b090a52881a41445cf07f1/DEVELOPING_OPAL/tools/src/main/scala/org/opalj/support/info/CallGraph.scala#L406
     var config = OpalClient.project.get.config
 

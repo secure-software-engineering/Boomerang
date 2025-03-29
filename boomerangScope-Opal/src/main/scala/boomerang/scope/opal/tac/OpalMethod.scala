@@ -133,7 +133,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
 
 object OpalMethod {
 
-  def apply(delegate: org.opalj.br.Method): OpalMethod = new OpalMethod(delegate, TacTransformer(delegate, OpalClient.getClassHierarchy))
+  def apply(delegate: org.opalj.br.Method): OpalMethod = new OpalMethod(delegate, TacTransformer(OpalClient.project.get, delegate))
 
   def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod = new OpalMethod(delegate, tac)
 }

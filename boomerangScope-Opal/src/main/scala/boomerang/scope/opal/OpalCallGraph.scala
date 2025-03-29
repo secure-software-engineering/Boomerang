@@ -20,7 +20,7 @@ class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Meth
   })
 
   private def addEdgesFromMethod(method: DefinedMethod): Unit = {
-    val tacCode = TacTransformer(method.definedMethod, OpalClient.getClassHierarchy)
+    val tacCode = TacTransformer(OpalClient.project.get, method.definedMethod)
 
     tacCode.statements.foreach(stmt => {
       val srcStatement = new OpalStatement(stmt, OpalMethod(method.definedMethod, tacCode))
