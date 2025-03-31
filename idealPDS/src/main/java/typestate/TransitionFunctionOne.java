@@ -60,12 +60,8 @@ public class TransitionFunctionOne implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    TransitionFunctionZero zero = zero();
-    TransitionFunction one1 = one();
-    if (other == (zero)) return this;
-
-    if (other == one1) {
-      return one1;
+    if (other == zero() || other == one) {
+        return this;
     }
 
     TransitionFunction func = (TransitionFunction) other;
@@ -73,16 +69,9 @@ public class TransitionFunctionOne implements TransitionFunction {
     Set<Transition> idTransitions = Sets.newHashSet();
     for (Transition t : transitions) {
       idTransitions.add(new TransitionImpl(t.from(), t.from()));
-
-      transitions.addAll(idTransitions);
-      return new TransitionFunctionImpl(
-          transitions, Sets.newHashSet(func.getStateChangeStatements()));
     }
-    transitions.addAll(getValues());
-    HashSet<ControlFlowGraph.Edge> newStateChangeStmts =
-        Sets.newHashSet(getStateChangeStatements());
-    newStateChangeStmts.addAll(func.getStateChangeStatements());
-    return new TransitionFunctionImpl(transitions, newStateChangeStmts);
+    transitions.addAll(idTransitions);
+    return new TransitionFunctionImpl(transitions,Sets.newHashSet(func.getStateChangeStatements()));
   }
 
   public String toString() {
