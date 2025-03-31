@@ -46,7 +46,7 @@ public class NumWeightImpl implements NumWeight {
   public Weight combineWith(@NonNull Weight other) {
     NumWeight zero = zero();
     if (other == zero) return this;
-    NumWeightImpl o = (NumWeightImpl) other;
+    NumWeight o = (NumWeight) other;
     if (o.getI() == getI()) return o;
     return zero;
   }
