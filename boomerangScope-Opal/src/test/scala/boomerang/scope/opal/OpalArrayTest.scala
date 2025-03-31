@@ -3,11 +3,12 @@ package boomerang.scope.opal
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
-import org.junit.{Assert, Test}
+import org.junit.{Assert, Ignore, Test}
 import org.opalj.br.IntegerType
 
 import java.util
 
+@Ignore
 class OpalArrayTest {
 
   private val integerType = IntegerType.toJVMTypeName

@@ -1,18 +1,18 @@
 package boomerang.scope.opal.transformer
 
-import org.opalj.br.{Field, Method}
+import org.opalj.br.{ComputationalTypeReference, Field, Method}
 import org.opalj.tac.{Assignment, Expr, NullExpr, PutField, Stmt}
 
 object NullifyFieldsTransformer {
 
   final val NULLIFIED_FIELD = -2
 
-  def apply(method: Method, tac: Array[Stmt[TacLocal]], pcToIndex: Array[Int]): (Array[Stmt[TacLocal]], Array[Int]) = {
+  def apply(method: Method, tac: Array[Stmt[TacLocal]]): (Array[Stmt[TacLocal]], Int) = {
     if (!method.isConstructor || method.isStatic) {
-      return (tac.map(identity), pcToIndex)
+      return (tac.map(identity), 0)
     }
 
-    var stackCounter = -1
+    var localCounter = 0
 
     def isFieldDefined(field: Field): Boolean = {
       // TODO Also consider super classes
@@ -36,8 +36,8 @@ object NullifyFieldsTransformer {
     val undefinedFields = method.classFile.fields.filter(f => !definedFields.contains(f) && f.isNotStatic && f.isNotFinal)
 
     // For each undefined field, we add a definition and a field store statement
-    val cutIndex = 2 * undefinedFields.size
-    val nullifiedTac = new Array[Stmt[TacLocal]](tac.length + cutIndex)
+    val offset = 2 * undefinedFields.size
+    val nullifiedTac = new Array[Stmt[TacLocal]](tac.length + offset)
 
     // Add the parameter definitions
     val paramDefinitions = tac.filter(stmt => stmt.pc == -1)
@@ -47,8 +47,8 @@ object NullifyFieldsTransformer {
     Range(0, undefinedFields.size).foreach(i => {
       val currField = undefinedFields(i)
       // TODO Types
-      val local = new StackLocal(stackCounter, null, null)
-      stackCounter -= 1
+      val local = new NullifiedLocal(localCounter, ComputationalTypeReference)
+      localCounter += 1
 
       val defSite = Assignment[TacLocal](NULLIFIED_FIELD, local, NullExpr(NULLIFIED_FIELD))
       val putField = PutField(NULLIFIED_FIELD, method.classFile.thisType, currField.name, currField.fieldType, getThisLocal, local)
@@ -58,14 +58,10 @@ object NullifyFieldsTransformer {
     })
 
     // Append the original tac statements
-    val offset = paramDefinitions.length + cutIndex - 1
     Range(paramDefinitions.length, tac.length).foreach(i => {
       nullifiedTac(i + offset) = tac(i)
     })
 
-    // Nullified fields were added before the original statements. Hence, the original
-    // statements are shifted by the amount of new statements
-    val nullifiedPcToIndex = pcToIndex.map(i => if (i == Int.MinValue) i else i + cutIndex)
-    (nullifiedTac, nullifiedPcToIndex)
+    (nullifiedTac, offset)
   }
 }

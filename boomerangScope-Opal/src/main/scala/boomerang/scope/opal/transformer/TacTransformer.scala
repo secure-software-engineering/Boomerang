@@ -17,7 +17,7 @@ object TacTransformer {
 
     val transformedTac: Array[Stmt[TacLocal]] = LocalTransformer(method, tacNaive, aiResult)
     val simplifiedTac: Array[Stmt[TacLocal]] = BasicPropagation(transformedTac)
-    val nullifiedTac = NullifyFieldsTransformer(method, simplifiedTac, tacNaive.pcToIndex)
+    val nullifiedTac = NullifyFieldsTransformer(method, simplifiedTac)
 
     // Update the CFG
     val cfg = CFGFactory(method, project.classHierarchy)
@@ -25,11 +25,12 @@ object TacTransformer {
       throw new RuntimeException("Could not compute CFG for method " + method.name)
     }
 
-    val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(nullifiedTac._1), nullifiedTac._2, i => i, nullifiedTac._1.length)
-    val tacCfg2 = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(simplifiedTac), tacNaive.pcToIndex, i => i, simplifiedTac.length)
-    val preds = tacCfg.predecessors(5)
-    val preds2 = tacCfg2.predecessors(5)
+    val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(simplifiedTac), tacNaive.pcToIndex, i => i, simplifiedTac.length)
+    val stmtGraph = StmtGraph(nullifiedTac._1, tacCfg, tacNaive.pcToIndex, nullifiedTac._2)
 
-    new BoomerangTACode(tacNaive.params, simplifiedTac, tacNaive.pcToIndex, tacCfg, tacNaive.exceptionHandlers)
+    // Nullified fields were added before the original statements. Hence, the original
+    // statements are shifted by the amount of new statements
+    val nullifiedPcToIndex = tacNaive.pcToIndex.map(i => if (i == Int.MinValue) i else i + nullifiedTac._2)
+    new BoomerangTACode(nullifiedTac._1, nullifiedPcToIndex, stmtGraph)
   }
 }

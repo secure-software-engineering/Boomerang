@@ -50,7 +50,40 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
   private def buildCache(): Unit = {
     if (cacheBuilt) return
 
-    // Definition of parameter locals
+    val graph = method.tac.cfg
+
+    val head = new OpalStatement(Nop(-1), method)
+    startPointCache.add(head)
+    statements.add(head)
+
+    graph.heads.foreach(stmt => {
+      val headStmt = new OpalStatement(stmt, method)
+
+      predsOfCache.put(headStmt, head)
+      succsOfCache.put(head, headStmt)
+    })
+
+    graph.tails.foreach(stmt => {
+      val tailStmt = new OpalStatement(stmt, method)
+
+      endPointCache.add(tailStmt)
+    })
+
+    method.tac.statements.foreach(stmt => {
+      val statement = new OpalStatement(stmt, method)
+      statements.add(statement)
+
+      graph.predecessors(stmt).foreach(pred => {
+        val predStmt = new OpalStatement(pred, method)
+        predsOfCache.put(statement, predStmt)
+      })
+
+      graph.successors(stmt).foreach(succ => {
+        val succStmt = new OpalStatement(succ, method)
+        succsOfCache.put(statement, succStmt)
+      })
+    })
+    /*// Definition of parameter locals
     method.tac.statements.filter(stmt => stmt.pc == -1).foreach(stmt => {
       val statement = new OpalStatement(stmt, method)
       statements.add(statement)
@@ -95,7 +128,7 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
           succsOfCache.put(statement, successorStatement)
         })
       }
-    })
+    })*/
 
     cacheBuilt = true
   }

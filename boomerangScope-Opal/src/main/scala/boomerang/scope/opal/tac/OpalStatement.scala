@@ -92,7 +92,18 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     false
   }
 
-  override def isAssignStmt: Boolean = delegate.isAssignment || isFieldStore || isArrayStore
+  override def isAssignStmt: Boolean = {
+    if (delegate.isAssignment) {
+      if (delegate.asAssignment.expr.isVar) {
+        return !delegate.asAssignment.expr.asVar.isParameterLocal
+      } else {
+        return true
+      }
+    }
+
+    // TODO Add static field store
+    isFieldStore || isArrayStore
+  }
 
   override def getLeftOp: Val = {
     if (isAssignStmt) {
@@ -313,7 +324,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
   private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalStatement]
 
   override def equals(obj: Any): Boolean = obj match {
-    case other: OpalStatement => other.canEqual(this) && this.delegate.pc == other.delegate.pc
+    case other: OpalStatement => other.canEqual(this) && this.delegate == other.delegate
     case _ => false
   }
 

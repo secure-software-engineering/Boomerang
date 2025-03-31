@@ -2,7 +2,7 @@ package boomerang.scope.opal.transformer
 
 import org.opalj.br.ComputationalType
 import org.opalj.tac.{DUVar, Var}
-import org.opalj.value.ValueInformation
+import org.opalj.value.{IsNullValue, ValueInformation}
 
 import java.util.Objects
 
@@ -99,6 +99,30 @@ class ParameterLocal(identifier: Int, computationalType: ComputationalType, para
 
   override def equals(other: Any): Boolean = other match {
     case that: ParameterLocal => this.id == that.id
+    case _ => false
+  }
+}
+
+class NullifiedLocal(identifier: Int, computationalType: ComputationalType) extends TacLocal {
+
+  override def id: Int = identifier
+
+  override def isStackLocal: Boolean = false
+
+  override def isRegisterLocal: Boolean = false
+
+  override def isParameterLocal: Boolean = false
+
+  override def cTpe: ComputationalType = computationalType
+
+  override def value: ValueInformation = IsNullValue
+
+  override def name: String = s"n$identifier"
+
+  override def hashCode(): Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: NullifiedLocal => this.id == that.id
     case _ => false
   }
 }
