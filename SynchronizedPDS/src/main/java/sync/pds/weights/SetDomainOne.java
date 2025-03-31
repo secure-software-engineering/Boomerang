@@ -31,7 +31,7 @@ public class SetDomainOne implements SetDomain {
     if (other == one()) {
       return this;
     }
-      return other;
+    return other;
   }
 
   @NonNull

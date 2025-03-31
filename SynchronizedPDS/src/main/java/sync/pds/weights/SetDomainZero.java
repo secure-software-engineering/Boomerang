@@ -13,9 +13,7 @@ package sync.pds.weights;
 
 import static sync.pds.weights.SetDomainOne.one;
 
-
 import java.util.Collection;
-
 import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
@@ -40,7 +38,7 @@ public class SetDomainZero implements SetDomain {
   public Weight combineWith(@NonNull Weight other) {
 
     if (other == (zero())) return this;
-     return other;
+    return other;
   }
 
   @NonNull

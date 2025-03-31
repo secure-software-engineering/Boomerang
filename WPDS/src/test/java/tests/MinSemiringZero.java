@@ -34,7 +34,7 @@ public class MinSemiringZero implements MinSemiring {
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-      return other == (zero()) ? this : other;
+    return other == (zero()) ? this : other;
   }
 
   @NonNull private static final MinSemiringZero zero = new MinSemiringZero();

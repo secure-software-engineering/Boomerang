@@ -47,7 +47,6 @@ public class NumWeightZero implements NumWeight {
   public Weight combineWith(@NonNull Weight other) {
     if (other == zero()) return this;
     return other;
-
   }
 
   @Override

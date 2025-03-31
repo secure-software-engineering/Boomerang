@@ -22,10 +22,7 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-import static inference.InferenceWeightZero.zero;
-
 import boomerang.scope.Method;
-import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;

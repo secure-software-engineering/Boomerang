@@ -50,8 +50,8 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     if (other == zero) return this;
     if (other == one) return one;
     Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
-      merged.addAll(((SetDomainImpl) other).nodes);
-      return new SetDomainImpl<N, Stmt, Fact>(merged);
+    merged.addAll(((SetDomainImpl) other).nodes);
+    return new SetDomainImpl<N, Stmt, Fact>(merged);
   }
 
   @NonNull

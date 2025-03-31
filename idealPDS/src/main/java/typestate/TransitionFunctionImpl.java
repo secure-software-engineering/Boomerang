@@ -64,7 +64,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-      Set<Transition> ress = new HashSet<>();
+    Set<Transition> ress = new HashSet<>();
     Set<Edge> newStateChangeStatements = new HashSet<>();
     for (Transition first : values) {
       for (Transition second : func.values) {

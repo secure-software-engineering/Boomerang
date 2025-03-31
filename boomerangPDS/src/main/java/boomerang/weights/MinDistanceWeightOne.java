@@ -28,8 +28,7 @@ public class MinDistanceWeightOne implements MinDistanceWeight {
     if (!(o instanceof MinDistanceWeightOne)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
-      return o;
-
+    return o;
   }
 
   @NonNull

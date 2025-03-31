@@ -14,7 +14,6 @@ package typestate;
 import static typestate.TransitionFunctionOne.one;
 
 import boomerang.scope.ControlFlowGraph;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
