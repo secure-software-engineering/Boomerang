@@ -11,8 +11,6 @@
  */
 package tests;
 
-import static tests.NumWeightOne.one;
-
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
@@ -35,7 +33,7 @@ public class NumWeightZero implements NumWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-  return zero();
+    return zero();
   }
 
   @NonNull

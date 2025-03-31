@@ -37,7 +37,7 @@ public class SootFrameworkScope implements FrameworkScope {
 
   public SootFrameworkScope(
       @NonNull Scene scene,
-     soot.jimple.toolkits.callgraph.CallGraph callGraph,
+      soot.jimple.toolkits.callgraph.CallGraph callGraph,
       @NonNull Collection<SootMethod> entryPoints,
       @NonNull DataFlowScope dataFlowScope) {
     this.scene = scene;

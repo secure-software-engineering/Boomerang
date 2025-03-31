@@ -11,8 +11,6 @@
  */
 package tests;
 
-import static tests.MinSemiringOne.one;
-
 import de.fraunhofer.iem.Location;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
@@ -47,7 +45,6 @@ public class MinSemiringZero implements MinSemiring {
     return this;
   }
 
-
   @Override
   public String toString() {
     return Integer.toString(getI());
@@ -69,6 +66,4 @@ public class MinSemiringZero implements MinSemiring {
     MinSemiringZero other = (MinSemiringZero) obj;
     return getI() == other.getI();
   }
-
-
 }

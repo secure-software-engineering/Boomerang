@@ -11,16 +11,11 @@
  */
 package typestate;
 
-import static typestate.TransitionFunctionZero.zero;
-
 import boomerang.scope.ControlFlowGraph;
-import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
-import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
 
 public class TransitionFunctionOne implements TransitionFunction {

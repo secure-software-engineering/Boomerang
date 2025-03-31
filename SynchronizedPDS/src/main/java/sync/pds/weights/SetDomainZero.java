@@ -11,7 +11,6 @@
  */
 package sync.pds.weights;
 
-
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;

@@ -107,7 +107,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return new TransitionFunctionImpl(
           transitions,
           Sets.newHashSet(
-                  other.equals(one()) ? stateChangeStatements : func.getStateChangeStatements()));
+              other.equals(one()) ? stateChangeStatements : func.getStateChangeStatements()));
     }
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(values);

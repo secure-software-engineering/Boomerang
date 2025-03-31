@@ -22,10 +22,7 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-import static inference.InferenceWeightOne.one;
-
 import boomerang.scope.Method;
-import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
@@ -44,7 +41,7 @@ public class InferenceWeightZero implements Weight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-      return zero();
+    return zero();
   }
 
   @NonNull

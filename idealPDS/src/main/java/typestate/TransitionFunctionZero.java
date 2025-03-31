@@ -11,7 +11,6 @@
  */
 package typestate;
 
-
 import boomerang.scope.ControlFlowGraph;
 import java.util.Collection;
 import java.util.Set;

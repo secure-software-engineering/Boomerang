@@ -69,6 +69,4 @@ public class MinSemiringOne implements MinSemiring {
     MinSemiringOne other = (MinSemiringOne) obj;
     return getI() == other.getI();
   }
-
-
 }
