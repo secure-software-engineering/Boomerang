@@ -19,14 +19,24 @@ import wpds.impl.Weight;
 
 public class MinSemiringOne implements MinSemiring {
 
+  @NonNull private static final MinSemiringOne one = new MinSemiringOne();
+
   private MinSemiringOne() {}
 
   public MinSemiringOne(int i) {}
 
+  public static <N extends Location> MinSemiring one() {
+    return one;
+  }
+
+  @Override
+  public int getI() {
+    return 0;
+  }
+
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other == one()) return this;
     return other;
   }
 
@@ -36,12 +46,6 @@ public class MinSemiringOne implements MinSemiring {
     if (other == zero()) return this;
     MinSemiring o = (MinSemiring) other;
     return new MinSemiringOne(Math.min(o.getI(), getI()));
-  }
-
-  @NonNull private static final MinSemiringOne one = new MinSemiringOne();
-
-  public static <N extends Location> MinSemiring one() {
-    return one;
   }
 
   @Override
@@ -66,8 +70,5 @@ public class MinSemiringOne implements MinSemiring {
     return getI() == other.getI();
   }
 
-  @Override
-  public int getI() {
-    return 0;
-  }
+
 }

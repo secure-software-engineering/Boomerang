@@ -44,16 +44,7 @@ public class InferenceWeightZero implements Weight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    InferenceWeightOne one = one();
-    if (other == (one)) return this;
-    if (other == zero()) {
       return zero();
-    }
-    InferenceWeightImpl func = (InferenceWeightImpl) other;
-    Set<Method> otherInvokedMethods = (func).getInvokedMethods();
-    Set<Method> res = new HashSet<>(getInvokedMethods());
-    res.addAll(otherInvokedMethods);
-    return new InferenceWeightImpl((Method) res);
   }
 
   @NonNull

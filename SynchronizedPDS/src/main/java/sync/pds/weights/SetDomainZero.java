@@ -11,7 +11,6 @@
  */
 package sync.pds.weights;
 
-import static sync.pds.weights.SetDomainOne.one;
 
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
@@ -25,20 +24,13 @@ public class SetDomainZero implements SetDomain {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    SetDomain one = one();
-    if (other == one) {
-      return this;
-    }
-
     return zero();
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-
-    if (other == (zero())) return this;
-    return other;
+    return this;
   }
 
   @NonNull

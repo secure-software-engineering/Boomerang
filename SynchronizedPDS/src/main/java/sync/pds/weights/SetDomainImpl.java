@@ -34,7 +34,7 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
   @Override
   public Weight extendWith(@NonNull Weight other) {
     Weight one = one();
-    if (other == (one)) {
+    if (other == one) {
       return this;
     }
 
@@ -72,11 +72,13 @@ public class SetDomainImpl<N, Stmt, Fact> implements SetDomain {
     result = prime * result + nodes.hashCode();
     return result;
   }
-
-  @Override
+ @Override
   public boolean equals(Object obj) {
-    return false;
-  }
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+     return false;
+ }
 
   @NonNull
   @Override

@@ -10,9 +10,6 @@
  * *****************************************************************************
  */
 package sync.pds.weights;
-
-import static sync.pds.weights.SetDomainZero.zero;
-
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
@@ -28,20 +25,13 @@ public class SetDomainOne implements SetDomain {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other == one()) {
-      return this;
-    }
     return other;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-
-    SetDomain zero = zero();
-    if (other == zero) return this;
-    if (other == (one())) return one();
-    return zero;
+    return one();
   }
 
   @NonNull

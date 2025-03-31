@@ -49,8 +49,6 @@ public class TransitionFunctionOne implements TransitionFunction {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    TransitionFunctionOne one1 = one();
-    if (other == (one1)) return this;
     return other;
   }
 
@@ -60,18 +58,7 @@ public class TransitionFunctionOne implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    if (other == zero() || other == one) {
-        return this;
-    }
-
-    TransitionFunction func = (TransitionFunction) other;
-    Set<Transition> transitions = new HashSet<>(func.getValues());
-    Set<Transition> idTransitions = Sets.newHashSet();
-    for (Transition t : transitions) {
-      idTransitions.add(new TransitionImpl(t.from(), t.from()));
-    }
-    transitions.addAll(idTransitions);
-    return new TransitionFunctionImpl(transitions,Sets.newHashSet(func.getStateChangeStatements()));
+    return this;
   }
 
   public String toString() {

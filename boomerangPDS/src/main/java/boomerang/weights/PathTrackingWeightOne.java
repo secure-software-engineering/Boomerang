@@ -39,10 +39,16 @@ public class PathTrackingWeightOne implements PathTrackingWeight {
   @Override
   @NonNull
   public Weight extendWith(@NonNull Weight o) {
-    if (!(o instanceof PathTrackingWeightImpl)) {
+    if (!(o instanceof PathTrackingWeight)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
-    return new PathTrackingWeightImpl(new LinkedHashSet<>());
+
+    PathTrackingWeightImpl other = (PathTrackingWeightImpl) o;
+    LinkedHashSet<Node<Edge, Val>> newAllStatements = new LinkedHashSet<>();
+    newAllStatements.addAll(getShortestPathWitness());
+    newAllStatements.addAll(other.getShortestPathWitness());
+
+    return new PathTrackingWeightImpl(newAllStatements);
   }
 
   @Override

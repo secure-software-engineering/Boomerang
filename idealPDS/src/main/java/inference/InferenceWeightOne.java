@@ -41,8 +41,6 @@ public class InferenceWeightOne implements InferenceWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    InferenceWeightOne one1 = one();
-    if (other == one1) return this;
     return other;
   }
 

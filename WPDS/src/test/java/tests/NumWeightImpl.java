@@ -33,7 +33,7 @@ public class NumWeightImpl implements NumWeight {
   @Override
   public Weight extendWith(@NonNull Weight other) {
     NumWeight one = one();
-    if (other == (one)) return this;
+    if (other == one) return this;
     NumWeight zero = zero();
     if (other == zero) return zero;
 

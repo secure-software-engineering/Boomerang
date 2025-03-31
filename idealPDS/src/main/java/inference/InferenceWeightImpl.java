@@ -42,7 +42,7 @@ public class InferenceWeightImpl implements InferenceWeight {
   @Override
   public Weight extendWith(@NonNull Weight other) {
     InferenceWeight one = one();
-    if (other == (one)) return this;
+    if (other == one) return this;
     InferenceWeight zero = (InferenceWeight) zero();
     if (other == zero) {
       return zero;

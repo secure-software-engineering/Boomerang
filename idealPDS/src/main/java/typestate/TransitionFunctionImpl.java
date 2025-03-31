@@ -60,7 +60,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     TransitionFunctionOne one = one();
     TransitionFunctionZero zero = zero();
     if (other == one) return this;
-    if ((other == zero)) {
+    if (other == zero) {
       return zero;
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -93,7 +93,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     TransitionFunctionZero zero = zero();
     TransitionFunctionOne one = one();
 
-    if (other == (zero)) return this;
+    if (other == zero) return this;
 
     TransitionFunction func = (TransitionFunction) other;
     if (other == one) {
@@ -107,7 +107,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return new TransitionFunctionImpl(
           transitions,
           Sets.newHashSet(
-              (other.equals(one()) ? stateChangeStatements : func.getStateChangeStatements())));
+                  other.equals(one()) ? stateChangeStatements : func.getStateChangeStatements()));
     }
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(values);

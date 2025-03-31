@@ -40,7 +40,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight o) {
-    if (!(o instanceof PathTrackingWeightImpl)) {
+    if (!(o instanceof PathTrackingWeight)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
 
@@ -55,7 +55,7 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight o) {
-    if (!(o instanceof PathTrackingWeightImpl)) {
+    if (!(o instanceof PathTrackingWeight)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
     PathTrackingWeightImpl other = (PathTrackingWeightImpl) o;
