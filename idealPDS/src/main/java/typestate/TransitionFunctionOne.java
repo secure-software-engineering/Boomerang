@@ -11,18 +11,17 @@
  */
 package typestate;
 
+import static typestate.TransitionFunctionZero.zero;
+
 import boomerang.scope.ControlFlowGraph;
+import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
-
-import static typestate.TransitionFunctionZero.zero;
 
 public class TransitionFunctionOne implements TransitionFunction {
 
@@ -53,7 +52,6 @@ public class TransitionFunctionOne implements TransitionFunction {
     TransitionFunctionOne one = one();
     if (other == one) return this;
     return other;
-
   }
 
   @NonNull
@@ -73,19 +71,16 @@ public class TransitionFunctionOne implements TransitionFunction {
 
     TransitionFunction func = (TransitionFunction) other;
 
-      Set<Transition> transitions =
-          new HashSet<>((other == (one) ? getValues() : func.getValues()));
-      Set<Transition> idTransitions = Sets.newHashSet();
-      for (Transition t : transitions) {
-        idTransitions.add(new TransitionImpl(t.from(), t.from()));
-      }
-      transitions.addAll(idTransitions);
-      return new TransitionFunctionImpl(
-          transitions,
-          Sets.newHashSet(
-              (other == (one) ? getStateChangeStatements() : func.getStateChangeStatements())));
-
-
+    Set<Transition> transitions = new HashSet<>((other == (one) ? getValues() : func.getValues()));
+    Set<Transition> idTransitions = Sets.newHashSet();
+    for (Transition t : transitions) {
+      idTransitions.add(new TransitionImpl(t.from(), t.from()));
+    }
+    transitions.addAll(idTransitions);
+    return new TransitionFunctionImpl(
+        transitions,
+        Sets.newHashSet(
+            (other == (one) ? getStateChangeStatements() : func.getStateChangeStatements())));
   }
 
   public String toString() {
