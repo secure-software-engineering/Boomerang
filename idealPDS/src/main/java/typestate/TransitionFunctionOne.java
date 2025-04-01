@@ -13,10 +13,17 @@ package typestate;
 
 import boomerang.scope.ControlFlowGraph;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
+import typestate.finiteautomata.TransitionIdentity;
+import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
+
+import static typestate.TransitionFunctionZero.zero;
 
 public class TransitionFunctionOne implements TransitionFunction {
 
@@ -44,7 +51,30 @@ public class TransitionFunctionOne implements TransitionFunction {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-     return other;
+    TransitionFunctionOne one1 = one();
+    if (other == one1) return this;
+    if (this == one1) return other;
+
+    TransitionFunction func = (TransitionFunction) other;
+    Set<? extends Transition> otherTransitions = (Set<? extends Transition>) func.getValues();
+    Set<Transition> ress = new HashSet<>();
+    Set<ControlFlowGraph.Edge> newStateChangeStatements = new HashSet<>();
+    for (Transition first : getValues()) {
+      for (Transition second : otherTransitions) {
+
+        if (second == (TransitionIdentity.identity())) {
+          ress.add(first);
+          newStateChangeStatements.addAll(getStateChangeStatements());
+        } else if (first == (TransitionIdentity.identity())) {
+          ress.add(second);
+          newStateChangeStatements.addAll(func.getStateChangeStatements());
+        } else if (first.to() == (second.from())) {
+          ress.add(new TransitionImpl(first.from(), second.to()));
+          newStateChangeStatements.addAll(func.getStateChangeStatements());
+        }
+      }
+    }
+    return new TransitionFunctionImpl(ress, newStateChangeStatements);
   }
 
   @NonNull
@@ -53,7 +83,7 @@ public class TransitionFunctionOne implements TransitionFunction {
     if (!(other instanceof TransitionFunction)) {
       throw new RuntimeException();
     }
-    return one();
+      return one();
     }
 
   public String toString() {
