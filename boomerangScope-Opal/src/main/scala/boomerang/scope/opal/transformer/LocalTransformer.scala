@@ -2,175 +2,137 @@ package boomerang.scope.opal.transformer
 
 import org.opalj.ai.{AIResult, BaseAI}
 import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
-import org.opalj.br.{ClassHierarchy, Method}
+import org.opalj.br.Method
 import org.opalj.collection.immutable.IntIntPair
-import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, CaughtException, Checkcast, ClassConst, Compare, DoubleConst, DynamicConst, Expr, ExprStmt, FloatConst, GetField, GetStatic, Goto, IdBasedVar, If, InstanceOf, IntConst, InvokedynamicFunctionCall, InvokedynamicMethodCall, JSR, LongConst, MethodHandleConst, MethodTypeConst, MonitorEnter, MonitorExit, NaiveTACode, New, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, NullExpr, Param, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, Ret, Return, ReturnValue, StaticFunctionCall, StaticMethodCall, Stmt, StringConst, Switch, TACNaive, Throw, VirtualFunctionCall, VirtualMethodCall}
+import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, CaughtException, Checkcast, ClassConst, Compare, DoubleConst, DynamicConst, Expr, ExprStmt, FloatConst, GetField, GetStatic, Goto, IdBasedVar, If, InstanceOf, IntConst, InvokedynamicFunctionCall, InvokedynamicMethodCall, JSR, LongConst, MethodHandleConst, MethodTypeConst, MonitorEnter, MonitorExit, NaiveTACode, New, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, NullExpr, Param, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, Ret, Return, ReturnValue, StaticFunctionCall, StaticMethodCall, Stmt, StringConst, Switch, Throw, VirtualFunctionCall, VirtualMethodCall}
 
 import scala.collection.mutable
 
 object LocalTransformer {
 
-  def apply(method: Method, tacNaive: NaiveTACode[_], aiResult: AIResult): Array[Stmt[TacLocal]] = {
+  def apply(method: Method, tacNaive: NaiveTACode[_], domain: PrimitiveTACAIDomain): Array[Stmt[TacLocal]] = {
     var paramCounter = -1
-    var stackCounter = -1
-    val currentStack = mutable.Map.empty[Int, TacLocal]
+    val currentLocals = mutable.Map.empty[Int, TacLocal]
+    val operandStack = OperandStack(tacNaive.stmts, tacNaive.cfg)
 
+    // Domain components
+    val aiResult: AIResult = BaseAI(method, domain)
     val operandsArray: aiResult.domain.OperandsArray = aiResult.operandsArray
-    val localArray = aiResult.localsArray
+    val localArray: aiResult.domain.LocalsArray = aiResult.localsArray
 
     def transformStatement(stmt: Stmt[IdBasedVar]): Stmt[TacLocal] = {
-      if (stmt.astID == If.ASTID) {
-        val ifStmt = stmt.asIf
+      stmt.astID match {
+        case If.ASTID =>
+          val ifStmt = stmt.asIf
 
-        val left = transformExpr(ifStmt.left)
-        val right = transformExpr(ifStmt.right)
+          val left = transformExpr(stmt.pc, ifStmt.left)
+          val right = transformExpr(stmt.pc, ifStmt.right)
 
-        return If(ifStmt.pc, left, ifStmt.condition, right, ifStmt.targetStmt)
-      }
+          return If(ifStmt.pc, left, ifStmt.condition, right, ifStmt.targetStmt)
+        case Goto.ASTID =>
+          return stmt.asGoto
+        case Ret.ASTID =>
+          return stmt.asRet
+        case JSR.ASTID =>
+          return stmt.asJSR
+        case Switch.ASTID =>
+          val switchStmt = stmt.asSwitch
+          val index = transformExpr(stmt.pc, switchStmt.index)
 
-      if (stmt.astID == Goto.ASTID) {
-        return stmt.asGoto
-      }
+          // Inserting -1 as it is only used in previous remapping steps
+          return Switch(switchStmt.pc, switchStmt.defaultStmt, index, switchStmt.caseStmts.map(p => IntIntPair(-1, p)))
+        case Assignment.ASTID =>
+          val transformedExpr = transformExpr(stmt.pc, stmt.asAssignment.expr)
+          val isThisAssignment = !method.isStatic && transformedExpr.isVar && transformedExpr.asVar.id == -1
 
-      if (stmt.astID == Ret.ASTID) {
-        return stmt.asRet
-      }
+          val target = createNewLocal(stmt.pc, stmt.asAssignment.targetVar, isThisAssignment)
 
-      if (stmt.astID == JSR.ASTID) {
-        return stmt.asJSR
-      }
+          // Store the current stack and register locals on our own 'stack'
+          currentLocals(target.id) = target
 
-      if (stmt.astID == Switch.ASTID) {
-        val switchStmt = stmt.asSwitch
-        val index = transformExpr(switchStmt.index)
+          return new Assignment(stmt.pc, target, transformedExpr)
+        case ReturnValue.ASTID =>
+          val returnStmt = stmt.asReturnValue
+          val returnValue = transformExpr(stmt.pc, returnStmt.expr)
 
-        // Inserting -1 as it is only used in previous remapping steps
-        return Switch(switchStmt.pc, switchStmt.defaultStmt, index, switchStmt.caseStmts.map(p => IntIntPair(-1, p)))
-      }
+          return ReturnValue(returnStmt.pc, returnValue)
+        case Return.ASTID =>
+          return stmt.asReturn
+        case Nop.ASTID =>
+          return stmt.asNop
+        case MonitorEnter.ASTID =>
+          val monitorEnter = stmt.asMonitorEnter
+          val objRef = transformExpr(stmt.pc, monitorEnter.objRef)
 
-      if (stmt.astID == Assignment.ASTID) {
-        val transformedExpr = transformExpr(stmt.asAssignment.expr)
-        val isThisAssignment = !method.isStatic && transformedExpr.isVar && transformedExpr.asVar.id == -1
+          return MonitorEnter(monitorEnter.pc, objRef)
+        case MonitorExit.ASTID =>
+          val monitorExit = stmt.asMonitorExit
+          val objRef = transformExpr(stmt.pc, monitorExit.objRef)
 
-        val target = createNewLocal(stmt.pc, stmt.asAssignment.targetVar, isThisAssignment)
+          return MonitorExit(monitorExit.pc, objRef)
+        case ArrayStore.ASTID =>
+          val arrayStore = stmt.asArrayStore
 
-        // Store the current stack and register locals on our own 'stack'
-        currentStack(stmt.asAssignment.targetVar.id) = target
+          val arrayRef = transformExpr(stmt.pc, arrayStore.arrayRef)
+          val index = transformExpr(stmt.pc, arrayStore.index)
+          val value = transformExpr(stmt.pc, arrayStore.value)
 
-        return new Assignment(stmt.pc, target, transformedExpr)
-      }
+          return ArrayStore(arrayStore.pc, arrayRef, index, value)
+        case Throw.ASTID =>
+          val throwStmt = stmt.asThrow
+          val exception = transformExpr(stmt.pc, throwStmt.exception)
 
-      if (stmt.astID == ReturnValue.ASTID) {
-        val returnStmt = stmt.asReturnValue
-        val returnValue = transformExpr(returnStmt.expr)
+          return Throw(throwStmt.pc, exception)
+        case PutStatic.ASTID =>
+          val putStatic = stmt.asPutStatic
+          val value = transformExpr(stmt.pc, putStatic.value)
 
-        return ReturnValue(returnStmt.pc, returnValue)
-      }
+          return PutStatic(putStatic.pc, putStatic.declaringClass, putStatic.name, putStatic.declaredFieldType, value)
+        case PutField.ASTID =>
+          val putField = stmt.asPutField
 
-      if (stmt.astID == Return.ASTID) {
-        return Return(stmt.asReturn.pc)
-      }
+          val objRef = transformExpr(stmt.pc, putField.objRef)
+          val value = transformExpr(stmt.pc, putField.value)
 
-      if (stmt.astID == Nop.ASTID) {
-        return Nop(stmt.asNop.pc)
-      }
+          return PutField(putField.pc, putField.declaringClass, putField.name, putField.declaredFieldType, objRef, value)
+        case NonVirtualMethodCall.ASTID =>
+          val methodCall = stmt.asNonVirtualMethodCall
 
-      if (stmt.astID == MonitorEnter.ASTID) {
-        val monitorEnter = stmt.asMonitorEnter
-        val objRef = transformExpr(monitorEnter.objRef)
+          val baseLocal = transformExpr(stmt.pc, methodCall.receiver)
+          val paramLocals = methodCall.params.map(p => transformExpr(stmt.pc, p))
 
-        return MonitorEnter(monitorEnter.pc, objRef)
-      }
+          return NonVirtualMethodCall(methodCall.pc, methodCall.declaringClass, methodCall.isInterface, methodCall.name, methodCall.descriptor, baseLocal, paramLocals)
+        case VirtualMethodCall.ASTID =>
+          val methodCall = stmt.asVirtualMethodCall
 
-      if (stmt.astID == MonitorExit.ASTID) {
-        val monitorExit = stmt.asMonitorExit
-        val objRef = transformExpr(monitorExit.objRef)
+          val baseLocal = transformExpr(stmt.pc, methodCall.receiver)
+          val paramLocals = methodCall.params.map(p => transformExpr(stmt.pc, p))
 
-        return MonitorExit(monitorExit.pc, objRef)
-      }
+          return VirtualMethodCall(methodCall.pc, methodCall.declaringClass, methodCall.isInterface, methodCall.name, methodCall.descriptor, baseLocal, paramLocals)
+        case StaticMethodCall.ASTID =>
+          val methodCall = stmt.asStaticMethodCall
+          val params = methodCall.params.map(p => transformExpr(stmt.pc, p))
 
-      if (stmt.astID == ArrayStore.ASTID) {
-        val arrayStore = stmt.asArrayStore
+          return StaticMethodCall(methodCall.pc, methodCall.declaringClass, methodCall.isInterface, methodCall.name, methodCall.descriptor, params)
+        case InvokedynamicMethodCall.ASTID =>
+          val methodCall = stmt.asInvokedynamicMethodCall
+          val params = methodCall.params.map(p => transformExpr(stmt.pc, p))
 
-        val arrayRef = transformExpr(arrayStore.arrayRef)
-        val index = transformExpr(arrayStore.index)
-        val value = transformExpr(arrayStore.value)
+          return InvokedynamicMethodCall(methodCall.pc, methodCall.bootstrapMethod, methodCall.name, methodCall.descriptor, params)
+        case ExprStmt.ASTID =>
+          val expr = transformExpr(stmt.pc, stmt.asExprStmt.expr)
 
-        return ArrayStore(arrayStore.pc, arrayRef, index, value)
-      }
+          return ExprStmt(stmt.pc, expr)
+        case CaughtException.ASTID =>
+          val caughtException = stmt.asCaughtException
 
-      if (stmt.astID == Throw.ASTID) {
-        val throwStmt = stmt.asThrow
-        val exception = transformExpr(throwStmt.exception)
+          return CaughtException(caughtException.pc, caughtException.exceptionType, caughtException.origins)
+        case Checkcast.ASTID =>
+          val castExpr = stmt.asCheckcast
+          val value = transformExpr(stmt.pc, castExpr.value)
 
-        return Throw(throwStmt.pc, exception)
-      }
-
-      if (stmt.astID == PutStatic.ASTID) {
-        val putStatic = stmt.asPutStatic
-        val value = transformExpr(putStatic.value)
-
-        return PutStatic(putStatic.pc, putStatic.declaringClass, putStatic.name, putStatic.declaredFieldType, value)
-      }
-
-      if (stmt.astID == PutField.ASTID) {
-        val putField = stmt.asPutField
-
-        val objRef = transformExpr(putField.objRef)
-        val value = transformExpr(putField.value)
-
-        return PutField(putField.pc, putField.declaringClass, putField.name, putField.declaredFieldType, objRef, value)
-      }
-
-      if (stmt.astID == NonVirtualMethodCall.ASTID) {
-        val methodCall = stmt.asNonVirtualMethodCall
-
-        val baseLocal = transformExpr(methodCall.receiver)
-        val paramLocals = methodCall.params.map(p => transformExpr(p))
-
-        return NonVirtualMethodCall(methodCall.pc, methodCall.declaringClass, methodCall.isInterface, methodCall.name, methodCall.descriptor, baseLocal, paramLocals)
-      }
-
-      if (stmt.astID == VirtualMethodCall.ASTID) {
-        val methodCall = stmt.asVirtualMethodCall
-
-        val baseLocal = transformExpr(methodCall.receiver)
-        val paramLocals = methodCall.params.map(p => transformExpr(p))
-
-        return VirtualMethodCall(methodCall.pc, methodCall.declaringClass, methodCall.isInterface, methodCall.name, methodCall.descriptor, baseLocal, paramLocals)
-      }
-
-      if (stmt.astID == StaticMethodCall.ASTID) {
-        val methodCall = stmt.asStaticMethodCall
-        val params = methodCall.params.map(p => transformExpr(p))
-
-        return StaticMethodCall(methodCall.pc, methodCall.declaringClass, methodCall.isInterface, methodCall.name, methodCall.descriptor, params)
-      }
-
-      if (stmt.astID == InvokedynamicMethodCall.ASTID) {
-        val methodCall = stmt.asInvokedynamicMethodCall
-        val params = methodCall.params.map(p => transformExpr(p))
-
-        return InvokedynamicMethodCall(methodCall.pc, methodCall.bootstrapMethod, methodCall.name, methodCall.descriptor, params)
-      }
-
-      if (stmt.astID == ExprStmt.ASTID) {
-        val expr = transformExpr(stmt.asExprStmt.expr)
-
-        return ExprStmt(stmt.pc, expr)
-      }
-
-      if (stmt.astID == CaughtException.ASTID) {
-        val caughtException = stmt.asCaughtException
-
-        return CaughtException(caughtException.pc, caughtException.exceptionType, caughtException.origins)
-      }
-
-      if (stmt.astID == Checkcast.ASTID) {
-        val castExpr = stmt.asCheckcast
-        val value = transformExpr(castExpr.value)
-
-        return Checkcast(castExpr.pc, value, castExpr.cmpTpe)
+          return Checkcast(castExpr.pc, value, castExpr.cmpTpe)
+        case _ => throw new RuntimeException("Unknown statement: " + stmt)
       }
 
       throw new RuntimeException("Could not transform statement: " + stmt)
@@ -187,13 +149,14 @@ object LocalTransformer {
 
       if (idBasedVar.id >= 0) {
         /*if (isThis) {
-          val value = operandsArray(nextPc).head
-          new StackLocal(-1, idBasedVar.cTpe, value)
-        } else {*/
-        stackCounter += 1
+        val value = operandsArray(nextPc).head
+        new StackLocal(-1, idBasedVar.cTpe, value)
+      } else {*/
+        val index = tacNaive.pcToIndex(pc)
+        val counter = operandStack.operandCounterAtStmt(index + 1, idBasedVar.id)
 
         val value = operandsArray(nextPc).head
-        new StackLocal(stackCounter, idBasedVar.cTpe, value)
+        new StackLocal(counter, idBasedVar.cTpe, value)
         //}
       } else {
         val local = localArray(nextPc)
@@ -201,165 +164,125 @@ object LocalTransformer {
       }
     }
 
-    def transformExpr(expr: Expr[IdBasedVar]): Expr[TacLocal] = {
+    def transformExpr(pc: Int, expr: Expr[IdBasedVar]): Expr[TacLocal] = {
       if (expr.isVar) {
-        return currentStack.getOrElse(expr.asVar.id, throw new RuntimeException("No local on stack"))
+        if (expr.asVar.id >= 0) {
+          val index = tacNaive.pcToIndex(pc)
+          val count = operandStack.operandCounterAtStmt(index, expr.asVar.id)
+
+          return currentLocals(count)
+        }
+
+        return currentLocals(expr.asVar.id)
       }
 
-      if (expr.astID == InstanceOf.ASTID) {
-        val instanceOf = expr.asInstanceOf
-        val value = transformExpr(instanceOf.value)
+      expr.astID match {
+        case InstanceOf.ASTID =>
+          val instanceOf = expr.asInstanceOf
+          val value = transformExpr(pc, instanceOf.value)
 
-        return InstanceOf(instanceOf.pc, value, instanceOf.cmpTpe)
-      }
+          return InstanceOf(instanceOf.pc, value, instanceOf.cmpTpe)
+        case Compare.ASTID =>
+          val compareExpr = expr.asCompare
 
-      if (expr.astID == Compare.ASTID) {
-        val compareExpr = expr.asCompare
+          val leftLocal = transformExpr(pc, compareExpr.left)
+          val rightLocal = transformExpr(pc, compareExpr.right)
 
-        val leftLocal = transformExpr(compareExpr.left)
-        val rightLocal = transformExpr(compareExpr.right)
+          return Compare(compareExpr.pc, leftLocal, compareExpr.condition, rightLocal)
+        case Param.ASTID =>
+          paramCounter += 1
 
-        return Compare(compareExpr.pc, leftLocal, compareExpr.condition, rightLocal)
-      }
+          return new ParameterLocal(paramCounter, expr.asParam.cTpe, expr.asParam.name)
+        case MethodTypeConst.ASTID =>
+          return expr.asMethodTypeConst
+        case MethodHandleConst.ASTID =>
+          return expr.asMethodHandleConst
+        case IntConst.ASTID =>
+          return expr.asIntConst
+        case LongConst.ASTID =>
+          return expr.asLongConst
+        case FloatConst.ASTID =>
+          return expr.asFloatConst
+        case DoubleConst.ASTID =>
+          return expr.asDoubleConst
+        case StringConst.ASTID =>
+          return expr.asStringConst
+        case ClassConst.ASTID =>
+          return expr.asClassConst
+        case DynamicConst.ASTID =>
+          return expr.asDynamicConst
+        case NullExpr.ASTID =>
+          return expr.asNullExpr
+        case BinaryExpr.ASTID =>
+          val binaryExpr = expr.asBinaryExpr
 
-      if (expr.astID == Param.ASTID) {
-        paramCounter += 1
-        return new ParameterLocal(paramCounter, expr.asParam.cTpe, expr.asParam.name)
-      }
+          val left = transformExpr(pc, binaryExpr.left)
+          val right = transformExpr(pc, binaryExpr.right)
 
-      if (expr.astID == MethodTypeConst.ASTID) {
-        return MethodTypeConst(expr.asMethodTypeConst.pc, expr.asMethodTypeConst.value)
-      }
+          return BinaryExpr(binaryExpr.pc, binaryExpr.cTpe, binaryExpr.op, left, right)
+        case PrefixExpr.ASTID =>
+          val prefixExpr = expr.asPrefixExpr
+          val operand = transformExpr(pc, prefixExpr.operand)
 
-      if (expr.astID == MethodHandleConst.ASTID) {
-        return MethodHandleConst(expr.asMethodHandleConst.pc, expr.asMethodHandleConst.value)
-      }
+          return PrefixExpr(prefixExpr.pc, prefixExpr.cTpe, prefixExpr.op, operand)
+        case PrimitiveTypecastExpr.ASTID =>
+          val primitiveTypecastExpr = expr.asPrimitiveTypeCastExpr
+          val operand = transformExpr(pc, primitiveTypecastExpr.operand)
 
-      if (expr.astID == IntConst.ASTID) {
-        return IntConst(expr.asIntConst.pc, expr.asIntConst.value)
-      }
+          return PrimitiveTypecastExpr(primitiveTypecastExpr.pc, primitiveTypecastExpr.targetTpe, operand)
+        case New.ASTID =>
+          return expr.asNew
+        case NewArray.ASTID =>
+          val newArray = expr.asNewArray
+          val counts = newArray.counts.map(c => transformExpr(pc, c))
 
-      if (expr.astID == LongConst.ASTID) {
-        return LongConst(expr.asLongConst.pc, expr.asLongConst.value)
-      }
+          return NewArray(newArray.pc, counts, newArray.tpe)
+        case ArrayLoad.ASTID =>
+          val arrayLoad = expr.asArrayLoad
 
-      if (expr.astID == FloatConst.ASTID) {
-        return FloatConst(expr.asFloatConst.pc, expr.asFloatConst.value)
-      }
+          val index = transformExpr(pc, arrayLoad.index)
+          val arrayRef = transformExpr(pc, arrayLoad.arrayRef)
 
-      if (expr.astID == DoubleConst.ASTID) {
-        return DoubleConst(expr.asDoubleConst.pc, expr.asDoubleConst.value)
-      }
+          return ArrayLoad(arrayLoad.pc, index, arrayRef)
+        case ArrayLength.ASTID =>
+          val arrayLength = expr.asArrayLength
+          val arrayRef = transformExpr(pc, arrayLength.arrayRef)
 
-      if (expr.astID == StringConst.ASTID) {
-        return StringConst(expr.asStringConst.pc, expr.asStringConst.value)
-      }
+          return ArrayLength(arrayLength.pc, arrayRef)
+        case GetField.ASTID =>
+          val getField = expr.asGetField
+          val objRef = transformExpr(pc, getField.objRef)
 
-      if (expr.astID == ClassConst.ASTID) {
-        return ClassConst(expr.asClassConst.pc, expr.asClassConst.value)
-      }
+          return GetField(getField.pc, getField.declaringClass, getField.name, getField.declaredFieldType, objRef)
+        case GetStatic.ASTID =>
+          return expr.asGetStatic
+        case InvokedynamicFunctionCall.ASTID =>
+          val functionCall = expr.asInvokedynamicFunctionCall
+          val params = functionCall.params.map(p => transformExpr(pc, p))
 
-      if (expr.astID == DynamicConst.ASTID) {
-        return DynamicConst(expr.asDynamicConst.pc, expr.asDynamicConst.bootstrapMethod, expr.asDynamicConst.name, expr.asDynamicConst.descriptor)
-      }
+          return InvokedynamicFunctionCall(functionCall.pc, functionCall.bootstrapMethod, functionCall.name, functionCall.descriptor, params)
+        case NonVirtualFunctionCall.ASTID =>
+          val functionCall = expr.asNonVirtualFunctionCall
 
-      if (expr.astID == NullExpr.ASTID) {
-        return NullExpr(expr.asNullExpr.pc)
-      }
+          val base = transformExpr(pc, functionCall.receiver)
+          val params = functionCall.params.map(p => transformExpr(pc, p))
 
-      if (expr.astID == BinaryExpr.ASTID) {
-        val binaryExpr = expr.asBinaryExpr
+          return NonVirtualFunctionCall(functionCall.pc, functionCall.declaringClass, functionCall.isInterface, functionCall.name, functionCall.descriptor, base, params)
+        case VirtualFunctionCall.ASTID =>
+          val functionCall = expr.asVirtualFunctionCall
 
-        val left = transformExpr(binaryExpr.left)
-        val right = transformExpr(binaryExpr.right)
+          val base = transformExpr(pc, functionCall.receiver)
+          val params = functionCall.params.map(p => transformExpr(pc, p))
 
-        return BinaryExpr(binaryExpr.pc, binaryExpr.cTpe, binaryExpr.op, left, right)
-      }
+          return VirtualFunctionCall(functionCall.pc, functionCall.declaringClass, functionCall.isInterface, functionCall.name, functionCall.descriptor, base, params)
+        case StaticFunctionCall.ASTID =>
+          val functionCall = expr.asStaticFunctionCall
 
-      if (expr.astID == PrefixExpr.ASTID) {
-        val prefixExpr = expr.asPrefixExpr
-        val operand = transformExpr(prefixExpr.operand)
+          val params = functionCall.params
+          val paramLocals = params.map(p => transformExpr(pc, p))
 
-        return PrefixExpr(prefixExpr.pc, prefixExpr.cTpe, prefixExpr.op, operand)
-      }
-
-      if (expr.astID == PrimitiveTypecastExpr.ASTID) {
-        val primitiveTypecastExpr = expr.asPrimitiveTypeCastExpr
-        val operand = transformExpr(primitiveTypecastExpr.operand)
-
-        return PrimitiveTypecastExpr(primitiveTypecastExpr.pc, primitiveTypecastExpr.targetTpe, operand)
-      }
-
-      if (expr.astID == New.ASTID) {
-        return New(expr.asNew.pc, expr.asNew.tpe)
-      }
-
-      if (expr.astID == NewArray.ASTID) {
-        val newArray = expr.asNewArray
-        val counts = newArray.counts.map(c => transformExpr(c))
-
-        return NewArray(newArray.pc, counts, newArray.tpe)
-      }
-
-      if (expr.astID == ArrayLoad.ASTID) {
-        val arrayLoad = expr.asArrayLoad
-
-        val index = transformExpr(arrayLoad.index)
-        val arrayRef = transformExpr(arrayLoad.arrayRef)
-
-        return ArrayLoad(arrayLoad.pc, index, arrayRef)
-      }
-
-      if (expr.astID == ArrayLength.ASTID) {
-        val arrayLength = expr.asArrayLength
-        val arrayRef = transformExpr(arrayLength.arrayRef)
-
-        return ArrayLength(arrayLength.pc, arrayRef)
-      }
-
-      if (expr.astID == GetField.ASTID) {
-        val getField = expr.asGetField
-        val objRef = transformExpr(getField.objRef)
-
-        return GetField(getField.pc, getField.declaringClass, getField.name, getField.declaredFieldType, objRef)
-      }
-
-      if (expr.astID == GetStatic.ASTID) {
-        return GetStatic(expr.asGetStatic.pc, expr.asGetStatic.declaringClass, expr.asGetStatic.name, expr.asGetStatic.declaredFieldType)
-      }
-
-      if (expr.astID == InvokedynamicFunctionCall.ASTID) {
-        val functionCall = expr.asInvokedynamicFunctionCall
-        val params = functionCall.params.map(p => transformExpr(p))
-
-        return InvokedynamicFunctionCall(functionCall.pc, functionCall.bootstrapMethod, functionCall.name, functionCall.descriptor, params)
-      }
-
-      if (expr.astID == NonVirtualFunctionCall.ASTID) {
-        val functionCall = expr.asNonVirtualFunctionCall
-
-        val base = transformExpr(functionCall.receiver)
-        val params = functionCall.params.map(p => transformExpr(p))
-
-        return NonVirtualFunctionCall(functionCall.pc, functionCall.declaringClass, functionCall.isInterface, functionCall.name, functionCall.descriptor, base, params)
-      }
-
-      if (expr.astID == VirtualFunctionCall.ASTID) {
-        val functionCall = expr.asVirtualFunctionCall
-
-        val base = transformExpr(functionCall.receiver)
-        val params = functionCall.params.map(p => transformExpr(p))
-
-        return VirtualFunctionCall(functionCall.pc, functionCall.declaringClass, functionCall.isInterface, functionCall.name, functionCall.descriptor, base, params)
-      }
-
-      if (expr.astID == StaticFunctionCall.ASTID) {
-        val functionCall = expr.asStaticFunctionCall
-
-        val params = functionCall.params
-        val paramLocals = params.map(p => transformExpr(p))
-
-        return StaticFunctionCall(functionCall.pc, functionCall.declaringClass, functionCall.isInterface, functionCall.name, functionCall.descriptor, paramLocals)
+          return StaticFunctionCall(functionCall.pc, functionCall.declaringClass, functionCall.isInterface, functionCall.name, functionCall.descriptor, paramLocals)
+        case _ => throw new RuntimeException("Unknown expression: " + expr)
       }
 
       throw new RuntimeException("Could not transform expression: " + expr)

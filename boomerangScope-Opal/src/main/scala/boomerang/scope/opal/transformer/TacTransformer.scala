@@ -1,6 +1,5 @@
 package boomerang.scope.opal.transformer
 
-import org.opalj.ai.{AIResult, BaseAI}
 import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
 import org.opalj.br.analyses.Project
 import org.opalj.br.cfg.CFGFactory
@@ -10,12 +9,12 @@ import org.opalj.tac.{Stmt, TACNaive, TACStmts}
 object TacTransformer {
 
   def apply(project: Project[_], method: Method): BoomerangTACode = {
-
-    val aiResult: AIResult = BaseAI(method, new PrimitiveTACAIDomain(project.classHierarchy, method))
-
     val tacNaive = TACNaive(method, project.classHierarchy)
 
-    val transformedTac: Array[Stmt[TacLocal]] = LocalTransformer(method, tacNaive, aiResult)
+    val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
+    val transformedTac: Array[Stmt[TacLocal]] = LocalTransformerOld(method, tacNaive, domain)
+    val stack = OperandStack(tacNaive.stmts, tacNaive.cfg)
+    val tac = LocalTransformer(method, tacNaive, domain)
     val simplifiedTac: Array[Stmt[TacLocal]] = BasicPropagation(transformedTac)
     val nullifiedTac = NullifyFieldsTransformer(method, simplifiedTac)
 

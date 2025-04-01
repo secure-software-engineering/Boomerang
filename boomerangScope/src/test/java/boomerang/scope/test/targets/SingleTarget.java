@@ -16,6 +16,8 @@ public class SingleTarget {
   public static void main(String[] args) {
     getAndSetField();
     identityTest();
+    branching();
+    usage();
   }
 
   public static void identityTest() {
@@ -37,5 +39,26 @@ public class SingleTarget {
     A query = c.getA();
 
     System.out.println(query);
+  }
+
+  private static int branching() {
+    return ((Math.random() > 0.5) ? 10 : 100);
+  }
+
+  private static void branching2() {
+    int i;
+    if (Math.random() > 0.5) {
+      i = 10;
+    } else {
+      i = 100;
+    }
+  }
+
+  private static void usage() {
+    A a = new A();
+    int i = 10;
+
+    a.methodCall(i);
+    a.methodCall(i);
   }
 }

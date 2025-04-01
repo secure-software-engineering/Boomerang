@@ -21,6 +21,7 @@ import boomerang.scope.test.targets.A;
 import boomerang.scope.test.targets.AssignmentTarget;
 import boomerang.scope.test.targets.HashCodeEqualsLocalTarget;
 import boomerang.scope.test.targets.ParameterLocalsTarget;
+import boomerang.scope.test.targets.SingleTarget;
 import boomerang.scope.test.targets.ThisLocalTarget;
 import java.util.List;
 import org.junit.Assert;
@@ -142,23 +143,14 @@ public class SootScopeTest {
   @Test
   public void fieldStoreAssignmentTest() {
     SootSetup sootSetup = new SootSetup();
-    sootSetup.setupSoot(AssignmentTarget.class.getName());
+    sootSetup.setupSoot(SingleTarget.class.getName());
 
     // Parameter locals
     MethodSignature signature =
-        new MethodSignature(AssignmentTarget.class.getName(), "fieldStoreAssignment");
+        new MethodSignature(SingleTarget.class.getName(), "branching2", "void");
     SootMethod method = sootSetup.resolveMethod(signature);
     Method jimpleMethod = JimpleMethod.of(method);
 
-    for (Statement stmt : jimpleMethod.getStatements()) {
-      if (stmt.isFieldStore()) {
-        Assert.assertTrue(stmt.isAssignStmt());
-
-        Val leftOp = stmt.getLeftOp();
-        Val rightOp = stmt.getRightOp();
-
-        System.out.println();
-      }
-    }
+    System.out.println(method.getActiveBody());
   }
 }

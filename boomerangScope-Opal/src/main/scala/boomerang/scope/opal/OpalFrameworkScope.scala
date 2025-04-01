@@ -1,9 +1,7 @@
 package boomerang.scope.opal
 
-import boomerang.scope.{CallGraph, DataFlowScope, Field, FrameworkScope, Method, StaticFieldVal, Val}
-import org.opalj.ai.domain
+import boomerang.scope._
 import org.opalj.br.analyses.Project
-import org.opalj.tac.ComputeTACAIKey
 
 import java.util.stream
 
