@@ -30,6 +30,7 @@ public class TestingFramework {
   public TestingFramework() {
 
     String framework = System.getProperty("framework");
+    framework = framework == null ? "" : framework;
     switch(framework){
       case "soot":
         this.testSetup = new SootTestSetup();
