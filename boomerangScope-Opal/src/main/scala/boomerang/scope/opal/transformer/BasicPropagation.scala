@@ -31,7 +31,7 @@ object BasicPropagation {
       }
     })
 
-    Range(0, max).foreach(i => {
+    /*Range(0, max).foreach(i => {
       statements(i) match {
         // If we have an assignment $s = r, we replace $s with r in all following statements
         case Assignment(pc, stackLocal: StackLocal, registerLocal: RegisterLocal) =>
@@ -43,7 +43,7 @@ object BasicPropagation {
           statements(i) = Nop(pc)
         case _ =>
       }
-    })
+    })*/
 
     def updateStatementWithLocal(stmt: Stmt[TacLocal], stackLocal: StackLocal, registerLocal: RegisterLocal): Stmt[TacLocal] = {
       stmt.astID match {

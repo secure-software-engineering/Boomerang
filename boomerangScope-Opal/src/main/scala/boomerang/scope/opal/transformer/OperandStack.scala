@@ -7,17 +7,25 @@ import scala.collection.mutable
 
 class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
 
-  private val stmtStacks = new Array[mutable.Map[Int, (Int, List[Int])]](tac.length)
-  stmtStacks(0) = mutable.Map.empty[Int, (Int, List[Int])]
+  private val stmtStacks = new Array[mutable.Map[Int, (Int, List[Int], List[Int])]](tac.length)
+  private val operandDefSites = Array.fill(tac.length)(-1)
+  stmtStacks(0) = mutable.Map.empty[Int, (Int, List[Int], List[Int])]
 
   def push(currIndex: Int, nextIndex: Int, operand: IdBasedVar, stackCounter: Int): Unit = {
     val currStack = stmtStacks(currIndex).map(identity)
 
     // Update all entries with current statement index
-    val nextStack = currStack.map { case (k, (id, useSite)) => k -> (id, useSite :+ nextIndex) }
-    nextStack.put(operand.id, (stackCounter, List(nextIndex)))
+    val nextStack = currStack.map { case (k, (id, defSite, scope)) => k -> (id, defSite, scope :+ nextIndex) }
+    nextStack.put(operand.id, (stackCounter, List(currIndex), List(nextIndex)))
 
-    stmtStacks(nextIndex) = nextStack
+    operandDefSites(currIndex) = stackCounter
+
+    val existingStack = stmtStacks(nextIndex)
+    if (existingStack != null) {
+      mergeStacks(nextIndex, existingStack.toMap, nextStack.toMap)
+    } else {
+      stmtStacks(nextIndex) = nextStack
+    }
   }
 
   def update(currIndex: Int, nextIndex: Int): Unit = {
@@ -25,43 +33,56 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
     val existingStack = stmtStacks(nextIndex)
 
     if (existingStack != null) {
-      mergeStacks(existingStack.toMap, currStack.toMap)
+      mergeStacks(nextIndex, existingStack.toMap, currStack.toMap)
     } else {
-      // Update with currIndex
+      // Update with next index
       val nextStack = currStack.map {
-        case (k, (id, scope)) => k -> (id, scope :+ nextIndex)
+        case (k, (id, defSite, scope)) => k -> (id, defSite, scope :+ nextIndex)
       }
       stmtStacks(nextIndex) = nextStack
     }
   }
 
-  private def mergeStacks(existingStack: Map[Int, (Int, List[Int])], incomingStack: Map[Int, (Int, List[Int])]): Unit = {
+  private def mergeStacks(currIndex: Int, existingStack: Map[Int, (Int, List[Int], List[Int])], incomingStack: Map[Int, (Int, List[Int], List[Int])]): Unit = {
     existingStack.foreach {
-      case (id, (currStackCounter, _)) =>
+      case (id, (currStackCounter, existingDefSites, existingScope)) =>
         incomingStack.foreach {
-          case (`id`, (incomingStackCounter, scope)) =>
-            // If the stack counter is equal, no merge is needed as the operands describe the same stack local
+          case (`id`, (incomingStackCounter, incomingDefSites, incomingScope)) =>
             if (currStackCounter != incomingStackCounter) {
-              scope.foreach(s => {
-                val currIndex = stmtStacks(s)
+              incomingScope.foreach(s => {
+                val currStack = stmtStacks(s)
 
                 // Update the stack counter s.t. the operands describe the same stack local
-                currIndex.put(id, (currStackCounter, currIndex(id)._2))
+                currStack.put(id, (currStackCounter, incomingDefSites, currStack(id)._3))
+
+                incomingDefSites.foreach(d => operandDefSites(d) = currStackCounter)
               })
             }
+
+            // Update the def sites and scopes for the merge statement
+            val currStack = stmtStacks(currIndex)
+            val mergedDefSites = (existingDefSites ++ incomingDefSites).distinct
+            val mergedScopes = (existingScope ++ incomingScope).distinct
+            currStack.put(id, (currStackCounter, mergedDefSites, mergedScopes))
+
           case _ =>
         }
     }
   }
 
-  def operandCountersAtStmt(stmtIndex: Int): Map[Int, Int] = {
-    val stmtStack = stmtStacks(stmtIndex)
+  def operandDefSite(stmtIndex: Int): Int = operandDefSites(stmtIndex)
 
-    stmtStack.map { case (id, (counter, _)) => id -> counter}.toMap
-  }
+  def operandCounterAtStmt(stmtIndex: Int, operandId: Int): Int = stmtStacks(stmtIndex).getOrElse(operandId, throw new RuntimeException("Could not find operand on stack with id " + operandId))._1
 
-  def operandCounterAtStmt(stmtIndex: Int, operandId: Int): Int = {
-    operandCountersAtStmt(stmtIndex).getOrElse(operandId, throw new RuntimeException("Could not find operand on stack with id " + operandId))
+  def operandHasMultipleDefSites(stackLocalId: Int): Boolean = {
+    stmtStacks.foreach(m => {
+      m.foreach {
+        case (_, (`stackLocalId`, defSites, _)) => if (defSites.size > 1) return true
+        case _ =>
+      }
+    })
+
+    false
   }
 }
 
@@ -80,7 +101,8 @@ object OperandStack {
       if (currStmt.pc == -1) {
         schedule(currIndex + 1)
       } else {
-        val nextIndices = cfg.successors(currIndex)
+        // Reversing is not needed; however, this way, the stack locals are enumerated in ascending order
+        val nextIndices = cfg.successors(currIndex).toList.reverse
         nextIndices.foreach(nextIndex => {
           if (isOperandPushStmt(currStmt)) {
             val targetVar = currStmt.asAssignment.targetVar

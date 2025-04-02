@@ -153,7 +153,7 @@ object LocalTransformer {
         new StackLocal(-1, idBasedVar.cTpe, value)
       } else {*/
         val index = tacNaive.pcToIndex(pc)
-        val counter = operandStack.operandCounterAtStmt(index + 1, idBasedVar.id)
+        val counter = operandStack.operandDefSite(index)
 
         val value = operandsArray(nextPc).head
         new StackLocal(counter, idBasedVar.cTpe, value)

@@ -42,7 +42,7 @@ public class SingleTarget {
   }
 
   private static int branching() {
-    return ((Math.random() > 0.5) ? 10 : 100);
+    return ((Math.random() > 0.5) ? 10 : (Math.random() > 0.5) ? 100 : 1000);
   }
 
   private static void branching2() {

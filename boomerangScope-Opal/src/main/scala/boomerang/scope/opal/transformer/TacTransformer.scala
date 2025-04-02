@@ -15,6 +15,9 @@ object TacTransformer {
     val transformedTac: Array[Stmt[TacLocal]] = LocalTransformerOld(method, tacNaive, domain)
     val stack = OperandStack(tacNaive.stmts, tacNaive.cfg)
     val tac = LocalTransformer(method, tacNaive, domain)
+    val propagatedTac = BasicPropagation(tac)
+
+
     val simplifiedTac: Array[Stmt[TacLocal]] = BasicPropagation(transformedTac)
     val nullifiedTac = NullifyFieldsTransformer(method, simplifiedTac)
 
