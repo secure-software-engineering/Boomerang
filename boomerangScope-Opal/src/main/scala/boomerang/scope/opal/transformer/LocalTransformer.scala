@@ -43,7 +43,7 @@ object LocalTransformer {
           return Switch(switchStmt.pc, switchStmt.defaultStmt, index, switchStmt.caseStmts.map(p => IntIntPair(-1, p)))
         case Assignment.ASTID =>
           val transformedExpr = transformExpr(stmt.pc, stmt.asAssignment.expr)
-          val isThisAssignment = !method.isStatic && transformedExpr.isVar && transformedExpr.asVar.id == -1
+          val isThisAssignment = transformedExpr.isVar && transformedExpr.asVar.isThisLocal
 
           val target = createNewLocal(stmt.pc, stmt.asAssignment.targetVar, isThisAssignment)
 
@@ -142,25 +142,21 @@ object LocalTransformer {
       if (pc == -1) {
         val local = localArray(0)
 
-        return new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1))
+        val isThisDef = method.isNotStatic && idBasedVar.id == -1
+        return new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThisDef)
       }
 
       val nextPc = tacNaive.stmts(tacNaive.pcToIndex(pc) + 1).pc
 
       if (idBasedVar.id >= 0) {
-        /*if (isThis) {
-        val value = operandsArray(nextPc).head
-        new StackLocal(-1, idBasedVar.cTpe, value)
-      } else {*/
         val index = tacNaive.pcToIndex(pc)
         val counter = operandStack.operandDefSite(index)
 
         val value = operandsArray(nextPc).head
-        new StackLocal(counter, idBasedVar.cTpe, value)
-        //}
+        new StackLocal(counter, idBasedVar.cTpe, value, isThis)
       } else {
         val local = localArray(nextPc)
-        new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1))
+        new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThis)
       }
     }
 

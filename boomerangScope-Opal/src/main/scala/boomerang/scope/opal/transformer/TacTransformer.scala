@@ -12,13 +12,10 @@ object TacTransformer {
     val tacNaive = TACNaive(method, project.classHierarchy)
 
     val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
-    val transformedTac: Array[Stmt[TacLocal]] = LocalTransformerOld(method, tacNaive, domain)
-    val stack = OperandStack(tacNaive.stmts, tacNaive.cfg)
-    val tac = LocalTransformer(method, tacNaive, domain)
-    val propagatedTac = BasicPropagation(tac)
 
-
-    val simplifiedTac: Array[Stmt[TacLocal]] = BasicPropagation(transformedTac)
+    val operandStack = OperandStack(tacNaive.stmts, tacNaive.cfg)
+    val transformedTac = LocalTransformer(method, tacNaive, domain)
+    val simplifiedTac = BasicPropagation(transformedTac, operandStack)
     val nullifiedTac = NullifyFieldsTransformer(method, simplifiedTac)
 
     // Update the CFG

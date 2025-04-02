@@ -45,12 +45,21 @@ public class SingleTarget {
     return ((Math.random() > 0.5) ? 10 : (Math.random() > 0.5) ? 100 : 1000);
   }
 
-  private static void branching2() {
+  private static int branching2() {
     int i;
     if (Math.random() > 0.5) {
       i = 10;
     } else {
       i = 100;
+    }
+
+    return i;
+  }
+
+  private static void whileLoop() {
+    A a = new A();
+    while (Math.random() > 0.5) {
+      System.out.println("Loop");
     }
   }
 

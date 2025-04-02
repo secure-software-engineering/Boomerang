@@ -16,6 +16,8 @@ trait TacLocal extends Var[TacLocal] {
 
   def isParameterLocal: Boolean
 
+  def isThisLocal: Boolean
+
   def cTpe: ComputationalType
 
   def value: ValueInformation
@@ -31,7 +33,7 @@ trait TacLocal extends Var[TacLocal] {
   override def toString: String = name
 }
 
-class StackLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation) extends TacLocal {
+class StackLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation, isThis: Boolean = false) extends TacLocal {
 
   override def id: Int = identifier
 
@@ -41,7 +43,9 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def isParameterLocal: Boolean = false
 
-  override def name: String = s"$$s$identifier"
+  override def isThisLocal: Boolean = isThis
+
+  override def name: String = if (isThis) "$this" else s"$$s$identifier"
 
   override def cTpe: ComputationalType = computationalType
 
@@ -51,11 +55,12 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def equals(other: Any): Boolean = other match {
     case that: StackLocal => this.id == that.id
+    case that: RegisterLocal => this.isThisLocal && that.isThisLocal
     case _ => false
   }
 }
 
-class RegisterLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation) extends TacLocal {
+class RegisterLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation, isThis: Boolean = false) extends TacLocal {
 
   override def id: Int = identifier
 
@@ -65,7 +70,9 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType, value
 
   override def isParameterLocal: Boolean = false
 
-  override def name: String = s"r${-identifier - 1}"
+  override def isThisLocal: Boolean = isThis
+
+  override def name: String = if (isThis) "this" else s"r${-identifier - 1}"
 
   override def cTpe: ComputationalType = computationalType
 
@@ -75,6 +82,7 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType, value
 
   override def equals(other: Any): Boolean = other match {
     case that: RegisterLocal => this.id == that.id
+    case that: StackLocal => this.isThisLocal && that.isThisLocal
     case _ => false
   }
 }
@@ -88,6 +96,8 @@ class ParameterLocal(identifier: Int, computationalType: ComputationalType, para
   override def isRegisterLocal: Boolean = false
 
   override def isParameterLocal: Boolean = true
+
+  override def isThisLocal: Boolean = false
 
   override def cTpe: ComputationalType = computationalType
 
@@ -112,6 +122,8 @@ class NullifiedLocal(identifier: Int, computationalType: ComputationalType) exte
   override def isRegisterLocal: Boolean = false
 
   override def isParameterLocal: Boolean = false
+
+  override def isThisLocal: Boolean = false
 
   override def cTpe: ComputationalType = computationalType
 

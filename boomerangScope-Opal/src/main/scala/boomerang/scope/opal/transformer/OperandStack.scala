@@ -5,13 +5,13 @@ import org.opalj.tac.{Assignment, IdBasedVar, Stmt, TACStmts}
 
 import scala.collection.mutable
 
-class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
+class OperandStack(tac: Array[Stmt[IdBasedVar]], startIndex: Int) {
 
   private val stmtStacks = new Array[mutable.Map[Int, (Int, List[Int], List[Int])]](tac.length)
   private val operandDefSites = Array.fill(tac.length)(-1)
-  stmtStacks(0) = mutable.Map.empty[Int, (Int, List[Int], List[Int])]
+  stmtStacks(startIndex) = mutable.Map.empty[Int, (Int, List[Int], List[Int])]
 
-  def push(currIndex: Int, nextIndex: Int, operand: IdBasedVar, stackCounter: Int): Unit = {
+  def push(currIndex: Int, nextIndex: Int, operand: IdBasedVar, stackCounter: Int): Boolean = {
     val currStack = stmtStacks(currIndex).map(identity)
 
     // Update all entries with current statement index
@@ -25,10 +25,12 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
       mergeStacks(nextIndex, existingStack.toMap, nextStack.toMap)
     } else {
       stmtStacks(nextIndex) = nextStack
+
+      true
     }
   }
 
-  def update(currIndex: Int, nextIndex: Int): Unit = {
+  def update(currIndex: Int, nextIndex: Int): Boolean = {
     val currStack = stmtStacks(currIndex).map(identity)
     val existingStack = stmtStacks(nextIndex)
 
@@ -40,10 +42,14 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
         case (k, (id, defSite, scope)) => k -> (id, defSite, scope :+ nextIndex)
       }
       stmtStacks(nextIndex) = nextStack
+
+      true
     }
   }
 
-  private def mergeStacks(currIndex: Int, existingStack: Map[Int, (Int, List[Int], List[Int])], incomingStack: Map[Int, (Int, List[Int], List[Int])]): Unit = {
+  private def mergeStacks(currIndex: Int, existingStack: Map[Int, (Int, List[Int], List[Int])], incomingStack: Map[Int, (Int, List[Int], List[Int])]): Boolean = {
+    var merged = false
+
     existingStack.foreach {
       case (id, (currStackCounter, existingDefSites, existingScope)) =>
         incomingStack.foreach {
@@ -54,8 +60,9 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
 
                 // Update the stack counter s.t. the operands describe the same stack local
                 currStack.put(id, (currStackCounter, incomingDefSites, currStack(id)._3))
-
                 incomingDefSites.foreach(d => operandDefSites(d) = currStackCounter)
+
+                merged = true
               })
             }
 
@@ -65,9 +72,13 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
             val mergedScopes = (existingScope ++ incomingScope).distinct
             currStack.put(id, (currStackCounter, mergedDefSites, mergedScopes))
 
+            if (existingDefSites != mergedDefSites || existingScope != mergedScopes) merged = true
+
           case _ =>
         }
     }
+
+    merged
   }
 
   def operandDefSite(stmtIndex: Int): Int = operandDefSites(stmtIndex)
@@ -75,7 +86,7 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
   def operandCounterAtStmt(stmtIndex: Int, operandId: Int): Int = stmtStacks(stmtIndex).getOrElse(operandId, throw new RuntimeException("Could not find operand on stack with id " + operandId))._1
 
   def operandHasMultipleDefSites(stackLocalId: Int): Boolean = {
-    stmtStacks.foreach(m => {
+    stmtStacks.filter(m => m != null).foreach(m => {
       m.foreach {
         case (_, (`stackLocalId`, defSites, _)) => if (defSites.size > 1) return true
         case _ =>
@@ -89,10 +100,11 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]]) {
 object OperandStack {
 
   def apply(tac: Array[Stmt[IdBasedVar]], cfg: CFG[Stmt[IdBasedVar], TACStmts[IdBasedVar]]): OperandStack = {
-    val stack = new OperandStack(tac)
+    val firstNonNegativeIndex = tac.indexWhere(stmt => stmt.pc >= 0)
+    val stack = new OperandStack(tac, firstNonNegativeIndex)
     var stackCounter = 0
 
-    var workList: List[Int] = List(0)
+    var workList: List[Int] = List(firstNonNegativeIndex)
     while (workList.nonEmpty) {
       val currIndex = workList.head
       val currStmt = tac(currIndex)
@@ -101,19 +113,23 @@ object OperandStack {
       if (currStmt.pc == -1) {
         schedule(currIndex + 1)
       } else {
+        var stackChanged = false
+
         // Reversing is not needed; however, this way, the stack locals are enumerated in ascending order
         val nextIndices = cfg.successors(currIndex).toList.reverse
         nextIndices.foreach(nextIndex => {
           if (isOperandPushStmt(currStmt)) {
             val targetVar = currStmt.asAssignment.targetVar
 
-            stack.push(currIndex, nextIndex, targetVar, stackCounter)
+            stackChanged = stack.push(currIndex, nextIndex, targetVar, stackCounter)
             stackCounter += 1
           } else {
-            stack.update(currIndex, nextIndex)
+            stackChanged = stack.update(currIndex, nextIndex)
           }
 
-          schedule(nextIndex)
+          if (stackChanged) {
+            schedule(nextIndex)
+          }
         })
       }
 

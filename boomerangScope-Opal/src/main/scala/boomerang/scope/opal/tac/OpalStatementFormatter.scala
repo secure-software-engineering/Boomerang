@@ -1,7 +1,7 @@
 package boomerang.scope.opal.tac
 
 import com.google.common.base.Joiner
-import org.opalj.tac.{Nop, PutField, Return}
+import org.opalj.tac.{Nop, Param, PutField, Return}
 
 object OpalStatementFormatter {
 
@@ -31,6 +31,12 @@ object OpalStatementFormatter {
         } else {
           return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
         }
+      }
+    }
+
+    if (delegate.isAssignment) {
+      if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isParameterLocal) {
+        return s"${delegate.asAssignment.targetVar} := @${delegate.asAssignment.expr}: ${stmt.getMethod}"
       }
     }
 
