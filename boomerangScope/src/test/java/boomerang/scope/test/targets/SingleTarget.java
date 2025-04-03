@@ -17,7 +17,9 @@ public class SingleTarget {
     getAndSetField();
     identityTest();
     branching();
+    branching2();
     usage();
+    whileLoop();
   }
 
   public static void identityTest() {
@@ -57,7 +59,7 @@ public class SingleTarget {
   }
 
   private static void whileLoop() {
-    A a = new A();
+    String s = "s";
     while (Math.random() > 0.5) {
       System.out.println("Loop");
     }

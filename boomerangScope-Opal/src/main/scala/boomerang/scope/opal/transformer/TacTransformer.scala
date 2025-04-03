@@ -12,11 +12,9 @@ object TacTransformer {
     val tacNaive = TACNaive(method, project.classHierarchy)
 
     val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
-
     val operandStack = OperandStack(tacNaive.stmts, tacNaive.cfg)
-    val transformedTac = LocalTransformer(method, tacNaive, domain)
+    val transformedTac = LocalTransformer(method, tacNaive, domain, operandStack)
     val simplifiedTac = BasicPropagation(transformedTac, operandStack)
-    val nullifiedTac = NullifyFieldsTransformer(method, simplifiedTac)
 
     // Update the CFG
     val cfg = CFGFactory(method, project.classHierarchy)
@@ -25,11 +23,11 @@ object TacTransformer {
     }
 
     val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(simplifiedTac), tacNaive.pcToIndex, i => i, simplifiedTac.length)
-    val stmtGraph = StmtGraph(nullifiedTac._1, tacCfg, tacNaive.pcToIndex, nullifiedTac._2)
 
-    // Nullified fields were added before the original statements. Hence, the original
-    // statements are shifted by the amount of new statements
-    val nullifiedPcToIndex = tacNaive.pcToIndex.map(i => if (i == Int.MinValue) i else i + nullifiedTac._2)
-    new BoomerangTACode(nullifiedTac._1, nullifiedPcToIndex, stmtGraph)
+    val stmtGraph = StmtGraph(simplifiedTac, tacCfg, tacNaive.pcToIndex)
+    val nopStmtGraph = NopTransformer(stmtGraph)
+    val nullifiedStmtGraph = NullifyFieldsTransformer(method, nopStmtGraph)
+
+    new BoomerangTACode(nullifiedStmtGraph)
   }
 }

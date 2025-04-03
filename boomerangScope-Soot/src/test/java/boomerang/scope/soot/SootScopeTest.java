@@ -147,9 +147,11 @@ public class SootScopeTest {
 
     // Parameter locals
     MethodSignature signature =
-        new MethodSignature(SingleTarget.class.getName(), "branching2", "void");
+        new MethodSignature(SingleTarget.class.getName(), "branching2", "int");
     SootMethod method = sootSetup.resolveMethod(signature);
+    BoomerangPretransformer.v().apply();
     Method jimpleMethod = JimpleMethod.of(method);
+    jimpleMethod.getControlFlowGraph().getStatements();
 
     System.out.println(method.getActiveBody());
   }

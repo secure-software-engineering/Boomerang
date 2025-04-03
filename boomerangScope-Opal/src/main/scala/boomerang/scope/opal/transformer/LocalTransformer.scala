@@ -1,7 +1,6 @@
 package boomerang.scope.opal.transformer
 
-import org.opalj.ai.{AIResult, BaseAI}
-import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
+import org.opalj.ai.{AIResult, BaseAI, Domain}
 import org.opalj.br.Method
 import org.opalj.collection.immutable.IntIntPair
 import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, CaughtException, Checkcast, ClassConst, Compare, DoubleConst, DynamicConst, Expr, ExprStmt, FloatConst, GetField, GetStatic, Goto, IdBasedVar, If, InstanceOf, IntConst, InvokedynamicFunctionCall, InvokedynamicMethodCall, JSR, LongConst, MethodHandleConst, MethodTypeConst, MonitorEnter, MonitorExit, NaiveTACode, New, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, NullExpr, Param, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, Ret, Return, ReturnValue, StaticFunctionCall, StaticMethodCall, Stmt, StringConst, Switch, Throw, VirtualFunctionCall, VirtualMethodCall}
@@ -10,10 +9,9 @@ import scala.collection.mutable
 
 object LocalTransformer {
 
-  def apply(method: Method, tacNaive: NaiveTACode[_], domain: PrimitiveTACAIDomain): Array[Stmt[TacLocal]] = {
+  def apply(method: Method, tacNaive: NaiveTACode[_], domain: Domain, operandStack: OperandStack): Array[Stmt[TacLocal]] = {
     var paramCounter = -1
     val currentLocals = mutable.Map.empty[Int, TacLocal]
-    val operandStack = OperandStack(tacNaive.stmts, tacNaive.cfg)
 
     // Domain components
     val aiResult: AIResult = BaseAI(method, domain)

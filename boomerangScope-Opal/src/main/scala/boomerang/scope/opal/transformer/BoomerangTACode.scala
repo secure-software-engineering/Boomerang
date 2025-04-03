@@ -2,11 +2,9 @@ package boomerang.scope.opal.transformer
 
 import org.opalj.tac.{Assignment, Stmt}
 
-class BoomerangTACode(
-                       val statements: Array[Stmt[TacLocal]],
-                       val pcToIndex: Array[Int],
-                       val cfg: StmtGraph
-                     ) {
+class BoomerangTACode(val cfg: StmtGraph) {
+
+  def statements: Array[Stmt[TacLocal]] = cfg.statements.toArray
 
   def getLocals: Set[TacLocal] = statements.filter(stmt => stmt.astID == Assignment.ASTID).map(stmt => stmt.asAssignment.targetVar).toSet
 

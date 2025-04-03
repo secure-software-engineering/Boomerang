@@ -1,17 +1,88 @@
 package boomerang.scope.opal.transformer
 
 import org.opalj.br.cfg.CFG
-import org.opalj.tac.{Stmt, TACStmts}
+import org.opalj.tac.{Return, Stmt, TACStmts}
 
-class StmtGraph(val heads: Set[Stmt[TacLocal]], val tails: Set[Stmt[TacLocal]], val predecessors: Map[Stmt[TacLocal], Set[Stmt[TacLocal]]], val successors: Map[Stmt[TacLocal], Set[Stmt[TacLocal]]]) {
+import scala.collection.mutable
 
+class StmtGraph private (val tac: Array[Stmt[TacLocal]], val heads: Set[Stmt[TacLocal]], val tails: Set[Stmt[TacLocal]], val predecessors: Map[Stmt[TacLocal], Set[Stmt[TacLocal]]], val successors: Map[Stmt[TacLocal], Set[Stmt[TacLocal]]], val statements: List[Stmt[TacLocal]]) {
+
+  def insertBefore(insertStmt: Stmt[TacLocal], existingStmt: Stmt[TacLocal]): StmtGraph = {
+    val tempSuccessor = mutable.Map.from(successors)
+
+    // Insert s1 between s0 -> s2
+    val preds = predecessors(existingStmt)
+    preds.foreach(pred => {
+      // Update succs of s0 from s2 to s1, giving s0 -> s1 ... s2
+      val succsOfPred = successors(pred)
+      assert(succsOfPred.contains(existingStmt))
+
+      val newSuccs = succsOfPred - existingStmt + insertStmt
+      tempSuccessor.put(pred, newSuccs)
+    })
+
+    // Update preds of s2 from s0 to (only) s1, giving s0 ... s1 <- s2
+    val tempPreds = mutable.Map.from(predecessors)
+    tempPreds.put(existingStmt, Set(insertStmt))
+
+    // Add the new statement
+    tempPreds.put(insertStmt, preds)
+    tempSuccessor.put(insertStmt, Set(existingStmt))
+
+    // Potential head statement update
+    var newHeads = heads.map(identity)
+    if (heads.contains(existingStmt)) {
+      newHeads = Set(insertStmt)
+    }
+
+    val newStatements = statements.flatMap {
+      case `existingStmt` => List(insertStmt, existingStmt)
+      case x => List(x)
+    }
+
+    new StmtGraph(tac, newHeads, tails, tempPreds.toMap, tempSuccessor.toMap, newStatements)
+  }
+
+  def remove(stmt: Stmt[TacLocal]): StmtGraph = {
+    if (stmt.astID == Return.ASTID) throw new RuntimeException("Cannot remove return statement")
+
+    val tempPreds = mutable.Map.from(predecessors)
+    val tempSuccs = mutable.Map.from(successors)
+
+    val preds = predecessors(stmt)
+    val succs = successors(stmt)
+    preds.foreach(pred => {
+      val succsOfPred = successors(pred)
+      tempSuccs.put(pred, succsOfPred ++ succs)
+    })
+
+    succs.foreach(succ => {
+      val predsOfSuccs = predecessors(succ)
+      tempPreds.put(succ, predsOfSuccs ++ preds)
+    })
+
+    var newHeads = heads.map(identity)
+    if (heads.contains(stmt)) {
+      newHeads = newHeads - stmt
+
+      if (newHeads.isEmpty) {
+        newHeads = succs
+      }
+    }
+
+    val newStatements = statements.filter(s => s != stmt)
+    val newPreds = tempPreds.filter(s => s._1 != stmt).toMap
+    val newSuccs = tempSuccs.filter(s => s._1 != stmt).toMap
+
+    new StmtGraph(tac, newHeads, tails, newPreds, newSuccs, newStatements)
+  }
 }
 
 object StmtGraph {
 
-  def apply(tac: Array[Stmt[TacLocal]], cfg: CFG[Stmt[TacLocal], TACStmts[TacLocal]], pcToIndex: Array[Int], offset: Int): StmtGraph = {
+  def apply(tac: Array[Stmt[TacLocal]], cfg: CFG[Stmt[TacLocal], TACStmts[TacLocal]], pcToIndex: Array[Int]): StmtGraph = {
 
-    def computeHeads: Set[Stmt[TacLocal]] = Set(tac(0))
+    def computeHead: Set[Stmt[TacLocal]] = Set(tac(0))
 
     def computeTails: Set[Stmt[TacLocal]] = {
       tac.filter(stmt => stmt.pc >= 0).filter(stmt => {
@@ -41,7 +112,7 @@ object StmtGraph {
 
       val stmtIndex = pcToIndex(stmt.pc)
       val predecessors = cfg.predecessors(stmtIndex)
-      predecessors.map(predecessorIndex => tac(predecessorIndex + offset))
+      predecessors.map(predecessorIndex => tac(predecessorIndex))
     }
 
     def computeSuccessors(stmt: Stmt[TacLocal]): Set[Stmt[TacLocal]] = {
@@ -53,14 +124,14 @@ object StmtGraph {
 
       val stmtIndex = pcToIndex(stmt.pc)
       val successors = cfg.successors(stmtIndex)
-      successors.map(successorIndex => tac(successorIndex + offset))
+      successors.map(successorIndex => tac(successorIndex))
     }
 
-    val heads = computeHeads
+    val heads = computeHead
     val tails = computeTails
     val predecessors = tac.map(stmt => stmt -> computePredecessors(stmt)).toMap
     val successors = tac.map(stmt => stmt -> computeSuccessors(stmt)).toMap
 
-    new StmtGraph(heads, tails, predecessors, successors)
+    new StmtGraph(tac, heads, tails, predecessors, successors, tac.toList)
   }
 }
