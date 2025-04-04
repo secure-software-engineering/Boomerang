@@ -12,7 +12,7 @@ object TacTransformer {
     val tacNaive = TACNaive(method, project.classHierarchy)
 
     val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
-    val operandStack = OperandStack(tacNaive.stmts, tacNaive.cfg)
+    val operandStack = OperandStack(tacNaive)
     val transformedTac = LocalTransformer(method, tacNaive, domain, operandStack)
     val simplifiedTac = BasicPropagation(transformedTac, operandStack)
 

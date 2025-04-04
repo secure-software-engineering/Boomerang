@@ -20,6 +20,7 @@ public class SingleTarget {
     branching2();
     usage();
     whileLoop();
+    tryCatch();
   }
 
   public static void identityTest() {
@@ -71,5 +72,13 @@ public class SingleTarget {
 
     a.methodCall(i);
     a.methodCall(i);
+  }
+
+  private static void tryCatch() {
+    try {
+      usage();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 }

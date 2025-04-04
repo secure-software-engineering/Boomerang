@@ -19,9 +19,9 @@ class OpalInvokeExprTest {
   @Test
   def instanceInvokeExprTest(): Unit = {
     val opalSetup = new OpalSetup()
-    opalSetup.setupOpal(classOf[ConstructorTarget].getName)
+    opalSetup.setupOpal(classOf[SingleTarget].getName)
 
-    val signature = new MethodSignature(classOf[ConstructorTarget].getName, "definedConstructor", "V")
+    val signature = new MethodSignature(classOf[SingleTarget].getName, "tryCatch", "V")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
     opalMethod.getControlFlowGraph

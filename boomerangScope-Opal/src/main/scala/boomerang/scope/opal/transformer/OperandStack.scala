@@ -1,7 +1,7 @@
 package boomerang.scope.opal.transformer
 
 import org.opalj.br.cfg.CFG
-import org.opalj.tac.{Assignment, IdBasedVar, Stmt, TACStmts}
+import org.opalj.tac.{Assignment, IdBasedVar, NaiveTACode, Stmt, TACStmts}
 
 import scala.collection.mutable
 
@@ -87,7 +87,11 @@ class OperandStack(tac: Array[Stmt[IdBasedVar]], startIndex: Int) {
 
 object OperandStack {
 
-  def apply(tac: Array[Stmt[IdBasedVar]], cfg: CFG[Stmt[IdBasedVar], TACStmts[IdBasedVar]]): OperandStack = {
+  def apply(code: NaiveTACode[_]): OperandStack = {
+    val tac = code.stmts
+    val cfg = code.cfg
+    val exceptionHandlers = code.exceptionHandlers.map(eh => eh.handlerPC)
+
     val firstNonNegativeIndex = tac.indexWhere(stmt => stmt.pc >= 0)
     val stack = new OperandStack(tac, firstNonNegativeIndex)
     var stackCounter = 0
@@ -110,6 +114,11 @@ object OperandStack {
 
               stack.push(currIndex, nextIndex, targetVar, stackCounter)
               stackCounter += 1
+            } else if (isExceptionLoadStmt(currStmt)) {
+              val exceptionVar = currStmt.asAssignment.expr.asVar
+
+              stack.push(currIndex, nextIndex, exceptionVar, stackCounter)
+              stackCounter += 1
             } else {
               stack.update(currIndex, nextIndex)
             }
@@ -122,6 +131,8 @@ object OperandStack {
       def schedule(nextIndex: Int): Unit = workList ::= nextIndex
 
       def isOperandPushStmt(stmt: Stmt[IdBasedVar]): Boolean = stmt.astID == Assignment.ASTID && stmt.asAssignment.targetVar.id >= 0
+
+      def isExceptionLoadStmt(stmt: Stmt[IdBasedVar]): Boolean = stmt.astID == Assignment.ASTID && stmt.asAssignment.expr.isVar && exceptionHandlers.contains(code.pcToIndex(stmt.pc))
     }
 
     stack

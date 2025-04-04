@@ -131,10 +131,36 @@ class NullifiedLocal(identifier: Int, computationalType: ComputationalType) exte
 
   override def name: String = s"n$identifier"
 
-  override def hashCode(): Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
+  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
 
   override def equals(other: Any): Boolean = other match {
     case that: NullifiedLocal => this.id == that.id
+    case _ => false
+  }
+}
+
+class ExceptionLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation) extends TacLocal {
+
+  override def id: Int = identifier
+
+  override def isStackLocal: Boolean = true
+
+  override def isRegisterLocal: Boolean = false
+
+  override def isParameterLocal: Boolean = false
+
+  override def isThisLocal: Boolean = false
+
+  override def cTpe: ComputationalType = computationalType
+
+  override def value: ValueInformation = valueInfo
+
+  override def name: String = s"e$identifier"
+
+  override def hashCode: Int = Objects.hash(id)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: ExceptionLocal => this.id == that.id
     case _ => false
   }
 }

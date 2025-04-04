@@ -12,6 +12,7 @@ object LocalTransformer {
   def apply(method: Method, tacNaive: NaiveTACode[_], domain: Domain, operandStack: OperandStack): Array[Stmt[TacLocal]] = {
     var paramCounter = -1
     val currentLocals = mutable.Map.empty[Int, TacLocal]
+    val exceptionHandlers = tacNaive.exceptionHandlers.map(eh => eh.handlerPC)
 
     // Domain components
     val aiResult: AIResult = BaseAI(method, domain)
@@ -40,7 +41,56 @@ object LocalTransformer {
           // Inserting -1 as it is only used in previous remapping steps
           return Switch(switchStmt.pc, switchStmt.defaultStmt, index, switchStmt.caseStmts.map(p => IntIntPair(-1, p)))
         case Assignment.ASTID =>
-          val transformedExpr = transformExpr(stmt.pc, stmt.asAssignment.expr)
+          val assignStmt = stmt.asAssignment
+          val targetVar = assignStmt.targetVar
+
+          if (assignStmt.pc == -1) {
+            val paramLocal = createNewParameterLocal(targetVar)
+            val transformedExpr = transformExpr(stmt.pc, assignStmt.expr)
+
+            currentLocals(paramLocal.id) = paramLocal
+            return new Assignment[TacLocal](stmt.pc, paramLocal, transformedExpr)
+          }
+
+          if (exceptionHandlers.contains(tacNaive.pcToIndex(stmt.pc)) && stmt.asAssignment.expr.isVar) {
+            val exceptionLocal = createNewExceptionLocal(stmt.pc, stmt.asAssignment.expr.asVar)
+            val targetLocal = if (targetVar.id >= 0) createNewStackLocal(stmt.pc, targetVar, exceptionLocal.isThisLocal) else createNewRegisterLocal(stmt.pc, targetVar, exceptionLocal.isThisLocal)
+
+            currentLocals(exceptionLocal.id) = exceptionLocal
+            currentLocals(targetLocal.id) = targetLocal
+            return new Assignment[TacLocal](stmt.pc, targetLocal, exceptionLocal)
+          }
+
+          if (targetVar.id >= 0) {
+            val transformedExpr = transformExpr(stmt.pc, assignStmt.expr)
+
+            val isThisAssignment = transformedExpr.isVar && transformedExpr.asVar.isThisLocal
+            val targetLocal = createNewStackLocal(stmt.pc, targetVar, isThisAssignment)
+
+            currentLocals(targetLocal.id) = targetLocal
+            return new Assignment[TacLocal](stmt.pc, targetLocal, transformedExpr)
+          }
+
+          if (targetVar.id < 0) {
+            val transformedExpr = transformExpr(stmt.pc, assignStmt.expr)
+
+            val isThisAssignment = transformedExpr.isVar && transformedExpr.asVar.isThisLocal
+            val targetLocal = createNewRegisterLocal(stmt.pc, targetVar, isThisAssignment)
+
+            currentLocals(targetLocal.id) = targetLocal
+            return new Assignment[TacLocal](stmt.pc, targetLocal, transformedExpr)
+          }
+
+          throw new RuntimeException("Could not transform assignment: " + assignStmt)
+
+          /*val transformedExpr = if (exceptionHandlers.contains(tacNaive.pcToIndex(stmt.pc)) && stmt.asAssignment.expr.isVar) {
+            val exceptionVar = createNewLocal(stmt.pc, stmt.asAssignment.expr.asVar)
+            currentLocals(exceptionVar.id) = exceptionVar
+
+            exceptionVar
+          } else {
+            transformExpr(stmt.pc, stmt.asAssignment.expr)
+          }
           val isThisAssignment = transformedExpr.isVar && transformedExpr.asVar.isThisLocal
 
           val target = createNewLocal(stmt.pc, stmt.asAssignment.targetVar, isThisAssignment)
@@ -48,7 +98,7 @@ object LocalTransformer {
           // Store the current stack and register locals on our own 'stack'
           currentLocals(target.id) = target
 
-          return new Assignment(stmt.pc, target, transformedExpr)
+          return new Assignment(stmt.pc, target, transformedExpr)*/
         case ReturnValue.ASTID =>
           val returnStmt = stmt.asReturnValue
           val returnValue = transformExpr(stmt.pc, returnStmt.expr)
@@ -136,26 +186,35 @@ object LocalTransformer {
       throw new RuntimeException("Could not transform statement: " + stmt)
     }
 
-    def createNewLocal(pc: Int, idBasedVar: IdBasedVar, isThis: Boolean = false): TacLocal = {
-      if (pc == -1) {
-        val local = localArray(0)
+    def createNewParameterLocal(idBasedVar: IdBasedVar): TacLocal = {
+      val local = localArray(0)
+      val isThisDef = method.isNotStatic && idBasedVar.id == -1
 
-        val isThisDef = method.isNotStatic && idBasedVar.id == -1
-        return new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThisDef)
-      }
+      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThisDef)
+    }
 
+    def createNewStackLocal(pc: Int, idBasedVar: IdBasedVar, isThis: Boolean): TacLocal = {
+      val nextPc = tacNaive.stmts(tacNaive.pcToIndex(pc) + 1).pc
+      val index = tacNaive.pcToIndex(pc)
+      val counter = operandStack.operandDefSite(index)
+
+      val value = operandsArray(nextPc).head
+      new StackLocal(counter, idBasedVar.cTpe, value, isThis)
+    }
+
+    def createNewRegisterLocal(pc: Int, idBasedVar: IdBasedVar, isThis: Boolean): TacLocal = {
       val nextPc = tacNaive.stmts(tacNaive.pcToIndex(pc) + 1).pc
 
-      if (idBasedVar.id >= 0) {
-        val index = tacNaive.pcToIndex(pc)
-        val counter = operandStack.operandDefSite(index)
+      val local = localArray(nextPc)
+      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThis)
+    }
 
-        val value = operandsArray(nextPc).head
-        new StackLocal(counter, idBasedVar.cTpe, value, isThis)
-      } else {
-        val local = localArray(nextPc)
-        new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThis)
-      }
+    def createNewExceptionLocal(pc: Int, idBasedVar: IdBasedVar): TacLocal = {
+      val index = tacNaive.pcToIndex(pc)
+      val counter = operandStack.operandDefSite(index)
+
+      val value = operandsArray(pc).head
+      new ExceptionLocal(counter, idBasedVar.cTpe, value)
     }
 
     def transformExpr(pc: Int, expr: Expr[IdBasedVar]): Expr[TacLocal] = {
