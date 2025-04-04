@@ -38,6 +38,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
 
   override def isThisLocal(fact: Val): Boolean = {
     if (isStatic) return false
+    if (fact.isStatic) return false
 
     val thisLocal = getThisLocal
     thisLocal.equals(fact)
@@ -66,21 +67,6 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
       localCache = Some(new util.HashSet[Val]())
 
       tac.getLocals.foreach(l => localCache.get.add(new OpalLocal(l, this)))
-      /*// 'this' local
-      if (!isStatic) {
-        localCache.get.add(getThisLocal)
-      }
-
-      // Parameter locals
-      localCache.get.addAll(getParameterLocals)
-
-      tac.statements.foreach(stmt => {
-        if (stmt.isAssignment) {
-          val targetVar = stmt.asAssignment.targetVar
-
-          localCache.get.add(new OpalLocal(targetVar, this))
-        }
-      })*/
     }
 
     localCache.get

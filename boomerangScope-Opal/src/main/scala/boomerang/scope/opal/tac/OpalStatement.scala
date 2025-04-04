@@ -94,8 +94,18 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def isAssignStmt: Boolean = {
     if (delegate.isAssignment) {
-      if (delegate.asAssignment.expr.isVar) {
-        return !delegate.asAssignment.expr.asVar.isParameterLocal
+      val targetVar = delegate.asAssignment.targetVar
+      val expr = delegate.asAssignment.expr
+
+      if (expr.isVar) {
+        /* Difference between Soot and Opal:
+         * - Soot considers parameter definitions and self assignments of the this local as identity statements (no assignments)
+         * - Opal considers these statements as basic assignments, so we have to exclude them manually
+         */
+        if (expr.asVar.isParameterLocal) return false
+        if (targetVar.isThisLocal && expr.asVar.isThisLocal) return false
+
+        return true
       } else {
         return true
       }
