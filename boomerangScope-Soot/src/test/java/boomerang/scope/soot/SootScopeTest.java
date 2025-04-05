@@ -18,7 +18,6 @@ import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleMethod;
 import boomerang.scope.test.MethodSignature;
 import boomerang.scope.test.targets.A;
-import boomerang.scope.test.targets.AssignmentTarget;
 import boomerang.scope.test.targets.HashCodeEqualsLocalTarget;
 import boomerang.scope.test.targets.ParameterLocalsTarget;
 import boomerang.scope.test.targets.SingleTarget;

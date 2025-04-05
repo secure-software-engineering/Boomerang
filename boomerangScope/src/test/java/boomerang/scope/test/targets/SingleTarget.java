@@ -21,6 +21,9 @@ public class SingleTarget {
     usage();
     whileLoop();
     tryCatch();
+
+    SingleTarget target = new SingleTarget();
+    target.block();
   }
 
   public static void identityTest() {
@@ -78,7 +81,18 @@ public class SingleTarget {
     try {
       usage();
     } catch (Exception e) {
-      System.out.println(e);
+      A a = new A();
+      throw e;
+    }
+  }
+
+  Object field;
+
+  public void block() {
+    synchronized (field) {
+      A a = new A();
+
+      System.out.println(a);
     }
   }
 }

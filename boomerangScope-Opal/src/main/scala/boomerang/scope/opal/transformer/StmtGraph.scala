@@ -7,6 +7,7 @@ import scala.collection.mutable
 
 class StmtGraph private (val tac: Array[Stmt[TacLocal]], val heads: Set[Stmt[TacLocal]], val tails: Set[Stmt[TacLocal]], val predecessors: Map[Stmt[TacLocal], Set[Stmt[TacLocal]]], val successors: Map[Stmt[TacLocal], Set[Stmt[TacLocal]]], val statements: List[Stmt[TacLocal]]) {
 
+  // TODO Update if and goto targets
   def insertBefore(insertStmt: Stmt[TacLocal], existingStmt: Stmt[TacLocal]): StmtGraph = {
     val tempSuccessor = mutable.Map.from(successors)
 
@@ -32,7 +33,7 @@ class StmtGraph private (val tac: Array[Stmt[TacLocal]], val heads: Set[Stmt[Tac
     // Potential head statement update
     var newHeads = heads.map(identity)
     if (heads.contains(existingStmt)) {
-      newHeads = Set(insertStmt)
+      newHeads = newHeads - existingStmt + insertStmt
     }
 
     val newStatements = statements.flatMap {
@@ -80,9 +81,9 @@ class StmtGraph private (val tac: Array[Stmt[TacLocal]], val heads: Set[Stmt[Tac
 
 object StmtGraph {
 
-  def apply(tac: Array[Stmt[TacLocal]], cfg: CFG[Stmt[TacLocal], TACStmts[TacLocal]], pcToIndex: Array[Int]): StmtGraph = {
+  def apply(tac: Array[Stmt[TacLocal]], cfg: CFG[Stmt[TacLocal], TACStmts[TacLocal]], pcToIndex: Array[Int], exceptionHandlers: Array[Int]): StmtGraph = {
 
-    def computeHead: Set[Stmt[TacLocal]] = Set(tac(0))
+    def computeHead: Set[Stmt[TacLocal]] = exceptionHandlers.map(eh => tac(eh)).toSet + tac(0)
 
     def computeTails: Set[Stmt[TacLocal]] = {
       tac.filter(stmt => stmt.pc >= 0).filter(stmt => {
@@ -111,6 +112,10 @@ object StmtGraph {
       }
 
       val stmtIndex = pcToIndex(stmt.pc)
+      if (exceptionHandlers.contains(stmtIndex)) {
+        return Set()
+      }
+
       val predecessors = cfg.predecessors(stmtIndex)
       predecessors.map(predecessorIndex => tac(predecessorIndex))
     }
@@ -124,7 +129,7 @@ object StmtGraph {
 
       val stmtIndex = pcToIndex(stmt.pc)
       val successors = cfg.successors(stmtIndex)
-      successors.map(successorIndex => tac(successorIndex))
+      successors.filter(s => !exceptionHandlers.contains(s)).map(successorIndex => tac(successorIndex))
     }
 
     val heads = computeHead

@@ -155,8 +155,12 @@ public class OpalTestSetup implements TestSetup {
     if (type.equals("long")) return LongType$.MODULE$.toJVMTypeName();
     if (type.equals("short")) return ShortType$.MODULE$.toJVMTypeName();
     if (type.equals("boolean")) return BooleanType$.MODULE$.toJVMTypeName();
-    if (type.contains("[]")) {
-      return new StringBuilder(type.replace(".", "/")).insert(0, "[").toString();
+    // TODO Consider all array types (not just ref types
+    if (type.endsWith("[]")) {
+      return new StringBuilder(type.replace(".", "/").replace("[]", ""))
+          .insert(0, "[L")
+          .append(";")
+          .toString();
     }
 
     // Convert class types: java.lang.Object => Ljava.lang.Object;

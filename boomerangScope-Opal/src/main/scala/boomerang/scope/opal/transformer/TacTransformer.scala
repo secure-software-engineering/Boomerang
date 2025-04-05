@@ -24,7 +24,8 @@ object TacTransformer {
 
     val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(simplifiedTac), tacNaive.pcToIndex, i => i, simplifiedTac.length)
 
-    val stmtGraph = StmtGraph(simplifiedTac, tacCfg, tacNaive.pcToIndex)
+    val exceptionHandlers = tacNaive.exceptionHandlers.map(eh => eh.handlerPC).toArray
+    val stmtGraph = StmtGraph(simplifiedTac, tacCfg, tacNaive.pcToIndex, exceptionHandlers)
     val nopStmtGraph = NopTransformer(stmtGraph)
     val nullifiedStmtGraph = NullifyFieldsTransformer(method, nopStmtGraph)
 

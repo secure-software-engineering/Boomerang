@@ -5,11 +5,12 @@ import org.opalj.tac.{Assignment, IdBasedVar, NaiveTACode, Stmt, TACStmts}
 
 import scala.collection.mutable
 
-class OperandStack(tac: Array[Stmt[IdBasedVar]], startIndex: Int) {
+class OperandStack(tac: Array[Stmt[IdBasedVar]], startIndex: Int, exceptionHandlers: List[Int]) {
 
   private val stmtStacks = new Array[mutable.Map[Int, (Int, List[Int], List[Int])]](tac.length)
   private val operandDefSites = Array.fill(tac.length)(-1)
-  stmtStacks(startIndex) = mutable.Map.empty[Int, (Int, List[Int], List[Int])]
+  stmtStacks(startIndex) = mutable.Map.empty
+  exceptionHandlers.foreach(i => stmtStacks(i) = mutable.Map.empty)
 
   def push(currIndex: Int, nextIndex: Int, operand: IdBasedVar, stackCounter: Int): Unit = {
     val currStack = stmtStacks(currIndex).map(identity)
@@ -90,13 +91,13 @@ object OperandStack {
   def apply(code: NaiveTACode[_]): OperandStack = {
     val tac = code.stmts
     val cfg = code.cfg
-    val exceptionHandlers = code.exceptionHandlers.map(eh => eh.handlerPC)
+    val exceptionHandlers = code.exceptionHandlers.map(eh => eh.handlerPC).toList
 
     val firstNonNegativeIndex = tac.indexWhere(stmt => stmt.pc >= 0)
-    val stack = new OperandStack(tac, firstNonNegativeIndex)
+    val stack = new OperandStack(tac, firstNonNegativeIndex, exceptionHandlers)
     var stackCounter = 0
 
-    var workList: List[Int] = List(firstNonNegativeIndex)
+    var workList: List[Int] = firstNonNegativeIndex :: exceptionHandlers
     while (workList.nonEmpty) {
       val currIndex = workList.head
       val currStmt = tac(currIndex)
@@ -108,7 +109,7 @@ object OperandStack {
         // Reversing is not needed; however, this way, the stack locals are enumerated in ascending order
         val nextIndices = cfg.successors(currIndex).toList.reverse
         nextIndices.foreach(nextIndex => {
-          if (currIndex < nextIndex) {
+          if (currIndex < nextIndex && !exceptionHandlers.contains(nextIndex)) {
             if (isOperandPushStmt(currStmt)) {
               val targetVar = currStmt.asAssignment.targetVar
 
