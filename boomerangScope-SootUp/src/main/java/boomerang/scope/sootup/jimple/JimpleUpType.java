@@ -175,10 +175,12 @@ public class JimpleUpType implements Type {
     }
   }
 
+  @Override
   public int hashCode() {
     return Objects.hash(new Object[] {this.delegate});
   }
 
+  @Override
   public String toString() {
     return this.delegate.toString();
   }
