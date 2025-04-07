@@ -180,5 +180,8 @@ public class JimpleUpType implements Type {
     return Objects.hash(new Object[]{this.delegate});
   }
 
+  public String toString() {
+    return this.delegate.toString();
+  }
 
 }
