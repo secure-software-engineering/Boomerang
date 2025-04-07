@@ -22,7 +22,7 @@ concurrency: pages
 
 jobs:
   deploy-preview:
-    uses: secure-software-engineering/actions/.github/workflows/pages-pr-preview.yml@Change evelop
+    uses: secure-software-engineering/actions/.github/workflows/pages-pr-preview.yml@develop
     with:
       enable_comment: true
       title_prefix: "Boomerang PR Preview: "
