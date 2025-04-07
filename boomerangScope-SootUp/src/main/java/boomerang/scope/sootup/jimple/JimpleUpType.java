@@ -176,4 +176,9 @@ public class JimpleUpType implements Type {
     }
   }
 
+  public int hashCode() {
+    return Objects.hash(new Object[]{this.delegate});
+  }
+
+
 }
