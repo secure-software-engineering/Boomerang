@@ -25,6 +25,8 @@ import sootup.java.core.JavaSootClass;
 import sootup.java.core.types.JavaClassType;
 import sootup.java.core.views.JavaView;
 
+import java.util.Objects;
+
 public class JimpleUpType implements Type {
 
   private final sootup.core.types.Type delegate;
@@ -161,4 +163,17 @@ public class JimpleUpType implements Type {
   public sootup.core.types.Type getDelegate() {
     return delegate;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    } else if (o != null && this.getClass() == o.getClass()) {
+      JimpleUpType that = (JimpleUpType)o;
+      return Objects.equals(this.delegate, that.delegate);
+    } else {
+      return false;
+    }
+  }
+
 }
