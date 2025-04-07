@@ -13,10 +13,10 @@ on:
       - closed
       - synchronize
       - reopened
-  paths:
-    - 'mkdocs.yml'
-    - 'docs/**'
-    - '.github/workflows/deploy-pr-preview.yml'
+    paths:
+      - 'mkdocs.yml'
+      - 'docs/**'
+      - '.github/workflows/deploy-pr-preview.yml'
 
 concurrency: pages
 
