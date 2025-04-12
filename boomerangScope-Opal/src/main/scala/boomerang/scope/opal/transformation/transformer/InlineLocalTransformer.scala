@@ -1,11 +1,13 @@
-package boomerang.scope.opal.transformer
+package boomerang.scope.opal.transformation.transformer
 
+import boomerang.scope.opal.transformation.stack.OperandStackHandler
+import boomerang.scope.opal.transformation.{RegisterLocal, StackLocal, TacLocal}
 import org.opalj.collection.immutable.IntIntPair
-import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, Checkcast, Compare, Expr, ExprStmt, FunctionCall, GetField, GetStatic, IdBasedVar, If, InstanceOf, InvokedynamicFunctionCall, InvokedynamicMethodCall, MonitorEnter, MonitorExit, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, ReturnValue, SimpleValueConst, StaticFunctionCall, StaticMethodCall, Stmt, Switch, TACStmts, Throw, VirtualFunctionCall, VirtualMethodCall}
+import org.opalj.tac._
 
-object BasicPropagation {
+object InlineLocalTransformer {
 
-  def apply(code: Array[Stmt[TacLocal]], operandStack: OperandStack): Array[Stmt[TacLocal]] = {
+  def apply(code: Array[Stmt[TacLocal]], stackHandler: OperandStackHandler): Array[Stmt[TacLocal]] = {
     val statements = code.map(identity)
 
     val max = code.length - 1
@@ -34,7 +36,7 @@ object BasicPropagation {
       statements(i) match {
         // If we have an assignment $s = r, we replace $s with r in all following statements
         case Assignment(pc, stackLocal: StackLocal, registerLocal: RegisterLocal) =>
-          if (!operandStack.operandHasMultipleDefSites(stackLocal.id)) {
+          if (!stackHandler.isBranchedOperand(pc, stackLocal.id)) {
             Range.inclusive(i + 1, max).foreach(j => {
               val currStmt = statements(j)
               statements(j) = updateStatementWithLocal(currStmt, stackLocal, registerLocal)

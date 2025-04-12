@@ -2,7 +2,7 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalClient
 import boomerang.scope._
-import boomerang.scope.opal.transformer.TacLocal
+import boomerang.scope.opal.transformation.TacLocal
 import org.opalj.br.ReferenceType
 import org.opalj.tac._
 

@@ -1,7 +1,7 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
-import boomerang.scope.opal.transformer.TacLocal
+import boomerang.scope.opal.transformation.TacLocal
 import org.opalj.br.ObjectType
 import org.opalj.tac.Var
 

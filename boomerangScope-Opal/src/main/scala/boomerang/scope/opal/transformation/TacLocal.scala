@@ -10,13 +10,15 @@ trait TacLocal extends Var[TacLocal] {
 
   def id: Int
 
-  def isStackLocal: Boolean
+  def isStackLocal: Boolean = false
 
-  def isRegisterLocal: Boolean
+  def isRegisterLocal: Boolean = false
 
-  def isParameterLocal: Boolean
+  def isParameterLocal: Boolean = false
 
-  def isThisLocal: Boolean
+  def isThisLocal: Boolean = false
+
+  def isExceptionLocal: Boolean = false
 
   def cTpe: ComputationalType
 
@@ -39,10 +41,6 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def isStackLocal: Boolean = true
 
-  override def isRegisterLocal: Boolean = false
-
-  override def isParameterLocal: Boolean = false
-
   override def isThisLocal: Boolean = isThis
 
   override def name: String = if (isThis) "$this" else s"$$s$identifier"
@@ -51,7 +49,7 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def value: ValueInformation = valueInfo
 
-  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
+  override def hashCode: Int = Objects.hash(id)
 
   override def equals(other: Any): Boolean = other match {
     case that: StackLocal => this.id == that.id
@@ -64,11 +62,7 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType, value
 
   override def id: Int = identifier
 
-  override def isStackLocal: Boolean = false
-
   override def isRegisterLocal: Boolean = true
-
-  override def isParameterLocal: Boolean = false
 
   override def isThisLocal: Boolean = isThis
 
@@ -78,7 +72,7 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType, value
 
   override def value: ValueInformation = valueInfo
 
-  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
+  override def hashCode: Int = Objects.hash(id)
 
   override def equals(other: Any): Boolean = other match {
     case that: RegisterLocal => this.id == that.id
@@ -91,13 +85,7 @@ class ParameterLocal(identifier: Int, computationalType: ComputationalType, para
 
   override def id: Int = identifier
 
-  override def isStackLocal: Boolean = false
-
-  override def isRegisterLocal: Boolean = false
-
   override def isParameterLocal: Boolean = true
-
-  override def isThisLocal: Boolean = false
 
   override def cTpe: ComputationalType = computationalType
 
@@ -105,7 +93,7 @@ class ParameterLocal(identifier: Int, computationalType: ComputationalType, para
 
   override def name: String = paramName
 
-  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
+  override def hashCode: Int = Objects.hash(id)
 
   override def equals(other: Any): Boolean = other match {
     case that: ParameterLocal => this.id == that.id
@@ -117,21 +105,13 @@ class NullifiedLocal(identifier: Int, computationalType: ComputationalType) exte
 
   override def id: Int = identifier
 
-  override def isStackLocal: Boolean = false
-
-  override def isRegisterLocal: Boolean = false
-
-  override def isParameterLocal: Boolean = false
-
-  override def isThisLocal: Boolean = false
-
   override def cTpe: ComputationalType = computationalType
 
   override def value: ValueInformation = IsNullValue
 
   override def name: String = s"n$identifier"
 
-  override def hashCode: Int = Objects.hash(id, isStackLocal, isRegisterLocal, isParameterLocal)
+  override def hashCode: Int = Objects.hash(id)
 
   override def equals(other: Any): Boolean = other match {
     case that: NullifiedLocal => this.id == that.id
@@ -143,13 +123,7 @@ class ExceptionLocal(identifier: Int, computationalType: ComputationalType, valu
 
   override def id: Int = identifier
 
-  override def isStackLocal: Boolean = true
-
-  override def isRegisterLocal: Boolean = false
-
-  override def isParameterLocal: Boolean = false
-
-  override def isThisLocal: Boolean = false
+  override def isExceptionLocal: Boolean = true
 
   override def cTpe: ComputationalType = computationalType
 
@@ -164,5 +138,3 @@ class ExceptionLocal(identifier: Int, computationalType: ComputationalType, valu
     case _ => false
   }
 }
-
-// TODO Consider TempLocal in SWAP

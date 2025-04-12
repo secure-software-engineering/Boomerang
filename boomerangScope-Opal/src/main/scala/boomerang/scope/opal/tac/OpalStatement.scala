@@ -1,7 +1,7 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
-import boomerang.scope.opal.transformer.TacLocal
+import boomerang.scope.opal.transformation.TacLocal
 import com.google.common.base.Joiner
 import org.opalj.tac.{DUVar, IdBasedVar, PrimitiveTypecastExpr, Stmt, Var}
 import org.opalj.value.ValueInformation

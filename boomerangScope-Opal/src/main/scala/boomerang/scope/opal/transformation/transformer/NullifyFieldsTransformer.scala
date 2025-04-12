@@ -1,5 +1,6 @@
-package boomerang.scope.opal.transformer
+package boomerang.scope.opal.transformation.transformer
 
+import boomerang.scope.opal.transformation.{NullifiedLocal, StmtGraph, TacLocal}
 import org.opalj.br.{ComputationalTypeReference, Field, FieldType, Method}
 import org.opalj.tac.{Assignment, Expr, NullExpr, PutField}
 

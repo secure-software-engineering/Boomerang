@@ -1,7 +1,7 @@
 package boomerang.scope.opal.tac
 
+import boomerang.scope.opal.transformation.TacLocal
 import boomerang.scope.{ControlFlowGraph, Method, Pair, Type, Val}
-import boomerang.scope.opal.transformer.TacLocal
 
 import java.util.Objects
 

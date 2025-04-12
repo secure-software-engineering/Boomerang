@@ -1,4 +1,4 @@
-package boomerang.scope.opal.transformer
+package boomerang.scope.opal.transformation
 
 import org.opalj.br.cfg.CFG
 import org.opalj.tac.{Return, Stmt, TACStmts}

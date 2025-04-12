@@ -1,5 +1,6 @@
-package boomerang.scope.opal.transformer
+package boomerang.scope.opal.transformation.transformer
 
+import boomerang.scope.opal.transformation.StmtGraph
 import org.opalj.tac.{If, Nop}
 
 object NopTransformer {

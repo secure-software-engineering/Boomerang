@@ -1,6 +1,6 @@
 package boomerang.scope.opal.tac
 
-import boomerang.scope.opal.transformer.TacLocal
+import boomerang.scope.opal.transformation.TacLocal
 import boomerang.scope.{Val, ValWithFalseVariable}
 import org.opalj.tac.{DUVar, Expr, IdBasedVar, Var}
 import org.opalj.value.ValueInformation

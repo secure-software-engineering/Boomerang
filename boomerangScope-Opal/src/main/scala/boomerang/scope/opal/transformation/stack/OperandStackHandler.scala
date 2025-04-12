@@ -8,7 +8,7 @@ class OperandStackHandler {
 
   private val pcToStack = mutable.Map.empty[PC, OperandStack]
   private val defSites = mutable.Map.empty[PC, Operand]
-  private var localCounter = 0
+  private var localCounter = -1
 
   def getOrCreate(pc: PC): OperandStack = {
     if (pcToStack.contains(pc)) {
@@ -34,8 +34,8 @@ class OperandStackHandler {
       true
     } else {
       var modified = false
-      existingStack.stack.foreach(existingOp => {
-        incomingStack.stack.foreach(incomingOp => {
+      existingStack.stackEntries.foreach(existingOp => {
+        incomingStack.stackEntries.foreach(incomingOp => {
           if (existingOp.id == incomingOp.id && existingOp.localId != incomingOp.localId) {
             incomingOp.updateCounter(existingOp.localId)
 
@@ -51,6 +51,26 @@ class OperandStackHandler {
     localCounter += 1
 
     localCounter
+  }
+
+  def defSiteAtPc(pc: PC): Int = defSites.getOrElse(pc, throw new RuntimeException(s"No operand definition at PC $pc")).localId
+
+  def counterForOperand(pc: PC, id: Int): Int = {
+    val stack = pcToStack.getOrElse(pc, throw new RuntimeException(s"Stack for PC $pc not available"))
+    stack.stackEntries.foreach(op => if (op.id == id) return op.localId)
+
+    throw new RuntimeException(s"Could not find operand with id $id on stack")
+  }
+
+  def isBranchedOperand(pc: PC, id: Int): Boolean = {
+    val defSite = defSites.getOrElse(pc, throw new RuntimeException(s"No def site found at pc $pc"))
+
+    defSite.isBranchedOperand
+    //val stack = pcToStack.getOrElse(pc, throw new RuntimeException(s"Stack for PC $pc not available"))
+    //stack.stackEntries.foreach(op => if (op.id == id) return op.isBranchedOperand)
+
+
+    //throw new RuntimeException(s"Could not find operand with id $id on stack")
   }
 
 }

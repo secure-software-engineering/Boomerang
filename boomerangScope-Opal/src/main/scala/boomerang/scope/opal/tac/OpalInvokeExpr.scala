@@ -1,6 +1,6 @@
 package boomerang.scope.opal.tac
 
-import boomerang.scope.opal.transformer.TacLocal
+import boomerang.scope.opal.transformation.TacLocal
 import boomerang.scope.{DeclaredMethod, InvokeExpr, Val}
 import org.opalj.tac._
 

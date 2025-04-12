@@ -3,7 +3,7 @@ package boomerang.scope.opal
 import boomerang.scope.{CallGraph, InvokeExpr}
 import boomerang.scope.CallGraph.Edge
 import boomerang.scope.opal.tac.{OpalFunctionInvokeExpr, OpalMethod, OpalMethodInvokeExpr, OpalPhantomMethod, OpalStatement}
-import boomerang.scope.opal.transformer.TacTransformer
+import boomerang.scope.opal.transformation.TacBodyBuilder
 import org.opalj.br.{DefinedMethod, Method, MultipleDefinedMethods, VirtualDeclaredMethod}
 import org.opalj.tac.{NonVirtualFunctionCall, StaticFunctionCall, VirtualFunctionCall}
 
@@ -20,7 +20,7 @@ class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Meth
   })
 
   private def addEdgesFromMethod(method: DefinedMethod): Unit = {
-    val tacCode = TacTransformer(OpalClient.project.get, method.definedMethod)
+    val tacCode = TacBodyBuilder(OpalClient.project.get, method.definedMethod)
 
     tacCode.statements.foreach(stmt => {
       val srcStatement = new OpalStatement(stmt, OpalMethod(method.definedMethod, tacCode))

@@ -1,7 +1,7 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalClient
-import boomerang.scope.opal.transformer.TacLocal
+import boomerang.scope.opal.transformation.TacLocal
 import boomerang.scope.{IfStatement, Statement, Val}
 import org.opalj.tac.{DUVar, IdBasedVar, If, Var}
 import org.opalj.value.ValueInformation

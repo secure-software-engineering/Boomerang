@@ -4,6 +4,8 @@ import org.opalj.tac.IdBasedVar
 
 class OperandStack private(stackHandler: OperandStackHandler, private var stack: List[Operand]) {
 
+  def stackEntries: List[Operand] = stack
+
   def push(idBasedVar: IdBasedVar): Unit = {
     val operand = new Operand(idBasedVar.id, stackHandler.nextLocalCounter)
     stack = operand :: stack
@@ -46,7 +48,6 @@ class OperandStack private(stackHandler: OperandStackHandler, private var stack:
   def copy: OperandStack = new OperandStack(stackHandler, stack.map(identity))
 
   override def toString: String = stack.toString()
-
 }
 
 object OperandStack {

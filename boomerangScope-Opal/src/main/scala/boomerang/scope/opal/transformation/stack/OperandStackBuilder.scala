@@ -12,8 +12,10 @@ object OperandStackBuilder {
 
     // Initialize work list; we always start with pc 0
     var workList = List(0)
-    for (eh <- tacNaive.exceptionHandlers) {
-      workList ::= eh.handlerPC
+
+    val exceptionHandlersPc = tacNaive.exceptionHandlers.map(eh => tacNaive.stmts(eh.handlerPC).pc)
+    for (eh <- exceptionHandlersPc) {
+      workList ::= eh
     }
 
     while (workList.nonEmpty) {
@@ -38,11 +40,11 @@ object OperandStackBuilder {
 
         stmt match {
           case If(pc, left, _, right, target) =>
-            val leftOps = processExpr(left)
-            leftOps.foreach(op => stack.pop(op))
-
             val rightOps = processExpr(right)
             rightOps.foreach(op => stack.pop(op))
+
+            val leftOps = processExpr(left)
+            leftOps.foreach(op => stack.pop(op))
 
             schedule(pcOfNextStatement(pc), stack)
 
@@ -61,8 +63,11 @@ object OperandStackBuilder {
             // TODO branch targets
             schedule(defaultTarget, stack)
           case Assignment(pc, targetVar: IdBasedVar, expr: Expr[IdBasedVar]) =>
-            val operands = processExpr(expr)
-            operands.foreach(op => stack.pop(op))
+            // Exception handlers are defined implicitly, so cannot pop them from the stack
+            if (!exceptionHandlersPc.contains(pc)) {
+              val operands = processExpr(expr)
+              operands.foreach(op => stack.pop(op))
+            }
 
             if (targetVar.id >= 0) {
               stack.push(targetVar)
@@ -125,8 +130,8 @@ object OperandStackBuilder {
 
             schedule(pcOfNextStatement(pc), stack)
           case PutField(pc, _, _, _, objRef: IdBasedVar, value: IdBasedVar) =>
-            stack.pop(objRef)
             stack.pop(value)
+            stack.pop(objRef)
 
             schedule(pcOfNextStatement(pc), stack)
           case NonVirtualMethodCall(pc, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) =>
@@ -177,7 +182,7 @@ object OperandStackBuilder {
           case ClassConst(_, _) => List()
           case DynamicConst(_, _, _, _) => List()
           case NullExpr(_) => List()
-          case BinaryExpr(_, _, _, left: IdBasedVar, right: IdBasedVar) => List(left, right)
+          case BinaryExpr(_, _, _, left, right) => processExpr(left) ++ processExpr(right)
           case PrefixExpr(_, _, _, operand: IdBasedVar) => List(operand)
           case PrimitiveTypecastExpr(_, _, operand: IdBasedVar) => List(operand)
           case New(_, _) => List()

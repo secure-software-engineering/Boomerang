@@ -2,7 +2,7 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope._
 import boomerang.scope.opal.OpalClient
-import boomerang.scope.opal.transformer.{BoomerangTACode, TacTransformer}
+import boomerang.scope.opal.transformation.{BoomerangTACode, TacBodyBuilder}
 
 import java.util
 import java.util.Objects
@@ -119,7 +119,7 @@ class OpalMethod private(val delegate: org.opalj.br.Method, val tac: BoomerangTA
 
 object OpalMethod {
 
-  def apply(delegate: org.opalj.br.Method): OpalMethod = new OpalMethod(delegate, TacTransformer(OpalClient.project.get, delegate))
+  def apply(delegate: org.opalj.br.Method): OpalMethod = new OpalMethod(delegate, TacBodyBuilder(OpalClient.project.get, delegate))
 
   def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod = new OpalMethod(delegate, tac)
 }
