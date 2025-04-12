@@ -2,6 +2,7 @@ package boomerang.scope.opal
 
 import boomerang.scope.DataFlowScope
 import boomerang.scope.opal.tac.OpalMethod
+import boomerang.scope.opal.transformation.TacBodyBuilder
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.{ConstructorTarget, InvokeExprTarget, SingleTarget}
 import com.typesafe.config.{Config, ConfigValueFactory}
@@ -21,10 +22,12 @@ class OpalInvokeExprTest {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[SingleTarget].getName)
 
-    val signature = new MethodSignature(classOf[SingleTarget].getName, "tryCatch", "V")
+    val signature = new MethodSignature(classOf[SingleTarget].getName, "branching", "I")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
     opalMethod.getControlFlowGraph
+
+    val test = TacBodyBuilder(OpalClient.project.get, method)
 
     // Update the project's config to set the test method as the (single) entry point. See
     // https://github.com/opalj/opal/blob/ff01c1c9e696946a88b090a52881a41445cf07f1/DEVELOPING_OPAL/tools/src/main/scala/org/opalj/support/info/CallGraph.scala#L406
