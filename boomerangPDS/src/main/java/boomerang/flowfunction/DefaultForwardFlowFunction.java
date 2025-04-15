@@ -23,9 +23,9 @@ import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
@@ -47,7 +47,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
   @Override
   public Set<Val> returnFlow(Method method, Statement curr, Val value) {
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     if (curr.isThrowStmt() && !options.throwFlows()) {
       return Collections.emptySet();
     }
@@ -80,7 +80,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
     if (callee.isStaticInitializer()) {
       return Collections.emptySet();
     }
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(fact) && !callee.isStatic()) {
@@ -104,7 +104,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
   @Override
   public Set<State> normalFlow(ForwardQuery query, Edge nextEdge, Val fact) {
     Statement succ = nextEdge.getStart();
-    Set<State> out = Sets.newHashSet();
+    Set<State> out = new LinkedHashSet<>();
     if (killFlow(succ, fact)) {
       return out;
     }

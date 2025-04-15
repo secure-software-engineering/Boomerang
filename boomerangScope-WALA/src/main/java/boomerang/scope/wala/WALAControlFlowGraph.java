@@ -20,7 +20,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IField;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
@@ -33,6 +32,7 @@ import com.ibm.wala.types.FieldReference;
 import com.ibm.wala.types.TypeReference;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class WALAControlFlowGraph implements ControlFlowGraph {
     if (cacheBuild) return;
     cacheBuild = true;
 
-    Set<ISSABasicBlock> emptyBasicBlocks = Sets.newHashSet();
+    Set<ISSABasicBlock> emptyBasicBlocks = new LinkedHashSet<>();
     Map<ISSABasicBlock, Statement> basicBlockToLastStmt = Maps.newHashMap();
     Iterator<ISSABasicBlock> bbIt = cfg.iterator();
     // Convert each basic block.
@@ -105,7 +105,7 @@ public class WALAControlFlowGraph implements ControlFlowGraph {
     for (ISSABasicBlock eBB : emptyBasicBlocks) {
       bbGraph.removeNode(eBB);
     }
-    Set<ISSABasicBlock> visited = Sets.newHashSet();
+    Set<ISSABasicBlock> visited = new LinkedHashSet<>();
     LinkedList<ISSABasicBlock> worklist = Lists.newLinkedList();
     worklist.addAll(bbGraph.entries);
     while (!worklist.isEmpty()) {
@@ -287,7 +287,7 @@ public class WALAControlFlowGraph implements ControlFlowGraph {
 
   private Graph<ISSABasicBlock> buildDirectedGraph() {
     Graph<ISSABasicBlock> graph = new Graph<>();
-    Set<ISSABasicBlock> visited = Sets.newHashSet();
+    Set<ISSABasicBlock> visited = new LinkedHashSet<>();
     LinkedList<ISSABasicBlock> worklist = Lists.newLinkedList();
     worklist.add(cfg.entry());
     graph.addEntry(cfg.entry());
@@ -309,7 +309,7 @@ public class WALAControlFlowGraph implements ControlFlowGraph {
   private static class Graph<N> {
     Multimap<N, N> outEdges = HashMultimap.create();
     Multimap<N, N> inEdges = HashMultimap.create();
-    Set<N> entries = Sets.newHashSet();
+    Set<N> entries = new LinkedHashSet<>();
 
     public void removeNode(N bb) {
       Collection<N> out = outEdges.get(bb);

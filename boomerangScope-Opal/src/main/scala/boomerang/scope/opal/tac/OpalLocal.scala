@@ -95,7 +95,7 @@ class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: Con
 
   override def getVariableName: String = delegate.asVar.name
 
-  override def hashCode: Int = Objects.hash(delegate.asVar.id)
+  override def hashCode: Int = Objects.hash(delegate.asVar)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalLocal => super.equals(that) && this.delegate == that.delegate

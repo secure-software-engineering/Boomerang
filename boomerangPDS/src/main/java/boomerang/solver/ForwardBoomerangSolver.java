@@ -29,10 +29,10 @@ import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -331,7 +331,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Val returnedFact) {
     Statement callSite = returnSiteStatement.getStart();
 
-    Set<Node<ControlFlowGraph.Edge, Val>> out = Sets.newHashSet();
+    Set<Node<ControlFlowGraph.Edge, Val>> out = new LinkedHashSet<>();
     if (callSite.containsInvokeExpr()) {
       if (returnedFact.isThisLocal()) {
         if (callSite.getInvokeExpr().isInstanceInvokeExpr()) {

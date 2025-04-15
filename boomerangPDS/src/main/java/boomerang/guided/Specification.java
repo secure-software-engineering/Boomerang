@@ -12,11 +12,11 @@
 package boomerang.guided;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,8 +42,8 @@ public class Specification {
   private MethodWithSelector parse(String input) {
     Pattern arguments = Pattern.compile("\\((.*?)\\)");
     Matcher argumentMatcher = arguments.matcher(input);
-    Set<QuerySelector> on = Sets.newHashSet();
-    Set<QuerySelector> go = Sets.newHashSet();
+    Set<QuerySelector> on = new LinkedHashSet<>();
+    Set<QuerySelector> go = new LinkedHashSet<>();
 
     // Handle arguments
     if (argumentMatcher.find()) {
@@ -190,7 +190,7 @@ public class Specification {
   }
 
   public static Specification create(String... spec) {
-    return new Specification(Sets.newHashSet(spec));
+    return new Specification(Set.of(spec));
   }
 
   public Set<MethodWithSelector> getMethodAndQueries() {

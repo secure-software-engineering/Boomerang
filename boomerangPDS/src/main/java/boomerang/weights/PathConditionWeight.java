@@ -15,7 +15,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import wpds.impl.Weight;
@@ -25,7 +25,7 @@ public class PathConditionWeight extends Weight {
   private static PathConditionWeight one;
   private Map<Statement, ConditionDomain> ifStatements = Maps.newHashMap();
   private Map<Val, ConditionDomain> variableToValue = Maps.newHashMap();
-  private Set<Val> returnVals = Sets.newHashSet();
+  private Set<Val> returnVals = new LinkedHashSet<>();
   private Map<Method, Statement> calleeToCallSite = Maps.newHashMap();
   private String rep;
 
@@ -115,7 +115,7 @@ public class PathConditionWeight extends Weight {
       }
     }
     newVals.putAll(returnToAssignedVariableMap);
-    Set<Val> newReturnVals = Sets.newHashSet(returnVals);
+    Set<Val> newReturnVals = new LinkedHashSet(returnVals);
     newReturnVals.addAll(other.returnVals);
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(calleeToCallSite);
     calleeToCallSiteMapping.putAll(other.calleeToCallSite);
@@ -179,7 +179,7 @@ public class PathConditionWeight extends Weight {
       }
     }
     newVals.putAll(returnToAssignedVariableMap);
-    Set<Val> newReturnVals = Sets.newHashSet(returnVals);
+    Set<Val> newReturnVals = new LinkedHashSet(returnVals);
     newReturnVals.addAll(other.returnVals);
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(calleeToCallSite);
     calleeToCallSiteMapping.putAll(other.calleeToCallSite);

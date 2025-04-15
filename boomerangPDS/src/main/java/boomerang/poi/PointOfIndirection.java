@@ -15,13 +15,13 @@ import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public abstract class PointOfIndirection<Statement, Val, Field> {
 
-  private final Set<ForwardQuery> actualBaseAllocations = Sets.newHashSet();
-  private final Set<Query> flowAllocations = Sets.newHashSet();
+  private final Set<ForwardQuery> actualBaseAllocations = new LinkedHashSet<>();
+  private final Set<Query> flowAllocations = new LinkedHashSet<>();
 
   public abstract void execute(ForwardQuery baseAllocation, Query flowAllocation);
 

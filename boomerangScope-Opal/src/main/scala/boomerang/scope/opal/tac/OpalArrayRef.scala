@@ -3,16 +3,10 @@ package boomerang.scope.opal.tac
 import boomerang.scope._
 import boomerang.scope.opal.transformation.TacLocal
 import org.opalj.br.ObjectType
-import org.opalj.tac.{DUVar, DVar, Expr, IdBasedVar, UVar, Var}
-import org.opalj.value.ValueInformation
 
 import java.util.Objects
 
-class OpalArrayRef(val arrayRef: Expr[TacLocal], val index: Int, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
-
-  if (!arrayRef.isVar) {
-    throw new RuntimeException("Array Ref has to be a variable")
-  }
+class OpalArrayRef(val arrayRef: TacLocal, val index: Int, method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   // TODO Type
   override def getType: Type = OpalType(ObjectType.Array)
@@ -70,18 +64,12 @@ class OpalArrayRef(val arrayRef: Expr[TacLocal], val index: Int, method: OpalMet
   override def getLongValue: Long = throw new RuntimeException("Array Value is not a long constant")
 
   override def getArrayBase: Pair[Val, Integer] = {
-    val base = new OpalLocal(arrayRef.asVar, method)
+    val base = new OpalLocal(arrayRef, method)
 
     new Pair[Val, Integer](base, index)
   }
 
-  override def getVariableName: String = {
-    arrayRef match {
-      case dVar: DVar[_] => s"var(D)[$index]" // TODO insert origin
-      case uVar: UVar[_] => s"var(${uVar.definedBy.head})[$index]"
-      case _ => arrayRef.toString
-    }
-  }
+  override def getVariableName: String = s"$arrayRef[$index]"
 
   override def hashCode: Int = Objects.hash(super.hashCode(), arrayRef, index)
 

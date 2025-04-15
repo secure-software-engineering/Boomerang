@@ -20,9 +20,9 @@ import boomerang.scope.WrappedClass;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import soot.Local;
@@ -104,7 +104,7 @@ public class JimpleMethod extends Method {
   @Override
   public Collection<Val> getLocals() {
     if (localCache == null) {
-      localCache = Sets.newHashSet();
+      localCache = new LinkedHashSet<>();
       Chain<Local> locals = delegate.getActiveBody().getLocals();
       for (Local l : locals) {
         localCache.add(new JimpleVal(l, this));

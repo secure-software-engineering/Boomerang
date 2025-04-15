@@ -14,6 +14,7 @@ package sync.pds.weights;
 import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
@@ -56,7 +57,7 @@ public class SetDomain<N, Stmt, Fact> extends Weight {
     if (this.equals(zero())) return other;
     if (this.equals(one()) || other.equals(one())) return one();
     if (other instanceof SetDomain) {
-      Set<Node<Stmt, Fact>> merged = Sets.newHashSet(nodes);
+      Set<Node<Stmt, Fact>> merged = new LinkedHashSet(nodes);
       merged.addAll(((SetDomain) other).nodes);
       return new SetDomain<N, Stmt, Fact>(merged);
     }
@@ -103,6 +104,6 @@ public class SetDomain<N, Stmt, Fact> extends Weight {
   }
 
   public Collection<Node<Stmt, Fact>> elements() {
-    return Sets.newHashSet(nodes);
+    return new LinkedHashSet(nodes);
   }
 }

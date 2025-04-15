@@ -34,9 +34,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +65,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
 
   private final CallGraph precomputedCallGraph;
   private final WeightedBoomerang<? extends Weight> solver;
-  private final Set<Statement> queriedInvokeExprAndAllocationSitesFound = Sets.newHashSet();
-  private final Set<Statement> queriedInvokeExpr = Sets.newHashSet();
+  private final Set<Statement> queriedInvokeExprAndAllocationSitesFound = new LinkedHashSet<>();
+  private final Set<Statement> queriedInvokeExpr = new LinkedHashSet<>();
 
   public BoomerangResolver(FrameworkScope frameworkScope) {
     this.solver = new Boomerang(frameworkScope);
@@ -169,7 +169,7 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
 
   private Collection<Method> getMethodFromClassOrFromSuperclass(
       DeclaredMethod method, WrappedClass sootClass) {
-    Set<Method> res = Sets.newHashSet();
+    Set<Method> res = new LinkedHashSet<>();
     WrappedClass originalClass = sootClass;
     while (sootClass != null) {
       for (Method candidate : sootClass.getMethods()) {

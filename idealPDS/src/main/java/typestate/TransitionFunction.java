@@ -13,10 +13,10 @@ package typestate;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import typestate.finiteautomata.ITransition;
 import typestate.finiteautomata.Transition;
@@ -45,9 +45,9 @@ public class TransitionFunction extends Weight {
   }
 
   private TransitionFunction(String rep) {
-    this.value = Sets.newHashSet();
+    this.value = new LinkedHashSet<>();
     this.rep = rep;
-    this.stateChangeStatements = Sets.newHashSet();
+    this.stateChangeStatements = new LinkedHashSet<>();
   }
 
   public Collection<ITransition> values() {
@@ -97,19 +97,19 @@ public class TransitionFunction extends Weight {
     TransitionFunction func = (TransitionFunction) other;
     if (other.equals(one()) || this.equals(one())) {
       Set<ITransition> transitions = new HashSet<>((other.equals(one()) ? value : func.value));
-      Set<ITransition> idTransitions = Sets.newHashSet();
+      Set<ITransition> idTransitions = new LinkedHashSet<>();
       for (ITransition t : transitions) {
         idTransitions.add(new Transition(t.from(), t.from()));
       }
       transitions.addAll(idTransitions);
       return new TransitionFunction(
           transitions,
-          Sets.newHashSet(
+          new LinkedHashSet(
               (other.equals(one()) ? stateChangeStatements : func.stateChangeStatements)));
     }
     Set<ITransition> transitions = new HashSet<>(func.value);
     transitions.addAll(value);
-    HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
+    HashSet<Edge> newStateChangeStmts = new LinkedHashSet(stateChangeStatements);
     newStateChangeStmts.addAll(func.stateChangeStatements);
     return new TransitionFunction(transitions, newStateChangeStmts);
   }

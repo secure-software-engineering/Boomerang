@@ -23,14 +23,16 @@ object OpalStatementFormatter {
 
     if (stmt.isAssignStmt) {
       if (delegate.isAssignment) {
-        if (stmt.isFieldStore) {
-          return s"${stmt.getLeftOp} = ${stmt.getFieldStore.getX}.${stmt.getFieldStore.getY}"
-        } else if (stmt.isArrayStore) {
-          val base = stmt.getArrayBase
-          return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
-        } else {
-          return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
-        }
+        return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+      }
+
+      if (stmt.isFieldStore) {
+        return s"${stmt.getLeftOp} = ${stmt.getFieldStore.getX}.${stmt.getFieldStore.getY}"
+      }
+
+      if (stmt.isArrayStore) {
+        val base = stmt.getArrayBase
+        return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
       }
     }
 

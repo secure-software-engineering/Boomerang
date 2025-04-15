@@ -25,7 +25,6 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
 import java.util.*;
@@ -37,7 +36,7 @@ public class DemandDrivenGuidedAnalysis {
 
   private final IDemandDrivenGuidedManager spec;
   private final LinkedList<QueryWithContext> queryQueue = Lists.newLinkedList();
-  private final Set<Query> visited = Sets.newHashSet();
+  private final Set<Query> visited = new LinkedHashSet<>();
   private final Boomerang solver;
   private boolean triggered;
 

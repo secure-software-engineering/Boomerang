@@ -27,8 +27,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class IDEALSeedSolver<W extends Weight> {
   private final WeightedBoomerang<W> phase2Solver;
   private final Stopwatch analysisStopwatch = Stopwatch.createUnstarted();
   private final Multimap<Node<Edge, Val>, Edge> affectedStrongUpdateStmt = HashMultimap.create();
-  private final Set<Node<Edge, Val>> weakUpdates = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> weakUpdates = new LinkedHashSet<>();
   private int killedRules;
 
   private final class AddIndirectFlowAtCallSite implements WPAUpdateListener<Edge, INode<Val>, W> {

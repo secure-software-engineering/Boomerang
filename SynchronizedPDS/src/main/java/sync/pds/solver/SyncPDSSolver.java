@@ -16,11 +16,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -70,10 +70,10 @@ public abstract class SyncPDSSolver<
           return "Field " + SyncPDSSolver.this;
         }
       };
-  private final Set<Node<Stmt, Fact>> reachedStates = Sets.newHashSet();
-  private final Set<Node<Stmt, Fact>> callingContextReachable = Sets.newHashSet();
-  private final Set<Node<Stmt, Fact>> fieldContextReachable = Sets.newHashSet();
-  private final Set<SyncPDSUpdateListener<Stmt, Fact>> updateListeners = Sets.newHashSet();
+  private final Set<Node<Stmt, Fact>> reachedStates = new LinkedHashSet<>();
+  private final Set<Node<Stmt, Fact>> callingContextReachable = new LinkedHashSet<>();
+  private final Set<Node<Stmt, Fact>> fieldContextReachable = new LinkedHashSet<>();
+  private final Set<SyncPDSUpdateListener<Stmt, Fact>> updateListeners = new LinkedHashSet<>();
   private final Multimap<Node<Stmt, Fact>, SyncStatePDSUpdateListener<Stmt, Fact>>
       reachedStateUpdateListeners = HashMultimap.create();
   protected final WeightedPAutomaton<Field, INode<Node<Stmt, Fact>>, W> fieldAutomaton;
@@ -594,8 +594,8 @@ public abstract class SyncPDSSolver<
         });
   }
 
-  Set<Summary> summaries = Sets.newHashSet();
-  Set<OnAddedSummaryListener> summaryListeners = Sets.newHashSet();
+  Set<Summary> summaries = new LinkedHashSet<>();
+  Set<OnAddedSummaryListener> summaryListeners = new LinkedHashSet<>();
 
   public void addApplySummaryListener(OnAddedSummaryListener l) {
     if (summaryListeners.add(l)) {
@@ -794,7 +794,7 @@ public abstract class SyncPDSSolver<
   public abstract Field fieldWildCard();
 
   public Set<Node<Stmt, Fact>> getReachedStates() {
-    return Sets.newHashSet(reachedStates);
+    return new LinkedHashSet(reachedStates);
   }
 
   public void debugOutput() {
@@ -802,9 +802,9 @@ public abstract class SyncPDSSolver<
     logger.debug("All reachable states");
     prettyPrintSet(getReachedStates());
 
-    HashSet<Node<Stmt, Fact>> notFieldReachable = Sets.newHashSet(callingContextReachable);
+    HashSet<Node<Stmt, Fact>> notFieldReachable = new LinkedHashSet(callingContextReachable);
     notFieldReachable.removeAll(getReachedStates());
-    HashSet<Node<Stmt, Fact>> notCallingContextReachable = Sets.newHashSet(fieldContextReachable);
+    HashSet<Node<Stmt, Fact>> notCallingContextReachable = new LinkedHashSet(fieldContextReachable);
     notCallingContextReachable.removeAll(getReachedStates());
     if (!notFieldReachable.isEmpty()) {
       logger.debug("Calling context reachable");

@@ -14,11 +14,11 @@ class OpalArrayTest {
   private val integerType = IntegerType.toJVMTypeName
 
   @Test
-  def singleArrayLoadTest(): Unit = {
+  def singleArrayLoadIndexTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayLoad", "Void", util.List.of("[" + integerType))
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayIndexLoad", "Void", util.List.of("[" + integerType))
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -41,11 +41,38 @@ class OpalArrayTest {
   }
 
   @Test
-  def singleArrayStoreTest(): Unit = {
+  def singleArrayLoadVarTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayStore", "Void")
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayVarLoad", "Void", util.List.of("[" + integerType))
+    val method = opalSetup.resolveMethod(signature)
+    val opalMethod = OpalMethod(method)
+
+    var arrayLoadCount = 0
+    opalMethod.getStatements.forEach(stmt => {
+      if (stmt.isArrayLoad) {
+        arrayLoadCount += 1
+
+        val arrayBase = stmt.getArrayBase
+        Assert.assertFalse(arrayBase.getX.isArrayRef)
+        Assert.assertTrue(arrayBase.getX.isLocal)
+        Assert.assertEquals(-1, arrayBase.getY)
+
+        val rightOp = stmt.getRightOp
+        Assert.assertTrue(rightOp.isArrayRef)
+      }
+    })
+
+    Assert.assertEquals(1, arrayLoadCount)
+  }
+
+  @Test
+  def singleArrayStoreIndexTest(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[ArrayTarget].getName)
+
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayStoreIndex", "Void")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -58,6 +85,33 @@ class OpalArrayTest {
         Assert.assertFalse(arrayBase.getX.isArrayRef)
         Assert.assertTrue(arrayBase.getX.isLocal)
         Assert.assertEquals(0, arrayBase.getY)
+
+        val leftOp = stmt.getLeftOp
+        Assert.assertTrue(leftOp.isArrayRef)
+      }
+    })
+
+    Assert.assertEquals(1, arrayStoreCount)
+  }
+
+  @Test
+  def singleArrayStoreVarTest(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[ArrayTarget].getName)
+
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayStoreVar", "Void")
+    val method = opalSetup.resolveMethod(signature)
+    val opalMethod = OpalMethod(method)
+
+    var arrayStoreCount = 0
+    opalMethod.getStatements.forEach(stmt => {
+      if (stmt.isArrayStore) {
+        arrayStoreCount += 1
+
+        val arrayBase = stmt.getArrayBase
+        Assert.assertFalse(arrayBase.getX.isArrayRef)
+        Assert.assertTrue(arrayBase.getX.isLocal)
+        Assert.assertEquals(-1, arrayBase.getY)
 
         val leftOp = stmt.getLeftOp
         Assert.assertTrue(leftOp.isArrayRef)

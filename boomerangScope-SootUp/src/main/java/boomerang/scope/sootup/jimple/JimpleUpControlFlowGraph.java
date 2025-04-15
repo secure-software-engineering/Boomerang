@@ -16,8 +16,8 @@ import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.JIdentityStmt;
@@ -30,8 +30,8 @@ public class JimpleUpControlFlowGraph implements ControlFlowGraph {
 
   private boolean cacheBuilt = false;
   private final List<Statement> statements = Lists.newArrayList();
-  private final Collection<Statement> startPointCache = Sets.newHashSet();
-  private final Collection<Statement> endPointCache = Sets.newHashSet();
+  private final Collection<Statement> startPointCache = new LinkedHashSet<>();
+  private final Collection<Statement> endPointCache = new LinkedHashSet<>();
   private final Multimap<Statement, Statement> predecessorsOfCache = HashMultimap.create();
   private final Multimap<Statement, Statement> successorsOfCache = HashMultimap.create();
 

@@ -23,8 +23,8 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,7 +40,7 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
   @Override
   public Collection<Query> onForwardFlow(ForwardQuery query, Edge dataFlowEdge, Val dataFlowVal) {
     Statement stmt = dataFlowEdge.getStart();
-    Set<Query> res = Sets.newHashSet();
+    Set<Query> res = new LinkedHashSet<>();
     if (stmt.containsInvokeExpr()) {
       Set<MethodWithSelector> selectors =
           spec.getMethodAndQueries().stream()
@@ -56,7 +56,7 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
   @Override
   public Collection<Query> onBackwardFlow(BackwardQuery query, Edge dataFlowEdge, Val dataFlowVal) {
     Statement stmt = dataFlowEdge.getStart();
-    Set<Query> res = Sets.newHashSet();
+    Set<Query> res = new LinkedHashSet<>();
     if (stmt.containsInvokeExpr()) {
       Set<MethodWithSelector> selectors =
           spec.getMethodAndQueries().stream()
@@ -70,7 +70,7 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
   }
 
   private Collection<Query> createNewQueries(MethodWithSelector sel, Statement stmt) {
-    Set<Query> results = Sets.newHashSet();
+    Set<Query> results = new LinkedHashSet<>();
     Method method = stmt.getMethod();
     for (QuerySelector qSel : sel.getGo()) {
       Optional<Val> parameterVal = getParameterVal(stmt, qSel.argumentSelection);

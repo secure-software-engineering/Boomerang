@@ -1,7 +1,7 @@
 package boomerang.scope.opal.transformation
 
 import boomerang.scope.opal.transformation.stack.OperandStackBuilder
-import boomerang.scope.opal.transformation.transformer.{InlineLocalTransformer, LocalTransformer, NopTransformer, NullifyFieldsTransformer}
+import boomerang.scope.opal.transformation.transformer.{InlineLocalTransformer, LocalPropagationTransformer, LocalTransformer, NopTransformer, NullifyFieldsTransformer}
 import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
 import org.opalj.br.Method
 import org.opalj.br.analyses.Project
@@ -16,7 +16,15 @@ object TacBodyBuilder {
 
     val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
     val localTransformedTac = LocalTransformer(method, tacNaive, stackHandler, domain)
-    val inlinedTac = InlineLocalTransformer(localTransformedTac, stackHandler)
+    assert(tacNaive.stmts.length == localTransformedTac.length, "Wrong transformation")
+
+    val inlinedTac = InlineLocalTransformer(localTransformedTac, tacNaive.cfg)
+    assert(tacNaive.stmts.length == inlinedTac.length, "Wrong transformation")
+
+    val propagatedTac = LocalPropagationTransformer(inlinedTac, stackHandler)
+    assert(tacNaive.stmts.length == propagatedTac.length, "Wrong transformation")
+
+    // TODO Local propagation
 
     // Update the CFG
     val cfg = CFGFactory(method, project.classHierarchy)
@@ -24,13 +32,13 @@ object TacBodyBuilder {
       throw new RuntimeException("Could not compute CFG for method " + method.name)
     }
 
-    val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(inlinedTac), tacNaive.pcToIndex, i => i, inlinedTac.length)
+    val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(propagatedTac), tacNaive.pcToIndex, i => i, propagatedTac.length)
 
     val exceptionHandlers = tacNaive.exceptionHandlers.map(eh => eh.handlerPC).toArray
-    val stmtGraph = StmtGraph(inlinedTac, tacCfg, tacNaive.pcToIndex, exceptionHandlers)
+    val stmtGraph = StmtGraph(propagatedTac, tacCfg, tacNaive.pcToIndex, exceptionHandlers)
 
     val nopStmtGraph = NopTransformer(stmtGraph)
-    val nullifiedStmtGraph = transformer.NullifyFieldsTransformer(method, nopStmtGraph)
+    val nullifiedStmtGraph = NullifyFieldsTransformer(method, nopStmtGraph)
 
     new BoomerangTACode(nullifiedStmtGraph)
   }

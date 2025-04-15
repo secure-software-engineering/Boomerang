@@ -45,7 +45,6 @@ import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import com.google.common.collect.Sets;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
@@ -579,7 +578,7 @@ public class DemandDrivenGuidedAnalysisTest {
             .map(x -> (x.isIntConstant() ? x.getIntValue() : x.getStringValue()))
             .collect(Collectors.toSet());
 
-    Assert.assertEquals(Sets.newHashSet(expectedValues), collect);
+    Assert.assertEquals(Set.of(expectedValues), collect);
   }
 
   private IAllocationSite allocationSite() {

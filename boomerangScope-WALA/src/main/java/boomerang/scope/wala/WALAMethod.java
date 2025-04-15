@@ -18,7 +18,6 @@ import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.ibm.wala.analysis.typeInference.TypeInference;
 import com.ibm.wala.cast.ir.ssa.AstIRFactory.AstIR;
 import com.ibm.wala.cast.java.analysis.typeInference.AstJavaTypeInference;
@@ -26,6 +25,7 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.ssa.IR;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -90,7 +90,7 @@ public class WALAMethod extends Method {
   @Override
   public Set<Val> getLocals() {
     if (valueCache == null) {
-      valueCache = Sets.newHashSet();
+      valueCache = new LinkedHashSet<>();
       for (int i = 0; i <= ir.getSymbolTable().getMaxValueNumber(); i++) {
         valueCache.add(new WALAVal(i, this));
       }

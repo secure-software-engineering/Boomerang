@@ -30,10 +30,10 @@ import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -256,7 +256,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
   @Override
   public void applyCallSummary(
       Edge callSiteEdge, Val factAtSpInCallee, Edge spInCallee, Edge exitStmt, Val exitingFact) {
-    Set<Node<Edge, Val>> out = Sets.newHashSet();
+    Set<Node<Edge, Val>> out = new LinkedHashSet<>();
     Statement callSite = callSiteEdge.getTarget();
     if (callSite.containsInvokeExpr()) {
       if (exitingFact.isThisLocal()) {

@@ -22,7 +22,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -145,7 +145,7 @@ public class CopyAccessPathChain<W extends Weight> {
 
   // Copied from ExecuteImportFielStmtPOI
 
-  private final Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
+  private final Set<INode<Node<Edge, Val>>> reachable = new LinkedHashSet<>();
   private final Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
       HashMultimap.create();
 

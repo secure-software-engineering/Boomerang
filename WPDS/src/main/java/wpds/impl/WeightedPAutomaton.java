@@ -18,12 +18,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,26 +51,27 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   // Set Q is implicit
   // Weighted Pushdown Systems and their Application to Interprocedural
   // Dataflow Analysis
-  protected Set<Transition<N, D>> transitions = Sets.newHashSet();
+  protected Set<Transition<N, D>> transitions = new LinkedHashSet<>();
   // set F in paper [Reps2003]
-  protected Set<D> finalState = Sets.newHashSet();
+  protected Set<D> finalState = new LinkedHashSet<>();
   protected Multimap<D, D> initialStatesToSource = HashMultimap.create();
   // set P in paper [Reps2003]
-  protected Set<D> states = Sets.newHashSet();
+  protected Set<D> states = new LinkedHashSet<>();
   private final Multimap<D, Transition<N, D>> transitionsOutOf = HashMultimap.create();
   private final Multimap<D, Transition<N, D>> transitionsInto = HashMultimap.create();
-  private final Set<WPAUpdateListener<N, D, W>> listeners = Sets.newHashSet();
+  private final Set<WPAUpdateListener<N, D, W>> listeners = new LinkedHashSet<>();
   private final Multimap<D, WPAStateListener<N, D, W>> stateListeners = HashMultimap.create();
   private final Map<D, ForwardDFSVisitor<N, D, W>> stateToDFS = Maps.newHashMap();
   private final Map<D, ForwardDFSVisitor<N, D, W>> stateToEpsilonDFS = Maps.newHashMap();
-  private final Set<WeightedPAutomaton<N, D, W>> nestedAutomatons = Sets.newHashSet();
-  private final Set<NestedAutomatonListener<N, D, W>> nestedAutomataListeners = Sets.newHashSet();
+  private final Set<WeightedPAutomaton<N, D, W>> nestedAutomatons = new LinkedHashSet<>();
+  private final Set<NestedAutomatonListener<N, D, W>> nestedAutomataListeners =
+      new LinkedHashSet<>();
   private final Map<D, ReachabilityListener<N, D>> stateToEpsilonReachabilityListener =
       Maps.newHashMap();
   private final Map<D, ReachabilityListener<N, D>> stateToReachabilityListener = Maps.newHashMap();
-  private final Set<ReturnSiteWithWeights> connectedPushes = Sets.newHashSet();
-  private final Set<ConnectPushListener<N, D, W>> conntectedPushListeners = Sets.newHashSet();
-  private final Set<UnbalancedPopListener<N, D, W>> unbalancedPopListeners = Sets.newHashSet();
+  private final Set<ReturnSiteWithWeights> connectedPushes = new LinkedHashSet<>();
+  private final Set<ConnectPushListener<N, D, W>> conntectedPushListeners = new LinkedHashSet<>();
+  private final Set<UnbalancedPopListener<N, D, W>> unbalancedPopListeners = new LinkedHashSet<>();
   private final Map<UnbalancedPopEntry, W> unbalancedPops = Maps.newHashMap();
   private final Map<Transition<N, D>, W> transitionsToFinalWeights = Maps.newHashMap();
   private ForwardDFSVisitor<N, D, W> dfsVisitor;
@@ -130,7 +131,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   private static final boolean SUMMARIZE = false;
 
   public String toDotString() {
-    return toDotString(Sets.newHashSet());
+    return toDotString(new LinkedHashSet<>());
   }
 
   private String toDotString(Set<WeightedPAutomaton<N, D, W>> visited) {
@@ -140,7 +141,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     String s = "digraph {\n";
     TreeSet<String> trans = new TreeSet<String>();
     List<String> summaryIdentifier = Lists.newArrayList();
-    Set<Transition<N, D>> removableTrans = Sets.newHashSet();
+    Set<Transition<N, D>> removableTrans = new LinkedHashSet<>();
     if (SUMMARIZE) {
       Table<N, D, Set<Transition<N, D>>> mergableStates = HashBasedTable.create();
       for (D source : states) {
@@ -148,7 +149,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
           for (Transition<N, D> t : transitionsOutOf.get(source)) {
             Set<Transition<N, D>> set = mergableStates.get(t.getLabel(), t.getTarget());
             if (set == null) {
-              set = Sets.newHashSet();
+              set = new LinkedHashSet<>();
             }
             set.add(t);
             removableTrans.add(t);
@@ -225,7 +226,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     HashBasedTable<D, N, Collection<D>> groupedByTargetAndLabel = HashBasedTable.create();
     for (Transition<N, D> t : transitions) {
       Collection<D> collection = groupedByTargetAndLabel.get(t.getTarget(), t.getLabel());
-      if (collection == null) collection = Sets.newHashSet();
+      if (collection == null) collection = new LinkedHashSet<>();
       collection.add(t.getStart());
       groupedByTargetAndLabel.put(t.getTarget(), t.getLabel(), collection);
     }
@@ -277,7 +278,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   }
 
   public Set<Edge<D, N>> getEdges() {
-    Set<Edge<D, N>> trans = Sets.newHashSet();
+    Set<Edge<D, N>> trans = new LinkedHashSet<>();
     for (Edge<D, N> tran : transitions) {
       if (!tran.getLabel().equals(epsilon())) {
         trans.add(new Transition<N, D>(tran.getTarget(), tran.getLabel(), tran.getStart()));
@@ -499,8 +500,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     }
   }
 
-  private final Set<Transition<N, D>> summaryEdges = Sets.newHashSet();
-  private final Set<SummaryListener<N, D>> summaryEdgeListener = Sets.newHashSet();
+  private final Set<Transition<N, D>> summaryEdges = new LinkedHashSet<>();
+  private final Set<SummaryListener<N, D>> summaryEdgeListener = new LinkedHashSet<>();
 
   public void registerSummaryEdge(Transition<N, D> t) {
     if (summaryEdges.add(t)) {
@@ -737,7 +738,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
 
   public boolean containsLoop() {
     // Performs a backward DFS
-    HashSet<D> visited = Sets.newHashSet();
+    HashSet<D> visited = new LinkedHashSet<>();
     LinkedList<D> worklist = Lists.newLinkedList();
     worklist.addAll(initialStatesToSource.keySet());
     while (!worklist.isEmpty()) {
@@ -771,7 +772,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
         if (!isGeneratedState(next)) continue;
         if (next.equals(pop)) continue;
         Set<N> atNext = getOrCreate(pathReachingD, next);
-        Set<N> newAtCurr = Sets.newHashSet(atCurr);
+        Set<N> newAtCurr = new LinkedHashSet(atCurr);
         if (newAtCurr.add(t.getLabel())) {
           boolean addAll = atNext.addAll(newAtCurr);
           if (addAll) {
@@ -780,7 +781,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
         }
       }
     }
-    Set<N> longest = Sets.newHashSet();
+    Set<N> longest = new LinkedHashSet<>();
     for (Set<N> l : pathReachingD.values()) {
       if (longest.size() < l.size()) {
         longest = l;
@@ -792,7 +793,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   private Set<N> getOrCreate(Map<D, Set<N>> pathReachingD, D pop) {
     Set<N> collection = pathReachingD.get(pop);
     if (collection == null) {
-      collection = Sets.newHashSet();
+      collection = new LinkedHashSet<>();
       pathReachingD.put(pop, collection);
     }
     return collection;
@@ -804,7 +805,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
 
   public boolean addUnbalancedState(D state, D parent) {
     Integer distance = 0;
-    Collection<D> parents = Sets.newHashSet();
+    Collection<D> parents = new LinkedHashSet<>();
     if (!initialStatesToSource.containsKey(parent)) {
       distance = stateToUnbalancedDistance.get(parent);
       parents.add(parent);

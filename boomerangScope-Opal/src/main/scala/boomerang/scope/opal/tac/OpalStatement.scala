@@ -131,11 +131,11 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         val base = delegate.asArrayStore.arrayRef
         val indexValue = delegate.asArrayStore.index
 
-        if (!indexValue.isVar) return new OpalArrayRef(base, -1, m)
-        //if (!indexValue.asVar.value.isPrimitiveValue) return new OpalArrayRef(base, -1, m)
+        if (indexValue.isIntConst) {
+          return new OpalArrayRef(base.asVar, indexValue.asIntConst.value, m)
+        }
 
-        //val index = indexValue.asVar.value.asPrimitiveValue.asConstantInteger.intValue()
-        return new OpalArrayRef(base, -1, m)
+        return new OpalArrayRef(base.asVar, -1, m)
       }
     }
 
@@ -157,11 +157,11 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
           val base = rightExpr.asArrayLoad.arrayRef
           val indexValue = rightExpr.asArrayLoad.index
 
-          if (!indexValue.isVar) return new OpalArrayRef(base, -1, m)
-          //if (!indexValue.asVar.value.isPrimitiveValue) return new OpalArrayRef(base, -1, m)
+          if (indexValue.isIntConst) {
+            return new OpalArrayRef(base.asVar, indexValue.asIntConst.value, m)
+          }
 
-          //val index = indexValue.asVar.value.asPrimitiveValue.asConstantInteger.intValue()
-          return new OpalArrayRef(base, -1, m)
+          return new OpalArrayRef(base.asVar, -1, m)
         }
 
         if (rightExpr.isVar) {
@@ -182,9 +182,13 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       }
 
       if (isArrayStore) {
-        // TODO Distinguish between constant and variable
         val arrayStore = delegate.asArrayStore
-        return new OpalLocal(arrayStore.arrayRef.asVar, m)
+
+        if (arrayStore.value.isVar) {
+          return new OpalLocal(arrayStore.value.asVar, m)
+        } else {
+          return new OpalVal(arrayStore.value, m)
+        }
       }
     }
 

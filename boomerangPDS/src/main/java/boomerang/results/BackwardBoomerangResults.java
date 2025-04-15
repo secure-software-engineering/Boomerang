@@ -26,7 +26,7 @@ import boomerang.util.AccessPath;
 import boomerang.util.DefaultValueMap;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -82,7 +82,7 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
 
   private void computeAllocations() {
     if (allocationSites != null) return;
-    final Set<ForwardQuery> results = Sets.newHashSet();
+    final Set<ForwardQuery> results = new LinkedHashSet<>();
     for (final Entry<ForwardQuery, ForwardBoomerangSolver<W>> fw : queryToSolvers.entrySet()) {
       for (INode<Node<Edge, Val>> node : fw.getValue().getFieldAutomaton().getInitialStates())
         fw.getValue()
@@ -117,7 +117,7 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
   }
 
   public Set<AccessPath> getAllAliases(Edge stmt) {
-    final Set<AccessPath> results = Sets.newHashSet();
+    final Set<AccessPath> results = new LinkedHashSet<>();
     for (final ForwardQuery fw : getAllocationSites().keySet()) {
       queryToSolvers
           .getOrCreate(fw)
@@ -147,7 +147,7 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
    * @return Set of types the backward analysis propagates
    */
   public Set<Type> getPropagationType() {
-    Set<Type> types = Sets.newHashSet();
+    Set<Type> types = new LinkedHashSet<>();
     for (Transition<Edge, INode<Val>> t : backwardSolver.getCallAutomaton().getTransitions()) {
       if (!t.getStart().fact().isStatic()) types.add(t.getStart().fact().getType());
     }
@@ -164,7 +164,7 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
    */
   @Deprecated
   public Set<Node<Edge, Val>> getDataFlowPath(ForwardQuery query) {
-    Set<Node<Edge, Val>> dataFlowPath = Sets.newHashSet();
+    Set<Node<Edge, Val>> dataFlowPath = new LinkedHashSet<>();
     WeightedPAutomaton<Edge, INode<Val>, W> callAut =
         queryToSolvers.getOrCreate(query).getCallAutomaton();
     for (Entry<Transition<Edge, INode<Val>>, W> e :

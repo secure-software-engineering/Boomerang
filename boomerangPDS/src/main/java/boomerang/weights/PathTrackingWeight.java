@@ -14,7 +14,6 @@ package boomerang.weights;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Val;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +33,7 @@ public class PathTrackingWeight extends Weight {
   /**
    * This set keeps track of all statement along all paths that use an alias from source to sink.
    */
-  private Set<LinkedHashSet<Node<Edge, Val>>> allPathWitness = Sets.newHashSet();
+  private Set<LinkedHashSet<Node<Edge, Val>>> allPathWitness = new LinkedHashSet<>();
 
   private String rep;
 
@@ -75,7 +74,7 @@ public class PathTrackingWeight extends Weight {
     Set<LinkedHashSet<Node<Edge, Val>>> newAllPathStatements = new LinkedHashSet<>();
     for (LinkedHashSet<Node<Edge, Val>> pathPrefix : allPathWitness) {
       for (LinkedHashSet<Node<Edge, Val>> pathSuffix : other.allPathWitness) {
-        LinkedHashSet<Node<Edge, Val>> combinedPath = Sets.newLinkedHashSet();
+        LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>();
         combinedPath.addAll(pathPrefix);
         combinedPath.addAll(pathSuffix);
         newAllPathStatements.add(combinedPath);
@@ -83,14 +82,14 @@ public class PathTrackingWeight extends Weight {
     }
     if (allPathWitness.isEmpty()) {
       for (LinkedHashSet<Node<Edge, Val>> pathSuffix : other.allPathWitness) {
-        LinkedHashSet<Node<Edge, Val>> combinedPath = Sets.newLinkedHashSet();
+        LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>();
         combinedPath.addAll(pathSuffix);
         newAllPathStatements.add(combinedPath);
       }
     }
     if (other.allPathWitness.isEmpty()) {
       for (LinkedHashSet<Node<Edge, Val>> pathSuffix : allPathWitness) {
-        LinkedHashSet<Node<Edge, Val>> combinedPath = Sets.newLinkedHashSet();
+        LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>();
         combinedPath.addAll(pathSuffix);
         newAllPathStatements.add(combinedPath);
       }
@@ -106,12 +105,12 @@ public class PathTrackingWeight extends Weight {
     PathTrackingWeight other = (PathTrackingWeight) o;
     Set<LinkedHashSet<Node<Edge, Val>>> newAllPathStatements = new LinkedHashSet<>();
     for (LinkedHashSet<Node<Edge, Val>> pathPrefix : allPathWitness) {
-      LinkedHashSet<Node<Edge, Val>> combinedPath = Sets.newLinkedHashSet();
+      LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>();
       combinedPath.addAll(pathPrefix);
       newAllPathStatements.add(combinedPath);
     }
     for (LinkedHashSet<Node<Edge, Val>> pathPrefix : other.allPathWitness) {
-      LinkedHashSet<Node<Edge, Val>> combinedPath = Sets.newLinkedHashSet();
+      LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>();
       combinedPath.addAll(pathPrefix);
       newAllPathStatements.add(combinedPath);
     }
@@ -161,6 +160,6 @@ public class PathTrackingWeight extends Weight {
   }
 
   public Set<LinkedHashSet<Node<Edge, Val>>> getAllPathWitness() {
-    return Sets.newHashSet(allPathWitness);
+    return new LinkedHashSet<>(allPathWitness);
   }
 }

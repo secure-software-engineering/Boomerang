@@ -22,7 +22,7 @@ import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ import wpds.interfaces.WPAUpdateListener;
 public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteImportFieldStmtPOI.class);
   private static final int MAX_IMPORT_DEPTH = -1;
-  private final Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
+  private final Set<INode<Node<Edge, Val>>> reachable = new LinkedHashSet<>();
   private final Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
       HashMultimap.create();
   protected final ForwardBoomerangSolver<W> baseSolver;

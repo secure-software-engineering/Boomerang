@@ -23,9 +23,9 @@ import boomerang.scope.Val;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
@@ -44,8 +44,8 @@ public class MultiQueryBoomerangTest extends TestingFramework {
 
   protected Collection<? extends Query> queryForCallSites;
   protected Multimap<Query, Query> expectedAllocsForQuery = HashMultimap.create();
-  protected Collection<Error> unsoundErrors = Sets.newHashSet();
-  protected Collection<Error> imprecisionErrors = Sets.newHashSet();
+  protected Collection<Error> unsoundErrors = new LinkedHashSet<>();
+  protected Collection<Error> imprecisionErrors = new LinkedHashSet<>();
 
   protected int analysisTimeout = 300 * 1000;
 

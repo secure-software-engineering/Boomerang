@@ -11,10 +11,10 @@
  */
 package boomerang.scope.soot;
 
-import com.google.common.collect.Sets;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -192,7 +192,7 @@ public class BoomerangPretransformer extends BodyTransformer {
       }
     }
     b.getUnits().insertBefore(nopStmt, b.getUnits().getFirst());
-    Set<IfStmt> ifStmts = Sets.newHashSet();
+    Set<IfStmt> ifStmts = new LinkedHashSet<>();
     for (Unit u : b.getUnits()) {
       if (u instanceof IfStmt) {
         // ((IfStmt) u).getTarget();
@@ -214,7 +214,7 @@ public class BoomerangPretransformer extends BodyTransformer {
   }
 
   private Set<Unit> getStmtsWithConstants(Body methodBody) {
-    Set<Unit> retMap = Sets.newHashSet();
+    Set<Unit> retMap = new LinkedHashSet<>();
     for (Unit u : methodBody.getUnits()) {
       if (u instanceof AssignStmt) {
         AssignStmt assignStmt = (AssignStmt) u;
@@ -263,7 +263,7 @@ public class BoomerangPretransformer extends BodyTransformer {
   private static void addNulliefiedFields(SootMethod cons) {
     Chain<SootField> fields = cons.getDeclaringClass().getFields();
     UnitPatchingChain units = cons.getActiveBody().getUnits();
-    Set<SootField> fieldsDefinedInMethod = getFieldsDefinedInMethod(cons, Sets.newHashSet());
+    Set<SootField> fieldsDefinedInMethod = getFieldsDefinedInMethod(cons, new LinkedHashSet<>());
     for (SootField f : fields) {
       if (fieldsDefinedInMethod.contains(f)) continue;
       if (f.isStatic()) continue;
@@ -297,7 +297,7 @@ public class BoomerangPretransformer extends BodyTransformer {
   }
 
   private static Set<SootField> getFieldsDefinedInMethod(SootMethod cons, Set<SootMethod> visited) {
-    Set<SootField> res = Sets.newHashSet();
+    Set<SootField> res = new LinkedHashSet<>();
     if (!visited.add(cons)) return res;
     if (!cons.hasActiveBody()) return res;
     for (Unit u : cons.getActiveBody().getUnits()) {

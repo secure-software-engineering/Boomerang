@@ -11,10 +11,10 @@
  */
 package boomerang.scope;
 
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public abstract class Method implements Location {
@@ -169,7 +169,7 @@ public abstract class Method implements Location {
 
   public Collection<Val> getReturnLocals() {
     if (returnLocals == null) {
-      returnLocals = Sets.newHashSet();
+      returnLocals = new LinkedHashSet<>();
       for (Statement s : getStatements()) {
         if (s.isReturnStmt()) {
           returnLocals.add(s.getReturnOp());

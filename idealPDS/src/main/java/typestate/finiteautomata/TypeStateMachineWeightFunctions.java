@@ -19,10 +19,10 @@ import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public abstract class TypeStateMachineWeightFunctions
 
   public TransitionFunction callToReturn(
       Node<Edge, Val> curr, Node<Edge, Val> succ, InvokeExpr invokeExpr) {
-    Set<Transition> res = Sets.newHashSet();
+    Set<Transition> res = new LinkedHashSet<>();
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(succ.fact())) {
         for (MatcherTransition trans : transition) {

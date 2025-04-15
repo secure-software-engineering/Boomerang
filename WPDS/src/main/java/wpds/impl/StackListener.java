@@ -11,8 +11,8 @@
  */
 package wpds.impl;
 
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
@@ -23,7 +23,7 @@ public abstract class StackListener<N extends Location, D extends State, W exten
   private final WeightedPAutomaton<N, D, W> aut;
 
   private final N source;
-  private final Set<N> notifiedStacks = Sets.newHashSet();
+  private final Set<N> notifiedStacks = new LinkedHashSet<>();
 
   public StackListener(WeightedPAutomaton<N, D, W> weightedPAutomaton, D state, N source) {
     super(state);

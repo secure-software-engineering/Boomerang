@@ -14,8 +14,8 @@ package boomerang.scope;
 import boomerang.Query;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -31,9 +31,9 @@ public abstract class AnalysisScope {
     this.cg = cg;
   }
 
-  private final Set<Query> seeds = Sets.newHashSet();
+  private final Set<Query> seeds = new LinkedHashSet<>();
 
-  private final Collection<Method> processed = Sets.newHashSet();
+  private final Collection<Method> processed = new LinkedHashSet<>();
   private int statementCount;
 
   public void setScanLibraryClasses(boolean enabled) {

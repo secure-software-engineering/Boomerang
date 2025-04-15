@@ -14,7 +14,6 @@ package boomerang.scope.wala;
 import boomerang.scope.CallGraph;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
@@ -23,6 +22,7 @@ import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +36,7 @@ public class WALACallGraph extends CallGraph {
   public WALACallGraph(com.ibm.wala.ipa.callgraph.CallGraph cg, IClassHierarchy cha) {
     this.cha = cha;
     Collection<CGNode> ep = cg.getEntrypointNodes();
-    Set<WALAMethod> visited = Sets.newHashSet();
+    Set<WALAMethod> visited = new LinkedHashSet<>();
     LinkedList<CGNode> worklist = Lists.newLinkedList();
     for (CGNode e : ep) {
       worklist.add(e);

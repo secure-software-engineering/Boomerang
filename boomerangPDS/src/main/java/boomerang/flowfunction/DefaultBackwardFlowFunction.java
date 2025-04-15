@@ -22,9 +22,9 @@ import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
@@ -46,7 +46,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
   @Override
   public Collection<Val> returnFlow(Method callee, Statement returnStmt, Val returnedVal) {
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     if (!callee.isStatic()) {
       if (callee.getThisLocal().equals(returnedVal)) {
         out.add(returnedVal);
@@ -69,7 +69,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
       throw new RuntimeException("Call site does not contain an invoke expression.");
     }
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(fact) && !callee.isStatic()) {
         out.add(callee.getThisLocal());
@@ -105,7 +105,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
     if (curr.isThrowStmt()) {
       return Collections.emptySet();
     }
-    Set<State> out = Sets.newHashSet();
+    Set<State> out = new LinkedHashSet<>();
 
     boolean leftSideMatches = false;
     if (curr.isAssignStmt()) {

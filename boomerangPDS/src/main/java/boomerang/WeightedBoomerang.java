@@ -54,11 +54,11 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -93,8 +93,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
       new HashMap<>();
   private long lastTick;
   private final IBoomerangStats<W> stats;
-  private final Set<Method> visitedMethods = Sets.newHashSet();
-  private final Set<SolverCreationListener<W>> solverCreationListeners = Sets.newHashSet();
+  private final Set<Method> visitedMethods = new LinkedHashSet<>();
+  private final Set<SolverCreationListener<W>> solverCreationListeners = new LinkedHashSet<>();
   private final Multimap<SolverPair, ExecuteImportFieldStmtPOI<W>> poiListeners =
       HashMultimap.create();
   private final Multimap<SolverPair, INode<Node<Edge, Val>>> activatedPoi = HashMultimap.create();
@@ -1484,8 +1484,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
     // LOGGER.debug("BackwardFieldRules " + backwardSolver.getFieldPDS().getAllRules().size());
     long forwardCallElaps = 0;
     long forwardFieldElaps = 0;
-    Set<Rule> allCallRules = Sets.newHashSet();
-    Set<Rule> allFieldRules = Sets.newHashSet();
+    Set<Rule> allCallRules = new LinkedHashSet<>();
+    Set<Rule> allFieldRules = new LinkedHashSet<>();
     for (ForwardBoomerangSolver<W> v : queryToSolvers.values()) {
       allCallRules.addAll(v.getCallPDS().getAllRules());
       allFieldRules.addAll(v.getFieldPDS().getAllRules());

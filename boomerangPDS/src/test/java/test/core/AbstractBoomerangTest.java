@@ -33,11 +33,11 @@ import boomerang.util.DefaultValueMap;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Assert;
@@ -81,8 +81,8 @@ public class AbstractBoomerangTest extends TestingFramework {
   private Collection<? extends Query> expectedAllocationSites;
   private Collection<? extends Node<Edge, Val>> explicitlyUnexpectedAllocationSites;
   protected Collection<? extends Query> queryForCallSites;
-  protected Collection<Error> unsoundErrors = Sets.newHashSet();
-  protected Collection<Error> imprecisionErrors = Sets.newHashSet();
+  protected Collection<Error> unsoundErrors = new LinkedHashSet<>();
+  protected Collection<Error> imprecisionErrors = new LinkedHashSet<>();
   private static Duration globalQueryTime = Duration.ofMillis(0);
 
   protected int analysisTimeout = 3000 * 1000;
@@ -153,7 +153,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void runWholeProgram(FrameworkScope frameworkScope) {
-    final Set<Node<Edge, Val>> results = Sets.newHashSet();
+    final Set<Node<Edge, Val>> results = new LinkedHashSet<>();
     BoomerangOptions options =
         BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();
     WholeProgramBoomerang<NoWeight> solver =
@@ -266,7 +266,7 @@ public class AbstractBoomerangTest extends TestingFramework {
 
   private Set<Node<Edge, Val>> runQuery(
       FrameworkScope frameworkScope, Collection<? extends Query> queries) {
-    final Set<Node<Edge, Val>> results = Sets.newHashSet();
+    final Set<Node<Edge, Val>> results = new LinkedHashSet<>();
 
     for (final Query query : queries) {
       BoomerangOptions options = createBoomerangOptions();
@@ -346,7 +346,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void checkContainsAllExpectedAccessPath(Set<AccessPath> allAliases) {
-    HashSet<AccessPath> expected = Sets.newHashSet(queryDetector.expectedAccessPaths);
+    HashSet<AccessPath> expected = new LinkedHashSet(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);

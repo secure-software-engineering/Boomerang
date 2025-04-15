@@ -11,7 +11,7 @@
  */
 package boomerang.scope.soot.jimple;
 
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import soot.RefType;
 import soot.Scene;
@@ -57,7 +57,7 @@ public class ExplicitNullifyFields {
   }
 
   private static Set<SootField> getFieldsDefinedInMethod(SootMethod cons) {
-    Set<SootField> res = Sets.newHashSet();
+    Set<SootField> res = new LinkedHashSet<>();
     for (Unit u : cons.getActiveBody().getUnits()) {
       if (u instanceof AssignStmt) {
         AssignStmt as = (AssignStmt) u;

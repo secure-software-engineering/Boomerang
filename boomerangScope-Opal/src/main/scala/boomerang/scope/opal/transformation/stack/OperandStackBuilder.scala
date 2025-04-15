@@ -117,9 +117,9 @@ object OperandStackBuilder {
 
             schedule(pcOfNextStatement(pc), stack)
           case ArrayStore(pc, arrayRef: IdBasedVar, index: IdBasedVar, value: IdBasedVar) =>
-            stack.pop(arrayRef)
-            stack.pop(index)
             stack.pop(value)
+            stack.pop(index)
+            stack.pop(arrayRef)
 
             schedule(pcOfNextStatement(pc), stack)
           case Throw(_, exception: IdBasedVar) =>

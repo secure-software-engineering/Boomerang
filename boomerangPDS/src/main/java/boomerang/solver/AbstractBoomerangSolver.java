@@ -32,10 +32,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -171,7 +171,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
         sourceNode,
         new WitnessListener<Edge, Val, Field>() {
           final Multimap<Val, Node<Edge, Val>> potentialFieldCandidate = HashMultimap.create();
-          final Set<Val> potentialCallCandidate = Sets.newHashSet();
+          final Set<Val> potentialCallCandidate = new LinkedHashSet<>();
 
           @Override
           public void fieldWitness(Transition<Field, INode<Node<Edge, Val>>> t) {
@@ -307,7 +307,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   }
 
   protected boolean isMatchingCallSiteCalleePair(Statement callSite, Method method) {
-    Set<Statement> callsitesOfCall = Sets.newHashSet();
+    Set<Statement> callsitesOfCall = new LinkedHashSet<>();
     icfg.addCallerListener(
         new CallerListener<Statement, Method>() {
           @Override

@@ -30,7 +30,7 @@ public class SootArrayTest {
     sootSetup.setupSoot(ArrayTarget.class.getName());
 
     MethodSignature signature =
-        new MethodSignature(ArrayTarget.class.getName(), "singleArrayStore");
+        new MethodSignature(ArrayTarget.class.getName(), "singleArrayStoreIndex");
     SootMethod method = sootSetup.resolveMethod(signature);
     Method jimpleMethod = JimpleMethod.of(method);
 

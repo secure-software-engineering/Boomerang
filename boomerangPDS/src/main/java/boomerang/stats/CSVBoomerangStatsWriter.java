@@ -28,7 +28,6 @@ import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.io.File;
 import java.io.FileWriter;
@@ -36,6 +35,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,26 +53,27 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
 
   private final Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
   private final Set<WeightedTransition<Field, INode<Node<Edge, Val>>, W>> globalFieldTransitions =
-      Sets.newHashSet();
+      new LinkedHashSet<>();
   private int fieldTransitionCollisions;
   private final Set<WeightedTransition<Edge, INode<Val>, W>> globalCallTransitions =
-      Sets.newHashSet();
+      new LinkedHashSet<>();
   private int callTransitionCollisions;
-  private final Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules = Sets.newHashSet();
+  private final Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules =
+      new LinkedHashSet<>();
   private int fieldRulesCollisions;
-  private final Set<Rule<Edge, INode<Val>, W>> globalCallRules = Sets.newHashSet();
+  private final Set<Rule<Edge, INode<Val>, W>> globalCallRules = new LinkedHashSet<>();
   private int callRulesCollisions;
-  private final Set<Node<Edge, Val>> reachedForwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedForwardNodes = new LinkedHashSet<>();
   private int reachedForwardNodeCollisions;
 
-  private final Set<Node<Edge, Val>> reachedBackwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedBackwardNodes = new LinkedHashSet<>();
   private int reachedBackwardNodeCollisions;
-  private final Set<Method> callVisitedMethods = Sets.newHashSet();
-  private final Set<Method> fieldVisitedMethods = Sets.newHashSet();
-  private final Set<Edge> callVisitedStmts = Sets.newHashSet();
-  private final Set<Edge> fieldVisitedStmts = Sets.newHashSet();
-  private final Set<INode<Node<Edge, Val>>> fieldGeneratedStates = Sets.newHashSet();
-  private final Set<INode<Val>> callGeneratedStates = Sets.newHashSet();
+  private final Set<Method> callVisitedMethods = new LinkedHashSet<>();
+  private final Set<Method> fieldVisitedMethods = new LinkedHashSet<>();
+  private final Set<Edge> callVisitedStmts = new LinkedHashSet<>();
+  private final Set<Edge> fieldVisitedStmts = new LinkedHashSet<>();
+  private final Set<INode<Node<Edge, Val>>> fieldGeneratedStates = new LinkedHashSet<>();
+  private final Set<INode<Val>> callGeneratedStates = new LinkedHashSet<>();
   private int arrayFlows;
   private int staticFlows;
   private int fieldWritePOIs;
@@ -276,7 +277,7 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
 
   @Override
   public Set<Method> getCallVisitedMethods() {
-    return Sets.newHashSet(callVisitedMethods);
+    return new LinkedHashSet(callVisitedMethods);
   }
 
   private String computeMetrics() {
@@ -334,7 +335,7 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
 
   @Override
   public Collection<? extends Node<Edge, Val>> getForwardReachesNodes() {
-    Set<Node<Edge, Val>> res = Sets.newHashSet();
+    Set<Node<Edge, Val>> res = new LinkedHashSet<>();
     for (Query q : queries.keySet()) {
       if (q instanceof ForwardQuery) res.addAll(queries.get(q).getReachedStates());
     }
