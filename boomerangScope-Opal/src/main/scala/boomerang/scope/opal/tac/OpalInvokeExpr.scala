@@ -31,7 +31,7 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[TacLocal], method: OpalMetho
     throw new RuntimeException("Method call is not an instance invoke expression")
   }
 
-  override def getMethod: DeclaredMethod = OpalDeclaredMethod(this, delegate)
+  override def getDeclaredMethod: DeclaredMethod = OpalDeclaredMethod(this, delegate)
 
   override def isSpecialInvokeExpr: Boolean = delegate.astID == NonVirtualMethodCall.ASTID
 
@@ -73,7 +73,7 @@ class OpalFunctionInvokeExpr(val delegate: FunctionCall[TacLocal], method: OpalM
     throw new RuntimeException("Function call is not an instance invoke expression")
   }
 
-  override def getMethod: DeclaredMethod = OpalDeclaredMethod(this, delegate)
+  override def getDeclaredMethod: DeclaredMethod = OpalDeclaredMethod(this, delegate)
 
   override def isSpecialInvokeExpr: Boolean = delegate.astID == NonVirtualFunctionCall.ASTID
 

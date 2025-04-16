@@ -20,6 +20,7 @@ import boomerang.results.BackwardBoomerangResults;
 import boomerang.scope.AnalysisScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
+import boomerang.utils.MethodWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -33,7 +34,6 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.Timeout;
 import test.TestingFramework;
-import boomerang.utils.MethodWrapper;
 import wpds.impl.Weight;
 
 public class MultiQueryBoomerangTest extends TestingFramework {

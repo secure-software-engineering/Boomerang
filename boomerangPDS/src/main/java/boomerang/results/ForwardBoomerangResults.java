@@ -205,7 +205,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     Map<Edge, DeclaredMethod> invokedMethodsOnInstance = Maps.newHashMap();
     if (query.cfgEdge().getStart().containsInvokeExpr()) {
       invokedMethodsOnInstance.put(
-          query.cfgEdge(), query.cfgEdge().getStart().getInvokeExpr().getMethod());
+          query.cfgEdge(), query.cfgEdge().getStart().getInvokeExpr().getDeclaredMethod());
     }
     queryToSolvers
         .get(query)
@@ -223,7 +223,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
                 if (curr.getInvokeExpr().isInstanceInvokeExpr()) {
                   Val base = curr.getInvokeExpr().getBase();
                   if (base.equals(fact)) {
-                    invokedMethodsOnInstance.put(currEdge, curr.getInvokeExpr().getMethod());
+                    invokedMethodsOnInstance.put(
+                        currEdge, curr.getInvokeExpr().getDeclaredMethod());
                   }
                 }
               }

@@ -11,12 +11,15 @@
  */
 package boomerang.guided;
 
+import boomerang.utils.MethodWrapper;
 import com.google.common.base.Objects;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,19 +36,19 @@ public class Specification {
     BACKWARD
   }
 
-  private final Set<MethodWithSelector> methodAndQueries;
+  private final Collection<MethodWithSelector> methodAndQueries;
 
   private Specification(Collection<String> spec) {
-    methodAndQueries = spec.stream().map(this::parse).collect(Collectors.toSet());
+    this.methodAndQueries = spec.stream().map(this::parse).collect(Collectors.toSet());
   }
 
   private MethodWithSelector parse(String input) {
-    Pattern arguments = Pattern.compile("\\((.*?)\\)");
-    Matcher argumentMatcher = arguments.matcher(input);
     Set<QuerySelector> on = new LinkedHashSet<>();
     Set<QuerySelector> go = new LinkedHashSet<>();
 
     // Handle arguments
+    Pattern arguments = Pattern.compile("\\((.*?)\\)");
+    Matcher argumentMatcher = arguments.matcher(input);
     if (argumentMatcher.find()) {
       String group = argumentMatcher.group(1);
       String[] args = group.split(",");
@@ -89,7 +92,63 @@ public class Specification {
       throw new RuntimeException("Parsing Specification failed. Please check your specification");
     }
 
-    return new MethodWithSelector(sootMethod, on, go);
+    // To avoid reworking the complete parsing process, we keep the soot signature and transform
+    // it into a general method descriptor
+    MethodWrapper methodWrapper = parseSootSignature(sootMethod);
+    return new MethodWithSelector(methodWrapper, on, go);
+  }
+
+  private MethodWrapper parseSootSignature(String signature) {
+    String declaringClass;
+    String returnType;
+    String name;
+    List<String> paramList;
+
+    Pattern pattern1 = Pattern.compile("<([^:]+):");
+    Matcher matcher1 = pattern1.matcher(signature);
+    if (matcher1.find()) {
+      declaringClass = matcher1.group(1).trim();
+    } else {
+      throw new IllegalArgumentException(
+          "Could not extract declaring class from signature: " + signature);
+    }
+
+    Pattern pattern2 = Pattern.compile(":\\s+([^\\s]+)\\s+[^\\s]+\\(");
+    Matcher matcher2 = pattern2.matcher(signature);
+    if (matcher2.find()) {
+      returnType = matcher2.group(1).trim();
+    } else {
+      throw new IllegalArgumentException(
+          "Could not extract return type from signature: " + signature);
+    }
+
+    Pattern pattern3 = Pattern.compile("\\s+([^\\s]+)\\(");
+    Matcher matcher3 = pattern3.matcher(signature);
+    if (matcher3.find()) {
+      name = matcher3.group(1).trim();
+    } else {
+      throw new IllegalArgumentException("Could not extract name from signature: " + signature);
+    }
+
+    Pattern pattern4 = Pattern.compile("\\(([^)]*)\\)");
+    Matcher matcher4 = pattern4.matcher(signature);
+    if (matcher4.find()) {
+      String params = matcher4.group(1).trim();
+
+      paramList = new ArrayList<>();
+      if (!params.isEmpty()) {
+        String[] paramArray = params.split(",");
+
+        for (String param : paramArray) {
+          paramList.add(param.trim());
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+          "Could not extract parameters from signature: " + signature);
+    }
+
+    return new MethodWrapper(declaringClass, name, returnType, paramList);
   }
 
   private void createQuerySelector(
@@ -107,16 +166,17 @@ public class Specification {
   }
 
   public static class MethodWithSelector {
-    MethodWithSelector(
-        String methodStr, Collection<QuerySelector> on, Collection<QuerySelector> go) {
-      this.methodStr = methodStr;
+
+    private final MethodWrapper method;
+    private final Collection<QuerySelector> on;
+    private final Collection<QuerySelector> go;
+
+    public MethodWithSelector(
+        MethodWrapper method, Collection<QuerySelector> on, Collection<QuerySelector> go) {
+      this.method = method;
       this.on = on;
       this.go = go;
     }
-
-    private final String methodStr;
-    private final Collection<QuerySelector> on;
-    private final Collection<QuerySelector> go;
 
     public Collection<QuerySelector> getOn() {
       return on;
@@ -126,8 +186,8 @@ public class Specification {
       return go;
     }
 
-    public String getMethodStr() {
-      return methodStr;
+    public MethodWrapper getMethod() {
+      return method;
     }
   }
 
@@ -193,7 +253,7 @@ public class Specification {
     return new Specification(Set.of(spec));
   }
 
-  public Set<MethodWithSelector> getMethodAndQueries() {
+  public Collection<MethodWithSelector> getMethodAndQueries() {
     return methodAndQueries;
   }
 }

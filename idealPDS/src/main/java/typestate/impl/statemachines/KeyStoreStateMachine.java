@@ -85,7 +85,7 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
   public Set<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
     Statement unit = edge.getStart();
     if (unit.isAssignStmt() && unit.containsInvokeExpr()) {
-      if (isKeyStoreConstructor(unit.getInvokeExpr().getMethod())) {
+      if (isKeyStoreConstructor(unit.getInvokeExpr().getDeclaredMethod())) {
         return Collections.singleton(
             new WeightedForwardQuery<>(
                 edge,

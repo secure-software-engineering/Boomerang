@@ -68,7 +68,7 @@ public class JimpleUpInvokeExpr implements InvokeExpr {
   }
 
   @Override
-  public DeclaredMethod getMethod() {
+  public DeclaredMethod getDeclaredMethod() {
     return new JimpleUpDeclaredMethod(this, delegate.getMethodSignature());
   }
 

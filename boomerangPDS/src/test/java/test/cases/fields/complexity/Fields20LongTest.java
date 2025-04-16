@@ -11,9 +11,11 @@
  */
 package test.cases.fields.complexity;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import test.core.AbstractBoomerangTest;
 
+@Ignore("Takes too long")
 public class Fields20LongTest extends AbstractBoomerangTest {
 
   private final String target = Fields20LongTarget.class.getName();

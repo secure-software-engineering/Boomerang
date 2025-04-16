@@ -77,7 +77,7 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
     if (unit.containsInvokeExpr() && unit.isAssignStmt()) {
       InvokeExpr invokeExpr = unit.getInvokeExpr();
       if (invokeExpr.isInstanceInvokeExpr()) {
-        if (invokeExpr.getMethod().getName().contains("iterator")) {
+        if (invokeExpr.getDeclaredMethod().getName().contains("iterator")) {
           return Collections.singleton(
               new WeightedForwardQuery<>(
                   edge,

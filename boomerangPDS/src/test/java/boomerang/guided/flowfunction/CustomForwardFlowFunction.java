@@ -54,7 +54,7 @@ public class CustomForwardFlowFunction extends DefaultForwardFlowFunction {
   }
 
   public boolean declaredMethodIsSystemExit(Statement callSite) {
-    DeclaredMethod method = callSite.getInvokeExpr().getMethod();
+    DeclaredMethod method = callSite.getInvokeExpr().getDeclaredMethod();
     return method.getDeclaringClass().getFullyQualifiedName().equals("java.lang.System")
         && method.getName().equals("exit");
   }

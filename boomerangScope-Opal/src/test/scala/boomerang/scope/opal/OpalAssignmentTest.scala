@@ -27,7 +27,7 @@ class OpalAssignmentTest {
           val leftOp = stmt.getLeftOp
           Assert.assertTrue(leftOp.isLocal)
 
-          Assert.assertTrue(rightOp.getArrayAllocationSize.isLocal)
+          Assert.assertTrue(rightOp.getArrayAllocationSize.isIntConstant)
           Assert.assertTrue(rightOp.getType.isArrayType)
         }
       }

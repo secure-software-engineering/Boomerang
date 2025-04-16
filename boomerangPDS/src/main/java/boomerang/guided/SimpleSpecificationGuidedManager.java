@@ -102,7 +102,10 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
       // lets notify us in such a case..
       throw new UnsupportedOperationException("possibly unspported case? investigate!");
     }
-    if (stmt.getInvokeExpr().getMethod().getSignature().equals(methodSelector.getMethodStr())) {
+    if (stmt.getInvokeExpr()
+        .getDeclaredMethod()
+        .toMethodWrapper()
+        .equals(methodSelector.getMethod())) {
       Collection<QuerySelector> on = methodSelector.getOn();
       return isInList(on, direction, stmt, fact);
     }

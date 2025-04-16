@@ -11,6 +11,7 @@
  */
 package boomerang.scope;
 
+import boomerang.utils.MethodWrapper;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +38,8 @@ public abstract class DeclaredMethod {
   public abstract Type getParameterType(int index);
 
   public abstract Type getReturnType();
+
+  public abstract MethodWrapper toMethodWrapper();
 
   public InvokeExpr getInvokeExpr() {
     return inv;

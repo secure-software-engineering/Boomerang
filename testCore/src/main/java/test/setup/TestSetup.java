@@ -11,10 +11,10 @@
  */
 package test.setup;
 
-import boomerang.utils.MethodWrapper;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
+import boomerang.utils.MethodWrapper;
 import java.util.List;
 
 public interface TestSetup {

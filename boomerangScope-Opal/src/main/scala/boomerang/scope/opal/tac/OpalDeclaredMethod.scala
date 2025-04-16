@@ -2,11 +2,12 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.{OpalClient, OpalFrameworkScope}
 import boomerang.scope.{DeclaredMethod, InvokeExpr, Type, WrappedClass}
+import boomerang.utils.MethodWrapper
 import org.opalj.br.MethodSignature
-import org.opalj.tac.{Call, DUVar, Var}
-import org.opalj.value.ValueInformation
+import org.opalj.tac.{Call, Var}
 
 import java.util
+import scala.jdk.CollectionConverters._
 
 case class OpalDeclaredMethod[+V <: Var[V]](invokeExpr: InvokeExpr, delegate: Call[V]) extends DeclaredMethod(invokeExpr) {
 
@@ -41,6 +42,12 @@ case class OpalDeclaredMethod[+V <: Var[V]](invokeExpr: InvokeExpr, delegate: Ca
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
   override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+
+  override def toMethodWrapper: MethodWrapper = new MethodWrapper(
+    delegate.declaringClass.toJava,
+    delegate.name,
+    delegate.descriptor.returnType.toJava,
+    delegate.descriptor.parameterTypes.map(p => p.toJava).toList.asJava)
 
   override def toString: String = delegate.descriptor.toJava
 }

@@ -45,6 +45,7 @@ import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.utils.MethodWrapper;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,6 @@ import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import boomerang.utils.MethodWrapper;
 import wpds.impl.Weight.NoWeight;
 
 public class DemandDrivenGuidedAnalysisTest {
@@ -438,9 +438,9 @@ public class DemandDrivenGuidedAnalysisTest {
             .filter(Statement::containsInvokeExpr)
             .filter(
                 x ->
-                    x.getInvokeExpr().getMethod().getName().equals("queryFor")
+                    x.getInvokeExpr().getDeclaredMethod().getName().equals("queryFor")
                         && x.getInvokeExpr()
-                            .getMethod()
+                            .getDeclaredMethod()
                             .getDeclaringClass()
                             .getFullyQualifiedName()
                             .equals("boomerang.guided.targets.Query"))
@@ -474,9 +474,9 @@ public class DemandDrivenGuidedAnalysisTest {
             .filter(Statement::containsInvokeExpr)
             .filter(
                 x ->
-                    x.getInvokeExpr().getMethod().getName().equals("<init>")
+                    x.getInvokeExpr().getDeclaredMethod().getName().equals("<init>")
                         && x.getInvokeExpr()
-                            .getMethod()
+                            .getDeclaredMethod()
                             .getDeclaringClass()
                             .getFullyQualifiedName()
                             .equals("java.io.File"))
@@ -501,7 +501,7 @@ public class DemandDrivenGuidedAnalysisTest {
     Optional<Statement> toStringCall =
         method.getStatements().stream()
             .filter(Statement::containsInvokeExpr)
-            .filter(x -> x.getInvokeExpr().getMethod().getName().equals("toString"))
+            .filter(x -> x.getInvokeExpr().getDeclaredMethod().getName().equals("toString"))
             .findFirst();
     if (toStringCall.isEmpty()) {
       Assert.fail("No call to toString() found in method " + method.getName());

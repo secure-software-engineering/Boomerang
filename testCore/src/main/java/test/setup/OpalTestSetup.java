@@ -11,12 +11,12 @@
  */
 package test.setup;
 
-import boomerang.utils.MethodWrapper;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.opal.OpalFrameworkScope;
 import boomerang.scope.opal.tac.OpalMethod;
+import boomerang.utils.MethodWrapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueFactory;
 import java.io.File;

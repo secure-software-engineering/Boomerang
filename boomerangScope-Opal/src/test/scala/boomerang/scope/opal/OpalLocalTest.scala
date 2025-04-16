@@ -25,7 +25,7 @@ class OpalLocalTest {
 
     var checked = false
     opalMethod.getStatements.forEach(stmt => {
-      if (stmt.containsInvokeExpr() && stmt.getInvokeExpr.getMethod.getName.equals("callWithThis")) {
+      if (stmt.containsInvokeExpr() && stmt.getInvokeExpr.getDeclaredMethod.getName.equals("callWithThis")) {
         val invokeExpr = stmt.getInvokeExpr
         val base = invokeExpr.getBase
 
@@ -109,7 +109,7 @@ class OpalLocalTest {
 
     var checked = false
     opalMethod.getStatements.forEach(stmt => {
-      if (stmt.containsInvokeExpr() && stmt.getInvokeExpr.getMethod.getName.equals("methodCall")) {
+      if (stmt.containsInvokeExpr() && stmt.getInvokeExpr.getDeclaredMethod.getName.equals("methodCall")) {
         val invokeExpr = stmt.getInvokeExpr
         val base = invokeExpr.getBase
         val arg = invokeExpr.getArg(0)
@@ -151,7 +151,7 @@ class OpalLocalTest {
 
     var checked2: Boolean = false
     jimpleMethod2.getStatements.forEach(stmt => {
-      if (stmt.containsInvokeExpr && stmt.getInvokeExpr.getMethod.getName == "methodCall") {
+      if (stmt.containsInvokeExpr && stmt.getInvokeExpr.getDeclaredMethod.getName == "methodCall") {
         val invokeExpr = stmt.getInvokeExpr
         val base = invokeExpr.getBase
         val arg = invokeExpr.getArg(0)

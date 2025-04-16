@@ -65,7 +65,7 @@ public class JimpleInvokeExpr implements InvokeExpr {
   }
 
   @Override
-  public DeclaredMethod getMethod() {
+  public DeclaredMethod getDeclaredMethod() {
     return new JimpleDeclaredMethod(this, delegate.getMethodRef());
   }
 

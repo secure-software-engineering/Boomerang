@@ -18,7 +18,7 @@ object OpalStatementFormatter {
         assign = s"${stmt.getLeftOp} = "
       }
 
-      return s"$assign$base${stmt.getInvokeExpr.getMethod.getName}(${Joiner.on(",").join(stmt.getInvokeExpr.getArgs)})"
+      return s"$assign$base${stmt.getInvokeExpr.getDeclaredMethod.getName}(${Joiner.on(",").join(stmt.getInvokeExpr.getArgs)})"
     }
 
     if (stmt.isAssignStmt) {

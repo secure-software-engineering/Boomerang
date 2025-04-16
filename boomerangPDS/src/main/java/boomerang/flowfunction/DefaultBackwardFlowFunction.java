@@ -174,7 +174,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
   @Override
   public Collection<State> callToReturnFlow(Edge edge, Val fact) {
-    if (FlowFunctionUtils.isSystemArrayCopy(edge.getTarget().getInvokeExpr().getMethod())) {
+    if (FlowFunctionUtils.isSystemArrayCopy(edge.getTarget().getInvokeExpr().getDeclaredMethod())) {
       return systemArrayCopyFlow(edge, fact);
     }
     return normalFlow(edge, fact);

@@ -138,7 +138,7 @@ public class SignatureStateMachine extends TypeStateMachineWeightFunctions {
   public Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
     Statement unit = edge.getStart();
     if (unit.containsInvokeExpr()) {
-      DeclaredMethod method = unit.getInvokeExpr().getMethod();
+      DeclaredMethod method = unit.getInvokeExpr().getDeclaredMethod();
       if (method.getName().equals("getInstance")
           && method.getSubSignature().contains("Signature")) {
         return getLeftSideOf(edge);

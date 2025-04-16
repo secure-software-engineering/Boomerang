@@ -11,13 +11,13 @@
  */
 package test.setup;
 
-import boomerang.utils.MethodWrapper;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.soot.BoomerangPretransformer;
 import boomerang.scope.soot.SootFrameworkScope;
 import boomerang.scope.soot.jimple.JimpleMethod;
+import boomerang.utils.MethodWrapper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

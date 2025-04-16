@@ -11,12 +11,12 @@
  */
 package test.setup;
 
-import boomerang.utils.MethodWrapper;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.sootup.BoomerangPreInterceptor;
 import boomerang.scope.sootup.SootUpFrameworkScope;
+import boomerang.utils.MethodWrapper;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Nonnull;
 import java.io.IOException;

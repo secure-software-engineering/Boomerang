@@ -57,7 +57,8 @@ class QueryForCallSiteDetector extends AnalysisScope {
     public Optional<? extends Query> test(Edge stmt) {
       if (!(stmt.getTarget().containsInvokeExpr())) return Optional.empty();
       InvokeExpr invokeExpr = stmt.getTarget().getInvokeExpr();
-      if (!invokeExpr.getMethod().getName().matches(methodNameMatcher)) return Optional.empty();
+      if (!invokeExpr.getDeclaredMethod().getName().matches(methodNameMatcher))
+        return Optional.empty();
       Val param = invokeExpr.getArg(0);
       if (!param.isLocal()) return Optional.empty();
       BackwardQuery newBackwardQuery = BackwardQuery.make(stmt, param);

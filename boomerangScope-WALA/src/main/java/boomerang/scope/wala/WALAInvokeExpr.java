@@ -57,7 +57,7 @@ public class WALAInvokeExpr implements InvokeExpr {
   }
 
   @Override
-  public DeclaredMethod getMethod() {
+  public DeclaredMethod getDeclaredMethod() {
     return new WALADeclaredMethod(this, inv.getCallSite().getDeclaredTarget());
   }
 

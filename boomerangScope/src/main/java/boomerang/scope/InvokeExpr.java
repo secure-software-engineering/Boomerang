@@ -23,7 +23,7 @@ public interface InvokeExpr {
 
   Val getBase();
 
-  DeclaredMethod getMethod();
+  DeclaredMethod getDeclaredMethod();
 
   boolean isSpecialInvokeExpr();
 

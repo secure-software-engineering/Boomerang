@@ -80,7 +80,7 @@ public abstract class TypeStateMachineWeightFunctions
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(succ.fact())) {
         for (MatcherTransition trans : transition) {
-          if (trans.matches(invokeExpr.getMethod())
+          if (trans.matches(invokeExpr.getDeclaredMethod())
               && (trans.getType().equals(Type.OnCallToReturn)
                   || trans.getType().equals(Type.OnCallOrOnCallToReturn))) {
             res.add(trans);
@@ -106,7 +106,7 @@ public abstract class TypeStateMachineWeightFunctions
     Set<ITransition> res = new HashSet<>();
     if (filteredTrans.isEmpty() || !transitionStmt.containsInvokeExpr()) return getOne();
     for (MatcherTransition trans : filteredTrans) {
-      if (trans.matches(transitionStmt.getInvokeExpr().getMethod())) {
+      if (trans.matches(transitionStmt.getInvokeExpr().getDeclaredMethod())) {
         LOGGER.trace(
             "Found potential transition at {}, now checking if parameter match", transitionStmt);
         Parameter param = trans.getParam();
@@ -170,7 +170,7 @@ public abstract class TypeStateMachineWeightFunctions
     if (unit.containsInvokeExpr()) {
       if (unit.getInvokeExpr().isInstanceInvokeExpr()) {
         Val base = unit.getInvokeExpr().getBase();
-        if (unit.getInvokeExpr().getMethod().getSignature().matches(declaredMethod)) {
+        if (unit.getInvokeExpr().getDeclaredMethod().getSignature().matches(declaredMethod)) {
           if (base.getType().isSubtypeOf(declaredType)) {
             return Collections.singleton(
                 new WeightedForwardQuery<>(

@@ -42,10 +42,20 @@ class OpalVal(val delegate: Expr[TacLocal], method: OpalMethod, unbalanced: Cont
 
   override def isArrayAllocationVal: Boolean = delegate.isNewArray
 
-  // TODO Deal with multiple arrays
   override def getArrayAllocationSize: Val = {
     if (isArrayAllocationVal) {
-      return new OpalLocal(delegate.asNewArray.counts.head.asVar, method)
+      val counts = delegate.asNewArray.counts
+
+      /* TODO
+       *  For now, the scope just returns the size of the first dimension.
+       *  In the future, we may change it to returning a list of values
+       */
+      val firstIndex = counts.last
+      if (firstIndex.isVar) {
+        return new OpalLocal(firstIndex.asVar, method)
+      } else {
+        return new OpalVal(firstIndex, method)
+      }
     }
 
     throw new RuntimeException("Value is not an array allocation expression")

@@ -114,7 +114,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
 
   protected void callFlow(Method caller, Node<Edge, Val> curr, Statement callSite) {
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
-    if (dataFlowScope.isExcluded(invokeExpr.getMethod())) {
+    if (dataFlowScope.isExcluded(invokeExpr.getDeclaredMethod())) {
       byPassFlowAtCallsite(caller, curr);
       return;
     }

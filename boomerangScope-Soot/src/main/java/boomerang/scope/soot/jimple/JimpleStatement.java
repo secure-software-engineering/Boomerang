@@ -246,7 +246,7 @@ public class JimpleStatement extends Statement {
       InvokeExpr invokeExpr = getInvokeExpr();
       if (invokeExpr.isStaticInvokeExpr()) {
         return (isAssignStmt() ? getLeftOp() + " = " : "")
-            + invokeExpr.getMethod()
+            + invokeExpr.getDeclaredMethod()
             + "("
             + invokeExpr.getArgs().toString().replace("[", "").replace("]", "")
             + ")";
@@ -255,7 +255,7 @@ public class JimpleStatement extends Statement {
         return (isAssignStmt() ? getLeftOp() + " = " : "")
             + invokeExpr.getBase()
             + "."
-            + invokeExpr.getMethod()
+            + invokeExpr.getDeclaredMethod()
             + "("
             + invokeExpr.getArgs().toString().replace("[", "").replace("]", "")
             + ")";

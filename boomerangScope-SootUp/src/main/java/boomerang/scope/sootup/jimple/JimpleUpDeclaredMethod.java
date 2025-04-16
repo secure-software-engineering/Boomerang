@@ -15,6 +15,7 @@ import boomerang.scope.DeclaredMethod;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
+import boomerang.utils.MethodWrapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,6 +80,18 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
   @Override
   public Type getReturnType() {
     return new JimpleUpType(delegate.getType());
+  }
+
+  @Override
+  public MethodWrapper toMethodWrapper() {
+    List<String> paramTypes =
+        delegate.getParameterTypes().stream().map(Object::toString).collect(Collectors.toList());
+
+    return new MethodWrapper(
+        delegate.getDeclClassType().getFullyQualifiedName(),
+        delegate.getName(),
+        delegate.getType().toString(),
+        paramTypes);
   }
 
   @Override

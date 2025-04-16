@@ -29,6 +29,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.solver.Strategies;
+import boomerang.utils.MethodWrapper;
 import ideal.IDEALAnalysis;
 import ideal.IDEALAnalysisDefinition;
 import ideal.IDEALResultHandler;
@@ -43,7 +44,6 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
-import boomerang.utils.MethodWrapper;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
@@ -175,14 +175,14 @@ public abstract class IDEALTestingFramework extends TestingFramework {
       }
 
       InvokeExpr invokeExpr = stmt.getInvokeExpr();
-      DeclaredMethod declaredMethod = invokeExpr.getMethod();
+      DeclaredMethod declaredMethod = invokeExpr.getDeclaredMethod();
 
       String assertionsName = Assertions.class.getName();
       if (!declaredMethod.getDeclaringClass().getFullyQualifiedName().equals(assertionsName)) {
         continue;
       }
 
-      String invocationName = invokeExpr.getMethod().getName();
+      String invocationName = invokeExpr.getDeclaredMethod().getName();
 
       if (invocationName.equals("shouldNotBeAnalyzed")) {
         queries.add(new ShouldNotBeAnalyzed(stmt));

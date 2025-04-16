@@ -15,6 +15,7 @@ import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
+import boomerang.utils.MethodWrapper;
 import com.ibm.wala.types.MethodReference;
 import java.util.List;
 
@@ -64,6 +65,11 @@ public class WALADeclaredMethod extends DeclaredMethod {
 
   @Override
   public Type getReturnType() {
+    throw new UnsupportedOperationException("Not implemented yet");
+  }
+
+  @Override
+  public MethodWrapper toMethodWrapper() {
     throw new UnsupportedOperationException("Not implemented yet");
   }
 

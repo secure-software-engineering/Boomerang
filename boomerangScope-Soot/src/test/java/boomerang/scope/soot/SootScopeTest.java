@@ -41,7 +41,7 @@ public class SootScopeTest {
     boolean checked = false;
     for (Statement stmt : jimpleMethod.getStatements()) {
       if (stmt.containsInvokeExpr()
-          && stmt.getInvokeExpr().getMethod().getName().equals("callWithThis")) {
+          && stmt.getInvokeExpr().getDeclaredMethod().getName().equals("callWithThis")) {
         InvokeExpr invokeExpr = stmt.getInvokeExpr();
         Val base = invokeExpr.getBase();
 
@@ -114,7 +114,7 @@ public class SootScopeTest {
     boolean checked = false;
     for (Statement stmt : jimpleMethod.getStatements()) {
       if (stmt.containsInvokeExpr()
-          && stmt.getInvokeExpr().getMethod().getName().equals("methodCall")) {
+          && stmt.getInvokeExpr().getDeclaredMethod().getName().equals("methodCall")) {
         InvokeExpr invokeExpr = stmt.getInvokeExpr();
         Val base = invokeExpr.getBase();
         Val arg = invokeExpr.getArg(0);

@@ -24,6 +24,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.utils.MethodWrapper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import boomerang.utils.MethodWrapper;
 import wpds.impl.Weight.NoWeight;
 
 /**
@@ -106,7 +106,7 @@ public class Issue5Test {
     Collection<MethodWrapper> methodCalledOnFoo = new HashSet<>();
     for (Statement s : statements) {
       System.out.println("\t" + s);
-      DeclaredMethod calledMethod = s.getInvokeExpr().getMethod();
+      DeclaredMethod calledMethod = s.getInvokeExpr().getDeclaredMethod();
       System.out.println("\t\t" + calledMethod);
       MethodWrapper methodWrapper =
           new MethodWrapper(

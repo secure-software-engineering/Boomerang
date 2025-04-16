@@ -431,7 +431,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Edge callSiteEdge,
       InvokeExpr invokeExpr) {
     assert icfg.isCallStmt(callSiteEdge.getStart());
-    if (dataFlowScope.isExcluded(invokeExpr.getMethod())) {
+    if (dataFlowScope.isExcluded(invokeExpr.getDeclaredMethod())) {
       byPassFlowAtCallSite(caller, currNode, callSiteEdge.getStart());
       return;
     }

@@ -39,7 +39,7 @@ public class IntAndStringAllocationSite extends DefaultAllocationSite {
 
     // BigInteger.valueOf(x) -> allocation site is x
     if (statement.containsInvokeExpr()) {
-      DeclaredMethod declaredMethod = statement.getInvokeExpr().getMethod();
+      DeclaredMethod declaredMethod = statement.getInvokeExpr().getDeclaredMethod();
 
       if (declaredMethod
           .toString()

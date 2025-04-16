@@ -14,14 +14,14 @@ package test;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
+import boomerang.utils.MethodWrapper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
-import boomerang.utils.MethodWrapper;
-import test.setup.OpalTestSetup;
+import test.setup.SootTestSetup;
 import test.setup.TestSetup;
 
 public class TestingFramework {
@@ -30,7 +30,7 @@ public class TestingFramework {
 
   public TestingFramework() {
     // TODO Parameterize
-    this.testSetup = new OpalTestSetup();
+    this.testSetup = new SootTestSetup();
   }
 
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {

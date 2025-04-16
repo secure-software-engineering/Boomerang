@@ -15,9 +15,11 @@ import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
+import boomerang.utils.MethodWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import soot.SootMethodRef;
 
 public class JimpleDeclaredMethod extends DeclaredMethod {
@@ -72,6 +74,18 @@ public class JimpleDeclaredMethod extends DeclaredMethod {
   @Override
   public Type getReturnType() {
     return new JimpleType(delegate.getReturnType());
+  }
+
+  @Override
+  public MethodWrapper toMethodWrapper() {
+    List<String> paramTypes =
+        delegate.getParameterTypes().stream().map(soot.Type::toString).collect(Collectors.toList());
+
+    return new MethodWrapper(
+        delegate.getDeclaringClass().getName(),
+        delegate.getName(),
+        delegate.getReturnType().toString(),
+        paramTypes);
   }
 
   public SootMethodRef getDelegate() {
