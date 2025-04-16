@@ -16,6 +16,7 @@ import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
+import java.util.Objects;
 import sootup.core.typehierarchy.TypeHierarchy;
 import sootup.core.types.ArrayType;
 import sootup.core.types.NullType;
@@ -160,5 +161,27 @@ public class JimpleUpType implements Type {
 
   public sootup.core.types.Type getDelegate() {
     return delegate;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    } else if (o != null && this.getClass() == o.getClass()) {
+      JimpleUpType that = (JimpleUpType) o;
+      return Objects.equals(this.delegate, that.delegate);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(delegate);
+  }
+
+  @Override
+  public String toString() {
+    return this.delegate.toString();
   }
 }
