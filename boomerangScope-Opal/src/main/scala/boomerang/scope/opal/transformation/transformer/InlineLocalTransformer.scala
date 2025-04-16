@@ -1,37 +1,46 @@
 package boomerang.scope.opal.transformation.transformer
 
+import boomerang.scope.opal.transformation.stack.OperandStackHandler
 import boomerang.scope.opal.transformation.{RegisterLocal, StackLocal, TacLocal}
-import org.opalj.br.cfg.CFG
 import org.opalj.tac._
 
 import scala.collection.mutable
 
 object InlineLocalTransformer {
 
-  def apply(code: Array[Stmt[TacLocal]], cfg: CFG[Stmt[IdBasedVar], TACStmts[IdBasedVar]]): Array[Stmt[TacLocal]] = {
+  def apply(code: Array[Stmt[TacLocal]], stackHandler: OperandStackHandler): Array[Stmt[TacLocal]] = {
     val statements = code.map(identity)
 
-    val bbs = cfg.allBBs
-    bbs.withFilter(bb => bb.startPC < bb.endPC).foreach(bb => {
       val localCache = mutable.Map.empty[TacLocal, Expr[TacLocal]]
       val localDefSites = mutable.Map.empty[TacLocal, (Int, Int)]
 
-      var index = bb.startPC
-      while (index <= bb.endPC) {
-        code(index) match {
-          case Assignment(pc, targetVar: StackLocal, c @ (_: SimpleValueConst | _: FunctionCall[TacLocal] | _: GetField[TacLocal] | _: GetStatic)) =>
-            localCache.put(targetVar, c)
-            localDefSites.put(targetVar, (index, pc))
+      val max = code.length - 1
+      Range(0, max).foreach(i => {
+        statements(i) match {
+          // Collect all expressions that may replace stack to register assignments
+          case Assignment(pc, targetVar: StackLocal, c @ (_: SimpleValueConst)) =>
+            if (!stackHandler.isBranchedOperand(pc, targetVar.id)) {
+              if (localCache.contains(targetVar)) {
+                throw new RuntimeException("Did not discover branched operand")
+              }
+
+              localCache.put(targetVar, c)
+              localDefSites.put(targetVar, (i, pc))
+            }
+          // Replace stack to register expressions if possible:
+          // r = $s becomes r = <expr> from previous assignment $s = <expr>
           case Assignment(pc, targetVar: RegisterLocal, rightVar: StackLocal) =>
             /*if (localCache.contains(rightVar)) {
               val localExpr = localCache(rightVar)
-              statements(index) = Assignment(pc, targetVar, localExpr)
+              statements(i) = Assignment(pc, targetVar, localExpr)
 
               val localDefSite = localDefSites.getOrElse(rightVar, throw new RuntimeException("Def sites not consistent"))
               statements(localDefSite._1) = Nop(localDefSite._2)
             }*/
+          // Array related assignments
           case Assignment(pc, targetVar: StackLocal, expr) =>
             expr match {
+              // Replace the counts in new array creation with concrete integers if available
               case NewArray(arrPc, counts, arrayType) =>
                 var countDefSites = List.empty[(Int, Int)]
 
@@ -52,14 +61,15 @@ object InlineLocalTransformer {
                   }
                 })
 
-                statements(index) = Assignment(pc, targetVar, NewArray(arrPc, newCounts, arrayType))
+                statements(i) = Assignment(pc, targetVar, NewArray(arrPc, newCounts, arrayType))
                 countDefSites.foreach(defSite => statements(defSite._1) = Nop(defSite._2))
+              // Replace the index expression with the concrete integer value if available
               case ArrayLoad(arrPc, arrayIndex: StackLocal, arrayRef) =>
                 if (localCache.contains(arrayIndex)) {
                   val localExpr = localCache(arrayIndex)
 
                   if (localExpr.isIntConst) {
-                    statements(index) = Assignment(pc, targetVar, ArrayLoad(arrPc, localExpr, arrayRef))
+                    statements(i) = Assignment(pc, targetVar, ArrayLoad(arrPc, localExpr, arrayRef))
 
                     val localDefSite = localDefSites.getOrElse(arrayIndex, throw new RuntimeException("Def sites not consistent"))
                     statements(localDefSite._1) = Nop(localDefSite._2)
@@ -73,7 +83,7 @@ object InlineLocalTransformer {
 
               if (localExpr.isIntConst) {
                 // TODO Also inline value if it is a simple constant
-                statements(index) = ArrayStore(pc, arrayRef, localExpr, value)
+                statements(i) = ArrayStore(pc, arrayRef, localExpr, value)
 
                 val localDefSite = localDefSites.getOrElse(arrayIndex, throw new RuntimeException("Def sites not consistent"))
                 statements(localDefSite._1) = Nop(localDefSite._2)
@@ -81,12 +91,8 @@ object InlineLocalTransformer {
             }
           case _ =>
         }
-
-        index += 1
-      }
     })
 
-    val max = code.length - 1
     Range(0, max).foreach(i => {
       statements(i) match {
 
@@ -108,35 +114,6 @@ object InlineLocalTransformer {
       }
     })
 
-    /*Range(0, max).foreach(i => {
-      statements(i) match {
-        case ArrayStore(pc, arrayRef, index, value) =>
-          val allocSiteIndex = findArrayIndexAllocSite(i, index)
-          val allocSiteStmt = statements(i)
-
-          //statements(allocSiteIndex) = Nop(allocSiteStmt.pc)
-          //statements(i) = ArrayStore(pc, arrayRef, allocSiteStmt.asAssignment)
-        case _ =>
-      }
-    })
-
-    def findArrayIndexAllocSite(index: Int, expr: Expr[TacLocal]): Int = {
-      Range(index, 0, -1).foreach(i => {
-        val currStmt = statements(i)
-
-        if (currStmt.isAssignment) {
-          val assignStmt = currStmt.asAssignment
-
-          if (assignStmt.targetVar == expr && assignStmt.expr.isIntConst) {
-            return i
-          }
-        }
-      })
-
-      -1
-    }*/
-
     statements
   }
-
 }

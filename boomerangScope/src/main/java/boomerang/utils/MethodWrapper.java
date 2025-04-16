@@ -9,7 +9,7 @@
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test.setup;
+package boomerang.utils;
 
 import java.util.Collections;
 import java.util.List;

@@ -54,7 +54,7 @@ import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
+import boomerang.utils.MethodWrapper;
 import wpds.impl.Weight.NoWeight;
 
 public class DemandDrivenGuidedAnalysisTest {

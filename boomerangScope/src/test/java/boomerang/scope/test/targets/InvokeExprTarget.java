@@ -16,6 +16,7 @@ public class InvokeExprTarget {
   public static void main(String[] args) {
     constructorCall();
     instanceInvokeExpr();
+    staticInvokeExpr();
     alias();
   }
 
@@ -28,6 +29,11 @@ public class InvokeExprTarget {
     A a = new A();
 
     a.methodCall(i);
+  }
+
+  public static void staticInvokeExpr() {
+    int i = 20;
+    A.staticMethodCall(10, i);
   }
 
   public static void alias() {

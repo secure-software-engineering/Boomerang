@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
+import boomerang.utils.MethodWrapper;
 import wpds.impl.Weight.NoWeight;
 
 /**

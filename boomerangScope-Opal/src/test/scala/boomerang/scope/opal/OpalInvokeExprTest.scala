@@ -6,7 +6,7 @@ import boomerang.scope.opal.transformation.TacBodyBuilder
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.{ConstructorTarget, InvokeExprTarget, SingleTarget}
 import com.typesafe.config.{Config, ConfigValueFactory}
-import org.junit.Test
+import org.junit.{Assert, Test}
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.cg.InitialEntryPointsKey
 import org.opalj.tac.cg.{CHACallGraphKey, CallGraph}
@@ -47,6 +47,30 @@ class OpalInvokeExprTest {
     val scope = new OpalFrameworkScope(project, callGraph, CollectionConverters.asScala(util.Set.of(method)).toSet, DataFlowScope.EXCLUDE_PHANTOM_CLASSES)
 
     println(opalMethod.tac.statements.mkString("Array(\n\t", "\n\t", "\n)"))
+  }
+
+  @Test
+  def staticInvokeExprTest(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[InvokeExprTarget].getName)
+
+    val signature = new MethodSignature(classOf[InvokeExprTarget].getName, "staticInvokeExpr", "V")
+    val method = opalSetup.resolveMethod(signature)
+    val opalMethod = OpalMethod(method)
+
+    var checked = false
+    opalMethod.getStatements.forEach(stmt => {
+      if (stmt.containsInvokeExpr()) {
+        val invokeExpr = stmt.getInvokeExpr
+
+        Assert.assertTrue(invokeExpr.isStaticInvokeExpr)
+        Assert.assertEquals(2, invokeExpr.getArgs.size())
+
+        checked = true
+      }
+    })
+
+    Assert.assertTrue(checked)
   }
 
 }

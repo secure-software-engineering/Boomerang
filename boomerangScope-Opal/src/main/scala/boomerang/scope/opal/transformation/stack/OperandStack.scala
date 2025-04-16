@@ -20,11 +20,12 @@ class OperandStack private(stackHandler: OperandStackHandler, private var stack:
       throw new IllegalStateException(s"Cannot pop operand $idBasedVar from empty stack")
     }
 
-    val top :: rest = stack
-    stack = rest
-
     // Check if stack is in consistent state
+    val top :: rest = stack
     assert(idBasedVar.id == top.id, s"Invalid pop operation on operand $idBasedVar")
+
+    // Update stack
+    stack = rest
   }
 
   def pop: Operand = {

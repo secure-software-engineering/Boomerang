@@ -18,13 +18,11 @@ object TacBodyBuilder {
     val localTransformedTac = LocalTransformer(method, tacNaive, stackHandler, domain)
     assert(tacNaive.stmts.length == localTransformedTac.length, "Wrong transformation")
 
-    val inlinedTac = InlineLocalTransformer(localTransformedTac, tacNaive.cfg)
+    val inlinedTac = InlineLocalTransformer(localTransformedTac, stackHandler)
     assert(tacNaive.stmts.length == inlinedTac.length, "Wrong transformation")
 
     val propagatedTac = LocalPropagationTransformer(inlinedTac, stackHandler)
     assert(tacNaive.stmts.length == propagatedTac.length, "Wrong transformation")
-
-    // TODO Local propagation
 
     // Update the CFG
     val cfg = CFGFactory(method, project.classHierarchy)

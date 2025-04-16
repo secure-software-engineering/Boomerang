@@ -53,19 +53,18 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     }
 
     if (isArrayStore) {
-      // TODO
-      val arrayStore = delegate.asArrayStore
+      return Field.array(getArrayBase.getY)
     }
 
     throw new RuntimeException("Statement is not a field store operation")
   }
 
   override def isFieldWriteWithBase(base: Val): Boolean = {
-    if (delegate.isAssignment && isFieldStore) {
+    if (isAssignStmt && isFieldStore) {
       return getFieldStore.getX.equals(base)
     }
 
-    if (delegate.isAssignment && isArrayStore) {
+    if (isAssignStmt && isArrayStore) {
       return getArrayBase.getX.equals(base)
     }
 

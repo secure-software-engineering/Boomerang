@@ -11,6 +11,7 @@
  */
 package test.setup;
 
+import boomerang.utils.MethodWrapper;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;

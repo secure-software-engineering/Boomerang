@@ -53,7 +53,7 @@ import sync.pds.solver.nodes.SingleNode;
 import test.TestingFramework;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
-import test.setup.MethodWrapper;
+import boomerang.utils.MethodWrapper;
 import wpds.impl.Transition;
 import wpds.impl.Weight.NoWeight;
 import wpds.impl.WeightedPAutomaton;

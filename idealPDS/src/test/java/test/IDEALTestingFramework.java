@@ -43,7 +43,7 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
-import test.setup.MethodWrapper;
+import boomerang.utils.MethodWrapper;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 

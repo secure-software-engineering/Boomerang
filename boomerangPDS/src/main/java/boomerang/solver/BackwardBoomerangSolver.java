@@ -109,7 +109,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
       Method method, Statement callerReturnStatement, Val value) {
     return flowFunction.returnFlow(method, callerReturnStatement, value).stream()
         .map(x -> new PopNode<>(x, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   protected void callFlow(Method caller, Node<Edge, Val> curr, Statement callSite) {
@@ -129,11 +129,8 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
             .getControlFlowGraph()
             .getPredsOf(curr.stmt().getStart())) {
 
-      Set<State> res =
-          flowFunction
-              .callToReturnFlow(new Edge(returnSite, curr.stmt().getStart()), curr.fact())
-              .stream()
-              .collect(Collectors.toSet());
+      Collection<State> res =
+          flowFunction.callToReturnFlow(new Edge(returnSite, curr.stmt().getStart()), curr.fact());
       for (State s : res) {
         propagate(curr, s);
       }
@@ -233,7 +230,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     Statement calleeSp = calleeStartEdge.getTarget();
     return flowFunction.callFlow(callSiteEdge.getTarget(), fact, callee, calleeSp).stream()
         .map(x -> new PushNode<>(calleeStartEdge, x, callSiteEdge, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   @Override
@@ -250,7 +247,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
 
   @Override
   protected Collection<State> computeNormalFlow(Method method, Edge currEdge, Val fact) {
-    return flowFunction.normalFlow(currEdge, fact).stream().collect(Collectors.toSet());
+    return flowFunction.normalFlow(currEdge, fact);
   }
 
   @Override

@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
-import test.setup.MethodWrapper;
+import boomerang.utils.MethodWrapper;
 import test.setup.OpalTestSetup;
 import test.setup.TestSetup;
 

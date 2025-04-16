@@ -14,4 +14,7 @@ package boomerang.scope.test.targets;
 public class A {
 
   public void methodCall(@SuppressWarnings("unused") int i) {}
+
+  public static void staticMethodCall(
+      @SuppressWarnings("unused") int i1, @SuppressWarnings("unused") int i2) {}
 }

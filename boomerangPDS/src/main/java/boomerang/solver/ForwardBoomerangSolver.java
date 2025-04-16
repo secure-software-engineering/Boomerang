@@ -375,7 +375,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
     Val fact = currNode.fact();
     return flowFunctions.callFlow(callSite, fact, callee).stream()
         .map(x -> new PushNode<>(calleeStartEdge, x, succOfCallSite, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public Query getQuery() {
@@ -462,7 +462,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
   public Collection<? extends State> computeReturnFlow(Method method, Statement curr, Val value) {
     return flowFunctions.returnFlow(method, curr, value).stream()
         .map(x -> new PopNode<>(x, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   @Override

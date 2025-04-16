@@ -36,7 +36,7 @@ public class Specification {
   private final Set<MethodWithSelector> methodAndQueries;
 
   private Specification(Collection<String> spec) {
-    methodAndQueries = spec.stream().map(x -> parse(x)).collect(Collectors.toSet());
+    methodAndQueries = spec.stream().map(this::parse).collect(Collectors.toSet());
   }
 
   private MethodWithSelector parse(String input) {

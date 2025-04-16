@@ -135,21 +135,21 @@ object OperandStackBuilder {
 
             schedule(pcOfNextStatement(pc), stack)
           case NonVirtualMethodCall(pc, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) =>
-            params.foreach(p => stack.pop(p.asVar))
+            params.reverse.foreach(p => stack.pop(p.asVar))
             stack.pop(receiver)
 
             schedule(pcOfNextStatement(pc), stack)
           case VirtualMethodCall(pc, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) =>
-            params.foreach(p => stack.pop(p.asVar))
+            params.reverse.foreach(p => stack.pop(p.asVar))
             stack.pop(receiver)
 
             schedule(pcOfNextStatement(pc), stack)
           case StaticMethodCall(pc, _, _, _, _, params: Seq[IdBasedVar]) =>
-            params.foreach(p => stack.pop(p.asVar))
+            params.reverse.foreach(p => stack.pop(p.asVar))
 
             schedule(pcOfNextStatement(pc), stack)
           case InvokedynamicMethodCall(pc, _, _, _, params: Seq[IdBasedVar]) =>
-            params.foreach(p => stack.pop(p.asVar))
+            params.reverse.foreach(p => stack.pop(p.asVar))
 
             schedule(pcOfNextStatement(pc), stack)
           case ExprStmt(pc, expr) =>
@@ -182,7 +182,7 @@ object OperandStackBuilder {
           case ClassConst(_, _) => List()
           case DynamicConst(_, _, _, _) => List()
           case NullExpr(_) => List()
-          case BinaryExpr(_, _, _, left, right) => processExpr(left) ++ processExpr(right)
+          case BinaryExpr(_, _, _, left, right) => processExpr(right) ++ processExpr(left)
           case PrefixExpr(_, _, _, operand: IdBasedVar) => List(operand)
           case PrimitiveTypecastExpr(_, _, operand: IdBasedVar) => List(operand)
           case New(_, _) => List()
@@ -191,10 +191,10 @@ object OperandStackBuilder {
           case ArrayLength(_, arrayRef: IdBasedVar) => List(arrayRef)
           case GetField(_, _, _, _, objRef: IdBasedVar) => List(objRef)
           case GetStatic(_, _, _, _) => List()
-          case InvokedynamicFunctionCall(_, _, _, _, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList
-          case NonVirtualFunctionCall(_, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList :+ receiver
-          case VirtualFunctionCall(_, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList :+ receiver
-          case StaticFunctionCall(_, _, _, _, _, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList
+          case InvokedynamicFunctionCall(_, _, _, _, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList.reverse
+          case NonVirtualFunctionCall(_, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList.reverse :+ receiver
+          case VirtualFunctionCall(_, _, _, _, _, receiver: IdBasedVar, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList.reverse :+ receiver
+          case StaticFunctionCall(_, _, _, _, _, params: Seq[IdBasedVar]) => params.map(p => p.asVar).toList.reverse
           case _ => throw new RuntimeException("Unknown expression: " + expr)
         }
       }

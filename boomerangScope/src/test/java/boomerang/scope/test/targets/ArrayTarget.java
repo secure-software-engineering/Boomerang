@@ -54,8 +54,8 @@ public class ArrayTarget {
   }
 
   public static void multiArrayStore() {
-    int[][] arr = new int[2][3];
-    arr[0][0] = 1;
+    A[][] arr = new A[2][3];
+    arr[0][1] = new A();
 
     System.out.println(Arrays.deepToString(arr));
   }

@@ -33,7 +33,7 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.Timeout;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
+import boomerang.utils.MethodWrapper;
 import wpds.impl.Weight;
 
 public class MultiQueryBoomerangTest extends TestingFramework {
