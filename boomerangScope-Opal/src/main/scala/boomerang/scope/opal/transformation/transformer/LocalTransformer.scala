@@ -34,7 +34,7 @@ object LocalTransformer {
         case Switch(pc, defaultTarget, index, nPairs) =>
           val indexExpr = transformExpr(pc, index)
 
-          return Switch(pc,defaultTarget, indexExpr, nPairs)
+          return Switch(pc, defaultTarget, indexExpr, nPairs)
         case Assignment(pc, targetVar, expr) =>
           // Parameter definition statements
           if (pc == -1) {

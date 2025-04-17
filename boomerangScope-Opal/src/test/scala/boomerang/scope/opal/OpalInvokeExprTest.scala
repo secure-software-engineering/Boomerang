@@ -4,7 +4,7 @@ import boomerang.scope.DataFlowScope
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.opal.transformation.TacBodyBuilder
 import boomerang.scope.test.MethodSignature
-import boomerang.scope.test.targets.{ConstructorTarget, InvokeExprTarget, SingleTarget}
+import boomerang.scope.test.targets.{BranchingTarget, ConstructorTarget, InvokeExprTarget, SingleTarget}
 import com.typesafe.config.{Config, ConfigValueFactory}
 import org.junit.{Assert, Test}
 import org.opalj.br.analyses.Project
@@ -20,9 +20,9 @@ class OpalInvokeExprTest {
   @Test
   def instanceInvokeExprTest(): Unit = {
     val opalSetup = new OpalSetup()
-    opalSetup.setupOpal(classOf[SingleTarget].getName)
+    opalSetup.setupOpal(classOf[BranchingTarget].getName)
 
-    val signature = new MethodSignature(classOf[SingleTarget].getName, "branch", "V")
+    val signature = new MethodSignature(classOf[BranchingTarget].getName, "switchBranching", "V")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
     opalMethod.getControlFlowGraph

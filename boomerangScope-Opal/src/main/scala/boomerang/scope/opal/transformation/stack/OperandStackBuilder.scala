@@ -1,9 +1,9 @@
 package boomerang.scope.opal.transformation.stack
 
-import org.opalj.br.{Method, NoPCs}
+import org.opalj.br.Method
 import org.opalj.br.instructions.{DUP, DUP2, DUP2_X1, DUP2_X2, DUP_X1, DUP_X2, NOP, POP, POP2, WIDE}
 import org.opalj.bytecode.PC
-import org.opalj.tac.{ArrayLength, ArrayLoad, ArrayStore, Assignment, BinaryExpr, CaughtException, Checkcast, ClassConst, Compare, Const, DoubleConst, DynamicConst, Expr, ExprStmt, FloatConst, GetField, GetStatic, Goto, IdBasedVar, If, InstanceOf, IntConst, InvokedynamicFunctionCall, InvokedynamicMethodCall, JSR, LongConst, MethodHandleConst, MethodTypeConst, MonitorEnter, MonitorExit, NaiveTACode, New, NewArray, NonVirtualFunctionCall, NonVirtualMethodCall, Nop, NullExpr, Param, PrefixExpr, PrimitiveTypecastExpr, PutField, PutStatic, Ret, Return, ReturnValue, StaticFunctionCall, StaticMethodCall, Stmt, StringConst, Switch, Throw, VirtualFunctionCall, VirtualMethodCall}
+import org.opalj.tac._
 
 object OperandStackBuilder {
 
@@ -60,10 +60,15 @@ object OperandStackBuilder {
           case Switch(_, defaultTarget, index: IdBasedVar, nPairs) =>
             stack.pop(index)
 
-            // TODO branch targets
-            schedule(defaultTarget, stack)
+            nPairs.foreach(target => {
+              val targetStmt = tacNaive.stmts(target.value)
+              schedule(targetStmt.pc, stack)
+            })
+
+            val defaultTargetStmt = tacNaive.stmts(defaultTarget)
+            schedule(defaultTargetStmt.pc, stack)
           case Assignment(pc, targetVar: IdBasedVar, expr: Expr[IdBasedVar]) =>
-            // Exception handlers are defined implicitly, so cannot pop them from the stack
+            // Exception handlers are defined implicitly, so we cannot pop them from the stack
             if (!exceptionHandlersPc.contains(pc)) {
               val operands = processExpr(expr)
               operands.foreach(op => stack.pop(op))
