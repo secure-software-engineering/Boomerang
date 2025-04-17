@@ -20,12 +20,24 @@ import boomerang.utils.MethodWrapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueFactory;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opalj.br.BooleanType$;
 import org.opalj.br.ByteType$;
 import org.opalj.br.CharType$;
@@ -67,7 +79,14 @@ public class OpalTestSetup implements TestSetup {
       List<String> excludedPackages) {
     OPALLogger.updateLogger(GlobalLogContext$.MODULE$, DevNullLogger$.MODULE$);
 
-    project = Project.apply(new File(classPath));
+    File[] classpathFiles = loadClassPathFiles(classPath, excludedPackages);
+    File[] includeFiles = loadJDKFiles(includedPackages);
+    File[] classFiles =
+        Stream.concat(Arrays.stream(classpathFiles), Arrays.stream(includeFiles))
+            .toArray(File[]::new);
+    project = Project.apply(classFiles, new File[0]); // , package$.MODULE$.RTJar());
+    scala.collection.Iterable<ClassFile> files =
+        project.allClassFiles(); // .filter(c -> c.thisType().fqn().contains("java.util"));
 
     // Load the class that contains the test method
     Option<ClassFile> testClass =
@@ -136,7 +155,6 @@ public class OpalTestSetup implements TestSetup {
 
   @Override
   public FrameworkScope createFrameworkScope(DataFlowScope dataFlowScope) {
-    // TODO Shrink to application and included classes only
     CallGraph callGraph = project.get(CHACallGraphKey$.MODULE$);
 
     return new OpalFrameworkScope(
@@ -144,6 +162,55 @@ public class OpalTestSetup implements TestSetup {
         callGraph,
         CollectionConverters.asScala(Set.of(testMethod)).toSet(),
         dataFlowScope);
+  }
+
+  private File[] loadClassPathFiles(String classpath, List<String> excludeList) {
+    Path path = Path.of(classpath);
+
+    try (Stream<Path> stream = Files.walk(path)) {
+      Stream<File> classPathFiles = stream.filter(Files::isRegularFile).map(Path::toFile);
+
+      // Filter for excluded classes
+      return classPathFiles
+          .filter(c -> !isExcludedFile(c, classpath, excludeList))
+          .toArray(File[]::new);
+    } catch (IOException e) {
+      throw new RuntimeException("Could not read classpath: " + e.getMessage());
+    }
+  }
+
+  private boolean isExcludedFile(File file, String classpath, List<String> excludeList) {
+    // Remove the classpath and the .class ending
+    String path = file.getPath().replace("/", ".").replace("\\", ".");
+    String formattedClassPath = classpath.replace("/", ".").replace("\\", ".");
+    String formattedPath = path.replace(formattedClassPath, "").replace(".class", "").substring(1);
+
+    return excludeList.contains(formattedPath);
+  }
+
+  private File[] loadJDKFiles(List<String> includeList) {
+    Collection<File> result = new ArrayList<>();
+
+    try (FileSystem fs =
+        FileSystems.newFileSystem(URI.create("jrt:/"), java.util.Collections.emptyMap())) {
+      for (String className : includeList) {
+        String pathInJrt = "/modules/java.base/" + className.replace('.', '/') + ".class";
+        Path jrtPath = fs.getPath(pathInJrt);
+
+        // Copy to a temp file
+        Path tempFile = Files.createTempFile(className.replace('.', '_'), ".class");
+        try (InputStream in = Files.newInputStream(jrtPath);
+            OutputStream out = Files.newOutputStream(tempFile)) {
+          in.transferTo(out);
+        }
+
+        result.add(tempFile.toFile());
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Could not read classes from JDK: " + e.getMessage());
+    }
+
+    return result.toArray(new File[0]);
   }
 
   private String convertType(String type) {
@@ -156,7 +223,7 @@ public class OpalTestSetup implements TestSetup {
     if (type.equals("long")) return LongType$.MODULE$.toJVMTypeName();
     if (type.equals("short")) return ShortType$.MODULE$.toJVMTypeName();
     if (type.equals("boolean")) return BooleanType$.MODULE$.toJVMTypeName();
-    // TODO Consider all array types (not just ref types
+    // TODO Consider all array types (not just ref types)
     if (type.endsWith("[]")) {
       return new StringBuilder(type.replace(".", "/").replace("[]", ""))
           .insert(0, "[L")

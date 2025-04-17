@@ -175,7 +175,8 @@ object LocalTransformer {
           }
 
           if (v.id >= 0) {
-            val counter = stackHandler.counterForOperand(pc, v.id)
+            val stmt = tac.stmts(tac.pcToIndex(pc))
+            val counter = stackHandler.counterForOperand(pc, v.id, stmt.isReturnValue)
 
             return currentLocals(counter)
           }

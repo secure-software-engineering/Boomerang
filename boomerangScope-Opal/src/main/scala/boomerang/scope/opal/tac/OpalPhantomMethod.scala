@@ -2,29 +2,29 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.opal.OpalFrameworkScope
 import boomerang.scope.{ControlFlowGraph, Method, Statement, Type, Val, WrappedClass}
-import org.opalj.br.{MethodSignature, VirtualDeclaredMethod}
+import org.opalj.br.{MethodDescriptor, MethodSignature, ObjectType, VirtualDeclaredMethod}
 
 import java.util
 
-case class OpalPhantomMethod(delegate: VirtualDeclaredMethod, static: Boolean) extends Method {
+case class OpalPhantomMethod(declaringClassType: ObjectType, name: String, descriptor: MethodDescriptor, static: Boolean) extends Method {
 
-  override def isStaticInitializer: Boolean = delegate.name == OpalFrameworkScope.STATIC_INITIALIZER
+  override def isStaticInitializer: Boolean = name == OpalFrameworkScope.STATIC_INITIALIZER
 
   override def isParameterLocal(value: Val): Boolean = false
 
   override def getParameterTypes: util.List[Type] = {
     val result = new util.ArrayList[Type]()
 
-    delegate.descriptor.parameterTypes.foreach(paramType => {
+    descriptor.parameterTypes.foreach(paramType => {
       result.add(OpalType(paramType))
     })
 
     result
   }
 
-  override def getParameterType(index: Int): Type = OpalType(delegate.descriptor.parameterType(index))
+  override def getParameterType(index: Int): Type = OpalType(descriptor.parameterType(index))
 
-  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+  override def getReturnType: Type = OpalType(descriptor.returnType)
 
   override def isThisLocal(value: Val): Boolean = false
 
@@ -43,15 +43,15 @@ case class OpalPhantomMethod(delegate: VirtualDeclaredMethod, static: Boolean) e
   override def getStatements: util.List[Statement] = throw new RuntimeException("Statements of phantom method are not available")
 
   // TODO
-  override def getDeclaringClass: WrappedClass = OpalPhantomWrappedClass(delegate.declaringClassType)
+  override def getDeclaringClass: WrappedClass = OpalPhantomWrappedClass(declaringClassType)
 
   override def getControlFlowGraph: ControlFlowGraph = throw new RuntimeException("CFG of phantom method is not available")
 
-  override def getSubSignature: String = MethodSignature(delegate.name, delegate.descriptor).toJava
+  override def getSubSignature: String = MethodSignature(name, descriptor).toJava
 
-  override def getName: String = delegate.name
+  override def getName: String = name
 
-  override def isConstructor: Boolean = delegate.name == OpalFrameworkScope.CONSTRUCTOR
+  override def isConstructor: Boolean = name == OpalFrameworkScope.CONSTRUCTOR
 
-  override def toString: String = "PHANTOM: " + delegate.toJava
+  override def toString: String = s"PHANTOM: ${descriptor.toJava}"
 }

@@ -11,6 +11,10 @@ import org.opalj.tac.{Stmt, TACNaive, TACStmts}
 object TacBodyBuilder {
 
   def apply(project: Project[_], method: Method): BoomerangTACode = {
+    if (method.body.isEmpty) {
+      throw new IllegalArgumentException("Cannot compute TAC for method without existing body: " + method)
+    }
+
     val tacNaive = TACNaive(method, project.classHierarchy)
     val stackHandler = OperandStackBuilder(method, tacNaive)
 

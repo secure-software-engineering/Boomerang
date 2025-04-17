@@ -81,7 +81,8 @@ object OperandStackBuilder {
 
             schedule(pcOfNextStatement(pc), stack)
           case ReturnValue(_, expr: IdBasedVar) =>
-            stack.pop(expr)
+            // TODO Bug in Opal: Return instructions return always s0 and not the top operand
+            // stack.pop(expr)
           // No scheduling since there is no next statement
           case Return(_) => // No scheduling since there is no next statement
           case Nop(pc) =>

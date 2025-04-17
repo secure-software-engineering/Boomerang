@@ -42,6 +42,8 @@ class OperandStackHandler {
             existingOp.updateCounter(existingOp.localId)
             incomingOp.updateCounter(existingOp.localId)
 
+            // TODO Merge types
+
             modified = true
           }
         })
@@ -58,9 +60,12 @@ class OperandStackHandler {
 
   def defSiteAtPc(pc: PC): Int = defSites.getOrElse(pc, throw new RuntimeException(s"No operand definition at PC $pc")).localId
 
-  def counterForOperand(pc: PC, id: Int): Int = {
+  def counterForOperand(pc: PC, id: Int, isReturn: Boolean = false): Int = {
     val stack = pcToStack.getOrElse(pc, throw new RuntimeException(s"Stack for PC $pc not available"))
     stack.stackEntries.foreach(op => if (op.id == id) return op.localId)
+
+    // TODO Bug in Opal: Return always has id 0, even if it may have another id
+    if (isReturn) return stack.stackEntries.head.localId
 
     throw new RuntimeException(s"Could not find operand with id $id on stack")
   }
@@ -69,11 +74,6 @@ class OperandStackHandler {
     val defSite = defSites.getOrElse(pc, throw new RuntimeException(s"No def site found at pc $pc"))
 
     defSite.isBranchedOperand
-    //val stack = pcToStack.getOrElse(pc, throw new RuntimeException(s"Stack for PC $pc not available"))
-    //stack.stackEntries.foreach(op => if (op.id == id) return op.isBranchedOperand)
-
-
-    //throw new RuntimeException(s"Could not find operand with id $id on stack")
   }
 
 }

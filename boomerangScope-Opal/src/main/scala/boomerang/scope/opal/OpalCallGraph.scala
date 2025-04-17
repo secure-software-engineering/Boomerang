@@ -11,7 +11,10 @@ class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Meth
 
   callGraph.reachableMethods().foreach(method => {
     method.method match {
-      case definedMethod: DefinedMethod => addEdgesFromMethod(definedMethod)
+      case definedMethod: DefinedMethod =>
+        if (definedMethod.definedMethod.body.isDefined) {
+          addEdgesFromMethod(definedMethod)
+        }
       // TODO Should this case be considered?
       // case definedMethods: MultipleDefinedMethods =>
       //   definedMethods.foreachDefinedMethod(m => addEdgesFromMethod(m))
@@ -33,11 +36,19 @@ class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Meth
         callees.foreach(callee => {
           callee.method match {
             case definedMethod: DefinedMethod =>
-              val targetMethod = OpalMethod(definedMethod.definedMethod)
+              val method = definedMethod.definedMethod
 
-              addEdge(new Edge(srcStatement, targetMethod))
+              if (method.body.isDefined) {
+                val targetMethod = OpalMethod(method)
+
+                addEdge(new Edge(srcStatement, targetMethod))
+              } else {
+                val targetMethod = OpalPhantomMethod(definedMethod.declaringClassType, definedMethod.name, definedMethod.descriptor, method.isStatic)
+
+                addEdge(new Edge(srcStatement, targetMethod))
+              }
             case virtualMethod: VirtualDeclaredMethod =>
-              val targetMethod = OpalPhantomMethod(virtualMethod, srcStatement.getInvokeExpr.isStaticInvokeExpr)
+              val targetMethod = OpalPhantomMethod(virtualMethod.declaringClassType, virtualMethod.name, virtualMethod.descriptor, srcStatement.getInvokeExpr.isStaticInvokeExpr)
 
               addEdge(new Edge(srcStatement, targetMethod))
             case definedMethods: MultipleDefinedMethods =>

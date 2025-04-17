@@ -18,6 +18,7 @@ import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
+@SuppressWarnings("unused")
 public class LinkedListsLongTarget {
 
   @TestMethod
