@@ -52,15 +52,10 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
 
     val graph = method.tac.cfg
 
-    val head = new OpalStatement(Nop(-1), method)
-    startPointCache.add(head)
-    statements.add(head)
-
     graph.heads.foreach(stmt => {
       val headStmt = new OpalStatement(stmt, method)
 
-      predsOfCache.put(headStmt, head)
-      succsOfCache.put(head, headStmt)
+      startPointCache.add(headStmt)
     })
 
     graph.tails.foreach(stmt => {

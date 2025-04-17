@@ -2,9 +2,7 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope._
 import boomerang.scope.opal.transformation.TacLocal
-import com.google.common.base.Joiner
-import org.opalj.tac.{DUVar, IdBasedVar, PrimitiveTypecastExpr, Stmt, Var}
-import org.opalj.value.ValueInformation
+import org.opalj.tac.{PrimitiveTypecastExpr, Stmt}
 
 import java.util
 import java.util.Objects
@@ -43,13 +41,13 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     if (isFieldStore) {
       val fieldStore = delegate.asPutField
 
-      return OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
+      return new OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
     }
 
     if (isStaticFieldStore) {
       val fieldStore = delegate.asPutStatic
 
-      return OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
+      return new OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
     }
 
     if (isArrayStore) {
@@ -76,7 +74,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     if (isFieldLoad) {
       val fieldLoad = delegate.asAssignment.expr.asGetField
 
-      return OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
+      return new OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
     }
 
     throw new RuntimeException("Statement is not a field load operation")
@@ -261,7 +259,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       val fieldStore = delegate.asPutField
 
       val local = new OpalLocal(fieldStore.objRef.asVar, m)
-      val field = OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
+      val field = new OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
 
       return new Pair(local, field)
     }
@@ -274,7 +272,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       val fieldLoad = delegate.asAssignment.expr.asGetField
 
       val local = new OpalLocal(fieldLoad.objRef.asVar, m)
-      val field = OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
+      val field = new OpalField(fieldLoad.declaringClass, fieldLoad.declaredFieldType, fieldLoad.name)
 
       return new Pair(local, field)
     }
@@ -290,14 +288,14 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     if (isStaticFieldLoad) {
       val staticFieldLoad = delegate.asAssignment.expr.asGetStatic
 
-      val staticField = OpalField(staticFieldLoad.declaringClass, staticFieldLoad.declaredFieldType, staticFieldLoad.name)
+      val staticField = new OpalField(staticFieldLoad.declaringClass, staticFieldLoad.declaredFieldType, staticFieldLoad.name)
       return new OpalStaticFieldVal(staticField, m)
     }
 
     if (isStaticFieldStore) {
       val staticFieldStore = delegate.asPutStatic
 
-      val staticField = OpalField(staticFieldStore.declaringClass, staticFieldStore.declaredFieldType, staticFieldStore.name)
+      val staticField = new OpalField(staticFieldStore.declaringClass, staticFieldStore.declaredFieldType, staticFieldStore.name)
       return new OpalStaticFieldVal(staticField, m)
     }
 
