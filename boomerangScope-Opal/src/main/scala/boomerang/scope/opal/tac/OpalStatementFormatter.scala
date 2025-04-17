@@ -27,7 +27,7 @@ object OpalStatementFormatter {
       }
 
       if (stmt.isFieldStore) {
-        return s"${stmt.getLeftOp} = ${stmt.getFieldStore.getX}.${stmt.getFieldStore.getY}"
+        return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
       }
 
       if (stmt.isArrayStore) {
@@ -39,6 +39,10 @@ object OpalStatementFormatter {
     if (delegate.isAssignment) {
       if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isParameterLocal) {
         return s"${delegate.asAssignment.targetVar} := @${delegate.asAssignment.expr}: ${stmt.getMethod}"
+      }
+
+      if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isExceptionLocal) {
+        return s"${delegate.asAssignment.targetVar} := @caughtException: ${delegate.asAssignment.expr}"
       }
     }
 
@@ -55,7 +59,7 @@ object OpalStatementFormatter {
     }
 
     if (stmt.isReturnStmt) {
-      return s"${delegate.pc}: return ${stmt.getReturnOp}"
+      return s"return ${stmt.getReturnOp}"
     }
 
     delegate.toString

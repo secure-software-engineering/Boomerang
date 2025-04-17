@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
@@ -108,15 +107,8 @@ public class Issue5Test {
       System.out.println("\t" + s);
       DeclaredMethod calledMethod = s.getInvokeExpr().getDeclaredMethod();
       System.out.println("\t\t" + calledMethod);
-      MethodWrapper methodWrapper =
-          new MethodWrapper(
-              calledMethod.getDeclaringClass().getFullyQualifiedName(),
-              calledMethod.getName(),
-              calledMethod.getReturnType().toString(),
-              calledMethod.getParameterTypes().stream()
-                  .map(Object::toString)
-                  .collect(Collectors.toList()));
-      methodCalledOnFoo.add(methodWrapper);
+
+      methodCalledOnFoo.add(calledMethod.toMethodWrapper());
     }
 
     Assert.assertEquals(Set.of(expectedCalledMethodsOnFoo), methodCalledOnFoo);

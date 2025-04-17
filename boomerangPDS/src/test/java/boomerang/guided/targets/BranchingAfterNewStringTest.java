@@ -20,7 +20,6 @@ public class BranchingAfterNewStringTest {
     String y = new String("foo");
     String bar = doPassArgument(Math.random() > 0 ? x : y);
     new File(bar);
-    ;
   }
 
   public static String doPassArgument(String param) {

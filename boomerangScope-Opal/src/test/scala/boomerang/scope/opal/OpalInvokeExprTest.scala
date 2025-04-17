@@ -22,7 +22,7 @@ class OpalInvokeExprTest {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[SingleTarget].getName)
 
-    val signature = new MethodSignature(classOf[SingleTarget].getName, "branching", "I")
+    val signature = new MethodSignature(classOf[SingleTarget].getName, "branch", "V")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
     opalMethod.getControlFlowGraph

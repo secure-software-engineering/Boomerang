@@ -5,8 +5,7 @@ import org.opalj.tac.{If, Nop}
 
 object NopTransformer {
 
-  // TODO Make it more general
-  final val INITIAL_NOP = -10
+  private final val INITIAL_NOP = Integer.MIN_VALUE
 
   def apply(stmtGraph: StmtGraph): StmtGraph = {
     val tac = stmtGraph.tac

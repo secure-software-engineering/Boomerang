@@ -45,7 +45,7 @@ class StmtGraph private (val tac: Array[Stmt[TacLocal]], val heads: Set[Stmt[Tac
   }
 
   def remove(stmt: Stmt[TacLocal]): StmtGraph = {
-    if (stmt.astID == Return.ASTID) throw new RuntimeException("Cannot remove return statement")
+    if (tails.contains(stmt)) throw new RuntimeException("Cannot remove tail statement")
 
     val tempPreds = mutable.Map.from(predecessors)
     val tempSuccs = mutable.Map.from(successors)
@@ -54,27 +54,32 @@ class StmtGraph private (val tac: Array[Stmt[TacLocal]], val heads: Set[Stmt[Tac
     val succs = successors(stmt)
     preds.foreach(pred => {
       val succsOfPred = successors(pred)
-      tempSuccs.put(pred, succsOfPred ++ succs)
+
+      assert(succsOfPred.contains(stmt), "Inconsistent state in graph")
+      tempSuccs.put(pred, succsOfPred ++ succs - stmt)
     })
 
     succs.foreach(succ => {
       val predsOfSuccs = predecessors(succ)
-      tempPreds.put(succ, predsOfSuccs ++ preds)
+
+      assert(predsOfSuccs.contains(stmt), "Inconsistent state in graph")
+      tempPreds.put(succ, predsOfSuccs ++ preds - stmt)
     })
 
     var newHeads = heads.map(identity)
     if (heads.contains(stmt)) {
       newHeads = newHeads - stmt
-
-      if (newHeads.isEmpty) {
-        newHeads = succs
-      }
+      newHeads = newHeads ++ succs
     }
 
     val newStatements = statements.filter(s => s != stmt)
     val newPreds = tempPreds.filter(s => s._1 != stmt).toMap
     val newSuccs = tempSuccs.filter(s => s._1 != stmt).toMap
 
+    assert(!newHeads.contains(stmt))
+    assert(!newStatements.contains(stmt))
+    assert(!newPreds.contains(stmt))
+    assert(!newSuccs.contains(stmt))
     new StmtGraph(tac, newHeads, tails, newPreds, newSuccs, newStatements)
   }
 }

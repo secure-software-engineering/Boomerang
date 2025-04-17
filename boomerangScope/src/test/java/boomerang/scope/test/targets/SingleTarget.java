@@ -11,6 +11,8 @@
  */
 package boomerang.scope.test.targets;
 
+import java.io.File;
+
 public class SingleTarget {
 
   public static void main(String[] args) {
@@ -21,6 +23,7 @@ public class SingleTarget {
     usage();
     whileLoop();
     tryCatch();
+    branch();
 
     SingleTarget target = new SingleTarget();
     target.block();
@@ -94,5 +97,16 @@ public class SingleTarget {
 
       System.out.println(a);
     }
+  }
+
+  public static void branch() {
+    String x = new String("bar");
+    String y = new String("foo");
+    String bar = doPassArgument(Math.random() > 0 ? x : y);
+    new File(bar);
+  }
+
+  public static String doPassArgument(String s) {
+    return s;
   }
 }

@@ -36,7 +36,10 @@ class OperandStackHandler {
       var modified = false
       existingStack.stackEntries.foreach(existingOp => {
         incomingStack.stackEntries.foreach(incomingOp => {
-          if (existingOp.id == incomingOp.id && existingOp.localId != incomingOp.localId) {
+          if (existingOp.id == incomingOp.id) {
+            // Update the counter of the incoming operand s.t. both operands describe
+            // the same local and mark both operands as branched
+            existingOp.updateCounter(existingOp.localId)
             incomingOp.updateCounter(existingOp.localId)
 
             modified = true
