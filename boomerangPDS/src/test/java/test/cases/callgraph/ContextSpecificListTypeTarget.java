@@ -40,7 +40,7 @@ public class ContextSpecificListTypeTarget {
     QueryMethods.queryFor(query);
   }
 
-  private static class WrongList extends LinkedList<Object> {
+  public static class WrongList extends LinkedList<Object> {
     @Override
     public boolean add(Object e) {
       unreachable();

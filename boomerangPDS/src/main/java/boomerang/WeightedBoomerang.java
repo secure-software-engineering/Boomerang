@@ -49,6 +49,7 @@ import boomerang.solver.Strategies;
 import boomerang.stats.IBoomerangStats;
 import boomerang.stats.SimpleBoomerangStats;
 import boomerang.util.DefaultValueMap;
+import boomerang.utils.MethodWrapper;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
@@ -59,6 +60,7 @@ import com.google.common.collect.Table.Cell;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -231,22 +233,28 @@ public abstract class WeightedBoomerang<W extends Weight> {
         && stmt.getMethod().getControlFlowGraph().getStartPoints().contains(stmt);
   }
 
-  private static final String MAP_PUT_SUB_SIGNATURE = "java.util.Map: java.lang.Object put(";
-  private static final String MAP_GET_SUB_SIGNATURE = "java.util.Map: java.lang.Object get(";
+  private static final MethodWrapper MAP_PUT_SIGNATURE =
+      new MethodWrapper(
+          "java.util.Map",
+          "put",
+          "java.lang.Object",
+          List.of("java.lang.Object", "java.lang.Object"));
+  private static final MethodWrapper MAP_GET_SIGNATURE =
+      new MethodWrapper("java.util.Map", "get", "java.lang.Object", List.of("java.lang.Object"));
 
   protected void handleMapsBackward(Node<Edge, Val> node) {
-    Statement rstmt = node.stmt().getStart();
-    if (rstmt.isAssignStmt()
-        && rstmt.containsInvokeExpr()
-        && rstmt.getInvokeExpr().toString().contains(MAP_GET_SUB_SIGNATURE)) {
-      if (rstmt.getLeftOp().equals(node.fact())) {
+    Statement stmt = node.stmt().getStart();
+    if (stmt.isAssignStmt()
+        && stmt.containsInvokeExpr()
+        && stmt.getInvokeExpr().getDeclaredMethod().toMethodWrapper().equals(MAP_GET_SIGNATURE)) {
+      if (stmt.getLeftOp().equals(node.fact())) {
 
         cfg.addPredsOfListener(
-            new PredecessorListener(rstmt) {
+            new PredecessorListener(stmt) {
               @Override
               public void getPredecessor(Statement pred) {
                 BackwardQuery bwq =
-                    BackwardQuery.make(new Edge(pred, rstmt), rstmt.getInvokeExpr().getArg(0));
+                    BackwardQuery.make(new Edge(pred, stmt), stmt.getInvokeExpr().getArg(0));
                 backwardSolve(bwq);
                 for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
                   if (queryToSolvers.get(q).getReachedStates().contains(bwq.asNode())) {
@@ -256,8 +264,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
                       backwardSolverIns.propagate(
                           node,
                           new PushNode<>(
-                              new Edge(pred, rstmt),
-                              rstmt.getInvokeExpr().getBase(),
+                              new Edge(pred, stmt),
+                              stmt.getInvokeExpr().getBase(),
                               Field.string(key),
                               PDSSystem.FIELDS));
                     }
@@ -267,15 +275,15 @@ public abstract class WeightedBoomerang<W extends Weight> {
             });
       }
     }
-    if (rstmt.containsInvokeExpr()
-        && rstmt.getInvokeExpr().toString().contains(MAP_PUT_SUB_SIGNATURE)) {
-      if (rstmt.getInvokeExpr().getBase().equals(node.fact())) {
+    if (stmt.containsInvokeExpr()
+        && stmt.getInvokeExpr().getDeclaredMethod().toMethodWrapper().equals(MAP_PUT_SIGNATURE)) {
+      if (stmt.getInvokeExpr().getBase().equals(node.fact())) {
         cfg.addPredsOfListener(
-            new PredecessorListener(rstmt) {
+            new PredecessorListener(stmt) {
               @Override
               public void getPredecessor(Statement pred) {
                 BackwardQuery bwq =
-                    BackwardQuery.make(new Edge(pred, rstmt), rstmt.getInvokeExpr().getArg(0));
+                    BackwardQuery.make(new Edge(pred, stmt), stmt.getInvokeExpr().getArg(0));
                 backwardSolve(bwq);
                 for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
                   if (queryToSolvers.get(q).getReachedStates().contains(bwq.asNode())) {
@@ -285,8 +293,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
                       String key = v.getAllocVal().getStringValue();
                       NodeWithLocation<Edge, Val, Field> succNode =
                           new NodeWithLocation<>(
-                              new Edge(pred, rstmt),
-                              rstmt.getInvokeExpr().getArg(1),
+                              new Edge(pred, stmt),
+                              stmt.getInvokeExpr().getArg(1),
                               Field.string(key));
                       backwardSolverIns.propagate(node, new PopNode<>(succNode, PDSSystem.FIELDS));
                     }
@@ -299,15 +307,15 @@ public abstract class WeightedBoomerang<W extends Weight> {
   }
 
   protected void handleMapsForward(ForwardBoomerangSolver<W> solver, Node<Edge, Val> node) {
-    Statement rstmt = node.stmt().getTarget();
-    if (rstmt.containsInvokeExpr()) {
-      if (rstmt.isAssignStmt()
-          && rstmt.getInvokeExpr().toString().contains(MAP_GET_SUB_SIGNATURE)) {
-        if (rstmt.getInvokeExpr().getBase().equals(node.fact())) {
-          BackwardQuery bwq = BackwardQuery.make(node.stmt(), rstmt.getInvokeExpr().getArg(0));
+    Statement stmt = node.stmt().getTarget();
+    if (stmt.containsInvokeExpr()) {
+      if (stmt.isAssignStmt()
+          && stmt.getInvokeExpr().getDeclaredMethod().toMethodWrapper().equals(MAP_GET_SIGNATURE)) {
+        if (stmt.getInvokeExpr().getBase().equals(node.fact())) {
+          BackwardQuery bwq = BackwardQuery.make(node.stmt(), stmt.getInvokeExpr().getArg(0));
           backwardSolve(bwq);
           cfg.addSuccsOfListener(
-              new SuccessorListener(rstmt) {
+              new SuccessorListener(stmt) {
                 @Override
                 public void getSuccessor(Statement succ) {
                   for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
@@ -318,7 +326,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
                         String key = v.getAllocVal().getStringValue();
                         NodeWithLocation<Edge, Val, Field> succNode =
                             new NodeWithLocation<>(
-                                new Edge(rstmt, succ), rstmt.getLeftOp(), Field.string(key));
+                                new Edge(stmt, succ), stmt.getLeftOp(), Field.string(key));
                         solver.propagate(node, new PopNode<>(succNode, PDSSystem.FIELDS));
                       }
                     }
@@ -327,13 +335,13 @@ public abstract class WeightedBoomerang<W extends Weight> {
               });
         }
       }
-      if (rstmt.getInvokeExpr().toString().contains(MAP_PUT_SUB_SIGNATURE)) {
-        if (rstmt.getInvokeExpr().getArg(1).equals(node.fact())) {
+      if (stmt.getInvokeExpr().getDeclaredMethod().toMethodWrapper().equals(MAP_PUT_SIGNATURE)) {
+        if (stmt.getInvokeExpr().getArg(1).equals(node.fact())) {
 
-          BackwardQuery bwq = BackwardQuery.make(node.stmt(), rstmt.getInvokeExpr().getArg(0));
+          BackwardQuery bwq = BackwardQuery.make(node.stmt(), stmt.getInvokeExpr().getArg(0));
           backwardSolve(bwq);
           cfg.addSuccsOfListener(
-              new SuccessorListener(rstmt) {
+              new SuccessorListener(stmt) {
                 @Override
                 public void getSuccessor(Statement succ) {
                   for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
@@ -344,8 +352,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
                         solver.propagate(
                             node,
                             new PushNode<>(
-                                new Edge(rstmt, succ),
-                                rstmt.getInvokeExpr().getBase(),
+                                new Edge(stmt, succ),
+                                stmt.getInvokeExpr().getBase(),
                                 Field.string(key),
                                 PDSSystem.FIELDS));
                       }
