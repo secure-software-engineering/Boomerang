@@ -28,8 +28,19 @@ object NopTransformer {
           val nextStmt = tac(stmt._2 + 1)
           val targetStmt = tac(stmt._1.asIf.targetStmt)
 
-          result = result.insertBefore(Nop(-nextStmt.pc), nextStmt)
-          result = result.insertBefore(Nop(-targetStmt.pc), targetStmt)
+          /* If one or multiple branches target the same statement, we add exactly one Nop statement
+           * before the target statement (represented by the negative pc). This way, important
+           * data flows are covered
+           */
+          val nextStmtNop = Nop(-nextStmt.pc)
+          if (!result.statements.contains(nextStmtNop)) {
+            result = result.insertBefore(nextStmtNop, nextStmt)
+          }
+
+          val targetStmtNop = Nop(-targetStmt.pc)
+          if (!result.statements.contains(targetStmtNop)) {
+            result = result.insertBefore(targetStmtNop, targetStmt)
+          }
         }
       })
 

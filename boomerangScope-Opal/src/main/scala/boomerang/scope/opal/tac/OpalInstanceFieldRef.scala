@@ -65,7 +65,7 @@ class OpalInstanceFieldRef(val base: TacLocal, val fieldType: org.opalj.br.Type,
 
   override def getVariableName: String = s"$base.$fieldName"
 
-  override def hashCode: Int = Objects.hash(base, fieldType, fieldName)
+  override def hashCode: Int = Objects.hash(super.hashCode(), base, fieldType, fieldName)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalInstanceFieldRef => super.equals(other) && this.base == that.base && this.fieldType == that.fieldType && this.fieldName == that.fieldName

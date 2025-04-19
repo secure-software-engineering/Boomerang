@@ -100,6 +100,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
          * - Opal considers these statements as basic assignments, so we have to exclude them manually
          */
         if (expr.asVar.isParameterLocal) return false
+        if (expr.asVar.isExceptionLocal) return false
         if (targetVar.isThisLocal && expr.asVar.isThisLocal) return false
 
         return true
@@ -108,8 +109,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       }
     }
 
-    // TODO Add static field store
-    isFieldStore || isArrayStore
+    isFieldStore || isArrayStore || isStaticFieldStore
   }
 
   override def getLeftOp: Val = {
@@ -133,6 +133,12 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         }
 
         return new OpalArrayRef(base.asVar, -1, m)
+      }
+
+      if (isStaticFieldStore) {
+        val staticFieldStore = delegate.asPutStatic
+
+        return new OpalStaticFieldRef(staticFieldStore.declaringClass, staticFieldStore.declaredFieldType, staticFieldStore.name, m)
       }
     }
 
@@ -161,6 +167,12 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
           return new OpalArrayRef(base.asVar, -1, m)
         }
 
+        if (rightExpr.isGetStatic) {
+          val staticFieldLoad = rightExpr.asGetStatic
+
+          return new OpalStaticFieldRef(staticFieldLoad.declaringClass, staticFieldLoad.declaredFieldType, staticFieldLoad.name, m)
+        }
+
         if (rightExpr.isVar) {
           return new OpalLocal(rightExpr.asVar, m)
         }
@@ -172,9 +184,9 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         val fieldStore = delegate.asPutField
 
         if (fieldStore.value.isVar) {
-          return new OpalLocal(delegate.asPutField.value.asVar, m)
+          return new OpalLocal(fieldStore.value.asVar, m)
         } else {
-          return new OpalVal(delegate.asPutField.value, m)
+          return new OpalVal(fieldStore.value, m)
         }
       }
 
@@ -185,6 +197,16 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
           return new OpalLocal(arrayStore.value.asVar, m)
         } else {
           return new OpalVal(arrayStore.value, m)
+        }
+      }
+
+      if (isStaticFieldStore) {
+        val staticFieldStore = delegate.asPutStatic
+
+        if (staticFieldStore.value.isVar) {
+          return new OpalLocal(staticFieldStore.value.asVar, m)
+        } else {
+          return new OpalVal(staticFieldStore.value, m)
         }
       }
     }

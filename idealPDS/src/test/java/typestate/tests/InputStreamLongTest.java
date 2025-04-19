@@ -11,7 +11,6 @@
  */
 package typestate.tests;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import test.IDEALTestingFramework;
@@ -31,11 +30,6 @@ public class InputStreamLongTest extends IDEALTestingFramework {
   @Override
   protected List<String> getIncludedPackages() {
     return List.of("java.io.FileInputStream");
-  }
-
-  @Override
-  protected List<String> getExcludedPackages() {
-    return new ArrayList<>();
   }
 
   @Test

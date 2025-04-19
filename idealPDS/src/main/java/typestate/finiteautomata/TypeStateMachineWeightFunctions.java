@@ -170,7 +170,11 @@ public abstract class TypeStateMachineWeightFunctions
     if (unit.containsInvokeExpr()) {
       if (unit.getInvokeExpr().isInstanceInvokeExpr()) {
         Val base = unit.getInvokeExpr().getBase();
-        if (unit.getInvokeExpr().getDeclaredMethod().getSignature().matches(declaredMethod)) {
+        // TODO
+        //  Soot, SootUp and Opal use different signatures. Hence, we should move away from
+        //  using basic pattern matching to identify correct methods
+        String sig = " " + unit.getInvokeExpr().getDeclaredMethod().getName();
+        if (sig.matches(declaredMethod)) {
           if (base.getType().isSubtypeOf(declaredType)) {
             return Collections.singleton(
                 new WeightedForwardQuery<>(
