@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -24,7 +23,7 @@ public class TreeMapMultipleInstancesTarget {
   @TestMethod
   public void addAndRetrieve() {
     Map<Integer, Object> set = new TreeMap<>();
-    Alloc alias = new Alloc();
+    SetAlloc alias = new SetAlloc();
     set.put(1, alias);
     Object query2 = set.get(2);
     QueryMethods.queryFor(query2);
@@ -36,7 +35,7 @@ public class TreeMapMultipleInstancesTarget {
   @TestMethod
   public void contextSensitive() {
     Map<Integer, Object> map = new TreeMap<>();
-    Object alias = new Alloc();
+    Object alias = new SetAlloc();
     Object ret = addToMap(map, alias);
 
     Map<Integer, Object> map2 = new TreeMap<>();

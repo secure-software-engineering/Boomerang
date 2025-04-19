@@ -9,19 +9,8 @@
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test.cases.statics;
+package test.cases.array;
 
-import test.TestMethod;
-import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-@SuppressWarnings("unused")
-public class StaticInitializerTarget {
-
-  private static final Object alloc = new StaticsAlloc();
-
-  @TestMethod
-  public void doubleSingleton() {
-    Object alias = alloc;
-    QueryMethods.queryFor(alias);
-  }
-}
+public class ArrayAlloc implements AllocatedObject {}

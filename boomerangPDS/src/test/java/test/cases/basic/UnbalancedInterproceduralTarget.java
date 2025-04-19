@@ -12,7 +12,6 @@
 package test.cases.basic;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -20,23 +19,23 @@ public class UnbalancedInterproceduralTarget {
 
   @TestMethod
   public void unbalancedCreation() {
-    Alloc alias1 = create();
-    Alloc query = alias1;
+    BasicAlloc alias1 = create();
+    BasicAlloc query = alias1;
     QueryMethods.queryFor(query);
   }
 
   @TestMethod
   public void doubleUnbalancedCreation() {
-    Alloc alias1 = wrappedCreate();
-    Alloc query = alias1;
+    BasicAlloc alias1 = wrappedCreate();
+    BasicAlloc query = alias1;
     QueryMethods.queryFor(query);
   }
 
-  private Alloc wrappedCreate() {
+  private BasicAlloc wrappedCreate() {
     return create();
   }
 
-  private Alloc create() {
-    return new Alloc();
+  private BasicAlloc create() {
+    return new BasicAlloc();
   }
 }

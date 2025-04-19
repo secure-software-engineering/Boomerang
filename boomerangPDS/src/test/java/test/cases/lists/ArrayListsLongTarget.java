@@ -14,7 +14,6 @@ package test.cases.lists;
 import java.util.ArrayList;
 import java.util.List;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -36,7 +35,7 @@ public class ArrayListsLongTarget {
   @TestMethod
   public void addAndRetrieveByIndex1() {
     List<Object> list = new ArrayList<>();
-    Alloc alias = new Alloc();
+    ListAlloc alias = new ListAlloc();
     list.add(alias);
     Object ir = list.get(0);
     Object query2 = ir;
@@ -57,7 +56,7 @@ public class ArrayListsLongTarget {
   public void addAndRetrieveByIndex3() {
     ArrayList<Object> list = new ArrayList<>();
     Object b = new Object();
-    Object a = new Alloc();
+    Object a = new ListAlloc();
     list.add(a);
     list.add(b);
     Object c = list.get(0);

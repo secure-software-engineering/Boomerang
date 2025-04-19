@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -27,7 +26,7 @@ public class ContextSpecificListTypeTarget {
   }
 
   public Object method(List<Object> list) {
-    Alloc alloc = new Alloc();
+    CallGraphAlloc alloc = new CallGraphAlloc();
     list.add(alloc);
     return alloc;
   }

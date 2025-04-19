@@ -12,14 +12,14 @@
 package test.cases.sets;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
+@SuppressWarnings("unused")
 public class CustomMapTarget {
 
   @TestMethod
   public void storeAndLoad() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     Map map = new Map();
     map.add(alloc);
     Object alias = map.get();
@@ -28,7 +28,7 @@ public class CustomMapTarget {
 
   @TestMethod
   public void storeAndLoadSimple() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     Map map = new Map();
     map.add(alloc);
     Object alias = map.m.content;
@@ -37,7 +37,7 @@ public class CustomMapTarget {
 
   @TestMethod
   public void onlyInnerMapSimple() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     InnerMap map = new InnerMap();
     map.innerAdd(alloc);
     Object alias = map.content;
@@ -74,7 +74,7 @@ public class CustomMapTarget {
 
   @TestMethod
   public void storeAndLoadSimpleNoInnerClasses() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     MyMap map = new MyMap();
     map.add(alloc);
     MyInnerMap load = map.m;

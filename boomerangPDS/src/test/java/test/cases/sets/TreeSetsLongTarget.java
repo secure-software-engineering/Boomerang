@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -24,9 +23,9 @@ public class TreeSetsLongTarget {
   @TestMethod
   public void addAndRetrieve() {
     Set<Object> set = new TreeSet<>();
-    Alloc alias = new Alloc();
+    SetAlloc alias = new SetAlloc();
     set.add(alias);
-    alias = new Alloc();
+    alias = new SetAlloc();
     set.add(alias);
 
     Object alias2 = null;

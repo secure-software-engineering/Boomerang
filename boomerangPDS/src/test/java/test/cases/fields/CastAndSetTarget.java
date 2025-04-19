@@ -23,7 +23,7 @@ public class CastAndSetTarget {
     Container container = new Container();
     Object o1 = new Object();
     container.set(o1);
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new FieldAlloc();
     container.set(o2);
     AllocatedObject alias = container.get();
     QueryMethods.queryFor(alias);

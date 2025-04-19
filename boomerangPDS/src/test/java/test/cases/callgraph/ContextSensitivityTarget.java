@@ -12,7 +12,6 @@
 package test.cases.callgraph;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -24,7 +23,7 @@ public class ContextSensitivityTarget {
   }
 
   public Object method(SuperClass type) {
-    Alloc alloc = new Alloc();
+    CallGraphAlloc alloc = new CallGraphAlloc();
     type.foo(alloc);
     return alloc;
   }

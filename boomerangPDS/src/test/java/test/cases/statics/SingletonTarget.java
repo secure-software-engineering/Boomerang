@@ -12,58 +12,57 @@
 package test.cases.statics;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
 public class SingletonTarget {
 
-  private static Alloc instance;
+  private static StaticsAlloc instance;
 
   @TestMethod
   public void doubleSingleton() {
-    Alloc singleton = i();
+    StaticsAlloc singleton = i();
     Object alias = singleton;
     QueryMethods.queryFor(alias);
   }
 
   @TestMethod
   public void doubleSingletonDirect() {
-    Alloc singleton = objectGetter.getG();
+    StaticsAlloc singleton = objectGetter.getG();
     Object alias = singleton;
     QueryMethods.queryFor(alias);
   }
 
   @TestMethod
   public void singletonDirect() {
-    Alloc singleton = alloc;
+    StaticsAlloc singleton = alloc;
     QueryMethods.queryFor(singleton);
   }
 
-  public static Alloc i() {
+  public static StaticsAlloc i() {
     GlobalObjectGetter getter = objectGetter;
-    Alloc allocation = getter.getG();
+    StaticsAlloc allocation = getter.getG();
     return allocation;
   }
 
   public interface GlobalObjectGetter {
-    Alloc getG();
+    StaticsAlloc getG();
 
     void reset();
   }
 
-  private static Alloc alloc;
+  private static StaticsAlloc alloc;
   private static final GlobalObjectGetter objectGetter =
       new GlobalObjectGetter() {
 
-        Alloc instance = new Alloc();
+        StaticsAlloc instance = new StaticsAlloc();
 
-        public Alloc getG() {
+        public StaticsAlloc getG() {
           return instance;
         }
 
         public void reset() {
-          instance = new Alloc();
+          instance = new StaticsAlloc();
         }
       };
 }

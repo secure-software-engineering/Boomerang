@@ -12,7 +12,6 @@
 package test.cases.context;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -20,59 +19,59 @@ public class ContextTypesTarget {
 
   @TestMethod
   public void openContext() {
-    Alloc alloc = new Alloc();
+    ContextAlloc alloc = new ContextAlloc();
     call(alloc);
   }
 
   @TestMethod
   public void twoOpenContexts() {
-    Alloc alloc = new Alloc();
+    ContextAlloc alloc = new ContextAlloc();
     call(alloc);
-    Alloc a = new Alloc();
+    ContextAlloc a = new ContextAlloc();
     call(a);
   }
 
   @TestMethod
   public void twoOpenContextsSameObject() {
-    Alloc alloc = new Alloc();
+    ContextAlloc alloc = new ContextAlloc();
     call(alloc);
     call(alloc);
   }
 
-  private void call(Alloc p) {
+  private void call(ContextAlloc p) {
     QueryMethods.queryFor(p);
   }
 
   @TestMethod
   public void closingContext() {
-    Alloc alloc = close();
+    ContextAlloc alloc = close();
     QueryMethods.queryFor(alloc);
   }
 
-  private Alloc close() {
-    return new Alloc();
+  private ContextAlloc close() {
+    return new ContextAlloc();
   }
 
   @TestMethod
   public void noContext() {
-    Alloc alloc = new Alloc();
+    ContextAlloc alloc = new ContextAlloc();
     QueryMethods.queryFor(alloc);
   }
 
   @TestMethod
   public void twoClosingContexts() {
-    Alloc alloc = wrappedClose();
+    ContextAlloc alloc = wrappedClose();
     QueryMethods.queryFor(alloc);
   }
 
-  private Alloc wrappedClose() {
+  private ContextAlloc wrappedClose() {
     return close();
   }
 
   @TestMethod
   public void openContextWithField() {
     A a = new A();
-    Alloc alloc = new Alloc();
+    ContextAlloc alloc = new ContextAlloc();
     a.b = alloc;
     call(a);
   }
@@ -89,25 +88,25 @@ public class ContextTypesTarget {
 
   @TestMethod
   public void threeStackedOpenContexts() {
-    Alloc alloc = new Alloc();
+    ContextAlloc alloc = new ContextAlloc();
     wrappedWrappedCall(alloc);
   }
 
-  private void wrappedWrappedCall(Alloc alloc) {
+  private void wrappedWrappedCall(ContextAlloc alloc) {
     wrappedCall(alloc);
   }
 
-  private void wrappedCall(Alloc alloc) {
+  private void wrappedCall(ContextAlloc alloc) {
     call(alloc);
   }
 
   @TestMethod
   public void recursionOpenCallStack() {
-    Alloc start = new Alloc();
+    ContextAlloc start = new ContextAlloc();
     recursionStart(start);
   }
 
-  private void recursionStart(Alloc rec) {
+  private void recursionStart(ContextAlloc rec) {
     if (Math.random() > 0.5) recursionStart(rec);
     call(rec);
   }

@@ -20,6 +20,6 @@ public class Recursion2LongTest extends AbstractBoomerangTest {
 
   @Test
   public void test() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

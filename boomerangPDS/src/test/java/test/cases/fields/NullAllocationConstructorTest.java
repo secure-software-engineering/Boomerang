@@ -20,6 +20,6 @@ public class NullAllocationConstructorTest extends AbstractBoomerangTest {
 
   @Test
   public void nullAllocationOfField() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

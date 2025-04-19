@@ -12,18 +12,17 @@
 package test.cases.threading;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
 @SuppressWarnings("unused")
 public class InnerClassWithThreadTarget {
 
-  private static Alloc param;
+  private static ThreadingAlloc param;
 
   @TestMethod
   public void runWithThreadStatic() {
-    param = new Alloc();
+    param = new ThreadingAlloc();
     Runnable r =
         new Runnable() {
 
@@ -46,7 +45,7 @@ public class InnerClassWithThreadTarget {
 
   @TestMethod
   public void runWithThread() {
-    final Alloc u = new Alloc();
+    final ThreadingAlloc u = new ThreadingAlloc();
     Runnable r =
         new Runnable() {
 

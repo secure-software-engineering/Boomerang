@@ -12,7 +12,6 @@
 package test.cases.context;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -21,7 +20,7 @@ public class SimpleContextQueryTarget {
 
   @TestMethod
   public void outerAllocation() {
-    AllocatedObject alloc = new Alloc();
+    AllocatedObject alloc = new ContextAlloc();
     methodOfQuery(alloc);
   }
 

@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -28,7 +27,7 @@ public class ContextSensitivityMyListTarget {
   }
 
   public Object method(List<Object> type) {
-    Alloc alloc = new Alloc();
+    CallGraphAlloc alloc = new CallGraphAlloc();
     type.add(alloc);
     return alloc;
   }

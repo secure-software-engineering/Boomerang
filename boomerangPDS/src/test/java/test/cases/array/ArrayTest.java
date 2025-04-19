@@ -57,6 +57,6 @@ public class ArrayTest extends AbstractBoomerangTest {
 
   @Test
   public void toCharArrayTest() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

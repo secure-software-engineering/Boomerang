@@ -14,7 +14,6 @@ package test.cases.hashmap;
 import java.util.HashMap;
 import java.util.Map;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
@@ -28,7 +27,7 @@ public class KeySensitiveTarget {
 
   @TestMethod
   public void directAccess() {
-    AllocatedObject someValue = new Alloc();
+    AllocatedObject someValue = new MapAlloc();
     Map<String, AllocatedObject> x = new HashMap<>();
     x.put("key", someValue);
     AllocatedObject t = x.get("key");
@@ -37,7 +36,7 @@ public class KeySensitiveTarget {
 
   @TestMethod
   public void directAccess2Keys() {
-    AllocatedObject someValue = new Alloc();
+    AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
     x.put("key", someValue);
     x.put("key2", new NoAllocation());
@@ -47,7 +46,7 @@ public class KeySensitiveTarget {
 
   @TestMethod
   public void overwrite() {
-    AllocatedObject someValue = new Alloc();
+    AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
     // False Positive: Overapproximation. We do not kill during the forward analysis.
     x.put("key", new Allocation());
@@ -58,7 +57,7 @@ public class KeySensitiveTarget {
 
   @TestMethod
   public void accessWithAliasedKey() {
-    AllocatedObject someValue = new Alloc();
+    AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
     String key = "key";
     x.put(key, someValue);
@@ -69,7 +68,7 @@ public class KeySensitiveTarget {
 
   @TestMethod
   public void accessWithKeyFromReturn() {
-    AllocatedObject someValue = new Alloc();
+    AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
     x.put(getKey(), someValue);
     x.put("key2", new NoAllocation());
@@ -79,7 +78,7 @@ public class KeySensitiveTarget {
 
   @TestMethod
   public void interprocedural() {
-    AllocatedObject someValue = new Alloc();
+    AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
     x.put(getKey(), someValue);
     x.put("key2", new NoAllocation());

@@ -11,17 +11,6 @@
  */
 package test.cases.statics;
 
-import test.TestMethod;
-import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-@SuppressWarnings("unused")
-public class StaticInitializerTarget {
-
-  private static final Object alloc = new StaticsAlloc();
-
-  @TestMethod
-  public void doubleSingleton() {
-    Object alias = alloc;
-    QueryMethods.queryFor(alias);
-  }
-}
+public class StaticsAlloc implements AllocatedObject {}

@@ -19,7 +19,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void doubleWriteAndReadFieldPositive() {
-    Object query = new Alloc();
+    Object query = new FieldAlloc();
     A a = new A();
     B b = new B();
     a.b = query;
@@ -43,7 +43,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void writeWithinCallPositive() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     call(a, query);
     Object alias = a.b;
@@ -61,7 +61,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void writeWithinCallSummarizedPositive() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     call(a, query);
     Object alias = a.b;
@@ -77,7 +77,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void doubleWriteWithinCallPositive() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     B b = callAndReturn(a, query);
     A first = b.a;
@@ -85,7 +85,7 @@ public class NoIndirectionTarget {
     QueryMethods.queryFor(alias);
   }
 
-  private B callAndReturn(A a, Alloc query) {
+  private B callAndReturn(A a, FieldAlloc query) {
     a.b = query;
     B b = new B();
     b.a = a;
@@ -104,7 +104,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void overwriteButPositiveFieldTest() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     a.b = query;
     // a.c = null;

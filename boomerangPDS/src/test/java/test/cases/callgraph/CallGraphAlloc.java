@@ -9,8 +9,8 @@
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test.cases.fields;
+package test.cases.callgraph;
 
 import test.core.selfrunning.AllocatedObject;
 
-public class Alloc implements AllocatedObject {}
+public class CallGraphAlloc implements AllocatedObject {}

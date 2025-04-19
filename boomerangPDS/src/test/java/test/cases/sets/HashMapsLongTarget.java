@@ -14,7 +14,6 @@ package test.cases.sets;
 import java.util.HashMap;
 import java.util.Map;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -25,7 +24,7 @@ public class HashMapsLongTarget {
   public void addAndRetrieve() {
     Map<Object, Object> set = new HashMap<>();
     Object key = new Object();
-    AllocatedObject alias3 = new Alloc();
+    AllocatedObject alias3 = new SetAlloc();
     set.put(key, alias3);
     Object alias2 = null;
     for (Object o : set.values()) alias2 = o;

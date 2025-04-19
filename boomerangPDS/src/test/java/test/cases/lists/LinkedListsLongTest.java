@@ -13,7 +13,6 @@ package test.cases.lists;
 
 import java.util.List;
 import org.junit.Test;
-import test.cases.callgraph.ContextSpecificListTypeTarget;
 import test.core.AbstractBoomerangTest;
 
 public class LinkedListsLongTest extends AbstractBoomerangTest {
@@ -29,13 +28,8 @@ public class LinkedListsLongTest extends AbstractBoomerangTest {
         "java.util.LinkedList",
         "java.util.LinkedList$ListItr",
         "java.util.LinkedList$Node",
-        "java.util.Iterator");
-  }
-
-  @Override
-  protected List<String> getExcludedPackages() {
-    // This is required because CHA adds an edge to the WrongList class, too
-    return List.of(ContextSpecificListTypeTarget.WrongList.class.getName());
+        "java.util.Iterator",
+        "java.util.ListIterator");
   }
 
   @Test

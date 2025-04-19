@@ -9,8 +9,8 @@
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test.cases.basic;
+package test.cases.hashmap;
 
 import test.core.selfrunning.AllocatedObject;
 
-public class Allocation implements AllocatedObject {}
+public class MapAlloc implements AllocatedObject {}

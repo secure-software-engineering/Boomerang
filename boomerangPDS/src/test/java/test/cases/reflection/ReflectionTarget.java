@@ -12,7 +12,6 @@
 package test.cases.reflection;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -20,7 +19,7 @@ public class ReflectionTarget {
 
   @TestMethod
   public void bypassClassForName() throws ClassNotFoundException {
-    Alloc query = new Alloc();
+    ReflectionAlloc query = new ReflectionAlloc();
     Class<?> cls = Class.forName(A.class.getName());
     QueryMethods.queryFor(query);
   }
@@ -31,11 +30,11 @@ public class ReflectionTarget {
     Class<?> cls = Class.forName(A.class.getName());
     Object newInstance = cls.newInstance();
     A a = (A) newInstance;
-    Alloc query = a.field;
+    ReflectionAlloc query = a.field;
     QueryMethods.queryFor(query);
   }
 
   private static class A {
-    Alloc field = new Alloc();
+    ReflectionAlloc field = new ReflectionAlloc();
   }
 }

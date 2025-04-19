@@ -41,11 +41,11 @@ public class TypeChangeTarget {
   }
 
   public static class D {
-    Alloc f = new Alloc();
+    FieldAlloc f = new FieldAlloc();
     D d = new D();
 
     public Object getField() {
-      Alloc varShouldBeThere = this.f;
+      FieldAlloc varShouldBeThere = this.f;
       return varShouldBeThere;
     }
 

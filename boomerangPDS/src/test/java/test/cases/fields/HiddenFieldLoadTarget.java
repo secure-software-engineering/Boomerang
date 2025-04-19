@@ -51,7 +51,7 @@ public class HiddenFieldLoadTarget {
   public void run3() {
     A b = new A();
     A a = b;
-    Alloc alloc = new Alloc();
+    FieldAlloc alloc = new FieldAlloc();
     b.setF(alloc);
     // int x =1;
     Object alias = a.f();
@@ -62,7 +62,7 @@ public class HiddenFieldLoadTarget {
   public void run6() {
     A b = new A();
     A a = b;
-    Alloc allocInRun6 = new Alloc();
+    FieldAlloc allocInRun6 = new FieldAlloc();
     b.setF(allocInRun6);
     int x = 1;
     Object alias = a.f;
@@ -73,7 +73,7 @@ public class HiddenFieldLoadTarget {
   public void run2() {
     A b = new A();
     A a = b;
-    Alloc c = new Alloc();
+    FieldAlloc c = new FieldAlloc();
     int y = 1;
     b.f = c;
     int x = 1;
@@ -85,7 +85,7 @@ public class HiddenFieldLoadTarget {
   public void run4() {
     A b = new A();
     A a = b;
-    b.f = new Alloc();
+    b.f = new FieldAlloc();
     Object alias = a.f;
     QueryMethods.queryFor(alias);
   }
@@ -94,14 +94,14 @@ public class HiddenFieldLoadTarget {
     Object f;
 
     public void setF() {
-      f = new Alloc();
+      f = new FieldAlloc();
     }
 
     public void setFBranched() {
       if (staticallyUnknown()) {
-        f = new Alloc();
+        f = new FieldAlloc();
       } else {
-        f = new Alloc();
+        f = new FieldAlloc();
       }
     }
 

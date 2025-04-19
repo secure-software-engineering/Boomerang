@@ -20,7 +20,7 @@ public class ObjectSensitivityTarget {
   @TestMethod
   public void objectSensitivity0() {
     B b1 = new B();
-    Alloc b2 = new Alloc();
+    FieldAlloc b2 = new FieldAlloc();
 
     A a1 = new A();
     A a2 = new A();
@@ -37,7 +37,7 @@ public class ObjectSensitivityTarget {
   @TestMethod
   public void objectSensitivity1() {
     B b1 = new B();
-    Alloc b2 = new Alloc();
+    FieldAlloc b2 = new FieldAlloc();
 
     A a1 = new A(b1);
     A a2 = new A(b2);
@@ -52,7 +52,7 @@ public class ObjectSensitivityTarget {
 
   @TestMethod
   public void objectSensitivity2() {
-    Alloc b2 = new Alloc();
+    FieldAlloc b2 = new FieldAlloc();
     A a2 = new A(b2);
 
     otherScope();

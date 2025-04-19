@@ -20,7 +20,7 @@ public class StringTest extends AbstractBoomerangTest {
 
   @Test
   public void stringConcat() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
@@ -35,16 +35,16 @@ public class StringTest extends AbstractBoomerangTest {
 
   @Test
   public void stringToCharArray() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
   public void stringBuilderTest() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
   public void stringBuilder1Test() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

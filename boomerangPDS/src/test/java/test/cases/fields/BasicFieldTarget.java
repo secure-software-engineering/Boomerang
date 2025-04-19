@@ -20,10 +20,10 @@ public class BasicFieldTarget {
   @TestMethod
   public void basicFieldReadAndWriteTest() {
     ClassWithField c = new ClassWithField();
-    Alloc alloc = new Alloc();
+    FieldAlloc alloc = new FieldAlloc();
 
     c.field = alloc;
-    Alloc query = c.field;
+    FieldAlloc query = c.field;
 
     QueryMethods.queryFor(query);
   }
@@ -31,10 +31,10 @@ public class BasicFieldTarget {
   @TestMethod
   public void basicFieldGetAndSetTest() {
     ClassWithField c = new ClassWithField();
-    Alloc alloc = new Alloc();
+    FieldAlloc alloc = new FieldAlloc();
 
     c.setField(alloc);
-    Alloc query = c.getField();
+    FieldAlloc query = c.getField();
 
     QueryMethods.queryFor(query);
   }
@@ -42,22 +42,22 @@ public class BasicFieldTarget {
   @TestMethod
   public void nestedFieldReadAndWriteTest() {
     ClassWithNestedFields c = new ClassWithNestedFields();
-    Alloc alloc = new Alloc();
+    FieldAlloc alloc = new FieldAlloc();
 
     c.c.field = alloc;
-    Alloc query = c.c.field;
+    FieldAlloc query = c.c.field;
 
     QueryMethods.queryFor(query);
   }
 
   private static class ClassWithField {
-    Alloc field;
+    FieldAlloc field;
 
-    public Alloc getField() {
+    public FieldAlloc getField() {
       return field;
     }
 
-    public void setField(Alloc alloc) {
+    public void setField(FieldAlloc alloc) {
       this.field = alloc;
     }
   }

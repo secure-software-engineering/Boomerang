@@ -12,7 +12,6 @@
 package test.cases.unbalanced;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.cases.fields.B;
 import test.core.QueryMethods;
 
@@ -57,7 +56,7 @@ public class UnbalancedScopesTarget {
   }
 
   private Object createA() {
-    Alloc c = new Alloc();
+    UnbalancedAlloc c = new UnbalancedAlloc();
     Object d = id(c);
     return d;
   }
@@ -68,7 +67,7 @@ public class UnbalancedScopesTarget {
 
   private Object aOrB() {
     if (staticallyUnknown()) {
-      return new Alloc();
+      return new UnbalancedAlloc();
     }
     return new B();
   }
@@ -84,6 +83,6 @@ public class UnbalancedScopesTarget {
   }
 
   private Object create() {
-    return new Alloc();
+    return new UnbalancedAlloc();
   }
 }

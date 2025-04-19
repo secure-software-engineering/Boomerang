@@ -40,7 +40,7 @@ public class FieldlessTest extends AbstractBoomerangTest {
 
   @Test
   public void returnNullAllocation() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test

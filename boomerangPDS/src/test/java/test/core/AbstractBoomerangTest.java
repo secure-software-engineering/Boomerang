@@ -104,18 +104,27 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   protected void analyze(String targetClassName, String targetMethodName) {
-    analyze(targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
+    analyze(targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES, false);
   }
 
   protected void analyze(
-      String targetClassName, String targetMethodName, DataFlowScope dataFlowScope) {
+      String targetClassName, String targetMethodName, boolean ignoreAllocSites) {
+    analyze(
+        targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES, ignoreAllocSites);
+  }
+
+  protected void analyze(
+      String targetClassName,
+      String targetMethodName,
+      DataFlowScope dataFlowScope,
+      boolean ignoreAllocSites) {
     MethodWrapper methodWrapper = new MethodWrapper(targetClassName, targetMethodName);
     FrameworkScope frameworkScope = super.getFrameworkScope(methodWrapper, dataFlowScope);
 
-    analyzeWithCallGraph(frameworkScope);
+    analyzeWithCallGraph(frameworkScope, ignoreAllocSites);
   }
 
-  private void analyzeWithCallGraph(FrameworkScope frameworkScope) {
+  private void analyzeWithCallGraph(FrameworkScope frameworkScope, boolean ignoreAllocSites) {
     CallGraph callGraph = frameworkScope.getCallGraph();
     queryDetector = new QueryForCallSiteDetector(callGraph);
     queryForCallSites = queryDetector.computeSeeds();
@@ -123,10 +132,16 @@ public class AbstractBoomerangTest extends TestingFramework {
     if (queryDetector.integerQueries) {
       Preanalysis an = new Preanalysis(callGraph, new IntegerAllocationSiteOf());
       expectedAllocationSites = an.computeSeeds();
+      if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
+        Assert.fail("Did not find any allocation sites. Nothing is tested");
+      }
     } else {
       Preanalysis an =
           new Preanalysis(callGraph, new AllocationSiteOf(AllocatedObject.class.getName()));
       expectedAllocationSites = an.computeSeeds();
+      if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
+        Assert.fail("Did not find any allocation sites. Nothing is tested");
+      }
       an = new Preanalysis(callGraph, new AllocationSiteOf(NoAllocatedObject.class.getName()));
       explicitlyUnexpectedAllocationSites =
           an.computeSeeds().stream().map(Query::asNode).collect(Collectors.toList());

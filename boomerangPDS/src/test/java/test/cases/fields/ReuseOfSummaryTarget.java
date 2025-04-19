@@ -22,7 +22,7 @@ public class ReuseOfSummaryTarget {
     A a = new A();
     A b = new A();
 
-    Object c = new Alloc(); // o1
+    Object c = new FieldAlloc(); // o1
     foo(a, b, c);
     foo(a, a, c);
 

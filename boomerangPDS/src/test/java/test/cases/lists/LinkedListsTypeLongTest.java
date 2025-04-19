@@ -28,7 +28,8 @@ public class LinkedListsTypeLongTest extends AbstractBoomerangTest {
         "java.util.AbstractList",
         "java.util.AbstractSequentialList",
         "java.util.List",
-        "java.util.Iterator");
+        "java.util.Iterator",
+        "java.util.ListIterator");
   }
 
   @Test

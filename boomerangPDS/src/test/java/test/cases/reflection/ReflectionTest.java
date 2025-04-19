@@ -25,6 +25,6 @@ public class ReflectionTest extends AbstractBoomerangTest {
 
   @Test
   public void loadObject() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

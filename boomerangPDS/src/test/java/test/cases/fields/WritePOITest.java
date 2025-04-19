@@ -120,11 +120,11 @@ public class WritePOITest extends AbstractBoomerangTest {
 
   @Test
   public void doubleNested() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
   public void doubleNestedBranched() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

@@ -25,7 +25,7 @@ public class NoIndirectionTest extends AbstractBoomerangTest {
 
   @Test
   public void doubleWriteAndReadFieldNegative() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
@@ -35,7 +35,7 @@ public class NoIndirectionTest extends AbstractBoomerangTest {
 
   @Test
   public void writeWithinCallNegative() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
@@ -50,7 +50,7 @@ public class NoIndirectionTest extends AbstractBoomerangTest {
 
   @Test
   public void overwriteFieldTest() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
@@ -60,6 +60,6 @@ public class NoIndirectionTest extends AbstractBoomerangTest {
 
   @Test
   public void overwriteButPositiveFieldTest2() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

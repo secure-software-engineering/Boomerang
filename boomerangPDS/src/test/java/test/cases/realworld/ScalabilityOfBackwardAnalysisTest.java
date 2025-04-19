@@ -20,6 +20,6 @@ public class ScalabilityOfBackwardAnalysisTest extends AbstractBoomerangTest {
 
   @Test
   public void simpleButDifficult() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

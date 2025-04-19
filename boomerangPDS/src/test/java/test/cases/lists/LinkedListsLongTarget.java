@@ -14,7 +14,6 @@ package test.cases.lists;
 import java.util.LinkedList;
 import java.util.List;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -57,7 +56,7 @@ public class LinkedListsLongTarget {
   public void addAndRetrieveByIndex3() {
     LinkedList<Object> list = new LinkedList<>();
     Object b = new Object();
-    Object a = new Alloc();
+    Object a = new ListAlloc();
     list.add(a);
     list.add(b);
     Object c = list.get(0);

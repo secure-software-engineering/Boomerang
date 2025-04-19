@@ -12,7 +12,6 @@
 package test.cases.array;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
@@ -39,7 +38,7 @@ public class ArrayContainerTarget {
     ArrayContainer container = new ArrayContainer();
     Object o1 = new Object();
     container.put(o1);
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new ArrayAlloc();
     container.put(o2);
     AllocatedObject alias = container.get();
     QueryMethods.queryFor(alias);
@@ -48,7 +47,7 @@ public class ArrayContainerTarget {
   @TestMethod
   public void insertAndGetField() {
     ArrayContainerWithPublicFields container = new ArrayContainerWithPublicFields();
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new ArrayAlloc();
     container.array[0] = o2;
     AllocatedObject alias = container.array[0];
     QueryMethods.queryFor(alias);
@@ -64,7 +63,7 @@ public class ArrayContainerTarget {
     ArrayContainer innerContainer1 = new ArrayContainer();
     Object o1 = new NoAllocation();
     innerContainer1.put(o1);
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new ArrayAlloc();
     innerContainer1.put(o2);
     outerContainer.put(innerContainer1);
     ArrayContainer innerContainer2 = outerContainer.get();

@@ -36,11 +36,11 @@ public class FailOnVisitMethodTest extends AbstractBoomerangTest {
 
   @Test
   public void failOnVisitBarSameMethodSimpleAlloc() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test
   public void doNotVisitBar() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 }

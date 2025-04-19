@@ -12,7 +12,6 @@
 package test.cases.statics;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -27,7 +26,7 @@ public class StaticWithSuperClassesTarget {
 
   private static class List {
 
-    private static final Object elementData = new Alloc();
+    private static final Object elementData = new StaticsAlloc();
 
     public Object get() {
       return elementData;
@@ -43,7 +42,7 @@ public class StaticWithSuperClassesTarget {
 
   private static class MyList extends List {
 
-    private static final Object elementData2 = new Alloc();
+    private static final Object elementData2 = new StaticsAlloc();
 
     public Object get() {
       return elementData2;

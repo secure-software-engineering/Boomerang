@@ -12,7 +12,6 @@
 package test.cases.subclassing;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -20,7 +19,7 @@ import test.core.selfrunning.AllocatedObject;
 public class InnerClassTarget {
 
   public static class Instance {
-    public Object o = new Alloc();
+    public Object o = new SubclassingAlloc();
 
     public class Inner {
       public Object getOuter() {

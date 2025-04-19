@@ -40,7 +40,7 @@ public class ReadPOITest extends AbstractBoomerangTest {
 
   @Test
   public void loadTwice() {
-    analyze(target, testName.getMethodName());
+    analyze(target, testName.getMethodName(), true);
   }
 
   @Test

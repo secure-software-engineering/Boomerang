@@ -79,14 +79,13 @@ public class OpalTestSetup implements TestSetup {
       List<String> excludedPackages) {
     OPALLogger.updateLogger(GlobalLogContext$.MODULE$, DevNullLogger$.MODULE$);
 
-    File[] classpathFiles = loadClassPathFiles(classPath, excludedPackages);
+    File[] classpathFiles =
+        loadClassPathFiles(classPath, methodWrapper.getDeclaringClass(), excludedPackages);
     File[] includeFiles = loadJDKFiles(includedPackages);
     File[] classFiles =
         Stream.concat(Arrays.stream(classpathFiles), Arrays.stream(includeFiles))
             .toArray(File[]::new);
     project = Project.apply(classFiles, new File[0]); // , package$.MODULE$.RTJar());
-    scala.collection.Iterable<ClassFile> files =
-        project.allClassFiles(); // .filter(c -> c.thisType().fqn().contains("java.util"));
 
     // Load the class that contains the test method
     Option<ClassFile> testClass =
@@ -164,28 +163,32 @@ public class OpalTestSetup implements TestSetup {
         dataFlowScope);
   }
 
-  private File[] loadClassPathFiles(String classpath, List<String> excludeList) {
+  private File[] loadClassPathFiles(
+      String classpath, String testClassName, List<String> excludeList) {
     Path path = Path.of(classpath);
 
     try (Stream<Path> stream = Files.walk(path)) {
       Stream<File> classPathFiles = stream.filter(Files::isRegularFile).map(Path::toFile);
 
-      // Filter for excluded classes
+      // Filter for excluded classes. Additionally, exclude all classes from different packages
+      // because CHA in Opal would add edges to methods from other classes
+      String packageName = testClassName.substring(0, testClassName.lastIndexOf("."));
       return classPathFiles
-          .filter(c -> !isExcludedFile(c, classpath, excludeList))
+          .filter(c -> !isExcludedFile(c, classpath, packageName, excludeList))
           .toArray(File[]::new);
     } catch (IOException e) {
       throw new RuntimeException("Could not read classpath: " + e.getMessage());
     }
   }
 
-  private boolean isExcludedFile(File file, String classpath, List<String> excludeList) {
+  private boolean isExcludedFile(
+      File file, String classpath, String packageName, List<String> excludeList) {
     // Remove the classpath and the .class ending
     String path = file.getPath().replace("/", ".").replace("\\", ".");
     String formattedClassPath = classpath.replace("/", ".").replace("\\", ".");
     String formattedPath = path.replace(formattedClassPath, "").replace(".class", "").substring(1);
 
-    return excludeList.contains(formattedPath);
+    return !formattedPath.startsWith(packageName) || excludeList.contains(formattedPath);
   }
 
   private File[] loadJDKFiles(List<String> includeList) {

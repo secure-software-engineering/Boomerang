@@ -12,7 +12,6 @@
 package test.cases.basic;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -34,13 +33,13 @@ public class InterproceduralTarget {
 
   @TestMethod
   public void simpleNonAnonymous() {
-    AllocatedObject alias1 = new Alloc();
+    AllocatedObject alias1 = new BasicAlloc();
     QueryMethods.queryFor(alias1);
   }
 
   @TestMethod
   public void identityTest1() {
-    Alloc alias1 = new Alloc();
+    BasicAlloc alias1 = new BasicAlloc();
     Object alias2 = alias1;
     identity(alias1);
     otherCall(alias2);
@@ -60,7 +59,7 @@ public class InterproceduralTarget {
 
   @TestMethod
   public void failedCast() {
-    Object o = new Object();
+    Object o = new BasicAlloc();
     Object returned = flow(o);
     String t = (String) returned;
     QueryMethods.queryFor(t);
@@ -72,12 +71,12 @@ public class InterproceduralTarget {
 
   @TestMethod
   public void summaryReuseTest4() {
-    Alloc alias2;
+    BasicAlloc alias2;
     if (Math.random() > 0.5) {
-      Alloc alias1 = new Alloc();
+      BasicAlloc alias1 = new BasicAlloc();
       alias2 = nestedIdentity(alias1);
     } else {
-      Alloc alias1 = new Alloc();
+      BasicAlloc alias1 = new BasicAlloc();
       alias2 = nestedIdentity(alias1);
     }
     QueryMethods.queryFor(alias2);
@@ -85,8 +84,8 @@ public class InterproceduralTarget {
 
   @TestMethod
   public void branchWithCall() {
-    Alloc a1 = new Alloc();
-    Alloc a2 = new Alloc();
+    BasicAlloc a1 = new BasicAlloc();
+    BasicAlloc a2 = new BasicAlloc();
     Object a = null;
     if (Math.random() > 0.5) {
       a = a1;
@@ -99,9 +98,9 @@ public class InterproceduralTarget {
 
   private void wrappedFoo(Object param) {}
 
-  private Alloc nestedIdentity(Alloc param2) {
+  private BasicAlloc nestedIdentity(BasicAlloc param2) {
     int shouldNotSeeThis = 1;
-    Alloc returnVal = param2;
+    BasicAlloc returnVal = param2;
     return returnVal;
   }
 
@@ -125,7 +124,7 @@ public class InterproceduralTarget {
 
   @TestMethod
   public void interLoop() {
-    AllocatedObject alias = new Alloc() {};
+    AllocatedObject alias = new BasicAlloc() {};
     AllocatedObject aliased2;
     Object aliased = new AllocatedObject() {}, notAlias = new Object();
     for (int i = 0; i < 20; i++) {
@@ -168,7 +167,7 @@ public class InterproceduralTarget {
   }
 
   private Object createStatic() {
-    return new Allocation();
+    return new BasicAlloc();
   }
 
   public AllocatedObject wrappedCreate() {
@@ -187,75 +186,75 @@ public class InterproceduralTarget {
 
   @TestMethod
   public void heavySummary() {
-    Allocation alias1 = new Allocation();
+    BasicAlloc alias1 = new BasicAlloc();
     Object q;
     if (Math.random() > 0.5) {
       q = doSummarize(alias1);
     } else if (Math.random() > 0.5) {
-      Allocation alias2 = new Allocation();
+      BasicAlloc alias2 = new BasicAlloc();
       q = doSummarize(alias2);
     } else {
-      Allocation alias3 = new Allocation();
+      BasicAlloc alias3 = new BasicAlloc();
       q = doSummarize(alias3);
     }
 
     QueryMethods.queryFor(q);
   }
 
-  private Allocation doSummarize(Allocation alias1) {
-    Allocation a = alias1;
-    Allocation b = a;
-    Allocation c = b;
-    Allocation d = c;
+  private BasicAlloc doSummarize(BasicAlloc alias1) {
+    BasicAlloc a = alias1;
+    BasicAlloc b = a;
+    BasicAlloc c = b;
+    BasicAlloc d = c;
 
-    Allocation e = d;
-    Allocation f = evenFurtherNested(e);
-    Allocation g = alias1;
+    BasicAlloc e = d;
+    BasicAlloc f = evenFurtherNested(e);
+    BasicAlloc g = alias1;
     if (Math.random() > 0.5) {
       g = f;
     }
-    Allocation h = g;
+    BasicAlloc h = g;
     return f;
   }
 
-  private Allocation evenFurtherNested(Allocation e) {
+  private BasicAlloc evenFurtherNested(BasicAlloc e) {
     return e;
   }
 
   @TestMethod
   public void summaryTest() {
-    Allocation alias1 = new Allocation();
+    BasicAlloc alias1 = new BasicAlloc();
     Object q;
     if (Math.random() > 0.5) {
       q = summary(alias1);
     } else {
-      Allocation alias2 = new Allocation();
+      BasicAlloc alias2 = new BasicAlloc();
       q = summary(alias2);
     }
 
     QueryMethods.queryFor(q);
   }
 
-  private Object summary(Allocation inner) {
-    Allocation ret = inner;
+  private Object summary(BasicAlloc inner) {
+    BasicAlloc ret = inner;
     return ret;
   }
 
   @TestMethod
   public void doubleNestedSummary() {
-    Allocation alias1 = new Allocation();
+    BasicAlloc alias1 = new BasicAlloc();
     Object q;
     if (Math.random() > 0.5) {
       q = nestedSummary(alias1);
     } else {
-      Allocation alias2 = new Allocation();
+      BasicAlloc alias2 = new BasicAlloc();
       q = nestedSummary(alias2);
     }
 
     QueryMethods.queryFor(q);
   }
 
-  private Object nestedSummary(Allocation inner) {
+  private Object nestedSummary(BasicAlloc inner) {
     Object ret = summary(inner);
     return ret;
   }

@@ -13,7 +13,6 @@ package test.cases.sets;
 
 import java.util.Iterator;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -57,7 +56,7 @@ public class CustomSetTarget {
   @TestMethod
   public void mySetIterableTest() {
     MySet mySet = new MySet();
-    AllocatedObject alias = new Alloc();
+    AllocatedObject alias = new SetAlloc();
     mySet.add(alias);
     Object query = null;
     for (Object el : mySet) {

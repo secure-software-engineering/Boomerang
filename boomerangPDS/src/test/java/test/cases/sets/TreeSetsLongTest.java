@@ -24,19 +24,33 @@ public class TreeSetsLongTest extends AbstractBoomerangTest {
   @Override
   protected List<String> getIncludedPackages() {
     return List.of(
-        "java.util.Set",
-        "java.util.AbstractSet",
-        "java.util.NavigableSet",
-        "java.util.SortedSet",
-        "java.util.HashSet",
-        "java.util.TreeSet",
-        "java.util.Iterator",
-        "java.util.Map",
-        "java.util.AbstractMap",
-        "java.util.TreeMap",
+        // TODO Add all superclasses from TreeSet and TreeMap
+        "java.util.TreeMap$EntrySpliterator",
+        "java.util.TreeMap$ValueSpliterator",
+        "java.util.TreeMap$DescendingKeySpliterator",
+        "java.util.TreeMap$KeySpliterator",
+        "java.util.TreeMap$TreeMapSpliterator",
         "java.util.TreeMap$Entry",
-        "java.util.NavigableMap",
-        "java.util.SortedMap");
+        "java.util.TreeMap$SubMap",
+        "java.util.TreeMap$DescendingSubMap",
+        "java.util.TreeMap$AscendingSubMap",
+        "java.util.TreeMap$NavigableSubMap",
+        "java.util.TreeMap$DescendingKeyIterator",
+        "java.util.TreeMap$KeyIterator",
+        "java.util.TreeMap$ValueIterator",
+        "java.util.TreeMap$EntryIterator",
+        "java.util.TreeMap$PrivateEntryIterator",
+        "java.util.TreeMap$KeySet",
+        "java.util.TreeMap$EntrySet",
+        "java.util.TreeMap$Values",
+        "java.util.TreeMap$DescendingSubMap$DescendingEntrySetView",
+        "java.util.TreeMap$AscendingSubMap$AscendingEntrySetView",
+        "java.util.TreeMap$NavigableSubMap$DescendingSubMapKeyIterator",
+        "java.util.TreeMap$NavigableSubMap$SubMapKeyIterator",
+        "java.util.TreeMap$NavigableSubMap$DescendingSubMapEntryIterator",
+        "java.util.TreeMap$NavigableSubMap$SubMapEntryIterator",
+        "java.util.TreeMap$NavigableSubMap$SubMapIterator",
+        "java.util.TreeMap$NavigableSubMap$EntrySetView");
   }
 
   @Test

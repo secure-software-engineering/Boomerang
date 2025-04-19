@@ -12,7 +12,6 @@
 package test.cases.context;
 
 import test.TestMethod;
-import test.cases.basic.Allocation;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -32,13 +31,13 @@ public class PathingContextProblemTarget {
     }
 
     public void test1() {
-      Object a1 = new Allocation();
+      Object a1 = new ContextAlloc();
       Object b1 = a1;
       callee(a1, b1);
     }
 
     public void test2() {
-      Object a2 = new Allocation();
+      Object a2 = new ContextAlloc();
       Object b2 = new Object();
       callee(a2, b2);
     }
@@ -58,14 +57,14 @@ public class PathingContextProblemTarget {
     }
 
     public void test1() {
-      Object a1 = new Allocation();
+      Object a1 = new ContextAlloc();
       Object b1 = a1;
       callee(a1, b1);
     }
 
     public void test2() {
       Object a2 = new Object();
-      Object b2 = new Allocation();
+      Object b2 = new ContextAlloc();
       callee(a2, b2);
     }
   }

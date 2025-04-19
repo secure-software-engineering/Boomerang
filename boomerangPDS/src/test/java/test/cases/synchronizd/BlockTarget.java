@@ -12,7 +12,6 @@
 package test.cases.synchronizd;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -24,7 +23,7 @@ public class BlockTarget {
   @TestMethod
   public void block() {
     synchronized (field) {
-      AllocatedObject o = new Alloc();
+      AllocatedObject o = new SynchronizedAlloc();
       QueryMethods.queryFor(o);
     }
   }
@@ -40,7 +39,7 @@ public class BlockTarget {
 
   private void set() {
     synchronized (field) {
-      field = new Alloc();
+      field = new SynchronizedAlloc();
     }
   }
 }
