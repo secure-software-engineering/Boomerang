@@ -2,17 +2,15 @@ package boomerang.scope.opal
 
 import boomerang.scope.DataFlowScope
 import boomerang.scope.opal.tac.OpalMethod
-import boomerang.scope.opal.transformation.TacBodyBuilder
 import boomerang.scope.test.MethodSignature
-import boomerang.scope.test.targets.{BranchingTarget, ConstructorTarget, InvokeExprTarget, SingleTarget}
-import com.typesafe.config.{Config, ConfigValueFactory}
+import boomerang.scope.test.targets.{BranchingTarget, InvokeExprTarget}
+import com.typesafe.config.ConfigValueFactory
 import org.junit.{Assert, Test}
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.cg.InitialEntryPointsKey
 import org.opalj.tac.cg.{CHACallGraphKey, CallGraph}
 
 import java.util
-import java.util.{HashMap, List, Map, Set}
 import scala.jdk.javaapi.CollectionConverters
 
 class OpalInvokeExprTest {

@@ -25,12 +25,12 @@ import soot.SootMethod;
 public class SootArrayTest {
 
   @Test
-  public void singleArrayStoreConstantTest() {
+  public void arrayStoreConstantTest() {
     SootSetup sootSetup = new SootSetup();
     sootSetup.setupSoot(ArrayTarget.class.getName());
 
     MethodSignature signature =
-        new MethodSignature(ArrayTarget.class.getName(), "singleArrayStoreIndex");
+        new MethodSignature(ArrayTarget.class.getName(), "arrayStoreIndex");
     SootMethod method = sootSetup.resolveMethod(signature);
     Method jimpleMethod = JimpleMethod.of(method);
 

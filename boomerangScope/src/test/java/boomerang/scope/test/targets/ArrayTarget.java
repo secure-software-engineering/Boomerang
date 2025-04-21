@@ -16,47 +16,38 @@ import java.util.Arrays;
 public class ArrayTarget {
 
   public static void main(String[] args) {
-    singleArrayIndexLoad(new int[] {1, 2});
-    singleArrayVarLoad(new int[] {1, 1});
+    arrayIndexLoad(new int[] {1, 2});
+    arrayVarLoad(new int[] {1, 1});
 
-    singleArrayStoreIndex();
-    singleArrayStoreVar();
-
-    multiArrayStore();
+    arrayStoreIndex();
+    arrayStoreVar();
   }
 
-  public static void singleArrayIndexLoad(int[] arr) {
+  public static void arrayIndexLoad(int[] arr) {
     int i = arr[1];
 
     System.out.println(i);
   }
 
-  public static void singleArrayVarLoad(int[] arr) {
+  public static void arrayVarLoad(int[] arr) {
     int index = 1;
     int i = arr[index];
 
     System.out.println(i);
   }
 
-  public static void singleArrayStoreIndex() {
+  public static void arrayStoreIndex() {
     int[] arr = new int[2];
     arr[0] = 1;
 
     System.out.println(Arrays.toString(arr));
   }
 
-  public static void singleArrayStoreVar() {
+  public static void arrayStoreVar() {
     int[] arr = new int[2];
     int index = 0;
     arr[index] = 1;
 
     System.out.println(Arrays.toString(arr));
-  }
-
-  public static void multiArrayStore() {
-    A[][] arr = new A[2][3];
-    arr[0][1] = new A();
-
-    System.out.println(Arrays.deepToString(arr));
   }
 }

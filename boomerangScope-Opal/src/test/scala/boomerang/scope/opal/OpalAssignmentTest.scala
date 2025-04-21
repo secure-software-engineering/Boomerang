@@ -12,7 +12,7 @@ class OpalAssignmentTest {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[AssignmentTarget].getName)
 
-    val signature = new MethodSignature(classOf[AssignmentTarget].getName, "arrayAllocation", "Void")
+    val signature = new MethodSignature(classOf[AssignmentTarget].getName, "arrayAllocation", "V")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -28,12 +28,42 @@ class OpalAssignmentTest {
           Assert.assertTrue(leftOp.isLocal)
 
           Assert.assertTrue(rightOp.getArrayAllocationSize.isIntConstant)
-          Assert.assertTrue(rightOp.getType.isArrayType)
+          Assert.assertEquals(2, rightOp.getArrayAllocationSize.getIntValue)
         }
       }
     })
 
     Assert.assertEquals(1, arrayAllocationCount)
+  }
+
+  @Test
+  def multiArrayAllocationTest(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[AssignmentTarget].getName)
+
+    val signature = new MethodSignature(classOf[AssignmentTarget].getName, "multiArrayAllocation", "V")
+    val method = opalSetup.resolveMethod(signature)
+    val opalMethod = OpalMethod(method)
+
+    var checked = false
+    opalMethod.getStatements.forEach(stmt => {
+      if (stmt.isAssignStmt) {
+        val rightOp = stmt.getRightOp
+
+        if (rightOp.isArrayAllocationVal) {
+          val leftOp = stmt.getLeftOp
+          Assert.assertTrue(leftOp.isLocal)
+
+          val arraySize = rightOp.getArrayAllocationSize
+          Assert.assertTrue(arraySize.isIntConstant)
+          Assert.assertEquals(2, arraySize.getIntValue)
+
+          checked = true
+        }
+      }
+    })
+
+    Assert.assertTrue(checked)
   }
 
   @Test

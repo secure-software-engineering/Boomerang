@@ -8,17 +8,16 @@ import org.opalj.br.IntegerType
 
 import java.util
 
-@Ignore
 class OpalArrayTest {
 
   private val integerType = IntegerType.toJVMTypeName
 
   @Test
-  def singleArrayLoadIndexTest(): Unit = {
+  def arrayLoadIndexTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayIndexLoad", "Void", util.List.of("[" + integerType))
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "arrayIndexLoad", "V", util.List.of("[" + integerType))
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -41,11 +40,11 @@ class OpalArrayTest {
   }
 
   @Test
-  def singleArrayLoadVarTest(): Unit = {
+  def arrayLoadVarTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayVarLoad", "Void", util.List.of("[" + integerType))
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "arrayVarLoad", "V", util.List.of("[" + integerType))
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -68,11 +67,11 @@ class OpalArrayTest {
   }
 
   @Test
-  def singleArrayStoreIndexTest(): Unit = {
+  def arrayStoreIndexTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayStoreIndex", "Void")
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreIndex", "V")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -95,11 +94,11 @@ class OpalArrayTest {
   }
 
   @Test
-  def singleArrayStoreVarTest(): Unit = {
+  def arrayStoreVarTest(): Unit = {
     val opalSetup = new OpalSetup()
     opalSetup.setupOpal(classOf[ArrayTarget].getName)
 
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "singleArrayStoreVar", "Void")
+    val signature = new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreVar", "V")
     val method = opalSetup.resolveMethod(signature)
     val opalMethod = OpalMethod(method)
 
@@ -120,17 +119,4 @@ class OpalArrayTest {
 
     Assert.assertEquals(1, arrayStoreCount)
   }
-
-  @Test
-  def multiArrayStore(): Unit = {
-    val opalSetup = new OpalSetup()
-    opalSetup.setupOpal(classOf[ArrayTarget].getName)
-
-    val signature = new MethodSignature(classOf[ArrayTarget].getName, "multiArrayStore", "Void")
-    val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
-
-    println(opalMethod.tac.statements.mkString("Array(\n\t", "\n\t", "\n)"))
-  }
-
 }

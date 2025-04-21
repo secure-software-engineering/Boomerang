@@ -17,6 +17,7 @@ public class AssignmentTarget {
 
   public static void main(String[] args) {
     arrayAllocation();
+    multiArrayAllocation();
     constantAssignment();
     fieldStoreAssignment();
   }
@@ -25,6 +26,13 @@ public class AssignmentTarget {
     int[] arr = new int[] {1, 2};
 
     System.out.println(Arrays.toString(arr));
+  }
+
+  public static void multiArrayAllocation() {
+    A[][] arr = new A[2][3];
+    arr[0][1] = new A();
+
+    System.out.println(Arrays.deepToString(arr));
   }
 
   public static void constantAssignment() {

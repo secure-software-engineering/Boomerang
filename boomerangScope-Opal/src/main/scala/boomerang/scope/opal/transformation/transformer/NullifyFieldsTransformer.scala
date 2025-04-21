@@ -6,7 +6,7 @@ import org.opalj.tac.{Assignment, Expr, NullExpr, PutField}
 
 object NullifyFieldsTransformer {
 
-  final val NULLIFIED_FIELD = -2
+  private final val NULLIFIED_FIELD = -2
 
   def apply(method: Method, stmtGraph: StmtGraph): StmtGraph = {
     if (!method.isConstructor || method.isStatic) {
@@ -53,7 +53,6 @@ object NullifyFieldsTransformer {
 
       result = result.insertBefore(defSite, firstOriginalStmt)
       result = result.insertBefore(putField, firstOriginalStmt)
-
     })
 
     result

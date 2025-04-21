@@ -1,7 +1,7 @@
 package boomerang.scope.opal.transformation
 
 import boomerang.scope.opal.transformation.stack.OperandStackBuilder
-import boomerang.scope.opal.transformation.transformer.{InlineLocalTransformer, LocalPropagationTransformer, LocalTransformer, NopTransformer, NullifyFieldsTransformer}
+import boomerang.scope.opal.transformation.transformer.{InlineLocalTransformer, LocalPropagationTransformer, LocalTransformer, NopEliminator, NopTransformer, NullifyFieldsTransformer}
 import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
 import org.opalj.br.Method
 import org.opalj.br.analyses.Project
@@ -37,11 +37,12 @@ object TacBodyBuilder {
     val tacCfg = cfg.get.mapPCsToIndexes[Stmt[TacLocal], TACStmts[TacLocal]](TACStmts(propagatedTac), tacNaive.pcToIndex, i => i, propagatedTac.length)
 
     val exceptionHandlers = tacNaive.exceptionHandlers.map(eh => eh.handlerPC).toArray
-    val stmtGraph = StmtGraph(propagatedTac, tacCfg, tacNaive.pcToIndex, exceptionHandlers)
+    var stmtGraph = StmtGraph(propagatedTac, tacCfg, tacNaive.pcToIndex, exceptionHandlers)
 
-    val nopStmtGraph = NopTransformer(stmtGraph)
-    val nullifiedStmtGraph = NullifyFieldsTransformer(method, nopStmtGraph)
+    stmtGraph = NopTransformer(stmtGraph)
+    stmtGraph = NullifyFieldsTransformer(method, stmtGraph)
+    stmtGraph = NopEliminator(stmtGraph)
 
-    new BoomerangTACode(nullifiedStmtGraph)
+    new BoomerangTACode(stmtGraph)
   }
 }
