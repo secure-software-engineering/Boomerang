@@ -38,8 +38,14 @@ object LocalTransformer {
         case Assignment(pc, targetVar, expr) =>
           // Parameter definition statements
           if (pc == -1) {
-            val paramLocal = createParameterLocal(targetVar)
             val transformedExpr = transformExpr(pc, expr)
+
+            var paramName: Option[String] = None
+            if (transformedExpr.isVar && transformedExpr.asVar.isParameterLocal) {
+              paramName = Some(transformedExpr.asVar.name)
+            }
+
+            val paramLocal = createParameterLocal(targetVar, paramName)
 
             currentLocals(paramLocal.id) = paramLocal
             return Assignment(pc, paramLocal, transformedExpr)
@@ -136,10 +142,10 @@ object LocalTransformer {
 
     def isThisVar(idBasedVar: IdBasedVar): Boolean = method.isNotStatic && idBasedVar.id == -1
 
-    def createParameterLocal(idBasedVar: IdBasedVar): TacLocal = {
+    def createParameterLocal(idBasedVar: IdBasedVar, paramName: Option[String] = Option.empty): TacLocal = {
       val local = localArray(0)
 
-      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThisVar(idBasedVar))
+      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThisVar(idBasedVar), paramName)
     }
 
     def createStackLocal(pc: PC, idBasedVar: IdBasedVar, isThis: Boolean): TacLocal = {
@@ -152,9 +158,16 @@ object LocalTransformer {
 
     def createRegisterLocal(pc: PC, idBasedVar: IdBasedVar, isThis: Boolean): TacLocal = {
       val nextPc = method.body.get.pcOfNextInstruction(pc)
-      val local = localArray(nextPc)
+      val locals = localArray(nextPc)
 
-      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, local(-idBasedVar.id - 1), isThis)
+      val index = -idBasedVar.id - 1
+
+      val local = method.body.get.localVariable(nextPc, index)
+      if (local.isDefined) {
+        return new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, locals(index), isThis, Option(local.get.name))
+      }
+
+      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, locals(index), isThis)
     }
 
     def createExceptionLocal(pc: PC, idBasedVar: IdBasedVar, localId: Int): TacLocal = {

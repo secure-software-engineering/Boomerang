@@ -39,10 +39,8 @@ class OpalMethodInvokeExpr(val delegate: MethodCall[TacLocal], method: OpalMetho
 
   override def hashCode: Int = Objects.hash(delegate)
 
-  private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalMethodInvokeExpr]
-
   override def equals(obj: Any): Boolean = obj match {
-    case other: OpalMethodInvokeExpr => other.canEqual(this) && this.delegate == other.delegate
+    case other: OpalMethodInvokeExpr => this.delegate == other.delegate
     case _ => false
   }
 

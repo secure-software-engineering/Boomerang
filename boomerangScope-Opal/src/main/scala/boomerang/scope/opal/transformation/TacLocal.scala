@@ -22,7 +22,7 @@ trait TacLocal extends Var[TacLocal] {
 
   def cTpe: ComputationalType
 
-  def value: ValueInformation
+  def valueInformation: ValueInformation
 
   final def isSideEffectFree: Boolean = true
 
@@ -47,9 +47,9 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
 
   override def cTpe: ComputationalType = computationalType
 
-  override def value: ValueInformation = valueInfo
+  override def valueInformation: ValueInformation = valueInfo
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
   override def equals(other: Any): Boolean = other match {
     case that: StackLocal => this.id == that.id
@@ -58,7 +58,7 @@ class StackLocal(identifier: Int, computationalType: ComputationalType, valueInf
   }
 }
 
-class RegisterLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation, isThis: Boolean = false) extends TacLocal {
+class RegisterLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation, isThis: Boolean = false, localName: Option[String] = Option.empty) extends TacLocal {
 
   override def id: Int = identifier
 
@@ -66,13 +66,18 @@ class RegisterLocal(identifier: Int, computationalType: ComputationalType, value
 
   override def isThisLocal: Boolean = isThis
 
-  override def name: String = if (isThis) "this" else s"r${-identifier - 1}"
+  override def name: String = {
+    if (isThis) return "this"
+    if (localName.isDefined) return localName.get
+
+    s"r${-identifier - 1}"
+  }
 
   override def cTpe: ComputationalType = computationalType
 
-  override def value: ValueInformation = valueInfo
+  override def valueInformation: ValueInformation = valueInfo
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
   override def equals(other: Any): Boolean = other match {
     case that: RegisterLocal => this.id == that.id
@@ -89,11 +94,11 @@ class ParameterLocal(identifier: Int, computationalType: ComputationalType, para
 
   override def cTpe: ComputationalType = computationalType
 
-  override def value: ValueInformation = throw new UnsupportedOperationException("No value information available for parameter local")
+  override def valueInformation: ValueInformation = throw new UnsupportedOperationException("No value information available for parameter local")
 
   override def name: String = paramName
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
   override def equals(other: Any): Boolean = other match {
     case that: ParameterLocal => this.id == that.id
@@ -107,11 +112,11 @@ class NullifiedLocal(identifier: Int, computationalType: ComputationalType) exte
 
   override def cTpe: ComputationalType = computationalType
 
-  override def value: ValueInformation = IsNullValue
+  override def valueInformation: ValueInformation = IsNullValue
 
   override def name: String = s"n$identifier"
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
   override def equals(other: Any): Boolean = other match {
     case that: NullifiedLocal => this.id == that.id
@@ -127,11 +132,11 @@ class ExceptionLocal(identifier: Int, computationalType: ComputationalType, valu
 
   override def cTpe: ComputationalType = computationalType
 
-  override def value: ValueInformation = valueInfo
+  override def valueInformation: ValueInformation = valueInfo
 
   override def name: String = s"e$identifier"
 
-  override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
   override def equals(other: Any): Boolean = other match {
     case that: ExceptionLocal => this.id == that.id

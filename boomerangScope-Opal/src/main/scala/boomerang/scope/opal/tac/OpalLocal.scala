@@ -10,7 +10,7 @@ import java.util.Objects
 class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: ControlFlowGraph.Edge = null) extends Val(method, unbalanced) {
 
   override def getType: Type = {
-    val value = delegate.asVar.value
+    val value = delegate.asVar.valueInformation
 
     if (value.isPrimitiveValue) {
       return OpalType(value.asPrimitiveValue.primitiveType)
@@ -26,9 +26,6 @@ class OpalLocal(val delegate: Var[TacLocal], method: OpalMethod, unbalanced: Con
       } else {
         return OpalType(value.asReferenceValue.upperTypeBound.head)
       }
-
-      // Over approximation: Same behavior as in Soot
-      return OpalType(ObjectType("java/lang/Object"))
     }
 
     if (value.isVoid) {
