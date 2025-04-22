@@ -4,11 +4,13 @@ import boomerang.scope.{CallGraph, InvokeExpr}
 import boomerang.scope.CallGraph.Edge
 import boomerang.scope.opal.tac.{OpalFunctionInvokeExpr, OpalMethod, OpalMethodInvokeExpr, OpalPhantomMethod, OpalStatement}
 import boomerang.scope.opal.transformation.TacBodyBuilder
+import org.opalj.br.analyses.Project
 import org.opalj.br.{DefinedMethod, Method, MultipleDefinedMethods, VirtualDeclaredMethod}
 import org.opalj.tac.{NonVirtualFunctionCall, StaticFunctionCall, VirtualFunctionCall}
 
-class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Method]) extends CallGraph {
+class OpalCallGraph(project: Project[_], callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Method]) extends CallGraph {
 
+  // TODO Deal with <clinit>
   callGraph.reachableMethods().foreach(method => {
     method.method match {
       case definedMethod: DefinedMethod =>
@@ -23,7 +25,7 @@ class OpalCallGraph(callGraph: org.opalj.tac.cg.CallGraph, entryPoints: Set[Meth
   })
 
   private def addEdgesFromMethod(method: DefinedMethod): Unit = {
-    val tacCode = TacBodyBuilder(OpalClient.project.get, method.definedMethod)
+    val tacCode = TacBodyBuilder(project, method.definedMethod)
 
     tacCode.statements.foreach(stmt => {
       val srcStatement = new OpalStatement(stmt, OpalMethod(method.definedMethod, tacCode))

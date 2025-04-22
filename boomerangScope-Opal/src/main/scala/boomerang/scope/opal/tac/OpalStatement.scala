@@ -90,25 +90,10 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
   }
 
   override def isAssignStmt: Boolean = {
-    if (delegate.isAssignment) {
-      val targetVar = delegate.asAssignment.targetVar
-      val expr = delegate.asAssignment.expr
+    if (isIdentityStmt) return false
+    if (delegate.isAssignment) return true
 
-      if (expr.isVar) {
-        /* Difference between Soot and Opal:
-         * - Soot considers parameter definitions and self assignments of the this local as identity statements (no assignments)
-         * - Opal considers these statements as basic assignments, so we have to exclude them manually
-         */
-        if (expr.asVar.isParameterLocal) return false
-        if (expr.asVar.isExceptionLocal) return false
-        if (targetVar.isThisLocal && expr.asVar.isThisLocal) return false
-
-        return true
-      } else {
-        return true
-      }
-    }
-
+    // Store statements are no assignments in Opal
     isFieldStore || isArrayStore || isStaticFieldStore
   }
 
@@ -274,7 +259,24 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def isFieldLoad: Boolean = delegate.isAssignment && delegate.asAssignment.expr.isGetField
 
-  override def isIdentityStmt: Boolean = false
+  override def isIdentityStmt: Boolean = {
+    if (delegate.isAssignment) {
+      /* Difference between Soot and Opal:
+       * - Soot considers parameter definitions and self assignments of the this local as identity statements (no assignments)
+       * - Opal considers these statements as basic assignments, so we have to exclude them manually
+       */
+      val targetVar = delegate.asAssignment.targetVar
+      val expr = delegate.asAssignment.expr
+
+      if (expr.isVar) {
+        if (expr.asVar.isParameterLocal) return true
+        if (expr.asVar.isExceptionLocal) return true
+        if (targetVar.isThisLocal && expr.asVar.isThisLocal) return true
+      }
+    }
+
+    false
+  }
 
   override def getFieldStore: Pair[Val, Field] = {
     if (isFieldStore) {
