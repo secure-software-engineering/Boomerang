@@ -13,7 +13,7 @@ jobs:
   BuildAndTest:
     strategy:
       matrix:
-        framework: [soot, opal] # TODO Add SootUp when available
+        framework: [Soot, Opal] # TODO Add SootUp when available
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
