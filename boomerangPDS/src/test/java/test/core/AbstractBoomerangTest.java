@@ -54,6 +54,7 @@ import sync.pds.solver.nodes.SingleNode;
 import test.TestingFramework;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
+import wpds.impl.NoWeight;
 import wpds.impl.Transition;
 import wpds.impl.WeightedPAutomaton;
 import wpds.interfaces.WPAStateListener;

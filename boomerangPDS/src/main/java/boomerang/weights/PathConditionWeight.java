@@ -13,8 +13,6 @@ package boomerang.weights;
 
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import com.google.common.collect.Maps;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import wpds.impl.Weight;
 

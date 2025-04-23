@@ -13,9 +13,6 @@ package boomerang.weights;
 
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Val;
-import com.google.common.collect.Lists;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;

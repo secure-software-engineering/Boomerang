@@ -33,7 +33,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 /**
  * This code was added to test <a href="https://github.com/CodeShield-Security/SPDS/issues/5">Issue

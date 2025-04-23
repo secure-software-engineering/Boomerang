@@ -34,7 +34,7 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.Timeout;
 import test.TestingFramework;
-import wpds.impl.Weight;
+import wpds.impl.NoWeight;
 
 public class MultiQueryBoomerangTest extends TestingFramework {
 
