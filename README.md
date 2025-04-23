@@ -9,7 +9,7 @@ This repository contains:
 - a Java implementation of [Synchronized Pushdown Systems](https://digital.ub.uni-paderborn.de/hs/content/titleinfo/3030984).
 - [Boomerang](boomerangPDS) to calculate on-demand points-to and dataflow information using a Synchronized Pushdown System.
 - [IDEal](idealPDS), an IDE solver based on a [Weighted Pushdown System](https://www.bodden.de/pubs/sab19context.pdf) that uses Boomerang to compute alias information only when required (i.e. on-demand).
-- Implementation of scopes that allows you to run Boomerang and IDEal with the static analysis frameworks Soot.
+- Implementation of scopes that allows you to run Boomerang and IDEal with the static analysis frameworks Soot and Opal.
 
 ## Examples
 
@@ -37,6 +37,14 @@ The projects are released on [Maven Central](https://central.sonatype.com/artifa
   <version>x.y.z</version>
 </dependency>
 ```
+
+## Build and Installation
+If you plan to install Boomerang and IDEal locally, you can use the following commands to build the project:
+
+- `mvn clean install -DskipTests` Install the projects and skip all tests
+- `mvn clean install -DtestSetup=Soot` Install the projects and run the tests with Soot as the underlying framework
+- `mvn clean install -DtestSetup=SootUp` Install the projects and run the tests with SootUp as the underlying framework
+- `mvn clean install -DtestSetup=Opal` Install the projects and run the tests with Opal as the underlying framework
 
 ## Contributing
 
