@@ -11,56 +11,53 @@
  */
 package tests;
 
-import static tests.NumWeightOne.one;
-import static tests.NumWeightZero.zero;
+import static tests.MinSemiringZero.zero;
 
+import de.fraunhofer.iem.Location;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class NumWeightImpl implements NumWeight {
+public class MinSemiringOne implements MinSemiring {
 
-  private final int i;
+  @NonNull private static final MinSemiringOne one = new MinSemiringOne();
 
-  public NumWeightImpl(int i) {
-    this.i = i;
+  private MinSemiringOne() {}
+
+  public MinSemiringOne(int i) {}
+
+  public static <N extends Location> MinSemiring one() {
+    return one;
   }
 
+  @Override
   public int getI() {
-    return i;
+    return 0;
   }
 
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    NumWeight one = one();
-    if (other == one) return this;
-    NumWeight zero = zero();
-    if (other == zero) return zero;
-
-    NumWeightImpl o = (NumWeightImpl) other;
-    return new NumWeightImpl(o.getI() + getI());
+    return other;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    NumWeight zero = zero();
-    if (other == zero) return this;
-    NumWeight o = (NumWeight) other;
-    if (o.getI() == getI()) return o;
-    return zero;
+    if (other == zero()) return this;
+    MinSemiring o = (MinSemiring) other;
+    return new MinSemiringOne(Math.min(o.getI(), getI()));
   }
 
   @Override
   public String toString() {
-    return Integer.toString(i);
+    return Integer.toString(getI());
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + i;
+    result = prime * result + getI();
     return result;
   }
 
@@ -69,7 +66,7 @@ public class NumWeightImpl implements NumWeight {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    NumWeightImpl other = (NumWeightImpl) obj;
-    return i == other.i;
+    MinSemiringOne other = (MinSemiringOne) obj;
+    return getI() == other.getI();
   }
 }

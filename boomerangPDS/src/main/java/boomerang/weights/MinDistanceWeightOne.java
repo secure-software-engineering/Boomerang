@@ -25,25 +25,18 @@ public class MinDistanceWeightOne implements MinDistanceWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight o) {
-    if (!(o instanceof MinDistanceWeightImpl)) {
+    if (!(o instanceof MinDistanceWeight)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
-    MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    Integer newDistance = getMinDistance() + other.getMinDistance();
-    return new MinDistanceWeightImpl(newDistance);
+    return o;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight o) {
-    if (!(o instanceof MinDistanceWeightImpl))
+    if (!(o instanceof MinDistanceWeight))
       throw new RuntimeException("Cannot extend to different types of weight!");
-    MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    return new MinDistanceWeightImpl(Math.min(other.getMinDistance(), getMinDistance()));
+    return o;
   }
 
   @Override

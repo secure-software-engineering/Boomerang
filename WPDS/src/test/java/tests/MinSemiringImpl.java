@@ -11,44 +11,33 @@
  */
 package tests;
 
-import static tests.NumWeightOne.one;
-import static tests.NumWeightZero.zero;
-
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class NumWeightImpl implements NumWeight {
+public class MinSemiringImpl implements Weight, MinSemiring {
+  int i;
 
-  private final int i;
-
-  public NumWeightImpl(int i) {
+  public MinSemiringImpl(int i) {
     this.i = i;
-  }
-
-  public int getI() {
-    return i;
   }
 
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    NumWeight one = one();
+    MinSemiring one = MinSemiringOne.one();
     if (other == one) return this;
-    NumWeight zero = zero();
-    if (other == zero) return zero;
-
-    NumWeightImpl o = (NumWeightImpl) other;
-    return new NumWeightImpl(o.getI() + getI());
+    if (this == one) return other;
+    MinSemiringImpl o = (MinSemiringImpl) other;
+    return new MinSemiringImpl(o.i + i);
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    NumWeight zero = zero();
-    if (other == zero) return this;
-    NumWeight o = (NumWeight) other;
-    if (o.getI() == getI()) return o;
-    return zero;
+    if (other == MinSemiringZero.zero()) return this;
+    if (this == MinSemiringZero.zero()) return other;
+    MinSemiringImpl o = (MinSemiringImpl) other;
+    return new MinSemiringImpl(Math.min(o.i, i));
   }
 
   @Override
@@ -69,7 +58,12 @@ public class NumWeightImpl implements NumWeight {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    NumWeightImpl other = (NumWeightImpl) obj;
+    MinSemiringImpl other = (MinSemiringImpl) obj;
     return i == other.i;
+  }
+
+  @Override
+  public int getI() {
+    return 0;
   }
 }

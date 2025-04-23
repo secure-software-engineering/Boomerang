@@ -37,7 +37,7 @@ public class SootFrameworkScope implements FrameworkScope {
 
   public SootFrameworkScope(
       @NonNull Scene scene,
-      soot.jimple.toolkits.callgraph.@NonNull CallGraph callGraph,
+      soot.jimple.toolkits.callgraph.CallGraph callGraph,
       @NonNull Collection<SootMethod> entryPoints,
       @NonNull DataFlowScope dataFlowScope) {
     this.scene = scene;
@@ -47,16 +47,19 @@ public class SootFrameworkScope implements FrameworkScope {
   }
 
   @Override
+  @NonNull
   public Val getTrueValue(Method m) {
     return new JimpleVal(IntConstant.v(1), m);
   }
 
   @Override
+  @NonNull
   public Val getFalseValue(Method m) {
     return new JimpleVal(IntConstant.v(0), m);
   }
 
   @Override
+  @NonNull
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
     JimpleStaticFieldVal val = ((JimpleStaticFieldVal) fact);
     return ((JimpleField) val.field())
@@ -66,6 +69,7 @@ public class SootFrameworkScope implements FrameworkScope {
   }
 
   @Override
+  @NonNull
   public StaticFieldVal newStaticFieldVal(Field field, Method m) {
     return new JimpleStaticFieldVal((JimpleField) field, m);
   }

@@ -11,14 +11,12 @@
  */
 package boomerang.weights;
 
-import static boomerang.weights.MinDistanceWeightOne.one;
-
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
 public class MinDistanceWeightImpl implements MinDistanceWeight {
 
-  private Integer minDistance = -1;
+  private final Integer minDistance;
 
   public MinDistanceWeightImpl(Integer minDistance) {
     this.minDistance = minDistance;
@@ -27,12 +25,11 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight o) {
-    if (!(o instanceof MinDistanceWeightImpl)) {
+    if (!(o instanceof MinDistanceWeight)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
     MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
+
     Integer newDistance = minDistance + other.minDistance;
     return new MinDistanceWeightImpl(newDistance);
   }
@@ -40,12 +37,10 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight o) {
-    if (!(o instanceof MinDistanceWeightImpl))
+    if (!(o instanceof MinDistanceWeight))
       throw new RuntimeException("Cannot extend to different types of weight!");
-    MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    return new MinDistanceWeightImpl(Math.min(other.minDistance, minDistance));
+    return new MinDistanceWeightImpl(
+        Math.min(((MinDistanceWeightImpl) o).minDistance, minDistance));
   }
 
   @Override
@@ -70,8 +65,8 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
 
   @Override
   public String toString() {
-    final Weight one = new MinDistanceWeightOne();
-    return (this == one) ? "ONE " : " Distance: " + minDistance;
+
+    return " Distance: " + minDistance;
   }
 
   @Override

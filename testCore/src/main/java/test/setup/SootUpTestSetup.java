@@ -251,6 +251,7 @@ public class SootUpTestSetup implements TestSetup {
               .parseMethodSignature("<dummyClass: void main(java.lang.String[])>");
       BodySource bodySource =
           new BodySource() {
+
             @Override
             public sootup.core.model.@NonNull Body resolveBody(
                 @NonNull Iterable<MethodModifier> iterable) throws ResolveException, IOException {
