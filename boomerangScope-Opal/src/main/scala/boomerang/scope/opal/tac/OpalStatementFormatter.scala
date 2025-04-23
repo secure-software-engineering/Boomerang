@@ -34,6 +34,10 @@ object OpalStatementFormatter {
         val base = stmt.getArrayBase
         return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
       }
+
+      if (stmt.isStaticFieldStore) {
+        return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+      }
     }
 
     if (delegate.isAssignment) {

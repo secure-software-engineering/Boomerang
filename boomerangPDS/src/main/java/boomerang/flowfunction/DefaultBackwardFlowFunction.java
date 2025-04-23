@@ -97,8 +97,8 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
   }
 
   @Override
-  public Collection<State> normalFlow(Edge currEdge, Val fact) {
-    Statement curr = currEdge.getTarget();
+  public Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact) {
+    Statement curr = nextEdge.getTarget();
     if (options.allocationSite().getAllocationSite(curr.getMethod(), curr, fact).isPresent()) {
       return Collections.emptySet();
     }
@@ -117,7 +117,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
           if (options.trackFields()) {
             Pair<Val, Field> ifr = curr.getFieldLoad();
             if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
-              out.add(new PushNode<>(currEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
+              out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
             }
           }
         } else if (curr.isStaticFieldLoad()) {
@@ -129,20 +129,20 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
         } else if (rightOp.isArrayRef()) {
           Pair<Val, Integer> arrayBase = curr.getArrayBase();
           if (options.trackFields()) {
-            strategies.getArrayHandlingStrategy().handleBackward(currEdge, arrayBase, out);
+            strategies.getArrayHandlingStrategy().handleBackward(nextEdge, arrayBase, out);
           }
         } else if (rightOp.isCast()) {
-          out.add(new Node<>(currEdge, rightOp.getCastOp()));
+          out.add(new Node<>(nextEdge, rightOp.getCastOp()));
         } else if (curr.isPhiStatement()) {
           Collection<Val> phiVals = curr.getPhiVals();
           for (Val v : phiVals) {
-            out.add(new Node<>(currEdge, v));
+            out.add(new Node<>(nextEdge, v));
           }
         } else {
           if (curr.isFieldLoadWithBase(fact)) {
-            out.add(new ExclusionNode<>(currEdge, fact, curr.getLoadedField()));
+            out.add(new ExclusionNode<>(nextEdge, fact, curr.getLoadedField()));
           } else {
-            out.add(new Node<>(currEdge, rightOp));
+            out.add(new Node<>(nextEdge, rightOp));
           }
         }
       }
@@ -151,33 +151,34 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
         Val base = ifr.getX();
         if (base.equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(currEdge, rightOp, ifr.getY());
+              new NodeWithLocation<>(nextEdge, rightOp, ifr.getY());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (curr.isStaticFieldStore()) {
         StaticFieldVal staticField = curr.getStaticField();
         if (fact.isStatic() && fact.equals(staticField)) {
-          out.add(new Node<>(currEdge, rightOp));
+          out.add(new Node<>(nextEdge, rightOp));
         }
       } else if (leftOp.isArrayRef()) {
         Pair<Val, Integer> arrayBase = curr.getArrayBase();
         if (arrayBase.getX().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(currEdge, rightOp, Field.array(arrayBase.getY()));
+              new NodeWithLocation<>(nextEdge, rightOp, Field.array(arrayBase.getY()));
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       }
     }
-    if (!leftSideMatches) out.add(new Node<>(currEdge, fact));
+    if (!leftSideMatches) out.add(new Node<>(nextEdge, fact));
     return out;
   }
 
   @Override
-  public Collection<State> callToReturnFlow(Edge edge, Val fact) {
-    if (FlowFunctionUtils.isSystemArrayCopy(edge.getTarget().getInvokeExpr().getDeclaredMethod())) {
-      return systemArrayCopyFlow(edge, fact);
+  public Collection<State> callToReturnFlow(Edge currEdge, Edge nextEdge, Val fact) {
+    if (FlowFunctionUtils.isSystemArrayCopy(
+        nextEdge.getTarget().getInvokeExpr().getDeclaredMethod())) {
+      return systemArrayCopyFlow(nextEdge, fact);
     }
-    return normalFlow(edge, fact);
+    return normalFlow(currEdge, nextEdge, fact);
   }
 
   @Override

@@ -11,11 +11,9 @@
  */
 package test.cases.statics;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import test.core.AbstractBoomerangTest;
 
-@Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
 public class SimpleSingletonTest extends AbstractBoomerangTest {
 
   private final String target = SimpleSingletonTarget.class.getName();

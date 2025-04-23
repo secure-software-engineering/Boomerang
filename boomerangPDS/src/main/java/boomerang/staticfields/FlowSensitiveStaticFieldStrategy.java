@@ -28,6 +28,6 @@ public class FlowSensitiveStaticFieldStrategy implements StaticFieldHandlingStra
   @Override
   public void handleBackward(
       Edge loadStatement, Val loadedVal, StaticFieldVal staticVal, Set<State> out) {
-    out.add(new Node<>(loadStatement, loadStatement.getTarget().getStaticField()));
+    out.add(new Node<>(loadStatement, loadStatement.getStart().getStaticField()));
   }
 }

@@ -55,11 +55,12 @@ public interface IBackwardFlowFunction {
    * The logic differs from general IFDS logic here. edge.getTarget() can also contain a call site,
    * but fact is not used in the call site (no parameter or base variable of the call expression) .
    *
-   * @param edge The control-flow graph edge that will be propagated next.
+   * @param currEdge the current control-flow graph edge
+   * @param nextEdge The control-flow graph edge that will be propagated next.
    * @param fact The incoming data-flow fact that reaches the edge.
    * @return A set of data-flow states (states in the pushdown system).
    */
-  Collection<State> normalFlow(Edge edge, Val fact);
+  Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact);
 
   /**
    * Called by the backward analysis, when data-flow by-passes a call site with data-flow fact. Here
@@ -69,12 +70,13 @@ public interface IBackwardFlowFunction {
    * the call expression. As a consequence, special handling for call site may need to be
    * implemented as part of callToReturn and normalFlow.
    *
-   * @param edge Edge that bypasses the call site. edge.getTarget() is the call site,
+   * @param currEdge Current edge that generates the next edge
+   * @param nextEdge Edge that bypasses the call site. edge.getTarget() is the call site,
    *     edge.getStart() is any predecessor
    * @param fact The fact that by-passes the call site.
    * @return A set of data-flow states (states in the pushdown system)
    */
-  Collection<State> callToReturnFlow(Edge edge, Val fact);
+  Collection<State> callToReturnFlow(Edge currEdge, Edge nextEdge, Val fact);
 
   void setSolver(
       BackwardBoomerangSolver<?> solver,

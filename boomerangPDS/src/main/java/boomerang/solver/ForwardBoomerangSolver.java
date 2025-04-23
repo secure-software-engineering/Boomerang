@@ -421,7 +421,8 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Edge fieldWriteStatementEdge, Transition<Field, INode<Node<Edge, Val>>> killedTransition);
 
   @Override
-  public Collection<State> computeNormalFlow(Method method, Edge nextEdge, Val fact) {
+  public Collection<State> computeNormalFlow(
+      Method method, Edge currEdge, Edge nextEdge, Val fact) {
     return flowFunctions.normalFlow(query, nextEdge, fact);
   }
 

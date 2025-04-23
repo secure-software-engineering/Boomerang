@@ -15,13 +15,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import test.core.AbstractBoomerangTest;
 
-@Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
 public class SingletonTest extends AbstractBoomerangTest {
 
   private final String target = SingletonTarget.class.getName();
 
   @Test
-  @Ignore
+  @Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
   public void doubleSingleton() {
     analyze(target, testName.getMethodName());
   }
@@ -32,6 +31,7 @@ public class SingletonTest extends AbstractBoomerangTest {
   }
 
   @Test
+  @Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
   public void singletonDirect() {
     analyze(target, testName.getMethodName());
   }

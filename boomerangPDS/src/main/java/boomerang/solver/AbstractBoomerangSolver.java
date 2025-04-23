@@ -445,7 +445,8 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     }
   }
 
-  protected abstract Collection<State> computeNormalFlow(Method method, Edge currEdge, Val value);
+  protected abstract Collection<State> computeNormalFlow(
+      Method method, Edge currEdge, Edge nextEdge, Val value);
 
   @Override
   public Field epsilonField() {

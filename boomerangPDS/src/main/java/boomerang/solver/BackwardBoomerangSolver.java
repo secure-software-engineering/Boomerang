@@ -130,7 +130,8 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
             .getPredsOf(curr.stmt().getStart())) {
 
       Collection<State> res =
-          flowFunction.callToReturnFlow(new Edge(returnSite, curr.stmt().getStart()), curr.fact());
+          flowFunction.callToReturnFlow(
+              curr.stmt(), new Edge(returnSite, curr.stmt().getStart()), curr.fact());
       for (State s : res) {
         propagate(curr, s);
       }
@@ -180,7 +181,8 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     {
       for (Statement pred :
           curr.getStart().getMethod().getControlFlowGraph().getPredsOf(curr.getStart())) {
-        Collection<State> flow = computeNormalFlow(method, new Edge(pred, curr.getStart()), value);
+        Collection<State> flow =
+            computeNormalFlow(method, curr, new Edge(pred, curr.getStart()), value);
         for (State s : flow) {
           options.getSparsificationStrategy().getCounter().countBackwardProgragation();
           propagate(currNode, s);
@@ -246,8 +248,9 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
   }
 
   @Override
-  protected Collection<State> computeNormalFlow(Method method, Edge currEdge, Val fact) {
-    return flowFunction.normalFlow(currEdge, fact);
+  protected Collection<State> computeNormalFlow(
+      Method method, Edge currEdge, Edge nextEdge, Val fact) {
+    return flowFunction.normalFlow(currEdge, nextEdge, fact);
   }
 
   @Override

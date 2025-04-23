@@ -354,12 +354,10 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def isCatchStmt: Boolean = delegate.isCaughtException
 
-  override def hashCode: Int = Objects.hash(delegate)
+  override def hashCode: Int = Objects.hash(delegate, m)
 
-  private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalStatement]
-
-  override def equals(obj: Any): Boolean = obj match {
-    case other: OpalStatement => other.canEqual(this) && this.delegate == other.delegate
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalStatement => this.delegate == that.delegate && this.method == that.method
     case _ => false
   }
 

@@ -34,7 +34,7 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
   private final Node<ControlFlowGraph.Edge, Val> node;
   private final org.slf4j.Logger
       LOGGER; // doesn't look good but this class also shouldn't exist alone
-  private final ForwardBoomerangSolver owner;
+  private final ForwardBoomerangSolver<?> owner;
 
   public ForwardSolverSuccessorListener(
       ControlFlowGraph.Edge curr,
@@ -43,7 +43,7 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
       Method method,
       Node<ControlFlowGraph.Edge, Val> node,
       org.slf4j.Logger LOGGER,
-      ForwardBoomerangSolver owner) {
+      ForwardBoomerangSolver<?> owner) {
     super(curr.getTarget());
     this.query = query;
     this.curr = curr;
@@ -93,7 +93,8 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
         }
       } else {*/
       Collection<State> out =
-          owner.computeNormalFlow(method, new ControlFlowGraph.Edge(curr.getTarget(), succ), value);
+          owner.computeNormalFlow(
+              method, curr, new ControlFlowGraph.Edge(curr.getTarget(), succ), value);
       //      if (method.getName().contains("main")) {
       //        for (State s : out) {
       //          if (s instanceof Node) {

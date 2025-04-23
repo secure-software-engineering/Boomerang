@@ -79,6 +79,17 @@ class OpalCallGraph(project: Project[_], callGraph: org.opalj.tac.cg.CallGraph, 
     }
   }
 
+  // Explicitly add static initializers (<clinit>) as they are called only implicitly
+  callGraph.reachableMethods().foreach(method => {
+    method.method match {
+      case definedMethod: DefinedMethod if definedMethod.definedMethod.isStaticInitializer =>
+        if (definedMethod.definedMethod.body.isDefined) {
+          addEntryPoint(OpalMethod(definedMethod.definedMethod))
+        }
+      case _ =>
+    }
+  })
+
   entryPoints.foreach(entryPoint => {
     if (entryPoint.body.isDefined) {
       addEntryPoint(OpalMethod(entryPoint))

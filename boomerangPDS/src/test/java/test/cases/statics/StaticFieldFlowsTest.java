@@ -15,7 +15,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import test.core.AbstractBoomerangTest;
 
-@Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
 public class StaticFieldFlowsTest extends AbstractBoomerangTest {
 
   private final String target = StaticFieldFlowsTarget.class.getName();
@@ -41,6 +40,7 @@ public class StaticFieldFlowsTest extends AbstractBoomerangTest {
   }
 
   @Test
+  @Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
   public void getAndSet() {
     analyze(target, testName.getMethodName());
   }
