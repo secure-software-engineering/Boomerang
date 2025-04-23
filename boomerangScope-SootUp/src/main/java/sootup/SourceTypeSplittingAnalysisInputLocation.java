@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sootup.core.frontend.SootClassSource;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.model.SourceType;
@@ -26,14 +26,14 @@ import sootup.core.views.View;
 /** Mimics Soots includePackage / excludePackage behaviour */
 public abstract class SourceTypeSplittingAnalysisInputLocation implements AnalysisInputLocation {
 
-  @Nonnull
+  @NonNull
   protected abstract AnalysisInputLocation getInputLocation();
 
-  @Nonnull
+  @NonNull
   @Override
   public abstract SourceType getSourceType();
 
-  protected abstract boolean filter(@Nonnull ClassType type);
+  protected abstract boolean filter(@NonNull ClassType type);
 
   private static boolean filterConditionCheck(String pkg, String className) {
     if (className.equals(pkg)) {
@@ -45,23 +45,23 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
     return false;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public Optional<? extends SootClassSource> getClassSource(
-      @Nonnull ClassType type, @Nonnull View view) {
+      @NonNull ClassType type, @NonNull View view) {
     if (filter(type)) {
       return getInputLocation().getClassSource(type, view);
     }
     return Optional.empty();
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Stream<? extends SootClassSource> getClassSources(@Nonnull View view) {
+  public Stream<? extends SootClassSource> getClassSources(@NonNull View view) {
     return getInputLocation().getClassSources(view).filter(type -> filter(type.getClassType()));
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public List<BodyInterceptor> getBodyInterceptors() {
     return getInputLocation().getBodyInterceptors();
@@ -70,11 +70,11 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
   public static class LibraryAnalysisInputLocation
       extends SourceTypeSplittingAnalysisInputLocation {
 
-    @Nonnull private final SourceTypeSplittingAnalysisInputLocation inputLocation;
+    @NonNull private final SourceTypeSplittingAnalysisInputLocation inputLocation;
     private final Collection<String> excludes;
 
     public LibraryAnalysisInputLocation(
-        @Nonnull SourceTypeSplittingAnalysisInputLocation inputLocation,
+        @NonNull SourceTypeSplittingAnalysisInputLocation inputLocation,
         Collection<String> excludes) {
       this.inputLocation = inputLocation;
       this.excludes = excludes;
@@ -85,7 +85,7 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
       return inputLocation;
     }
 
-    protected boolean filter(@Nonnull ClassType type) {
+    protected boolean filter(@NonNull ClassType type) {
       String className = type.getFullyQualifiedName();
       for (String pkg : excludes) {
         if (filterConditionCheck(pkg, className)) {
@@ -95,7 +95,7 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
       return false;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceType getSourceType() {
       return SourceType.Library;
@@ -105,7 +105,7 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
   public static class ApplicationAnalysisInputLocation
       extends SourceTypeSplittingAnalysisInputLocation {
     private final Collection<String> includes;
-    @Nonnull private final AnalysisInputLocation inputLocation;
+    @NonNull private final AnalysisInputLocation inputLocation;
 
     @Override
     protected AnalysisInputLocation getInputLocation() {
@@ -113,12 +113,12 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
     }
 
     public ApplicationAnalysisInputLocation(
-        @Nonnull AnalysisInputLocation inputLocation, Collection<String> includes) {
+        @NonNull AnalysisInputLocation inputLocation, Collection<String> includes) {
       this.inputLocation = inputLocation;
       this.includes = includes;
     }
 
-    protected boolean filter(@Nonnull ClassType type) {
+    protected boolean filter(@NonNull ClassType type) {
       String className = type.getFullyQualifiedName();
       for (String pkg : includes) {
         if (filterConditionCheck(pkg, className)) {
@@ -128,7 +128,7 @@ public abstract class SourceTypeSplittingAnalysisInputLocation implements Analys
       return false;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SourceType getSourceType() {
       return SourceType.Application;

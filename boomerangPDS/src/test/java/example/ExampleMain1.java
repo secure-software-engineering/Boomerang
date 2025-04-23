@@ -113,7 +113,7 @@ public class ExampleMain1 {
         Collection<Query> seeds = scope.computeSeeds();
         for (Query query : seeds) {
           System.out.println("Solving query: " + query);
-          BackwardBoomerangResults<Weight.NoWeight> backwardQueryResults =
+          BackwardBoomerangResults<NoWeight> backwardQueryResults =
               solver.solve((BackwardQuery) query);
           System.out.println("All allocation sites of the query variable are:");
           System.out.println(backwardQueryResults.getAllocationSites());

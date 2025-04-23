@@ -953,7 +953,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
           query,
           visitedMethods.size());
     } catch (Throwable e) {
-      LOGGER.error("Solving query crashed in {}", e.getMessage());
+      LOGGER.error("Solving query crashed", e);
     }
     if (!options.allowMultipleQueries()) {
       unregisterAllListeners();
@@ -1067,7 +1067,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
           query,
           visitedMethods.size());
     } catch (Throwable e) {
-      LOGGER.error("Solving query crashed in {}", e.getMessage());
+      LOGGER.error("Solving query crashed", e);
     }
     if (!options.allowMultipleQueries()) {
       unregisterAllListeners();

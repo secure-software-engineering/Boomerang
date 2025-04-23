@@ -134,7 +134,7 @@ public class SparseAliasManager {
                               dataFlowScope,
                               new BoomerangOptions(
                                   INSTANCE.sparsificationStrategy, INSTANCE.ignoreAfterQuery));
-                      BackwardBoomerangResults<Weight.NoWeight> results =
+                      BackwardBoomerangResults<NoWeight> results =
                           boomerangSolver.solve(query);
                       aliases = results.getAllAliases();
                       boolean debug = false;

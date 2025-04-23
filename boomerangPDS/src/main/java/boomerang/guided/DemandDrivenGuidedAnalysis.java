@@ -30,7 +30,7 @@ import com.google.common.collect.Table.Cell;
 import java.util.*;
 import java.util.Map.Entry;
 import sync.pds.solver.nodes.Node;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 public class DemandDrivenGuidedAnalysis {
 

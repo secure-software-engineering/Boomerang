@@ -13,15 +13,16 @@ package typestate.finiteautomata;
 
 import boomerang.scope.DeclaredMethod;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MatcherTransition extends Transition {
+public class MatcherTransition extends TransitionImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(MatcherTransition.class);
-  private final Type type;
-  private final Parameter param;
-  private final String methodMatcher;
-  private boolean negate = false;
+  @NonNull private final Type type;
+  @NonNull private final Parameter param;
+  @NonNull private final Pattern methodMatcher;
+  private final boolean negate;
 
   public enum Type {
     OnCall,
@@ -36,41 +37,46 @@ public class MatcherTransition extends Transition {
     Param2
   }
 
-  public MatcherTransition(State from, String methodMatcher, Parameter param, State to, Type type) {
-    super(from, to);
-    this.methodMatcher = methodMatcher;
-    this.type = type;
-    this.param = param;
+  public MatcherTransition(
+      @NonNull State from,
+      @NonNull String methodMatcher,
+      @NonNull Parameter param,
+      @NonNull State to,
+      @NonNull Type type) {
+    this(from, methodMatcher, false, param, to, type);
   }
 
   public MatcherTransition(
-      State from, String methodMatcher, boolean negate, Parameter param, State to, Type type) {
+      @NonNull State from,
+      @NonNull String methodMatcher,
+      boolean negate,
+      @NonNull Parameter param,
+      @NonNull State to,
+      @NonNull Type type) {
     super(from, to);
-    this.methodMatcher = methodMatcher;
+    this.methodMatcher = Pattern.compile(methodMatcher);
     this.negate = negate;
     this.type = type;
     this.param = param;
   }
 
-  public boolean matches(DeclaredMethod declaredMethod) {
-    boolean matches = Pattern.matches(methodMatcher, declaredMethod.getSubSignature());
-    if (matches)
+  public boolean matches(@NonNull DeclaredMethod declaredMethod) {
+    boolean matches = methodMatcher.matcher(declaredMethod.getSubSignature()).matches();
+    if (matches) {
       LOGGER.debug(
           "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
+    }
     return negate != matches;
   }
 
+  @NonNull
   public Type getType() {
     return type;
   }
 
+  @NonNull
   public Parameter getParam() {
     return param;
-  }
-
-  @Override
-  public String toString() {
-    return super.toString();
   }
 
   @Override

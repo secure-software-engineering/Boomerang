@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import wpds.impl.Weight;
+import wpds.impl.NoWeight;
 
 public class ExampleMain1 {
   public static void main(String... args)
@@ -112,8 +112,7 @@ public class ExampleMain1 {
     Collection<Query> seeds = scope.computeSeeds();
     for (Query query : seeds) {
       System.out.println("Solving query: " + query);
-      BackwardBoomerangResults<Weight.NoWeight> backwardQueryResults =
-          solver.solve((BackwardQuery) query);
+      BackwardBoomerangResults<NoWeight> backwardQueryResults = solver.solve((BackwardQuery) query);
       System.out.println("All allocation sites of the query variable are:");
       System.out.println(backwardQueryResults.getAllocationSites());
     }

@@ -125,10 +125,10 @@ public class MultiQueryBoomerangTest extends TestingFramework {
             .withAnalysisTimeout(analysisTimeout)
             .enableAllowMultipleQueries(true)
             .build();
-    WeightedBoomerang<Weight.NoWeight> solver = new Boomerang(frameworkScope, options);
+    WeightedBoomerang<NoWeight> solver = new Boomerang(frameworkScope, options);
     for (final Query query : queryForCallSites) {
       if (query instanceof BackwardQuery) {
-        BackwardBoomerangResults<Weight.NoWeight> res = solver.solve((BackwardQuery) query);
+        BackwardBoomerangResults<NoWeight> res = solver.solve((BackwardQuery) query);
         compareQuery(query, res.getAllocationSites().keySet());
       }
     }
