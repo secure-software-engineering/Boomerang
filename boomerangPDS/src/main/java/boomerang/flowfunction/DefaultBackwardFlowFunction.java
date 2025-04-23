@@ -99,7 +99,10 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
   @Override
   public Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact) {
     Statement nextStmt = nextEdge.getTarget();
-    if (options.allocationSite().getAllocationSite(nextStmt.getMethod(), nextStmt, fact).isPresent()) {
+    if (options
+        .allocationSite()
+        .getAllocationSite(nextStmt.getMethod(), nextStmt, fact)
+        .isPresent()) {
       return Collections.emptySet();
     }
     if (nextStmt.isThrowStmt()) {
