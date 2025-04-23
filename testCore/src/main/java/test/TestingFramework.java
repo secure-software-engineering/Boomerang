@@ -22,15 +22,42 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import test.setup.OpalTestSetup;
+import test.setup.SootTestSetup;
+import test.setup.SootUpTestSetup;
 import test.setup.TestSetup;
 
 public class TestingFramework {
 
+  private static final String SOOT = "soot";
+  private static final String SOOT_UP = "sootup";
+  private static final String OPAL = "opal";
+
   private final TestSetup testSetup;
 
   public TestingFramework() {
-    // TODO Parameterize
-    this.testSetup = new OpalTestSetup();
+    this.testSetup = getTestSetup();
+  }
+
+  private TestSetup getTestSetup() {
+    String framework = System.getProperty("testSetup");
+    if (framework == null) {
+      // This can be changed when executing tests locally
+      return new SootTestSetup();
+    }
+
+    switch (framework.toLowerCase()) {
+      case SOOT:
+        return new SootTestSetup();
+      case SOOT_UP:
+        return new SootUpTestSetup();
+      case OPAL:
+        return new OpalTestSetup();
+      default:
+        throw new IllegalArgumentException(
+            "Cannot create test setup for framework "
+                + framework
+                + ". Available options are {Soot, SootUp, Opal}");
+    }
   }
 
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {

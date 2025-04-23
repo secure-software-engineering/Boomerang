@@ -302,6 +302,13 @@
                 <version>3.5.3</version>
                 <configuration>
                     <argLine>-Xmx8G -Xss128m</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>testSetup</name>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <value>${testSetup}</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>
@@ -333,6 +340,42 @@
     </build>
 
     <profiles>
+        <!-- This profile enforces the use of -DtestSetup when tests are executed -->
+        <profile>
+            <id>enforce-test-setup-property</id>
+            <activation>
+                <property>
+                    <name>!skipTests</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-test-setup</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>testSetup</property>
+                                            <message>Running the tests requires the testSetup property. Use e.g. -DtestSetup=soot</message>
+                                        </requireProperty>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- This profile is used to avoid running the deployment in non-deployment
             contexts because they require specific keys from the GitHub remote. Include
             this profile by setting the -Pdeployment flag. -->
