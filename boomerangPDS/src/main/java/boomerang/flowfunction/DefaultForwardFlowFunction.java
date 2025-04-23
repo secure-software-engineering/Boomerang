@@ -103,39 +103,39 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
   @Override
   public Set<State> normalFlow(ForwardQuery query, Edge nextEdge, Val fact) {
-    Statement succ = nextEdge.getStart();
+    Statement nextStmt = nextEdge.getStart();
     Set<State> out = new LinkedHashSet<>();
-    if (killFlow(succ, fact)) {
+    if (killFlow(nextStmt, fact)) {
       return out;
     }
-    if (!succ.isFieldWriteWithBase(fact)) {
+    if (!nextStmt.isFieldWriteWithBase(fact)) {
       // always maintain data-flow if not a field write // killFlow has
       // been taken care of
       if (!options.trackReturnOfInstanceOf()
-          || !(query.getType().isNullType() && succ.isInstanceOfStatement(fact))) {
+          || !(query.getType().isNullType() && nextStmt.isInstanceOfStatement(fact))) {
         out.add(new Node<>(nextEdge, fact));
       }
     } else {
-      out.add(new ExclusionNode<>(nextEdge, fact, succ.getWrittenField()));
+      out.add(new ExclusionNode<>(nextEdge, fact, nextStmt.getWrittenField()));
     }
-    if (succ.isAssignStmt()) {
-      Val leftOp = succ.getLeftOp();
-      Val rightOp = succ.getRightOp();
+    if (nextStmt.isAssignStmt()) {
+      Val leftOp = nextStmt.getLeftOp();
+      Val rightOp = nextStmt.getRightOp();
       if (rightOp.equals(fact)) {
-        if (succ.isFieldStore()) {
-          Pair<Val, Field> ifr = succ.getFieldStore();
+        if (nextStmt.isFieldStore()) {
+          Pair<Val, Field> ifr = nextStmt.getFieldStore();
           if (options.trackFields()) {
             if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
               out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
             }
           }
-        } else if (succ.isStaticFieldStore()) {
-          StaticFieldVal sf = succ.getStaticField();
+        } else if (nextStmt.isStaticFieldStore()) {
+          StaticFieldVal sf = nextStmt.getStaticField();
           if (options.trackFields()) {
             strategies.getStaticFieldStrategy().handleForward(nextEdge, rightOp, sf, out);
           }
         } else if (leftOp.isArrayRef()) {
-          Pair<Val, Integer> arrayBase = succ.getArrayBase();
+          Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
           if (options.trackFields()) {
             strategies.getArrayHandlingStrategy().handleForward(nextEdge, arrayBase, out);
           }
@@ -143,20 +143,20 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
           out.add(new Node<>(nextEdge, leftOp));
         }
       }
-      if (succ.isFieldLoad()) {
-        Pair<Val, Field> ifr = succ.getFieldLoad();
+      if (nextStmt.isFieldLoad()) {
+        Pair<Val, Field> ifr = nextStmt.getFieldLoad();
         if (ifr.getX().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
               new NodeWithLocation<>(nextEdge, leftOp, ifr.getY());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
-      } else if (succ.isStaticFieldLoad()) {
-        StaticFieldVal sf = succ.getStaticField();
+      } else if (nextStmt.isStaticFieldLoad()) {
+        StaticFieldVal sf = nextStmt.getStaticField();
         if (fact.isStatic() && fact.equals(sf)) {
           out.add(new Node<>(nextEdge, leftOp));
         }
       } else if (rightOp.isArrayRef()) {
-        Pair<Val, Integer> arrayBase = succ.getArrayBase();
+        Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
         if (arrayBase.getX().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
               new NodeWithLocation<>(nextEdge, leftOp, Field.array(arrayBase.getY()));
@@ -172,10 +172,10 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
         if (rightOp.getInstanceOfOp().equals(fact)) {
           out.add(new Node<>(nextEdge, fact.withSecondVal(leftOp)));
         }
-      } else if (succ.isPhiStatement()) {
-        Collection<Val> phiVals = succ.getPhiVals();
+      } else if (nextStmt.isPhiStatement()) {
+        Collection<Val> phiVals = nextStmt.getPhiVals();
         if (phiVals.contains(fact)) {
-          out.add(new Node<>(nextEdge, succ.getLeftOp()));
+          out.add(new Node<>(nextEdge, nextStmt.getLeftOp()));
         }
       }
     }

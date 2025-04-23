@@ -98,69 +98,69 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
   @Override
   public Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact) {
-    Statement curr = nextEdge.getTarget();
-    if (options.allocationSite().getAllocationSite(curr.getMethod(), curr, fact).isPresent()) {
+    Statement nextStmt = nextEdge.getTarget();
+    if (options.allocationSite().getAllocationSite(nextStmt.getMethod(), nextStmt, fact).isPresent()) {
       return Collections.emptySet();
     }
-    if (curr.isThrowStmt()) {
+    if (nextStmt.isThrowStmt()) {
       return Collections.emptySet();
     }
     Set<State> out = new LinkedHashSet<>();
 
     boolean leftSideMatches = false;
-    if (curr.isAssignStmt()) {
-      Val leftOp = curr.getLeftOp();
-      Val rightOp = curr.getRightOp();
+    if (nextStmt.isAssignStmt()) {
+      Val leftOp = nextStmt.getLeftOp();
+      Val rightOp = nextStmt.getRightOp();
       if (leftOp.equals(fact)) {
         leftSideMatches = true;
-        if (curr.isFieldLoad()) {
+        if (nextStmt.isFieldLoad()) {
           if (options.trackFields()) {
-            Pair<Val, Field> ifr = curr.getFieldLoad();
+            Pair<Val, Field> ifr = nextStmt.getFieldLoad();
             if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
               out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
             }
           }
-        } else if (curr.isStaticFieldLoad()) {
+        } else if (nextStmt.isStaticFieldLoad()) {
           if (options.trackFields()) {
             strategies
                 .getStaticFieldStrategy()
-                .handleBackward(currEdge, curr.getLeftOp(), curr.getStaticField(), out);
+                .handleBackward(currEdge, nextStmt.getLeftOp(), nextStmt.getStaticField(), out);
           }
         } else if (rightOp.isArrayRef()) {
-          Pair<Val, Integer> arrayBase = curr.getArrayBase();
+          Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
           if (options.trackFields()) {
             strategies.getArrayHandlingStrategy().handleBackward(nextEdge, arrayBase, out);
           }
         } else if (rightOp.isCast()) {
           out.add(new Node<>(nextEdge, rightOp.getCastOp()));
-        } else if (curr.isPhiStatement()) {
-          Collection<Val> phiVals = curr.getPhiVals();
+        } else if (nextStmt.isPhiStatement()) {
+          Collection<Val> phiVals = nextStmt.getPhiVals();
           for (Val v : phiVals) {
             out.add(new Node<>(nextEdge, v));
           }
         } else {
-          if (curr.isFieldLoadWithBase(fact)) {
-            out.add(new ExclusionNode<>(nextEdge, fact, curr.getLoadedField()));
+          if (nextStmt.isFieldLoadWithBase(fact)) {
+            out.add(new ExclusionNode<>(nextEdge, fact, nextStmt.getLoadedField()));
           } else {
             out.add(new Node<>(nextEdge, rightOp));
           }
         }
       }
-      if (curr.isFieldStore()) {
-        Pair<Val, Field> ifr = curr.getFieldStore();
+      if (nextStmt.isFieldStore()) {
+        Pair<Val, Field> ifr = nextStmt.getFieldStore();
         Val base = ifr.getX();
         if (base.equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
               new NodeWithLocation<>(nextEdge, rightOp, ifr.getY());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
-      } else if (curr.isStaticFieldStore()) {
-        StaticFieldVal staticField = curr.getStaticField();
+      } else if (nextStmt.isStaticFieldStore()) {
+        StaticFieldVal staticField = nextStmt.getStaticField();
         if (fact.isStatic() && fact.equals(staticField)) {
           out.add(new Node<>(nextEdge, rightOp));
         }
       } else if (leftOp.isArrayRef()) {
-        Pair<Val, Integer> arrayBase = curr.getArrayBase();
+        Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
         if (arrayBase.getX().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
               new NodeWithLocation<>(nextEdge, rightOp, Field.array(arrayBase.getY()));
