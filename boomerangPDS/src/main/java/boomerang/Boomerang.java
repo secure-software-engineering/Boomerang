@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang;
@@ -18,12 +21,12 @@ import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
 import sync.pds.solver.OneWeightFunctions;
 import sync.pds.solver.WeightFunctions;
-import wpds.impl.Weight;
+import wpds.impl.NoWeight;
 
-public class Boomerang extends WeightedBoomerang<Weight.NoWeight> {
+public class Boomerang extends WeightedBoomerang<NoWeight> {
 
-  private OneWeightFunctions<Edge, Val, Field, Weight.NoWeight> fieldWeights;
-  private OneWeightFunctions<Edge, Val, Edge, Weight.NoWeight> callWeights;
+  private OneWeightFunctions<Edge, Val, Field, NoWeight> fieldWeights;
+  private OneWeightFunctions<Edge, Val, Edge, NoWeight> callWeights;
 
   public Boomerang(FrameworkScope frameworkScope) {
     super(frameworkScope);
@@ -34,36 +37,36 @@ public class Boomerang extends WeightedBoomerang<Weight.NoWeight> {
   }
 
   @Override
-  protected WeightFunctions<Edge, Val, Field, Weight.NoWeight> getForwardFieldWeights() {
+  protected WeightFunctions<Edge, Val, Field, NoWeight> getForwardFieldWeights() {
     return getOrCreateFieldWeights();
   }
 
   @Override
-  protected WeightFunctions<Edge, Val, Field, Weight.NoWeight> getBackwardFieldWeights() {
+  protected WeightFunctions<Edge, Val, Field, NoWeight> getBackwardFieldWeights() {
     return getOrCreateFieldWeights();
   }
 
   @Override
-  protected WeightFunctions<Edge, Val, Edge, Weight.NoWeight> getBackwardCallWeights() {
+  protected WeightFunctions<Edge, Val, Edge, NoWeight> getBackwardCallWeights() {
     return getOrCreateCallWeights();
   }
 
   @Override
-  protected WeightFunctions<Edge, Val, Edge, Weight.NoWeight> getForwardCallWeights(
+  protected WeightFunctions<Edge, Val, Edge, NoWeight> getForwardCallWeights(
       ForwardQuery sourceQuery) {
     return getOrCreateCallWeights();
   }
 
-  private WeightFunctions<Edge, Val, Field, Weight.NoWeight> getOrCreateFieldWeights() {
+  private WeightFunctions<Edge, Val, Field, NoWeight> getOrCreateFieldWeights() {
     if (fieldWeights == null) {
-      fieldWeights = new OneWeightFunctions<>(Weight.NO_WEIGHT_ONE);
+      fieldWeights = new OneWeightFunctions<>(NoWeight.getInstance());
     }
     return fieldWeights;
   }
 
-  private WeightFunctions<Edge, Val, Edge, Weight.NoWeight> getOrCreateCallWeights() {
+  private WeightFunctions<Edge, Val, Edge, NoWeight> getOrCreateCallWeights() {
     if (callWeights == null) {
-      callWeights = new OneWeightFunctions<>(Weight.NO_WEIGHT_ONE);
+      callWeights = new OneWeightFunctions<>(NoWeight.getInstance());
     }
     return callWeights;
   }

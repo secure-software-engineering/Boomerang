@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package wpds.wildcard;
@@ -15,6 +18,7 @@ import de.fraunhofer.iem.Location;
 import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.HashSet;
 import java.util.Set;
+import wpds.impl.NoWeight;
 import wpds.impl.NormalRule;
 import wpds.impl.PopRule;
 import wpds.impl.PushRule;
@@ -23,7 +27,6 @@ import wpds.impl.Rule;
 import wpds.impl.UNormalRule;
 import wpds.impl.UPopRule;
 import wpds.impl.UPushRule;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.State;
 
 public abstract class WildcardPushdownSystem<N extends Location, D extends State>

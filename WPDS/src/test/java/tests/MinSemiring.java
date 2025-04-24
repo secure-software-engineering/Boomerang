@@ -1,20 +1,24 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package tests;
 
 import de.fraunhofer.iem.Location;
+import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class MinSemiring extends Weight {
+public class MinSemiring implements Weight {
   int i;
 
   public MinSemiring(int i) {
@@ -23,16 +27,18 @@ public class MinSemiring extends Weight {
 
   private MinSemiring() {}
 
+  @NonNull
   @Override
-  public Weight extendWith(Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
     MinSemiring o = (MinSemiring) other;
     return new MinSemiring(o.i + i);
   }
 
+  @NonNull
   @Override
-  public Weight combineWith(Weight other) {
+  public Weight combineWith(@NonNull Weight other) {
     if (other.equals(zero())) return this;
     if (this.equals(zero())) return other;
     MinSemiring o = (MinSemiring) other;

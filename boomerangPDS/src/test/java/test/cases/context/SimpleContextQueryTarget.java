@@ -1,18 +1,20 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.context;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 
@@ -21,7 +23,7 @@ public class SimpleContextQueryTarget {
 
   @TestMethod
   public void outerAllocation() {
-    AllocatedObject alloc = new Alloc();
+    AllocatedObject alloc = new ContextAlloc();
     methodOfQuery(alloc);
   }
 

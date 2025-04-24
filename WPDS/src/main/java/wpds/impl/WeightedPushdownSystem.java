@@ -1,22 +1,25 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package wpds.impl;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import wpds.interfaces.IPushdownSystem;
 import wpds.interfaces.State;
@@ -24,10 +27,10 @@ import wpds.interfaces.WPDSUpdateListener;
 
 public class WeightedPushdownSystem<N extends Location, D extends State, W extends Weight>
     implements IPushdownSystem<N, D, W> {
-  protected final Set<PushRule<N, D, W>> pushRules = Sets.newHashSet();
-  protected final Set<PopRule<N, D, W>> popRules = Sets.newHashSet();
-  protected final Set<NormalRule<N, D, W>> normalRules = Sets.newHashSet();
-  protected final Set<WPDSUpdateListener<N, D, W>> listeners = Sets.newHashSet();
+  protected final Set<PushRule<N, D, W>> pushRules = new LinkedHashSet<>();
+  protected final Set<PopRule<N, D, W>> popRules = new LinkedHashSet<>();
+  protected final Set<NormalRule<N, D, W>> normalRules = new LinkedHashSet<>();
+  protected final Set<WPDSUpdateListener<N, D, W>> listeners = new LinkedHashSet<>();
 
   @Override
   public boolean addRule(Rule<N, D, W> rule) {
@@ -73,7 +76,7 @@ public class WeightedPushdownSystem<N extends Location, D extends State, W exten
 
   @Override
   public Set<Rule<N, D, W>> getAllRules() {
-    Set<Rule<N, D, W>> rules = Sets.newHashSet();
+    Set<Rule<N, D, W>> rules = new LinkedHashSet<>();
     rules.addAll(normalRules);
     rules.addAll(popRules);
     rules.addAll(pushRules);
@@ -122,7 +125,7 @@ public class WeightedPushdownSystem<N extends Location, D extends State, W exten
 
   @Override
   public Set<D> getStates() {
-    Set<D> states = Sets.newHashSet();
+    Set<D> states = new LinkedHashSet<>();
     for (Rule<N, D, W> r : getAllRules()) {
       states.add(r.getS1());
       states.add(r.getS2());

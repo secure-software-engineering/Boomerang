@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.results;
@@ -30,16 +33,16 @@ import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
 import boomerang.util.DefaultValueMap;
-import boomerang.weights.DataFlowPathWeight;
+import boomerang.weights.DataFlowPathWeightImpl;
 import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +114,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       return HashBasedTable.create();
     }
     Table<Edge, Val, W> res = asEdgeValWeightTable();
-    Set<Method> visitedMethods = Sets.newHashSet();
+    Set<Method> visitedMethods = new LinkedHashSet<>();
     for (Edge s : res.rowKeySet()) {
       visitedMethods.add(s.getMethod());
     }
@@ -122,7 +125,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         for (Statement predOfExit :
             exitStmt.getMethod().getControlFlowGraph().getPredsOf(exitStmt)) {
           Edge exitEdge = new Edge(predOfExit, exitStmt);
-          Set<State> escapes = Sets.newHashSet();
+          Set<State> escapes = new LinkedHashSet<>();
           icfg.addCallerListener(
               new CallerListener<Statement, Method>() {
                 @Override
@@ -168,7 +171,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       ForwardBoomerangSolver<W> forwardSolver) {
     LinkedList<Edge> worklist = Lists.newLinkedList();
     worklist.add(exitStmt);
-    Set<Edge> visited = Sets.newHashSet();
+    Set<Edge> visited = new LinkedHashSet<>();
     while (!worklist.isEmpty()) {
       Edge curr = worklist.poll();
       if (!visited.add(curr)) {
@@ -205,7 +208,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     Map<Edge, DeclaredMethod> invokedMethodsOnInstance = Maps.newHashMap();
     if (query.cfgEdge().getStart().containsInvokeExpr()) {
       invokedMethodsOnInstance.put(
-          query.cfgEdge(), query.cfgEdge().getStart().getInvokeExpr().getMethod());
+          query.cfgEdge(), query.cfgEdge().getStart().getInvokeExpr().getDeclaredMethod());
     }
     queryToSolvers
         .get(query)
@@ -223,7 +226,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
                 if (curr.getInvokeExpr().isInstanceInvokeExpr()) {
                   Val base = curr.getInvokeExpr().getBase();
                   if (base.equals(fact)) {
-                    invokedMethodsOnInstance.put(currEdge, curr.getInvokeExpr().getMethod());
+                    invokedMethodsOnInstance.put(
+                        currEdge, curr.getInvokeExpr().getDeclaredMethod());
                   }
                 }
               }
@@ -249,7 +253,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
 
   public QueryResults getPotentialNullPointerDereferences() {
     // FIXME this should be located nullpointer analysis
-    Set<Node<Edge, Val>> res = Sets.newHashSet();
+    Set<Node<Edge, Val>> res = new LinkedHashSet<>();
     for (Transition<Field, INode<Node<Edge, Val>>> t :
         queryToSolvers.get(query).getFieldAutomaton().getTransitions()) {
       if (!t.getLabel().equals(Field.empty()) || t.getStart() instanceof GeneratedState) {
@@ -261,11 +265,11 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         res.add(nullPointerNode);
       }
     }
-    Set<AffectedLocation> resWithContext = Sets.newHashSet();
+    Set<AffectedLocation> resWithContext = new LinkedHashSet<>();
     for (Node<Edge, Val> r : res) {
       // Context context = constructContextGraph(query, r);
       if (trackDataFlowPath) {
-        DataFlowPathWeight dataFlowPath = getDataFlowPathWeight(query, r);
+        DataFlowPathWeightImpl dataFlowPath = getDataFlowPathWeight(query, r);
         if (isValidPath(dataFlowPath)) {
           List<PathElement> p = transformPath(dataFlowPath.getAllStatements(), r);
           resWithContext.add(new NullPointerDereference(query, r.stmt(), r.fact(), null, null, p));
@@ -281,7 +285,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return nullPointerResult;
   }
 
-  private boolean isValidPath(DataFlowPathWeight dataFlowPath) {
+  private boolean isValidPath(DataFlowPathWeightImpl dataFlowPath) {
     if (!pruneContradictoryDataFlowPath) {
       return true;
     }
@@ -294,7 +298,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return true;
   }
 
-  private DataFlowPathWeight getDataFlowPathWeight(
+  private DataFlowPathWeightImpl getDataFlowPathWeight(
       ForwardQuery query, Node<Edge, Val> sinkLocation) {
     WeightedPAutomaton<Edge, INode<Val>, W> callAut =
         queryToSolvers.getOrCreate(query).getCallAutomaton();
@@ -311,8 +315,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       }
       if (t.getStart().fact().equals(sinkLocation.fact())
           && t.getLabel().equals(sinkLocation.stmt())) {
-        if (e.getValue() instanceof DataFlowPathWeight) {
-          DataFlowPathWeight v = (DataFlowPathWeight) e.getValue();
+        if (e.getValue() instanceof DataFlowPathWeightImpl) {
+          DataFlowPathWeightImpl v = (DataFlowPathWeightImpl) e.getValue();
           return v;
         }
       }
@@ -380,7 +384,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   private List<PathElement> transformPath(
-      List<Node<Edge, Val>> allStatements, Node<Edge, Val> sinkLocation) {
+      Set<Node<Edge, Val>> allStatements, Node<Edge, Val> sinkLocation) {
     List<PathElement> res = Lists.newArrayList();
     int index = 0;
     for (Node<Edge, Val> x : allStatements) {

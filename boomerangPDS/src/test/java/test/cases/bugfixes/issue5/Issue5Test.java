@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.bugfixes.issue5;
@@ -24,17 +27,16 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.utils.MethodWrapper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 /**
  * This code was added to test <a href="https://github.com/CodeShield-Security/SPDS/issues/5">Issue
@@ -106,20 +108,13 @@ public class Issue5Test {
     Collection<MethodWrapper> methodCalledOnFoo = new HashSet<>();
     for (Statement s : statements) {
       System.out.println("\t" + s);
-      DeclaredMethod calledMethod = s.getInvokeExpr().getMethod();
+      DeclaredMethod calledMethod = s.getInvokeExpr().getDeclaredMethod();
       System.out.println("\t\t" + calledMethod);
-      MethodWrapper methodWrapper =
-          new MethodWrapper(
-              calledMethod.getDeclaringClass().getFullyQualifiedName(),
-              calledMethod.getName(),
-              calledMethod.getReturnType().toString(),
-              calledMethod.getParameterTypes().stream()
-                  .map(Object::toString)
-                  .collect(Collectors.toList()));
-      methodCalledOnFoo.add(methodWrapper);
+
+      methodCalledOnFoo.add(calledMethod.toMethodWrapper());
     }
 
-    Assert.assertEquals(methodCalledOnFoo, Set.of(expectedCalledMethodsOnFoo));
+    Assert.assertEquals(Set.of(expectedCalledMethodsOnFoo), methodCalledOnFoo);
   }
 
   private static Collection<Statement> getMethodsInvokedFromInstanceInStatement(

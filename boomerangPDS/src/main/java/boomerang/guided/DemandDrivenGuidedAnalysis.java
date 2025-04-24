@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.guided;
@@ -25,19 +28,18 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
 import java.util.*;
 import java.util.Map.Entry;
 import sync.pds.solver.nodes.Node;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 public class DemandDrivenGuidedAnalysis {
 
   private final IDemandDrivenGuidedManager spec;
   private final LinkedList<QueryWithContext> queryQueue = Lists.newLinkedList();
-  private final Set<Query> visited = Sets.newHashSet();
+  private final Set<Query> visited = new LinkedHashSet<>();
   private final Boomerang solver;
   private boolean triggered;
 

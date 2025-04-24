@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.core;
@@ -30,14 +33,15 @@ import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.util.AccessPath;
 import boomerang.util.DefaultValueMap;
+import boomerang.utils.MethodWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Assert;
@@ -53,9 +57,8 @@ import sync.pds.solver.nodes.SingleNode;
 import test.TestingFramework;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
-import test.setup.MethodWrapper;
+import wpds.impl.NoWeight;
 import wpds.impl.Transition;
-import wpds.impl.Weight.NoWeight;
 import wpds.impl.WeightedPAutomaton;
 import wpds.interfaces.WPAStateListener;
 
@@ -81,8 +84,8 @@ public class AbstractBoomerangTest extends TestingFramework {
   private Collection<? extends Query> expectedAllocationSites;
   private Collection<? extends Node<Edge, Val>> explicitlyUnexpectedAllocationSites;
   protected Collection<? extends Query> queryForCallSites;
-  protected Collection<Error> unsoundErrors = Sets.newHashSet();
-  protected Collection<Error> imprecisionErrors = Sets.newHashSet();
+  protected Collection<Error> unsoundErrors = new LinkedHashSet<>();
+  protected Collection<Error> imprecisionErrors = new LinkedHashSet<>();
   private static Duration globalQueryTime = Duration.ofMillis(0);
 
   protected int analysisTimeout = 3000 * 1000;
@@ -104,18 +107,28 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   protected void analyze(String targetClassName, String targetMethodName) {
-    analyze(targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
+    analyze(targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES, false);
   }
 
   protected void analyze(
-      String targetClassName, String targetMethodName, DataFlowScope dataFlowScope) {
+      String targetClassName, String targetMethodName, boolean ignoreAllocSites) {
+    analyze(
+        targetClassName, targetMethodName, DataFlowScope.EXCLUDE_PHANTOM_CLASSES, ignoreAllocSites);
+  }
+
+  protected void analyze(
+      String targetClassName,
+      String targetMethodName,
+      DataFlowScope dataFlowScope,
+      boolean ignoreAllocSites) {
     MethodWrapper methodWrapper = new MethodWrapper(targetClassName, targetMethodName);
     FrameworkScope frameworkScope = super.getFrameworkScope(methodWrapper, dataFlowScope);
 
-    analyzeWithCallGraph(frameworkScope);
+    analyzeWithCallGraph(frameworkScope, ignoreAllocSites);
   }
 
-  private void analyzeWithCallGraph(FrameworkScope frameworkScope) {
+  private void analyzeWithCallGraph(FrameworkScope frameworkScope, boolean ignoreAllocSites) {
+    LOGGER.info("Running test method " + testName.getMethodName());
     CallGraph callGraph = frameworkScope.getCallGraph();
     queryDetector = new QueryForCallSiteDetector(callGraph);
     queryForCallSites = queryDetector.computeSeeds();
@@ -123,10 +136,16 @@ public class AbstractBoomerangTest extends TestingFramework {
     if (queryDetector.integerQueries) {
       Preanalysis an = new Preanalysis(callGraph, new IntegerAllocationSiteOf());
       expectedAllocationSites = an.computeSeeds();
+      if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
+        Assert.fail("Did not find any allocation sites. Nothing is tested");
+      }
     } else {
       Preanalysis an =
           new Preanalysis(callGraph, new AllocationSiteOf(AllocatedObject.class.getName()));
       expectedAllocationSites = an.computeSeeds();
+      if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
+        Assert.fail("Did not find any allocation sites. Nothing is tested");
+      }
       an = new Preanalysis(callGraph, new AllocationSiteOf(NoAllocatedObject.class.getName()));
       explicitlyUnexpectedAllocationSites =
           an.computeSeeds().stream().map(Query::asNode).collect(Collectors.toList());
@@ -153,7 +172,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void runWholeProgram(FrameworkScope frameworkScope) {
-    final Set<Node<Edge, Val>> results = Sets.newHashSet();
+    final Set<Node<Edge, Val>> results = new LinkedHashSet<>();
     BoomerangOptions options =
         BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();
     WholeProgramBoomerang<NoWeight> solver =
@@ -161,23 +180,23 @@ public class AbstractBoomerangTest extends TestingFramework {
 
           @Override
           protected WeightFunctions<Edge, Val, Field, NoWeight> getForwardFieldWeights() {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
 
           @Override
           protected WeightFunctions<Edge, Val, Field, NoWeight> getBackwardFieldWeights() {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
 
           @Override
           protected WeightFunctions<Edge, Val, Edge, NoWeight> getBackwardCallWeights() {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
 
           @Override
           protected WeightFunctions<Edge, Val, Edge, NoWeight> getForwardCallWeights(
               ForwardQuery sourceQuery) {
-            return new OneWeightFunctions<>(NoWeight.NO_WEIGHT_ONE);
+            return new OneWeightFunctions<>(NoWeight.getInstance());
           }
         };
     solver.wholeProgramAnalysis();
@@ -239,7 +258,7 @@ public class AbstractBoomerangTest extends TestingFramework {
       InvokeExpr ie = stmt.getStart().getInvokeExpr();
       Val arg = ie.getArg(1);
       Collection<String> expectedResults = parse(arg);
-      LOGGER.info("Expected results: {}", expectedResults);
+      LOGGER.info("Expected results: {}", String.join("\n - ", expectedResults));
       boolean imprecise = false;
       for (Node<Edge, Val> v : backwardResults) {
         if (v.fact() instanceof AllocVal) {
@@ -266,7 +285,7 @@ public class AbstractBoomerangTest extends TestingFramework {
 
   private Set<Node<Edge, Val>> runQuery(
       FrameworkScope frameworkScope, Collection<? extends Query> queries) {
-    final Set<Node<Edge, Val>> results = Sets.newHashSet();
+    final Set<Node<Edge, Val>> results = new LinkedHashSet<>();
 
     for (final Query query : queries) {
       BoomerangOptions options = createBoomerangOptions();
@@ -308,10 +327,12 @@ public class AbstractBoomerangTest extends TestingFramework {
       Collection<? extends Query> expectedResults,
       Collection<? extends Node<Edge, Val>> results,
       AnalysisMode analysis) {
-    LOGGER.info("Boomerang Results: {}", results);
     LOGGER.info(
-        "Expected Results: {}",
-        expectedResults.stream().map(Query::var).collect(Collectors.toList()));
+        "Boomerang Results:\n - {}",
+        results.stream().map(r -> r.fact().toString()).collect(Collectors.joining("\n - ")));
+    LOGGER.info(
+        "Expected Results:\n - {}",
+        expectedResults.stream().map(r -> r.var().toString()).collect(Collectors.joining("\n - ")));
     Collection<Node<Edge, Val>> falseNegativeAllocationSites = new HashSet<>();
     for (Query res : expectedResults) {
       if (!results.contains(res.asNode())) falseNegativeAllocationSites.add(res.asNode());
@@ -344,14 +365,10 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void checkContainsAllExpectedAccessPath(Set<AccessPath> allAliases) {
-    HashSet<AccessPath> expected = Sets.newHashSet(queryDetector.expectedAccessPaths);
+    HashSet<AccessPath> expected = new LinkedHashSet(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);
     }
-  }
-
-  protected DataFlowScope getDataFlowScope() {
-    return null;
   }
 }

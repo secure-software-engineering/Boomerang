@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.poi;
@@ -22,7 +25,7 @@ import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +42,7 @@ import wpds.interfaces.WPAUpdateListener;
 public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteImportFieldStmtPOI.class);
   private static final int MAX_IMPORT_DEPTH = -1;
-  private final Set<INode<Node<Edge, Val>>> reachable = Sets.newHashSet();
+  private final Set<INode<Node<Edge, Val>>> reachable = new LinkedHashSet<>();
   private final Multimap<INode<Node<Edge, Val>>, InsertFieldTransitionCallback> delayedTransitions =
       HashMultimap.create();
   protected final ForwardBoomerangSolver<W> baseSolver;

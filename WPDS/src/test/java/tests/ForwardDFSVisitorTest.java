@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package tests;
@@ -20,19 +23,19 @@ import static tests.TestHelper.s;
 import static tests.TestHelper.t;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import tests.TestHelper.Abstraction;
 import tests.TestHelper.StackSymbol;
+import wpds.impl.NoWeight;
 import wpds.impl.PAutomaton;
 import wpds.impl.PushdownSystem;
 import wpds.impl.SummaryNestedWeightedPAutomatons;
 import wpds.impl.Transition;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.ReachabilityListener;
 
 public class ForwardDFSVisitorTest {
@@ -53,7 +56,7 @@ public class ForwardDFSVisitorTest {
           return d.s != null;
         }
       };
-  final Set<Transition<StackSymbol, Abstraction>> reachables = Sets.newHashSet();
+  final Set<Transition<StackSymbol, Abstraction>> reachables = new LinkedHashSet<>();
 
   @Test
   public void delayedAdd() {
@@ -193,9 +196,9 @@ public class ForwardDFSVisitorTest {
   private void assertSetEquals(
       Set<Transition<StackSymbol, Abstraction>> s1, Set<Transition<StackSymbol, Abstraction>> s2) {
     if (s1.equals(s2)) return;
-    Set<Transition<StackSymbol, Abstraction>> s1MinusS2 = Sets.newHashSet(s1);
+    Set<Transition<StackSymbol, Abstraction>> s1MinusS2 = new LinkedHashSet(s1);
     s1MinusS2.removeAll(s2);
-    Set<Transition<StackSymbol, Abstraction>> s2MinusS1 = Sets.newHashSet(s2);
+    Set<Transition<StackSymbol, Abstraction>> s2MinusS1 = new LinkedHashSet(s2);
     s2MinusS1.removeAll(s1);
     throw new AssertionError(
         "The sets are not equal: \n S1\\S2 = \n"
@@ -206,7 +209,7 @@ public class ForwardDFSVisitorTest {
 
   private Set<Transition<StackSymbol, Abstraction>> reachableFrom(
       PAutomaton<StackSymbol, Abstraction> aut, Abstraction a) {
-    final Set<Transition<StackSymbol, Abstraction>> reachable = Sets.newHashSet();
+    final Set<Transition<StackSymbol, Abstraction>> reachable = new LinkedHashSet<>();
     aut.registerDFSListener(
         a,
         new ReachabilityListener<StackSymbol, Abstraction>() {
@@ -219,7 +222,7 @@ public class ForwardDFSVisitorTest {
   }
 
   private Set<Transition<StackSymbol, Abstraction>> reachableMinusTrans() {
-    HashSet<Transition<StackSymbol, Abstraction>> res = Sets.newHashSet(fa.getTransitions());
+    HashSet<Transition<StackSymbol, Abstraction>> res = new LinkedHashSet(fa.getTransitions());
     res.removeAll(reachables);
     return res;
   }

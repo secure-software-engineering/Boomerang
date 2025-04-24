@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.soot;
@@ -24,7 +27,7 @@ import boomerang.scope.soot.jimple.JimpleStaticFieldVal;
 import boomerang.scope.soot.jimple.JimpleVal;
 import java.util.Collection;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import soot.Scene;
 import soot.SootMethod;
 import soot.jimple.IntConstant;
@@ -36,10 +39,10 @@ public class SootFrameworkScope implements FrameworkScope {
   protected DataFlowScope dataFlowScope;
 
   public SootFrameworkScope(
-      @Nonnull Scene scene,
-      @Nonnull soot.jimple.toolkits.callgraph.CallGraph callGraph,
-      @Nonnull Collection<SootMethod> entryPoints,
-      @Nonnull DataFlowScope dataFlowScope) {
+      @NonNull Scene scene,
+      soot.jimple.toolkits.callgraph.@NonNull CallGraph callGraph,
+      @NonNull Collection<SootMethod> entryPoints,
+      @NonNull DataFlowScope dataFlowScope) {
     this.scene = scene;
 
     this.sootCallGraph = new SootCallGraph(callGraph, entryPoints);

@@ -1,9 +1,19 @@
 name: Java CI with Maven
 
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  workflow_dispatch:
 
 jobs:
   BuildAndTest:
+    strategy:
+      matrix:
+        framework: [Soot, Opal] # TODO Add SootUp when available
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
@@ -15,4 +25,4 @@ jobs:
           java-package: jdk
           java-version: 11
     - name: Build with Maven
-      run: mvn -B clean verify
+      run: mvn -B clean verify -DtestSetup=${{ matrix.framework }}

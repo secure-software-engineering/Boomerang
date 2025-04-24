@@ -56,6 +56,25 @@ jobs:
 
       - name: Create PR for SNAPSHOT version
         run: |
-          gh pr create -B develop -H ${{ env.BRANCH_NAME }} -t "Update to next SNAPSHOT version" -b "Update to next SNAPSHOT version"
+          gh pr create --draft -B develop -H ${{ env.BRANCH_NAME }} -t "Update to next SNAPSHOT version" -b "Update to next SNAPSHOT version"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: deployment
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub release
+        run: |
+          gh release create "$TAG"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.get_tag.outputs.tag }}

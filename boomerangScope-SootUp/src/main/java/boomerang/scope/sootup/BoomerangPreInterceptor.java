@@ -1,19 +1,22 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.sootup;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sootup.core.graph.MutableStmtGraph;
 import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
@@ -46,7 +49,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   @Override
-  public void interceptBody(@Nonnull Body.BodyBuilder bodyBuilder, @Nonnull View view) {
+  public void interceptBody(Body.@NonNull BodyBuilder bodyBuilder, @NonNull View view) {
     addNopStatementsToMethod(bodyBuilder);
 
     if (TRANSFORM_CONSTANTS_SETTINGS) {

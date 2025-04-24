@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package wpds.impl;
@@ -32,7 +35,7 @@ public class NormalRule<N extends Location, D extends State, W extends Weight>
         + ";"
         + l2
         + ">"
-        + ((w instanceof Weight.NoWeight) ? "" : "(" + w + ")");
+        + ((w instanceof NoWeight) ? "" : "(" + w + ")");
   }
 
   public boolean canBeApplied(Transition<N, D> t, W weight) {

@@ -1,18 +1,21 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package wpds.impl;
 
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
@@ -23,7 +26,7 @@ public abstract class StackListener<N extends Location, D extends State, W exten
   private final WeightedPAutomaton<N, D, W> aut;
 
   private final N source;
-  private final Set<N> notifiedStacks = Sets.newHashSet();
+  private final Set<N> notifiedStacks = new LinkedHashSet<>();
 
   public StackListener(WeightedPAutomaton<N, D, W> weightedPAutomaton, D state, N source) {
     super(state);

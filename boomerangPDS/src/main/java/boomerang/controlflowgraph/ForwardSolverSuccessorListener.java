@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.controlflowgraph;
@@ -34,7 +37,7 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
   private final Node<ControlFlowGraph.Edge, Val> node;
   private final org.slf4j.Logger
       LOGGER; // doesn't look good but this class also shouldn't exist alone
-  private final ForwardBoomerangSolver owner;
+  private final ForwardBoomerangSolver<?> owner;
 
   public ForwardSolverSuccessorListener(
       ControlFlowGraph.Edge curr,
@@ -43,7 +46,7 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
       Method method,
       Node<ControlFlowGraph.Edge, Val> node,
       org.slf4j.Logger LOGGER,
-      ForwardBoomerangSolver owner) {
+      ForwardBoomerangSolver<?> owner) {
     super(curr.getTarget());
     this.query = query;
     this.curr = curr;
@@ -93,7 +96,8 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
         }
       } else {*/
       Collection<State> out =
-          owner.computeNormalFlow(method, new ControlFlowGraph.Edge(curr.getTarget(), succ), value);
+          owner.computeNormalFlow(
+              method, curr, new ControlFlowGraph.Edge(curr.getTarget(), succ), value);
       //      if (method.getName().contains("main")) {
       //        for (State s : out) {
       //          if (s instanceof Node) {

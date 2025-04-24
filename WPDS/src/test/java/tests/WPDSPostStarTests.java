@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package tests;
@@ -43,8 +46,8 @@ public class WPDSPostStarTests {
     pds.addRule(wnormal(2, "b", 3, "c", w(3)));
     WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(fa.getTransitions().size(), 3);
-    assertEquals(fa.getStates().size(), 4);
+    assertEquals(3, fa.getTransitions().size());
+    assertEquals(4, fa.getStates().size());
     assertEquals(fa.getWeightFor(t(3, "c", ACC)), w(5));
   }
 
@@ -56,7 +59,7 @@ public class WPDSPostStarTests {
     pds.addRule(wnormal(1, "d", 1, "c", w(3)));
     WeightedPAutomaton<StackSymbol, Abstraction, NumWeight> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(fa.getWeightFor(t(1, "c", ACC)), NumWeight.zero());
+    assertEquals(fa.getWeightFor(t(1, "c", ACC)), NumWeightZero.zero());
     assertEquals(fa.getWeightFor(t(1, "b", ACC)), w(2));
     assertEquals(fa.getWeightFor(t(1, "d", ACC)), w(3));
   }
@@ -135,7 +138,7 @@ public class WPDSPostStarTests {
     assertEquals(w(8), fa.getWeightFor(t(4, "h", ACC)));
   }
 
-  private static NumWeight w(int i) {
-    return new NumWeight(i);
+  private static NumWeightImpl w(int i) {
+    return new NumWeightImpl(i);
   }
 }

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.guided;
@@ -23,8 +26,8 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,7 +43,7 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
   @Override
   public Collection<Query> onForwardFlow(ForwardQuery query, Edge dataFlowEdge, Val dataFlowVal) {
     Statement stmt = dataFlowEdge.getStart();
-    Set<Query> res = Sets.newHashSet();
+    Set<Query> res = new LinkedHashSet<>();
     if (stmt.containsInvokeExpr()) {
       Set<MethodWithSelector> selectors =
           spec.getMethodAndQueries().stream()
@@ -56,7 +59,7 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
   @Override
   public Collection<Query> onBackwardFlow(BackwardQuery query, Edge dataFlowEdge, Val dataFlowVal) {
     Statement stmt = dataFlowEdge.getStart();
-    Set<Query> res = Sets.newHashSet();
+    Set<Query> res = new LinkedHashSet<>();
     if (stmt.containsInvokeExpr()) {
       Set<MethodWithSelector> selectors =
           spec.getMethodAndQueries().stream()
@@ -70,7 +73,7 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
   }
 
   private Collection<Query> createNewQueries(MethodWithSelector sel, Statement stmt) {
-    Set<Query> results = Sets.newHashSet();
+    Set<Query> results = new LinkedHashSet<>();
     Method method = stmt.getMethod();
     for (QuerySelector qSel : sel.getGo()) {
       Optional<Val> parameterVal = getParameterVal(stmt, qSel.argumentSelection);
@@ -94,15 +97,10 @@ public class SimpleSpecificationGuidedManager implements IDemandDrivenGuidedMana
 
   public boolean isInOnList(
       MethodWithSelector methodSelector, Statement stmt, Val fact, QueryDirection direction) {
-
-    //  [spaeth] This only works for Soot propagations
-    // TODO: [ms] refactored soot checks away.. lets investigate why! maybe it needs just some
-    // translation/mapping for other frameworks
-    if (!stmt.getClass().toString().contains("Jimple")) {
-      // lets notify us in such a case..
-      throw new UnsupportedOperationException("possibly unspported case? investigate!");
-    }
-    if (stmt.getInvokeExpr().getMethod().getSignature().equals(methodSelector.getMethodStr())) {
+    if (stmt.getInvokeExpr()
+        .getDeclaredMethod()
+        .toMethodWrapper()
+        .equals(methodSelector.getMethod())) {
       Collection<QuerySelector> on = methodSelector.getOn();
       return isInList(on, direction, stmt, fact);
     }

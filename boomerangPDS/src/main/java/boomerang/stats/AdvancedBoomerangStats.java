@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.stats;
@@ -26,10 +29,10 @@ import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -44,22 +47,23 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
 
   private final Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
   private final Set<WeightedTransition<Field, INode<Node<Edge, Val>>, W>> globalFieldTransitions =
-      Sets.newHashSet();
+      new LinkedHashSet<>();
   private int fieldTransitionCollisions;
   private final Set<WeightedTransition<Edge, INode<Val>, W>> globalCallTransitions =
-      Sets.newHashSet();
+      new LinkedHashSet<>();
   private int callTransitionCollisions;
-  private final Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules = Sets.newHashSet();
+  private final Set<Rule<Field, INode<Node<Edge, Val>>, W>> globalFieldRules =
+      new LinkedHashSet<>();
   private int fieldRulesCollisions;
-  private final Set<Rule<Edge, INode<Val>, W>> globalCallRules = Sets.newHashSet();
+  private final Set<Rule<Edge, INode<Val>, W>> globalCallRules = new LinkedHashSet<>();
   private int callRulesCollisions;
-  private final Set<Node<Edge, Val>> reachedForwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedForwardNodes = new LinkedHashSet<>();
   private int reachedForwardNodeCollisions;
 
-  private final Set<Node<Edge, Val>> reachedBackwardNodes = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> reachedBackwardNodes = new LinkedHashSet<>();
   private int reachedBackwardNodeCollisions;
-  private final Set<Method> callVisitedMethods = Sets.newHashSet();
-  private final Set<Method> fieldVisitedMethods = Sets.newHashSet();
+  private final Set<Method> callVisitedMethods = new LinkedHashSet<>();
+  private final Set<Method> fieldVisitedMethods = new LinkedHashSet<>();
   private int arrayFlows;
   private int staticFlows;
   private final boolean COUNT_TOP_METHODS = false;
@@ -242,7 +246,7 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
 
   @Override
   public Set<Method> getCallVisitedMethods() {
-    return Sets.newHashSet(callVisitedMethods);
+    return new LinkedHashSet(callVisitedMethods);
   }
 
   private String computeMetrics() {
@@ -300,7 +304,7 @@ public class AdvancedBoomerangStats<W extends Weight> implements IBoomerangStats
 
   @Override
   public Collection<? extends Node<Edge, Val>> getForwardReachesNodes() {
-    Set<Node<Edge, Val>> res = Sets.newHashSet();
+    Set<Node<Edge, Val>> res = new LinkedHashSet<>();
     for (Query q : queries.keySet()) {
       if (q instanceof ForwardQuery) res.addAll(queries.get(q).getReachedStates());
     }

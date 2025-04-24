@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package sootup;
@@ -16,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sootup.core.frontend.SootClassSource;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.model.SourceType;
@@ -31,38 +34,38 @@ import sootup.core.views.View;
  */
 public abstract class ScopedAnalysisInputLocation implements AnalysisInputLocation {
 
-  @Nonnull private final AnalysisInputLocation inputLocation;
+  @NonNull private final AnalysisInputLocation inputLocation;
 
-  public ScopedAnalysisInputLocation(@Nonnull AnalysisInputLocation inputLocation) {
+  public ScopedAnalysisInputLocation(@NonNull AnalysisInputLocation inputLocation) {
     this.inputLocation = inputLocation;
   }
 
   /** Override this method. */
-  protected abstract boolean filter(@Nonnull ClassType type);
+  protected abstract boolean filter(@NonNull ClassType type);
 
-  @Nonnull
+  @NonNull
   @Override
   public Optional<? extends SootClassSource> getClassSource(
-      @Nonnull ClassType type, @Nonnull View view) {
+      @NonNull ClassType type, @NonNull View view) {
     if (!filter(type)) {
       return Optional.empty();
     }
     return inputLocation.getClassSource(type, view);
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public Stream<? extends SootClassSource> getClassSources(@Nonnull View view) {
+  public Stream<? extends SootClassSource> getClassSources(@NonNull View view) {
     return inputLocation.getClassSources(view).filter(type -> filter(type.getClassType()));
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public SourceType getSourceType() {
     return inputLocation.getSourceType();
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public List<BodyInterceptor> getBodyInterceptors() {
     return inputLocation.getBodyInterceptors();
@@ -85,13 +88,13 @@ public abstract class ScopedAnalysisInputLocation implements AnalysisInputLocati
     }
 
     public AllowlistingScopedAnalysisInputLocation(
-        @Nonnull AnalysisInputLocation inputLocation, Collection<String> allowlist) {
+        @NonNull AnalysisInputLocation inputLocation, Collection<String> allowlist) {
       super(inputLocation);
       this.allowlist = allowlist.stream().map(this::mapStr).collect(Collectors.toList());
     }
 
     @Override
-    protected boolean filter(@Nonnull ClassType type) {
+    protected boolean filter(@NonNull ClassType type) {
       return allowlist.contains(type.getPackageName().toString());
     }
   }
@@ -112,13 +115,13 @@ public abstract class ScopedAnalysisInputLocation implements AnalysisInputLocati
     }
 
     public DenylistingScopedAnalysisInputLocation(
-        @Nonnull AnalysisInputLocation inputLocation, Collection<String> denylist) {
+        @NonNull AnalysisInputLocation inputLocation, Collection<String> denylist) {
       super(inputLocation);
       this.denylist = denylist.stream().map(this::mapStr).collect(Collectors.toList());
     }
 
     @Override
-    protected boolean filter(@Nonnull ClassType type) {
+    protected boolean filter(@NonNull ClassType type) {
       return !denylist.contains(type.getPackageName().toString());
     }
   }

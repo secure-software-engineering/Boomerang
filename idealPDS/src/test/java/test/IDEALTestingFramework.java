@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test;
@@ -29,6 +32,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.solver.Strategies;
+import boomerang.utils.MethodWrapper;
 import ideal.IDEALAnalysis;
 import ideal.IDEALAnalysisDefinition;
 import ideal.IDEALResultHandler;
@@ -43,7 +47,6 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
-import test.setup.MethodWrapper;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
@@ -175,14 +178,14 @@ public abstract class IDEALTestingFramework extends TestingFramework {
       }
 
       InvokeExpr invokeExpr = stmt.getInvokeExpr();
-      DeclaredMethod declaredMethod = invokeExpr.getMethod();
+      DeclaredMethod declaredMethod = invokeExpr.getDeclaredMethod();
 
       String assertionsName = Assertions.class.getName();
       if (!declaredMethod.getDeclaringClass().getFullyQualifiedName().equals(assertionsName)) {
         continue;
       }
 
-      String invocationName = invokeExpr.getMethod().getName();
+      String invocationName = invokeExpr.getDeclaredMethod().getName();
 
       if (invocationName.equals("shouldNotBeAnalyzed")) {
         queries.add(new ShouldNotBeAnalyzed(stmt));

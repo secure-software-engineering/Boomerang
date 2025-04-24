@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.solver;
@@ -32,10 +35,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -171,7 +174,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
         sourceNode,
         new WitnessListener<Edge, Val, Field>() {
           final Multimap<Val, Node<Edge, Val>> potentialFieldCandidate = HashMultimap.create();
-          final Set<Val> potentialCallCandidate = Sets.newHashSet();
+          final Set<Val> potentialCallCandidate = new LinkedHashSet<>();
 
           @Override
           public void fieldWitness(Transition<Field, INode<Node<Edge, Val>>> t) {
@@ -307,7 +310,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   }
 
   protected boolean isMatchingCallSiteCalleePair(Statement callSite, Method method) {
-    Set<Statement> callsitesOfCall = Sets.newHashSet();
+    Set<Statement> callsitesOfCall = new LinkedHashSet<>();
     icfg.addCallerListener(
         new CallerListener<Statement, Method>() {
           @Override
@@ -445,7 +448,8 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     }
   }
 
-  protected abstract Collection<State> computeNormalFlow(Method method, Edge currEdge, Val value);
+  protected abstract Collection<State> computeNormalFlow(
+      Method method, Edge currEdge, Edge nextEdge, Val value);
 
   @Override
   public Field epsilonField() {
@@ -522,6 +526,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     }
     if (!(targetVal.isRefType()) || !(sourceVal.isRefType())) {
       // A null pointer cannot be cast to any object
+      // TODO This should be more target.isNull
       return options.killNullAtCast()
           && targetVal.isNullType()
           && isCastNode(

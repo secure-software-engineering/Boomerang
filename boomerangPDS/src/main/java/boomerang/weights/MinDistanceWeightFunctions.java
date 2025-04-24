@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.weights;
@@ -23,29 +26,29 @@ public class MinDistanceWeightFunctions
   public MinDistanceWeight push(
       Node<Statement, Val> curr, Node<Statement, Val> succ, Statement callSite) {
     if (!curr.fact().isStatic()) {
-      return new MinDistanceWeight(Integer.valueOf(1));
+      return new MinDistanceWeightImpl(1);
     }
-    return MinDistanceWeight.one();
+    return MinDistanceWeightOne.one();
   }
 
   @Override
   public MinDistanceWeight normal(Node<Statement, Val> curr, Node<Statement, Val> succ) {
     if (!curr.fact().equals(succ.fact())) {
-      return new MinDistanceWeight(Integer.valueOf(1));
+      return new MinDistanceWeightImpl(1);
     }
     if (succ.stmt().containsInvokeExpr() && succ.stmt().uses(curr.fact())) {
-      return new MinDistanceWeight(Integer.valueOf(1));
+      return new MinDistanceWeightImpl(1);
     }
-    return MinDistanceWeight.one();
+    return MinDistanceWeightOne.one();
   }
 
   @Override
   public MinDistanceWeight pop(Node<Statement, Val> curr) {
-    return MinDistanceWeight.one();
+    return MinDistanceWeightOne.one();
   }
 
   @Override
   public MinDistanceWeight getOne() {
-    return MinDistanceWeight.one();
+    return MinDistanceWeightOne.one();
   }
 }

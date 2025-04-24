@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.weights;
@@ -18,6 +21,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
+import org.jspecify.annotations.NonNull;
 import sync.pds.solver.OneWeightFunctions;
 import sync.pds.solver.WeightFunctions;
 
@@ -26,11 +30,11 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
   private OneWeightFunctions<Edge, Val, Field, DataFlowPathWeight> fieldWeights;
   private PathTrackingWeightFunctions callWeights;
 
-  public PathTrackingBoomerang(FrameworkScope frameworkScope) {
+  public PathTrackingBoomerang(@NonNull FrameworkScope frameworkScope) {
     super(frameworkScope);
   }
 
-  public PathTrackingBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
+  public PathTrackingBoomerang(@NonNull FrameworkScope frameworkScope, BoomerangOptions options) {
     super(frameworkScope, options);
   }
 
@@ -55,13 +59,15 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
     return getOrCreateCallWeights();
   }
 
+  @NonNull
   private WeightFunctions<Edge, Val, Field, DataFlowPathWeight> getOrCreateFieldWeights() {
     if (fieldWeights == null) {
-      fieldWeights = new OneWeightFunctions<>(DataFlowPathWeight.one());
+      fieldWeights = new OneWeightFunctions<>(DataFlowPathWeightOne.one());
     }
     return fieldWeights;
   }
 
+  @NonNull
   private WeightFunctions<Edge, Val, Edge, DataFlowPathWeight> getOrCreateCallWeights() {
     if (callWeights == null) {
       callWeights =
