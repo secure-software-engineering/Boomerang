@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.sootup.jimple;
@@ -16,8 +19,8 @@ import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.JIdentityStmt;
@@ -30,8 +33,8 @@ public class JimpleUpControlFlowGraph implements ControlFlowGraph {
 
   private boolean cacheBuilt = false;
   private final List<Statement> statements = Lists.newArrayList();
-  private final Collection<Statement> startPointCache = Sets.newHashSet();
-  private final Collection<Statement> endPointCache = Sets.newHashSet();
+  private final Collection<Statement> startPointCache = new LinkedHashSet<>();
+  private final Collection<Statement> endPointCache = new LinkedHashSet<>();
   private final Multimap<Statement, Statement> predecessorsOfCache = HashMultimap.create();
   private final Multimap<Statement, Statement> successorsOfCache = HashMultimap.create();
 

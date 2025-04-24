@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope;
@@ -14,8 +17,8 @@ package boomerang.scope;
 import boomerang.Query;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -31,9 +34,9 @@ public abstract class AnalysisScope {
     this.cg = cg;
   }
 
-  private final Set<Query> seeds = Sets.newHashSet();
+  private final Set<Query> seeds = new LinkedHashSet<>();
 
-  private final Collection<Method> processed = Sets.newHashSet();
+  private final Collection<Method> processed = new LinkedHashSet<>();
   private int statementCount;
 
   public void setScanLibraryClasses(boolean enabled) {

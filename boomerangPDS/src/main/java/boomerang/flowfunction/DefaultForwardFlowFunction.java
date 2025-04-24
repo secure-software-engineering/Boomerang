@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.flowfunction;
@@ -23,9 +26,9 @@ import boomerang.scope.Val;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
@@ -47,7 +50,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
   @Override
   public Set<Val> returnFlow(Method method, Statement curr, Val value) {
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     if (curr.isThrowStmt() && !options.throwFlows()) {
       return Collections.emptySet();
     }
@@ -80,7 +83,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
     if (callee.isStaticInitializer()) {
       return Collections.emptySet();
     }
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(fact) && !callee.isStatic()) {
@@ -103,39 +106,39 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
   @Override
   public Set<State> normalFlow(ForwardQuery query, Edge nextEdge, Val fact) {
-    Statement succ = nextEdge.getStart();
-    Set<State> out = Sets.newHashSet();
-    if (killFlow(succ, fact)) {
+    Statement nextStmt = nextEdge.getStart();
+    Set<State> out = new LinkedHashSet<>();
+    if (killFlow(nextStmt, fact)) {
       return out;
     }
-    if (!succ.isFieldWriteWithBase(fact)) {
+    if (!nextStmt.isFieldWriteWithBase(fact)) {
       // always maintain data-flow if not a field write // killFlow has
       // been taken care of
       if (!options.trackReturnOfInstanceOf()
-          || !(query.getType().isNullType() && succ.isInstanceOfStatement(fact))) {
+          || !(query.getType().isNullType() && nextStmt.isInstanceOfStatement(fact))) {
         out.add(new Node<>(nextEdge, fact));
       }
     } else {
-      out.add(new ExclusionNode<>(nextEdge, fact, succ.getWrittenField()));
+      out.add(new ExclusionNode<>(nextEdge, fact, nextStmt.getWrittenField()));
     }
-    if (succ.isAssignStmt()) {
-      Val leftOp = succ.getLeftOp();
-      Val rightOp = succ.getRightOp();
+    if (nextStmt.isAssignStmt()) {
+      Val leftOp = nextStmt.getLeftOp();
+      Val rightOp = nextStmt.getRightOp();
       if (rightOp.equals(fact)) {
-        if (succ.isFieldStore()) {
-          Pair<Val, Field> ifr = succ.getFieldStore();
+        if (nextStmt.isFieldStore()) {
+          Pair<Val, Field> ifr = nextStmt.getFieldStore();
           if (options.trackFields()) {
             if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
               out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
             }
           }
-        } else if (succ.isStaticFieldStore()) {
-          StaticFieldVal sf = succ.getStaticField();
+        } else if (nextStmt.isStaticFieldStore()) {
+          StaticFieldVal sf = nextStmt.getStaticField();
           if (options.trackFields()) {
             strategies.getStaticFieldStrategy().handleForward(nextEdge, rightOp, sf, out);
           }
         } else if (leftOp.isArrayRef()) {
-          Pair<Val, Integer> arrayBase = succ.getArrayBase();
+          Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
           if (options.trackFields()) {
             strategies.getArrayHandlingStrategy().handleForward(nextEdge, arrayBase, out);
           }
@@ -143,20 +146,20 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
           out.add(new Node<>(nextEdge, leftOp));
         }
       }
-      if (succ.isFieldLoad()) {
-        Pair<Val, Field> ifr = succ.getFieldLoad();
+      if (nextStmt.isFieldLoad()) {
+        Pair<Val, Field> ifr = nextStmt.getFieldLoad();
         if (ifr.getX().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
               new NodeWithLocation<>(nextEdge, leftOp, ifr.getY());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
-      } else if (succ.isStaticFieldLoad()) {
-        StaticFieldVal sf = succ.getStaticField();
+      } else if (nextStmt.isStaticFieldLoad()) {
+        StaticFieldVal sf = nextStmt.getStaticField();
         if (fact.isStatic() && fact.equals(sf)) {
           out.add(new Node<>(nextEdge, leftOp));
         }
       } else if (rightOp.isArrayRef()) {
-        Pair<Val, Integer> arrayBase = succ.getArrayBase();
+        Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
         if (arrayBase.getX().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
               new NodeWithLocation<>(nextEdge, leftOp, Field.array(arrayBase.getY()));
@@ -172,10 +175,10 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
         if (rightOp.getInstanceOfOp().equals(fact)) {
           out.add(new Node<>(nextEdge, fact.withSecondVal(leftOp)));
         }
-      } else if (succ.isPhiStatement()) {
-        Collection<Val> phiVals = succ.getPhiVals();
+      } else if (nextStmt.isPhiStatement()) {
+        Collection<Val> phiVals = nextStmt.getPhiVals();
         if (phiVals.contains(fact)) {
-          out.add(new Node<>(nextEdge, succ.getLeftOp()));
+          out.add(new Node<>(nextEdge, nextStmt.getLeftOp()));
         }
       }
     }
@@ -208,7 +211,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
   @Override
   public Collection<State> callToReturnFlow(ForwardQuery query, Edge edge, Val fact) {
-    if (FlowFunctionUtils.isSystemArrayCopy(edge.getStart().getInvokeExpr().getMethod())) {
+    if (FlowFunctionUtils.isSystemArrayCopy(edge.getStart().getInvokeExpr().getDeclaredMethod())) {
       return systemArrayCopyFlow(edge, fact);
     }
     return normalFlow(query, edge, fact);

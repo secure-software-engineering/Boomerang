@@ -1,18 +1,20 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.context;
 
 import test.TestMethod;
-import test.cases.basic.Allocation;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -32,13 +34,13 @@ public class PathingContextProblemTarget {
     }
 
     public void test1() {
-      Object a1 = new Allocation();
+      Object a1 = new ContextAlloc();
       Object b1 = a1;
       callee(a1, b1);
     }
 
     public void test2() {
-      Object a2 = new Allocation();
+      Object a2 = new ContextAlloc();
       Object b2 = new Object();
       callee(a2, b2);
     }
@@ -58,14 +60,14 @@ public class PathingContextProblemTarget {
     }
 
     public void test1() {
-      Object a1 = new Allocation();
+      Object a1 = new ContextAlloc();
       Object b1 = a1;
       callee(a1, b1);
     }
 
     public void test2() {
       Object a2 = new Object();
-      Object b2 = new Allocation();
+      Object b2 = new ContextAlloc();
       callee(a2, b2);
     }
   }

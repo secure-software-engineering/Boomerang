@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test;
@@ -14,23 +17,50 @@ package test;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
+import boomerang.utils.MethodWrapper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
-import test.setup.MethodWrapper;
+import test.setup.OpalTestSetup;
 import test.setup.SootTestSetup;
+import test.setup.SootUpTestSetup;
 import test.setup.TestSetup;
 
 public class TestingFramework {
 
+  private static final String SOOT = "soot";
+  private static final String SOOT_UP = "sootup";
+  private static final String OPAL = "opal";
+
   private final TestSetup testSetup;
 
   public TestingFramework() {
-    // TODO Parameterize
-    this.testSetup = new SootTestSetup();
+    this.testSetup = getTestSetup();
+  }
+
+  private TestSetup getTestSetup() {
+    String framework = System.getProperty("testSetup");
+    if (framework == null) {
+      // This can be changed when executing tests locally
+      return new OpalTestSetup();
+    }
+
+    switch (framework.toLowerCase()) {
+      case SOOT:
+        return new SootTestSetup();
+      case SOOT_UP:
+        return new SootUpTestSetup();
+      case OPAL:
+        return new OpalTestSetup();
+      default:
+        throw new IllegalArgumentException(
+            "Cannot create test setup for framework "
+                + framework
+                + ". Available options are {Soot, SootUp, Opal}");
+    }
   }
 
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {

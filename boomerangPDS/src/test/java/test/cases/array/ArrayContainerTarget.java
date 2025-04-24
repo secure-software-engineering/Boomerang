@@ -1,18 +1,20 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.array;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
@@ -39,7 +41,7 @@ public class ArrayContainerTarget {
     ArrayContainer container = new ArrayContainer();
     Object o1 = new Object();
     container.put(o1);
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new ArrayAlloc();
     container.put(o2);
     AllocatedObject alias = container.get();
     QueryMethods.queryFor(alias);
@@ -48,7 +50,7 @@ public class ArrayContainerTarget {
   @TestMethod
   public void insertAndGetField() {
     ArrayContainerWithPublicFields container = new ArrayContainerWithPublicFields();
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new ArrayAlloc();
     container.array[0] = o2;
     AllocatedObject alias = container.array[0];
     QueryMethods.queryFor(alias);
@@ -64,7 +66,7 @@ public class ArrayContainerTarget {
     ArrayContainer innerContainer1 = new ArrayContainer();
     Object o1 = new NoAllocation();
     innerContainer1.put(o1);
-    AllocatedObject o2 = new Alloc();
+    AllocatedObject o2 = new ArrayAlloc();
     innerContainer1.put(o2);
     outerContainer.put(innerContainer1);
     ArrayContainer innerContainer2 = outerContainer.get();

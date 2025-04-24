@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.guided;
@@ -31,13 +34,13 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
+import boomerang.utils.MethodWrapper;
 import com.google.common.collect.Table;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
 import wpds.impl.NoWeight;
 
 public class CustomFlowFunctionTest {
@@ -132,7 +135,11 @@ public class CustomFlowFunctionTest {
             .anyMatch(
                 statement ->
                     statement.containsInvokeExpr()
-                        && statement.getInvokeExpr().getMethod().getName().equals("queryFor"));
+                        && statement
+                            .getInvokeExpr()
+                            .getDeclaredMethod()
+                            .getName()
+                            .equals("queryFor"));
     Assert.assertFalse(t);
   }
 
@@ -142,8 +149,9 @@ public class CustomFlowFunctionTest {
             .filter(Statement::containsInvokeExpr)
             .filter(
                 x -> {
-                  System.out.println("methodname: " + x.getInvokeExpr().getMethod().getName());
-                  return x.getInvokeExpr().getMethod().getName().equals("queryFor");
+                  System.out.println(
+                      "methodname: " + x.getInvokeExpr().getDeclaredMethod().getName());
+                  return x.getInvokeExpr().getDeclaredMethod().getName().equals("queryFor");
                 })
             .findFirst();
     if (queryStatement.isEmpty()) {

@@ -1,25 +1,28 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.sets;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
+@SuppressWarnings("unused")
 public class CustomMapTarget {
 
   @TestMethod
   public void storeAndLoad() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     Map map = new Map();
     map.add(alloc);
     Object alias = map.get();
@@ -28,7 +31,7 @@ public class CustomMapTarget {
 
   @TestMethod
   public void storeAndLoadSimple() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     Map map = new Map();
     map.add(alloc);
     Object alias = map.m.content;
@@ -37,7 +40,7 @@ public class CustomMapTarget {
 
   @TestMethod
   public void onlyInnerMapSimple() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     InnerMap map = new InnerMap();
     map.innerAdd(alloc);
     Object alias = map.content;
@@ -74,7 +77,7 @@ public class CustomMapTarget {
 
   @TestMethod
   public void storeAndLoadSimpleNoInnerClasses() {
-    Alloc alloc = new Alloc();
+    SetAlloc alloc = new SetAlloc();
     MyMap map = new MyMap();
     map.add(alloc);
     MyInnerMap load = map.m;

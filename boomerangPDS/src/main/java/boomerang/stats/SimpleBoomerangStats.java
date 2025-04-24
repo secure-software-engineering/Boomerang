@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.stats;
@@ -24,6 +27,7 @@ import boomerang.solver.AbstractBoomerangSolver;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import sync.pds.solver.nodes.INode;
@@ -37,8 +41,8 @@ import wpds.interfaces.WPAUpdateListener;
 public class SimpleBoomerangStats<W extends Weight> implements IBoomerangStats<W> {
 
   private final Map<Query, AbstractBoomerangSolver<W>> queries = Maps.newHashMap();
-  private final Set<Method> callVisitedMethods = Sets.newHashSet();
-  private final Set<Method> fieldVisitedMethods = Sets.newHashSet();
+  private final Set<Method> callVisitedMethods = new LinkedHashSet<>();
+  private final Set<Method> fieldVisitedMethods = new LinkedHashSet<>();
 
   @Override
   public void registerSolver(Query key, final AbstractBoomerangSolver<W> solver) {
@@ -94,7 +98,7 @@ public class SimpleBoomerangStats<W extends Weight> implements IBoomerangStats<W
 
   @Override
   public Collection<? extends Node<Edge, Val>> getForwardReachesNodes() {
-    Set<Node<Edge, Val>> res = Sets.newHashSet();
+    Set<Node<Edge, Val>> res = new LinkedHashSet<>();
     for (Query q : queries.keySet()) {
       if (q instanceof ForwardQuery) res.addAll(queries.get(q).getReachedStates());
     }
@@ -103,7 +107,7 @@ public class SimpleBoomerangStats<W extends Weight> implements IBoomerangStats<W
 
   @Override
   public Set<Method> getCallVisitedMethods() {
-    return Sets.newHashSet(callVisitedMethods);
+    return new LinkedHashSet(callVisitedMethods);
   }
 
   @Override

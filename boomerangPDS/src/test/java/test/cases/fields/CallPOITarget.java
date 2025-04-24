@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.fields;
@@ -30,7 +33,7 @@ public class CallPOITarget {
 
   @TestMethod
   public void simpleButDiffer() {
-    Alloc c = new Alloc();
+    FieldAlloc c = new FieldAlloc();
     T t = new T(c);
     S s = new S();
     t.foo(s);
@@ -162,7 +165,7 @@ public class CallPOITarget {
   }
 
   private void set(Outer o) {
-    Alloc alloc = new Alloc();
+    FieldAlloc alloc = new FieldAlloc();
     Outer alias = o;
     alias.field = alloc;
   }
@@ -186,17 +189,17 @@ public class CallPOITarget {
   @TestMethod
   public void testForBackwardCallPOI() {
     // Thanks to Martin Mory for contributing the test.
-    Alloc v = new Alloc();
+    FieldAlloc v = new FieldAlloc();
     Object x = front(v);
     QueryMethods.queryFor(x);
   }
 
   public static Object fromIt(SomeObj it) {
-    Alloc x = it.f;
+    FieldAlloc x = it.f;
     return x;
   }
 
-  public static Object front(Alloc y) {
+  public static Object front(FieldAlloc y) {
     SomeObj it = new SomeObj();
     SomeObj it2 = it;
     it2.f = y;
@@ -205,7 +208,7 @@ public class CallPOITarget {
   }
 
   public static class SomeObj {
-    Alloc f;
+    FieldAlloc f;
   }
 
   private void allocation(A1 a, AllocObj1 d) {

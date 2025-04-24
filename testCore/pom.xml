@@ -38,6 +38,10 @@
             <artifactId>boomerangScope-SootUp</artifactId>
         </dependency>
         <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>boomerangScope-Opal</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>

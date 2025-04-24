@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang;
@@ -26,8 +29,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,7 +50,7 @@ public class QueryGraph<W extends Weight> {
   private final ObservableICFG<Statement, Method> icfg;
   private final Multimap<Query, QueryEdge> sourceToQueryEdgeLookUp = HashMultimap.create();
   private final Multimap<Query, QueryEdge> targetToQueryEdgeLookUp = HashMultimap.create();
-  private final Set<Query> roots = Sets.newHashSet();
+  private final Set<Query> roots = new LinkedHashSet<>();
   private final DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> forwardSolvers;
   private final Multimap<Query, AddTargetEdgeListener> edgeAddListener = HashMultimap.create();
   private final DefaultValueMap<BackwardQuery, BackwardBoomerangSolver<W>> backwardSolver;
@@ -87,7 +90,7 @@ public class QueryGraph<W extends Weight> {
   }
 
   public Set<Query> getNodes() {
-    Set<Query> nodes = Sets.newHashSet(sourceToQueryEdgeLookUp.keySet());
+    Set<Query> nodes = new LinkedHashSet(sourceToQueryEdgeLookUp.keySet());
     nodes.addAll(targetToQueryEdgeLookUp.keySet());
     return nodes;
   }
@@ -176,7 +179,7 @@ public class QueryGraph<W extends Weight> {
     int level = 0;
     for (Query root : roots) {
       s += "Root:" + root + "\n";
-      s += visit(root, "", ++level, Sets.newHashSet());
+      s += visit(root, "", ++level, new LinkedHashSet<>());
     }
     return s;
   }
