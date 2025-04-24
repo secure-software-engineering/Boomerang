@@ -20,7 +20,7 @@ object TacBodyBuilder {
 
     // TODO Use other domain to compute static type information
     val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
-    val localTransformedTac = LocalTransformer(method, tacNaive, stackHandler, domain)
+    val localTransformedTac = LocalTransformer(project, method, tacNaive, stackHandler, domain)
     assert(tacNaive.stmts.length == localTransformedTac.length, "Wrong transformation")
 
     val inlinedTac = InlineLocalTransformer(localTransformedTac, stackHandler)

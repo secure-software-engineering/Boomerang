@@ -7,7 +7,7 @@ class OperandStack private(stackHandler: OperandStackHandler, private var stack:
   def stackEntries: List[Operand] = stack
 
   def push(idBasedVar: IdBasedVar): Unit = {
-    val operand = new Operand(idBasedVar.id, stackHandler.nextLocalCounter)
+    val operand = new Operand(idBasedVar.id, idBasedVar.cTpe, stackHandler.nextLocalCounter)
     stack = operand :: stack
   }
 

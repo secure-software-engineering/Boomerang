@@ -81,36 +81,133 @@ object OperandStackBuilder {
 
             schedule(pcOfNextStatement(pc), stack)
           case ReturnValue(_, expr: IdBasedVar) =>
-            // TODO Bug in Opal: Return instructions return always s0 and not the top operand
+            // TODO Bug in Opal causes to return the wrong operand (fixed but not released yet)
             // stack.pop(expr)
           // No scheduling since there is no next statement
           case Return(_) => // No scheduling since there is no next statement
           case Nop(pc) =>
             val instr = method.body.get.instructions(pc)
 
+            // TODO
+            //  Use pattern matching from stack.stackEntries to avoid having so many sequential
+            //  operations (as done in TacNaive)
             instr.opcode match {
               case NOP.opcode =>
-              case POP.opcode | POP2.opcode =>
+                schedule(pcOfNextStatement(pc), stack)
+              case POP.opcode =>
                 stack.pop
+
+                schedule(pcOfNextStatement(pc), stack)
+              case POP2.opcode =>
+                val top = stack.pop
+                if (top.cTpe.categoryId == 1) {
+                  stack.pop
+                }
+
+                schedule(pcOfNextStatement(pc), stack)
               case DUP.opcode =>
                 val dupOperand = stack.peek
                 stack.push(dupOperand)
-              case DUP_X1.opcode =>
-                val val1 = stack.pop
-                val val2 = stack.pop
 
-                stack.push(val1)
-                stack.push(val2)
-                stack.push(val1)
+                schedule(pcOfNextStatement(pc), stack)
+              case DUP_X1.opcode =>
+                val v1 = stack.pop
+                val v2 = stack.pop
+
+                stack.push(v1)
+                stack.push(v2)
+                stack.push(v1)
+
+                schedule(pcOfNextStatement(pc), stack)
               case DUP_X2.opcode =>
-                // TODO
+                val v1 = stack.pop
+                val v2 = stack.pop
+
+                if (v2.cTpe.categoryId == 1) {
+                  val v3 = stack.pop
+
+                  stack.push(v1)
+                  stack.push(v3)
+                  stack.push(v2)
+                  stack.push(v1)
+                } else {
+                  stack.push(v1)
+                  stack.push(v2)
+                  stack.push(v1)
+                }
+
+                schedule(pcOfNextStatement(pc), stack)
               case DUP2.opcode =>
-                // TODO
+                val v1 = stack.pop
+
+                if (v1.cTpe.categoryId == 1) {
+                  val v2 = stack.pop
+
+                  stack.push(v2)
+                  stack.push(v1)
+                  stack.push(v2)
+                  stack.push(v1)
+                } else {
+                  stack.push(v1)
+                  stack.push(v1)
+                }
+
+                schedule(pcOfNextStatement(pc), stack)
               case DUP2_X1.opcode =>
-                // TODO
+                val v1 = stack.pop
+                val v2 = stack.pop
+
+                if (v1.cTpe.categoryId == 1) {
+                  val v3 = stack.pop
+
+                  stack.push(v2)
+                  stack.push(v1)
+                  stack.push(v3)
+                  stack.push(v2)
+                  stack.push(v1)
+                } else {
+                  stack.push(v1)
+                  stack.push(v2)
+                  stack.push(v1)
+                }
+
+                schedule(pcOfNextStatement(pc), stack)
               case DUP2_X2.opcode =>
-                // TODO
+                val v1 = stack.pop
+                val v2 = stack.pop
+                val v3 = stack.pop
+
+                if (v1.cTpe.categoryId == 1 && v2.cTpe.categoryId == 1 && v3.cTpe.categoryId == 1) {
+                  val v4 = stack.pop
+
+                  stack.push(v2)
+                  stack.push(v1)
+                  stack.push(v4)
+                  stack.push(v3)
+                  stack.push(v2)
+                  stack.push(v1)
+                } else if (v1.cTpe.categoryId == 2 && v2.cTpe.categoryId == 1 && v3.cTpe.categoryId == 1) {
+                  stack.push(v1)
+                  stack.push(v3)
+                  stack.push(v2)
+                  stack.push(v1)
+                } else if (v1.cTpe.categoryId == 1 && v2.cTpe.categoryId == 1 && v3.cTpe.categoryId == 2) {
+                  stack.push(v2)
+                  stack.push(v1)
+                  stack.push(v3)
+                  stack.push(v2)
+                  stack.push(v1)
+                } else {
+                  stack.push(v3)
+                  stack.push(v1)
+                  stack.push(v2)
+                  stack.push(v1)
+                }
+
+                schedule(pcOfNextStatement(pc), stack)
               case WIDE.opcode =>
+                schedule(pcOfNextStatement(pc), stack)
+              case _ => throw new RuntimeException("Unknown instruction for NOP: " + instr)
             }
 
             schedule(pcOfNextStatement(pc), stack)

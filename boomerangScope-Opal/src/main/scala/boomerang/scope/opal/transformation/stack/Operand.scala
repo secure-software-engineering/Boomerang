@@ -1,8 +1,10 @@
 package boomerang.scope.opal.transformation.stack
 
+import org.opalj.br.ComputationalType
+
 import java.util.Objects
 
-class Operand(val id: Int, private var counter: Int) {
+class Operand(val id: Int, val cTpe: ComputationalType, private var counter: Int) {
 
   private var modified = false
 
