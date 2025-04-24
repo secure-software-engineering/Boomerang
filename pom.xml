@@ -213,6 +213,14 @@
                                 <file>${license.dir}/license_header.txt</file>
                             </licenseHeader>
                         </java>
+                        <scala>
+                            <scalafmt>
+                                <file>${license.dir}/misc/.scalafmt.conf</file>
+                            </scalafmt>
+                            <licenseHeader>
+                                <file>${license.dir}/license_header.txt</file>
+                            </licenseHeader>
+                        </scala>
                     </configuration>
                 </plugin>
 
