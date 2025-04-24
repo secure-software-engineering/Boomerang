@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.opal.transformation.transformer
@@ -71,8 +74,7 @@ object LocalPropagationTransformer {
                             .inclusive(i + 1, max)
                             .foreach(j => {
                                 val currStmt = statements(j)
-                                statements(j) =
-                                    updateStatementWithLocal(currStmt, stackLocal, registerLocal)
+                                statements(j) = updateStatementWithLocal(currStmt, stackLocal, registerLocal)
                             })
 
                         statements(i) = Nop(pc)
@@ -219,9 +221,8 @@ object LocalPropagationTransformer {
                         stackLocal,
                         registerLocal
                     )
-                    val paramLocals = methodCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val paramLocals =
+                        methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return NonVirtualMethodCall(
                         methodCall.pc,
@@ -240,9 +241,8 @@ object LocalPropagationTransformer {
                         stackLocal,
                         registerLocal
                     )
-                    val paramLocals = methodCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val paramLocals =
+                        methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return VirtualMethodCall(
                         methodCall.pc,
@@ -255,9 +255,7 @@ object LocalPropagationTransformer {
                     )
                 case StaticMethodCall.ASTID =>
                     val methodCall = stmt.asStaticMethodCall
-                    val params = methodCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val params = methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return StaticMethodCall(
                         methodCall.pc,
@@ -269,9 +267,7 @@ object LocalPropagationTransformer {
                     )
                 case InvokedynamicMethodCall.ASTID =>
                     val methodCall = stmt.asInvokedynamicMethodCall
-                    val params = methodCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val params = methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return InvokedynamicMethodCall(
                         methodCall.pc,
@@ -396,9 +392,7 @@ object LocalPropagationTransformer {
                     )
                 case NewArray.ASTID =>
                     val newArray = expr.asNewArray
-                    val counts = newArray.counts.map(c =>
-                        updateExpressionWithLocal(c, stackLocal, registerLocal)
-                    )
+                    val counts = newArray.counts.map(c => updateExpressionWithLocal(c, stackLocal, registerLocal))
 
                     return NewArray(newArray.pc, counts, newArray.tpe)
                 case ArrayLoad.ASTID =>
@@ -442,9 +436,7 @@ object LocalPropagationTransformer {
                     )
                 case InvokedynamicFunctionCall.ASTID =>
                     val functionCall = expr.asInvokedynamicFunctionCall
-                    val params = functionCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val params = functionCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return InvokedynamicFunctionCall(
                         functionCall.pc,
@@ -461,9 +453,7 @@ object LocalPropagationTransformer {
                         stackLocal,
                         registerLocal
                     )
-                    val params = functionCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val params = functionCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return NonVirtualFunctionCall(
                         functionCall.pc,
@@ -482,9 +472,7 @@ object LocalPropagationTransformer {
                         stackLocal,
                         registerLocal
                     )
-                    val params = functionCall.params.map(p =>
-                        updateExpressionWithLocal(p, stackLocal, registerLocal)
-                    )
+                    val params = functionCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
                     return VirtualFunctionCall(
                         functionCall.pc,

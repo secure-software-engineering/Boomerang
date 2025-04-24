@@ -81,6 +81,7 @@
         <java.version>11</java.version>
         <scala.version>2.13.16</scala.version>
         <enforced-maven-version>3.6.1</enforced-maven-version>
+        <!-- See https://www.eclipse.org/projects/handbook/#ip-copyright-headers -->
         <license.dir>${project.basedir}</license.dir>
     </properties>
 

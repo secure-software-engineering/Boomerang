@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.opal.transformation.transformer
@@ -79,11 +82,8 @@ object InlineLocalTransformer {
                                 }
                             })
 
-                            statements(i) =
-                                Assignment(pc, targetVar, NewArray(arrPc, newCounts, arrayType))
-                            countDefSites.foreach(defSite =>
-                                statements(defSite._1) = Nop(defSite._2)
-                            )
+                            statements(i) = Assignment(pc, targetVar, NewArray(arrPc, newCounts, arrayType))
+                            countDefSites.foreach(defSite => statements(defSite._1) = Nop(defSite._2))
                         // Replace the index expression with the concrete integer value if available
                         case ArrayLoad(arrPc, arrayIndex: StackLocal, arrayRef) =>
                             if (localCache.contains(arrayIndex)) {
@@ -137,9 +137,8 @@ object InlineLocalTransformer {
                 case Assignment(
                         pc,
                         targetVar: StackLocal,
-                        c @ (_: SimpleValueConst | _: FunctionCall[TacLocal] |
-                        _: NewArray[TacLocal] | _: ArrayLoad[TacLocal] | _: GetField[TacLocal] |
-                        _: GetStatic)
+                        c @ (_: SimpleValueConst | _: FunctionCall[TacLocal] | _: NewArray[TacLocal] |
+                        _: ArrayLoad[TacLocal] | _: GetField[TacLocal] | _: GetStatic)
                     ) =>
                     statements(i + 1) match {
                         case Assignment(
