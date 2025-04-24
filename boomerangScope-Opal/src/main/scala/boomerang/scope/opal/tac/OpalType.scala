@@ -23,71 +23,71 @@ import org.opalj.br.ObjectType
 
 case class OpalType(delegate: org.opalj.br.Type) extends Type {
 
-    override def isNullType: Boolean = false
+  override def isNullType: Boolean = false
 
-    override def isRefType: Boolean = delegate.isObjectType
+  override def isRefType: Boolean = delegate.isObjectType
 
-    override def isArrayType: Boolean = delegate.isArrayType
+  override def isArrayType: Boolean = delegate.isArrayType
 
-    override def getArrayBaseType: Type = OpalType(delegate.asArrayType)
+  override def getArrayBaseType: Type = OpalType(delegate.asArrayType)
 
-    override def getWrappedClass: WrappedClass = {
-        if (isRefType) {
-            val declaringClass = OpalClient.getClassFileForType(delegate.asObjectType)
+  override def getWrappedClass: WrappedClass = {
+    if (isRefType) {
+      val declaringClass = OpalClient.getClassFileForType(delegate.asObjectType)
 
-            if (declaringClass.isDefined) {
-                OpalWrappedClass(declaringClass.get)
-            } else {
-                OpalPhantomWrappedClass(delegate.asReferenceType)
-            }
-        }
-
-        throw new RuntimeException(
-            "Cannot compute declaring class because type is not a RefType"
-        )
+      if (declaringClass.isDefined) {
+        OpalWrappedClass(declaringClass.get)
+      } else {
+        OpalPhantomWrappedClass(delegate.asReferenceType)
+      }
     }
 
-    override def doesCastFail(targetValType: Type, target: Val): Boolean = {
-        if (!isRefType || !targetValType.isRefType) {
-            return false
-        }
+    throw new RuntimeException(
+      "Cannot compute declaring class because type is not a RefType"
+    )
+  }
 
-        val sourceType = delegate.asReferenceType
-        val targetType =
-            targetValType.asInstanceOf[OpalType].delegate.asReferenceType
+  override def doesCastFail(targetValType: Type, target: Val): Boolean = {
+    if (!isRefType || !targetValType.isRefType) {
+      return false
+    }
 
-        false
+    val sourceType = delegate.asReferenceType
+    val targetType =
+      targetValType.asInstanceOf[OpalType].delegate.asReferenceType
 
-        /*target match {
+    false
+
+    /*target match {
       case allocVal: AllocVal if allocVal.getAllocVal.isNewExpr => OpalClient.getClassHierarchy.isSubtypeOf(sourceType, targetType)
 
       case _ => OpalClient.getClassHierarchy.isSubtypeOf(sourceType, targetType) || OpalClient.getClassHierarchy.isSubtypeOf(targetType, sourceType)
     }*/
+  }
+
+  override def isSubtypeOf(otherType: String): Boolean = {
+    if (!delegate.isObjectType) {
+      return false
     }
 
-    override def isSubtypeOf(otherType: String): Boolean = {
-        if (!delegate.isObjectType) {
-            return false
-        }
+    OpalClient.getClassHierarchy.isSubtypeOf(
+      delegate.asObjectType,
+      ObjectType(otherType.replace(".", "/"))
+    )
+  }
 
-        OpalClient.getClassHierarchy.isSubtypeOf(
-            delegate.asObjectType,
-            ObjectType(otherType.replace(".", "/"))
-        )
+  override def isSupertypeOf(subType: String): Boolean = {
+    if (!delegate.isObjectType) {
+      return false
     }
 
-    override def isSupertypeOf(subType: String): Boolean = {
-        if (!delegate.isObjectType) {
-            return false
-        }
+    OpalClient.getClassHierarchy.isSubtypeOf(
+      ObjectType(subType),
+      delegate.asObjectType
+    )
+  }
 
-        OpalClient.getClassHierarchy.isSubtypeOf(
-            ObjectType(subType),
-            delegate.asObjectType
-        )
-    }
+  override def isBooleanType: Boolean = delegate.isBooleanType
 
-    override def isBooleanType: Boolean = delegate.isBooleanType
-
-    override def toString: String = delegate.toJava
+  override def toString: String = delegate.toJava
 }

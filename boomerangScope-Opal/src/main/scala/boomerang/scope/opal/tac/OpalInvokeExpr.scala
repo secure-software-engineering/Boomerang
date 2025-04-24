@@ -27,47 +27,47 @@ class OpalMethodInvokeExpr(
     method: OpalMethod
 ) extends InvokeExpr {
 
-    override def getArg(index: Int): Val = getArgs.get(index)
+  override def getArg(index: Int): Val = getArgs.get(index)
 
-    override def getArgs: util.List[Val] = {
-        val result = new util.ArrayList[Val]
+  override def getArgs: util.List[Val] = {
+    val result = new util.ArrayList[Val]
 
-        delegate.params.foreach(param => {
-            result.add(new OpalLocal(param.asVar, method))
-        })
+    delegate.params.foreach(param => {
+      result.add(new OpalLocal(param.asVar, method))
+    })
 
-        result
+    result
+  }
+
+  override def isInstanceInvokeExpr: Boolean =
+    delegate.isInstanceOf[InstanceMethodCall[_]]
+
+  override def getBase: Val = {
+    if (isInstanceInvokeExpr) {
+      return new OpalLocal(delegate.asInstanceMethodCall.receiver.asVar, method)
     }
 
-    override def isInstanceInvokeExpr: Boolean =
-        delegate.isInstanceOf[InstanceMethodCall[_]]
+    throw new RuntimeException(
+      "Method call is not an instance invoke expression"
+    )
+  }
 
-    override def getBase: Val = {
-        if (isInstanceInvokeExpr) {
-            return new OpalLocal(delegate.asInstanceMethodCall.receiver.asVar, method)
-        }
+  override def getDeclaredMethod: DeclaredMethod =
+    OpalDeclaredMethod(this, delegate)
 
-        throw new RuntimeException(
-            "Method call is not an instance invoke expression"
-        )
-    }
+  override def isSpecialInvokeExpr: Boolean =
+    delegate.astID == NonVirtualMethodCall.ASTID
 
-    override def getDeclaredMethod: DeclaredMethod =
-        OpalDeclaredMethod(this, delegate)
+  override def isStaticInvokeExpr: Boolean = delegate.isStaticMethodCall
 
-    override def isSpecialInvokeExpr: Boolean =
-        delegate.astID == NonVirtualMethodCall.ASTID
+  override def hashCode: Int = Objects.hash(delegate)
 
-    override def isStaticInvokeExpr: Boolean = delegate.isStaticMethodCall
+  override def equals(obj: Any): Boolean = obj match {
+    case other: OpalMethodInvokeExpr => this.delegate == other.delegate
+    case _ => false
+  }
 
-    override def hashCode: Int = Objects.hash(delegate)
-
-    override def equals(obj: Any): Boolean = obj match {
-        case other: OpalMethodInvokeExpr => this.delegate == other.delegate
-        case _ => false
-    }
-
-    override def toString: String = delegate.toString
+  override def toString: String = delegate.toString
 }
 
 class OpalFunctionInvokeExpr(
@@ -75,51 +75,51 @@ class OpalFunctionInvokeExpr(
     method: OpalMethod
 ) extends InvokeExpr {
 
-    override def getArg(index: Int): Val = getArgs.get(index)
+  override def getArg(index: Int): Val = getArgs.get(index)
 
-    override def getArgs: util.List[Val] = {
-        val result = new util.ArrayList[Val]
+  override def getArgs: util.List[Val] = {
+    val result = new util.ArrayList[Val]
 
-        delegate.params.foreach(param => {
-            result.add(new OpalLocal(param.asVar, method))
-        })
+    delegate.params.foreach(param => {
+      result.add(new OpalLocal(param.asVar, method))
+    })
 
-        result
+    result
+  }
+
+  override def isInstanceInvokeExpr: Boolean =
+    delegate.isInstanceOf[InstanceFunctionCall[_]]
+
+  override def getBase: Val = {
+    if (isInstanceInvokeExpr) {
+      return new OpalLocal(
+        delegate.asInstanceFunctionCall.receiver.asVar,
+        method
+      )
     }
 
-    override def isInstanceInvokeExpr: Boolean =
-        delegate.isInstanceOf[InstanceFunctionCall[_]]
+    throw new RuntimeException(
+      "Function call is not an instance invoke expression"
+    )
+  }
 
-    override def getBase: Val = {
-        if (isInstanceInvokeExpr) {
-            return new OpalLocal(
-                delegate.asInstanceFunctionCall.receiver.asVar,
-                method
-            )
-        }
+  override def getDeclaredMethod: DeclaredMethod =
+    OpalDeclaredMethod(this, delegate)
 
-        throw new RuntimeException(
-            "Function call is not an instance invoke expression"
-        )
-    }
+  override def isSpecialInvokeExpr: Boolean =
+    delegate.astID == NonVirtualFunctionCall.ASTID
 
-    override def getDeclaredMethod: DeclaredMethod =
-        OpalDeclaredMethod(this, delegate)
+  override def isStaticInvokeExpr: Boolean = delegate.isStaticFunctionCall
 
-    override def isSpecialInvokeExpr: Boolean =
-        delegate.astID == NonVirtualFunctionCall.ASTID
+  override def hashCode: Int = Objects.hash(delegate)
 
-    override def isStaticInvokeExpr: Boolean = delegate.isStaticFunctionCall
+  private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalFunctionInvokeExpr]
 
-    override def hashCode: Int = Objects.hash(delegate)
+  override def equals(obj: Any): Boolean = obj match {
+    case other: OpalFunctionInvokeExpr =>
+      other.canEqual(this) && this.delegate == other.delegate
+    case _ => false
+  }
 
-    private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalFunctionInvokeExpr]
-
-    override def equals(obj: Any): Boolean = obj match {
-        case other: OpalFunctionInvokeExpr =>
-            other.canEqual(this) && this.delegate == other.delegate
-        case _ => false
-    }
-
-    override def toString: String = delegate.toString
+  override def toString: String = delegate.toString
 }

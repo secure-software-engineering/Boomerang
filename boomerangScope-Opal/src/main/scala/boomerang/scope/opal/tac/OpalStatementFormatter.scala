@@ -22,68 +22,68 @@ import org.opalj.tac.Return
 
 object OpalStatementFormatter {
 
-    def apply(stmt: OpalStatement): String = {
-        val delegate = stmt.delegate
+  def apply(stmt: OpalStatement): String = {
+    val delegate = stmt.delegate
 
-        if (stmt.containsInvokeExpr()) {
-            var base = ""
-            if (stmt.getInvokeExpr.isInstanceInvokeExpr) {
-                base = s"${stmt.getInvokeExpr.getBase}."
-            }
-            var assign = ""
-            if (stmt.isAssignStmt) {
-                assign = s"${stmt.getLeftOp} = "
-            }
+    if (stmt.containsInvokeExpr()) {
+      var base = ""
+      if (stmt.getInvokeExpr.isInstanceInvokeExpr) {
+        base = s"${stmt.getInvokeExpr.getBase}."
+      }
+      var assign = ""
+      if (stmt.isAssignStmt) {
+        assign = s"${stmt.getLeftOp} = "
+      }
 
-            return s"$assign$base${stmt.getInvokeExpr.getDeclaredMethod.getName}(${Joiner.on(",").join(stmt.getInvokeExpr.getArgs)})"
-        }
-
-        if (stmt.isAssignStmt) {
-            if (delegate.isAssignment) {
-                return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
-            }
-
-            if (stmt.isFieldStore) {
-                return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
-            }
-
-            if (stmt.isArrayStore) {
-                val base = stmt.getArrayBase
-                return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
-            }
-
-            if (stmt.isStaticFieldStore) {
-                return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
-            }
-        }
-
-        if (delegate.isAssignment) {
-            if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isParameterLocal) {
-                return s"${delegate.asAssignment.targetVar} := @${delegate.asAssignment.expr}: ${stmt.getMethod}"
-            }
-
-            if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isExceptionLocal) {
-                return s"${delegate.asAssignment.targetVar} := @caughtException: ${delegate.asAssignment.expr}"
-            }
-        }
-
-        if (delegate.astID == PutField.ASTID) {
-            return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
-        }
-
-        if (delegate.astID == Nop.ASTID) {
-            return "nop"
-        }
-
-        if (delegate.astID == Return.ASTID) {
-            return "return"
-        }
-
-        if (stmt.isReturnStmt) {
-            return s"return ${stmt.getReturnOp}"
-        }
-
-        delegate.toString
+      return s"$assign$base${stmt.getInvokeExpr.getDeclaredMethod.getName}(${Joiner.on(",").join(stmt.getInvokeExpr.getArgs)})"
     }
+
+    if (stmt.isAssignStmt) {
+      if (delegate.isAssignment) {
+        return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+      }
+
+      if (stmt.isFieldStore) {
+        return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+      }
+
+      if (stmt.isArrayStore) {
+        val base = stmt.getArrayBase
+        return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
+      }
+
+      if (stmt.isStaticFieldStore) {
+        return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+      }
+    }
+
+    if (delegate.isAssignment) {
+      if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isParameterLocal) {
+        return s"${delegate.asAssignment.targetVar} := @${delegate.asAssignment.expr}: ${stmt.getMethod}"
+      }
+
+      if (delegate.asAssignment.expr.isVar && delegate.asAssignment.expr.asVar.isExceptionLocal) {
+        return s"${delegate.asAssignment.targetVar} := @caughtException: ${delegate.asAssignment.expr}"
+      }
+    }
+
+    if (delegate.astID == PutField.ASTID) {
+      return s"${stmt.getLeftOp} = ${stmt.getRightOp}"
+    }
+
+    if (delegate.astID == Nop.ASTID) {
+      return "nop"
+    }
+
+    if (delegate.astID == Return.ASTID) {
+      return "return"
+    }
+
+    if (stmt.isReturnStmt) {
+      return s"return ${stmt.getReturnOp}"
+    }
+
+    delegate.toString
+  }
 
 }

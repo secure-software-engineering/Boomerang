@@ -21,63 +21,63 @@ class OperandStack private (
     private var stack: List[Operand]
 ) {
 
-    def stackEntries: List[Operand] = stack
+  def stackEntries: List[Operand] = stack
 
-    def push(idBasedVar: IdBasedVar): Unit = {
-        val operand =
-            new Operand(idBasedVar.id, idBasedVar.cTpe, stackHandler.nextLocalCounter)
-        stack = operand :: stack
+  def push(idBasedVar: IdBasedVar): Unit = {
+    val operand =
+      new Operand(idBasedVar.id, idBasedVar.cTpe, stackHandler.nextLocalCounter)
+    stack = operand :: stack
+  }
+
+  def push(operand: Operand): Unit = {
+    stack = operand :: stack
+  }
+
+  def pop(idBasedVar: IdBasedVar): Unit = {
+    if (stack.isEmpty) {
+      throw new IllegalStateException(
+        s"Cannot pop operand $idBasedVar from empty stack"
+      )
     }
 
-    def push(operand: Operand): Unit = {
-        stack = operand :: stack
+    // Check if stack is in consistent state
+    val top :: rest = stack
+    assert(
+      idBasedVar.id == top.id,
+      s"Invalid pop operation on operand $idBasedVar"
+    )
+
+    // Update stack
+    stack = rest
+  }
+
+  def pop: Operand = {
+    if (stack.isEmpty) {
+      throw new IllegalStateException(s"Cannot pop operand from empty stack")
     }
 
-    def pop(idBasedVar: IdBasedVar): Unit = {
-        if (stack.isEmpty) {
-            throw new IllegalStateException(
-                s"Cannot pop operand $idBasedVar from empty stack"
-            )
-        }
+    val top :: rest = stack
+    stack = rest
 
-        // Check if stack is in consistent state
-        val top :: rest = stack
-        assert(
-            idBasedVar.id == top.id,
-            s"Invalid pop operation on operand $idBasedVar"
-        )
+    top
+  }
 
-        // Update stack
-        stack = rest
-    }
+  def peek: Operand = {
+    if (stack.isEmpty) return null
 
-    def pop: Operand = {
-        if (stack.isEmpty) {
-            throw new IllegalStateException(s"Cannot pop operand from empty stack")
-        }
+    val top :: _ = stack
+    top
+  }
 
-        val top :: rest = stack
-        stack = rest
+  def copy: OperandStack = new OperandStack(stackHandler, stack.map(identity))
 
-        top
-    }
-
-    def peek: Operand = {
-        if (stack.isEmpty) return null
-
-        val top :: _ = stack
-        top
-    }
-
-    def copy: OperandStack = new OperandStack(stackHandler, stack.map(identity))
-
-    override def toString: String = stack.toString()
+  override def toString: String = stack.toString()
 }
 
 object OperandStack {
 
-    def apply(
-        stackHandler: OperandStackHandler,
-        stack: List[Operand] = List.empty
-    ) = new OperandStack(stackHandler, stack)
+  def apply(
+      stackHandler: OperandStackHandler,
+      stack: List[Operand] = List.empty
+  ) = new OperandStack(stackHandler, stack)
 }

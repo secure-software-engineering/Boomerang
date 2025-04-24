@@ -128,6 +128,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void analyzeWithCallGraph(FrameworkScope frameworkScope, boolean ignoreAllocSites) {
+    LOGGER.info("Running test method " + testName.getMethodName());
     CallGraph callGraph = frameworkScope.getCallGraph();
     queryDetector = new QueryForCallSiteDetector(callGraph);
     queryForCallSites = queryDetector.computeSeeds();

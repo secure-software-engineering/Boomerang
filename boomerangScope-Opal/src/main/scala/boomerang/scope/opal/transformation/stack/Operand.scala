@@ -23,23 +23,23 @@ class Operand(
     private var counter: Int
 ) {
 
-    private var modified = false
+  private var modified = false
 
-    def localId: Int = counter
+  def localId: Int = counter
 
-    def updateCounter(newCount: Int): Unit = {
-        counter = newCount
-        modified = true
-    }
+  def updateCounter(newCount: Int): Unit = {
+    counter = newCount
+    modified = true
+  }
 
-    def isBranchedOperand: Boolean = modified
+  def isBranchedOperand: Boolean = modified
 
-    override def hashCode: Int = Objects.hash(id)
+  override def hashCode: Int = Objects.hash(id)
 
-    override def equals(obj: Any): Boolean = obj match {
-        case that: Operand => this.id == that.id
-        case _ => false
-    }
+  override def equals(obj: Any): Boolean = obj match {
+    case that: Operand => this.id == that.id
+    case _ => false
+  }
 
-    override def toString: String = s"op$id ($counter)"
+  override def toString: String = s"op$id ($counter)"
 }

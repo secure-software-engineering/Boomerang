@@ -26,124 +26,124 @@ class OpalMethod private (
     val tac: BoomerangTACode
 ) extends Method {
 
-    if (delegate.body.isEmpty) {
-        throw new RuntimeException("Cannot build OpalMethod without existing body")
-    }
+  if (delegate.body.isEmpty) {
+    throw new RuntimeException("Cannot build OpalMethod without existing body")
+  }
 
-    private val cfg = new OpalControlFlowGraph(this)
+  private val cfg = new OpalControlFlowGraph(this)
 
-    private var localCache: Option[util.Set[Val]] = None
-    private var parameterLocalCache: Option[util.List[Val]] = None
+  private var localCache: Option[util.Set[Val]] = None
+  private var parameterLocalCache: Option[util.List[Val]] = None
 
-    override def isStaticInitializer: Boolean = delegate.isStaticInitializer
+  override def isStaticInitializer: Boolean = delegate.isStaticInitializer
 
-    override def isParameterLocal(value: Val): Boolean =
-        getParameterLocals.contains(value)
+  override def isParameterLocal(value: Val): Boolean =
+    getParameterLocals.contains(value)
 
-    override def getParameterTypes: util.List[Type] = {
-        val result = new util.ArrayList[Type]()
+  override def getParameterTypes: util.List[Type] = {
+    val result = new util.ArrayList[Type]()
 
-        delegate.parameterTypes.foreach(paramType => {
-            result.add(OpalType(paramType))
-        })
+    delegate.parameterTypes.foreach(paramType => {
+      result.add(OpalType(paramType))
+    })
 
-        result
-    }
+    result
+  }
 
-    override def getParameterType(index: Int): Type = getParameterTypes.get(index)
+  override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-    override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
 
-    override def isThisLocal(fact: Val): Boolean = {
-        if (isStatic) return false
-        if (fact.isStatic) return false
+  override def isThisLocal(fact: Val): Boolean = {
+    if (isStatic) return false
+    if (fact.isStatic) return false
 
-        val thisLocal = getThisLocal
-        thisLocal.equals(fact)
-    }
+    val thisLocal = getThisLocal
+    thisLocal.equals(fact)
+  }
 
-    override def getThisLocal: Val = {
-        if (!isStatic) {
-            tac.statements.foreach(stmt => {
-                if (stmt.pc == -1) {
-                    val targetVar = stmt.asAssignment.targetVar
+  override def getThisLocal: Val = {
+    if (!isStatic) {
+      tac.statements.foreach(stmt => {
+        if (stmt.pc == -1) {
+          val targetVar = stmt.asAssignment.targetVar
 
-                    if (targetVar.id == -1) {
-                        return new OpalLocal(targetVar, this)
-                    }
-                }
-            })
-
-            throw new RuntimeException(
-                "Could not determine 'this' local in method " + delegate.name
-            )
+          if (targetVar.id == -1) {
+            return new OpalLocal(targetVar, this)
+          }
         }
+      })
 
-        throw new RuntimeException("Static method does not have a 'this' local")
+      throw new RuntimeException(
+        "Could not determine 'this' local in method " + delegate.name
+      )
     }
 
-    override def getLocals: util.Set[Val] = {
-        if (localCache.isEmpty) {
-            localCache = Some(new util.HashSet[Val]())
+    throw new RuntimeException("Static method does not have a 'this' local")
+  }
 
-            tac.getLocals.foreach(l => localCache.get.add(new OpalLocal(l, this)))
+  override def getLocals: util.Set[Val] = {
+    if (localCache.isEmpty) {
+      localCache = Some(new util.HashSet[Val]())
+
+      tac.getLocals.foreach(l => localCache.get.add(new OpalLocal(l, this)))
+    }
+
+    localCache.get
+  }
+
+  override def getParameterLocals: util.List[Val] = {
+    if (parameterLocalCache.isEmpty) {
+      parameterLocalCache = Some(new util.ArrayList[Val]())
+
+      tac.getParameterLocals.foreach(l => {
+        // Exclude the 'this' local from the parameters if this is an instance method
+        if (isStatic) {
+          parameterLocalCache.get.add(new OpalLocal(l, this))
+        } else if (l.id != -1) {
+          parameterLocalCache.get.add(new OpalLocal(l, this))
         }
-
-        localCache.get
+      })
     }
 
-    override def getParameterLocals: util.List[Val] = {
-        if (parameterLocalCache.isEmpty) {
-            parameterLocalCache = Some(new util.ArrayList[Val]())
+    parameterLocalCache.get
+  }
 
-            tac.getParameterLocals.foreach(l => {
-                // Exclude the 'this' local from the parameters if this is an instance method
-                if (isStatic) {
-                    parameterLocalCache.get.add(new OpalLocal(l, this))
-                } else if (l.id != -1) {
-                    parameterLocalCache.get.add(new OpalLocal(l, this))
-                }
-            })
-        }
+  override def isStatic: Boolean = delegate.isStatic
 
-        parameterLocalCache.get
-    }
+  override def isDefined: Boolean = true
 
-    override def isStatic: Boolean = delegate.isStatic
+  override def isPhantom: Boolean = false
 
-    override def isDefined: Boolean = true
+  override def getStatements: util.List[Statement] = cfg.getStatements
 
-    override def isPhantom: Boolean = false
+  override def getDeclaringClass: WrappedClass = OpalWrappedClass(
+    delegate.classFile
+  )
 
-    override def getStatements: util.List[Statement] = cfg.getStatements
+  override def getControlFlowGraph: ControlFlowGraph = cfg.get()
 
-    override def getDeclaringClass: WrappedClass = OpalWrappedClass(
-        delegate.classFile
-    )
+  override def getSubSignature: String = delegate.signature.toJava
 
-    override def getControlFlowGraph: ControlFlowGraph = cfg.get()
+  override def getName: String = delegate.name
 
-    override def getSubSignature: String = delegate.signature.toJava
+  override def isConstructor: Boolean = delegate.isConstructor
 
-    override def getName: String = delegate.name
+  override def hashCode: Int = Objects.hash(delegate)
 
-    override def isConstructor: Boolean = delegate.isConstructor
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalMethod => this.delegate == that.delegate
+    case _ => false
+  }
 
-    override def hashCode: Int = Objects.hash(delegate)
-
-    override def equals(other: Any): Boolean = other match {
-        case that: OpalMethod => this.delegate == that.delegate
-        case _ => false
-    }
-
-    override def toString: String = delegate.toJava
+  override def toString: String = delegate.toJava
 }
 
 object OpalMethod {
 
-    def apply(delegate: org.opalj.br.Method): OpalMethod =
-        new OpalMethod(delegate, TacBodyBuilder(OpalClient.project.get, delegate))
+  def apply(delegate: org.opalj.br.Method): OpalMethod =
+    new OpalMethod(delegate, TacBodyBuilder(OpalClient.project.get, delegate))
 
-    def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod =
-        new OpalMethod(delegate, tac)
+  def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod =
+    new OpalMethod(delegate, tac)
 }

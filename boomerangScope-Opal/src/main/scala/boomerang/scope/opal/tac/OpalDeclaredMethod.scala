@@ -32,49 +32,49 @@ case class OpalDeclaredMethod[+V <: Var[V]](
     delegate: Call[V]
 ) extends DeclaredMethod(invokeExpr) {
 
-    override def getSubSignature: String =
-        MethodSignature(delegate.name, delegate.descriptor).toJava
+  override def getSubSignature: String =
+    MethodSignature(delegate.name, delegate.descriptor).toJava
 
-    override def getName: String = delegate.name
+  override def getName: String = delegate.name
 
-    override def isConstructor: Boolean =
-        delegate.name == OpalFrameworkScope.CONSTRUCTOR
+  override def isConstructor: Boolean =
+    delegate.name == OpalFrameworkScope.CONSTRUCTOR
 
-    override def getSignature: String = delegate.descriptor.toJava(
-        s"${delegate.declaringClass.toJava}.${delegate.name}"
-    )
+  override def getSignature: String = delegate.descriptor.toJava(
+    s"${delegate.declaringClass.toJava}.${delegate.name}"
+  )
 
-    override def getDeclaringClass: WrappedClass = {
-        val decClass =
-            OpalClient.getClassFileForType(delegate.declaringClass.asObjectType)
+  override def getDeclaringClass: WrappedClass = {
+    val decClass =
+      OpalClient.getClassFileForType(delegate.declaringClass.asObjectType)
 
-        if (decClass.isDefined) {
-            OpalWrappedClass(decClass.get)
-        } else {
-            OpalPhantomWrappedClass(delegate.declaringClass)
-        }
+    if (decClass.isDefined) {
+      OpalWrappedClass(decClass.get)
+    } else {
+      OpalPhantomWrappedClass(delegate.declaringClass)
     }
+  }
 
-    override def getParameterTypes: util.List[Type] = {
-        val result = new util.ArrayList[Type]()
+  override def getParameterTypes: util.List[Type] = {
+    val result = new util.ArrayList[Type]()
 
-        delegate.descriptor.parameterTypes.foreach(paramType => {
-            result.add(OpalType(paramType))
-        })
+    delegate.descriptor.parameterTypes.foreach(paramType => {
+      result.add(OpalType(paramType))
+    })
 
-        result
-    }
+    result
+  }
 
-    override def getParameterType(index: Int): Type = getParameterTypes.get(index)
+  override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-    override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
 
-    override def toMethodWrapper: MethodWrapper = new MethodWrapper(
-        delegate.declaringClass.toJava,
-        delegate.name,
-        delegate.descriptor.returnType.toJava,
-        delegate.descriptor.parameterTypes.map(p => p.toJava).toList.asJava
-    )
+  override def toMethodWrapper: MethodWrapper = new MethodWrapper(
+    delegate.declaringClass.toJava,
+    delegate.name,
+    delegate.descriptor.returnType.toJava,
+    delegate.descriptor.parameterTypes.map(p => p.toJava).toList.asJava
+  )
 
-    override def toString: String = delegate.descriptor.toJava
+  override def toString: String = delegate.descriptor.toJava
 }

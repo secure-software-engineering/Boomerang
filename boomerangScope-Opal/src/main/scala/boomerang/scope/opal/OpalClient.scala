@@ -28,18 +28,18 @@ import org.opalj.br.analyses.Project
 
 object OpalClient {
 
-    var project: Option[Project[_]] = None
+  var project: Option[Project[_]] = None
 
-    def init(p: Project[_]): Unit = {
-        project = Some(p)
-    }
+  def init(p: Project[_]): Unit = {
+    project = Some(p)
+  }
 
-    def getClassHierarchy: ClassHierarchy = project.get.classHierarchy
+  def getClassHierarchy: ClassHierarchy = project.get.classHierarchy
 
-    def getClassFileForType(objectType: ObjectType): Option[ClassFile] =
-        project.get.classFile(objectType)
+  def getClassFileForType(objectType: ObjectType): Option[ClassFile] =
+    project.get.classFile(objectType)
 
-    def isApplicationClass(classFile: ClassFile): Boolean =
-        project.get.allProjectClassFiles.toSet.contains(classFile)
+  def isApplicationClass(classFile: ClassFile): Boolean =
+    project.get.allProjectClassFiles.toSet.contains(classFile)
 
 }

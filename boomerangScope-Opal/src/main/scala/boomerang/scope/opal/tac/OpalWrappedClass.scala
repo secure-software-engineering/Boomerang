@@ -23,43 +23,43 @@ import org.opalj.br.ClassFile
 
 case class OpalWrappedClass(delegate: ClassFile) extends WrappedClass {
 
-    override def getMethods: util.Set[Method] = {
-        val methods = new util.HashSet[Method]
+  override def getMethods: util.Set[Method] = {
+    val methods = new util.HashSet[Method]
 
-        delegate.methods.foreach(method => {
-            methods.add(OpalMethod(method))
-        })
+    delegate.methods.foreach(method => {
+      methods.add(OpalMethod(method))
+    })
 
-        methods
+    methods
+  }
+
+  override def hasSuperclass: Boolean = delegate.superclassType.isDefined
+
+  override def getSuperclass: WrappedClass = {
+    if (hasSuperclass) {
+      val superClass =
+        OpalClient.getClassFileForType(delegate.superclassType.get)
+
+      if (superClass.isDefined) {
+        return OpalWrappedClass(superClass.get)
+      } else {
+        return OpalPhantomWrappedClass(delegate.superclassType.get)
+      }
     }
 
-    override def hasSuperclass: Boolean = delegate.superclassType.isDefined
+    throw new RuntimeException(
+      "Class " + delegate.thisType.toJava + " has no super class"
+    )
+  }
 
-    override def getSuperclass: WrappedClass = {
-        if (hasSuperclass) {
-            val superClass =
-                OpalClient.getClassFileForType(delegate.superclassType.get)
+  override def getType: Type = OpalType(delegate.thisType)
 
-            if (superClass.isDefined) {
-                return OpalWrappedClass(superClass.get)
-            } else {
-                return OpalPhantomWrappedClass(delegate.superclassType.get)
-            }
-        }
+  override def isApplicationClass: Boolean =
+    OpalClient.isApplicationClass(delegate)
 
-        throw new RuntimeException(
-            "Class " + delegate.thisType.toJava + " has no super class"
-        )
-    }
+  override def getFullyQualifiedName: String = delegate.fqn.replace("/", ".")
 
-    override def getType: Type = OpalType(delegate.thisType)
+  override def isPhantom: Boolean = false
 
-    override def isApplicationClass: Boolean =
-        OpalClient.isApplicationClass(delegate)
-
-    override def getFullyQualifiedName: String = delegate.fqn.replace("/", ".")
-
-    override def isPhantom: Boolean = false
-
-    override def toString: String = delegate.toString()
+  override def toString: String = delegate.toString()
 }
