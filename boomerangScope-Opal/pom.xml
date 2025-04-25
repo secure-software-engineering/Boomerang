@@ -10,6 +10,16 @@
 
     <artifactId>boomerangScope-Opal</artifactId>
 
+    <name>BoomerangScope-Opal</name>
+    <description>Scope implementation to run Boomerang and IDEal with Opal</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
     <properties>
         <opal.version>5.0.0</opal.version>
         <license.dir>${project.parent.basedir}</license.dir>
@@ -57,6 +67,26 @@
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- We have no Java sources in this submodule, so there won't be any
+                 generated JavaDoc files. To comply with Maven Central, we add an
+                 empty JavaDoc jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <executions>
+                    <execution>
+                        <id>empty-javadoc-jar</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
