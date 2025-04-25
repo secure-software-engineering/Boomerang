@@ -10,7 +10,6 @@ jobs:
   deployment:
     runs-on: ubuntu-latest
     environment: Deploy
-    name: Sparse SPDS deployment 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4

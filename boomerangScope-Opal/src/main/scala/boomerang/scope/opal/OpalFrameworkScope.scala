@@ -18,6 +18,14 @@ import boomerang.scope._
 import java.util.stream
 import org.opalj.br.analyses.Project
 
+/**
+ * Framework scope implementation for the static analysis framework Opal
+ *
+ * @param project the project to be analyzed
+ * @param callGraph the generated Opal call graph
+ * @param entryPoints the entry points
+ * @param dataFlowScope the dataflow scope to be used in the analysis
+ */
 class OpalFrameworkScope(
     project: Project[_],
     callGraph: org.opalj.tac.cg.CallGraph,
