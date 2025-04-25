@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.fraunhofer.iem</groupId>
     <artifactId>Boomerang-Parent</artifactId>
-    <version>4.1.0</version>
+    <version>4.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Boomerang-Parent</name>
     <description>Parent project that holds all definitions for Synchronized and Weighted Pushdown Systems, Boomerang, and IDEal</description>
