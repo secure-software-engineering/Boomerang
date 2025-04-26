@@ -42,6 +42,11 @@ public class JimpleField extends Field {
     return new JimpleType(delegate.getType());
   }
 
+  @Override
+  public String getName() {
+    return delegate.getName();
+  }
+
   public SootField getDelegate() {
     return this.delegate;
   }

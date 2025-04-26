@@ -15,12 +15,14 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
+import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.base.Joiner;
 import java.util.Arrays;
@@ -87,7 +89,7 @@ public class JimpleUpStatement extends Statement {
     }
 
     if (assignStmt.getLeftOp() instanceof JArrayRef) {
-      return Field.array(getArrayBase().getY());
+      return Field.array(getArrayBase().getIndex());
     }
 
     JInstanceFieldRef ifr = (JInstanceFieldRef) assignStmt.getLeftOp();
@@ -97,14 +99,16 @@ public class JimpleUpStatement extends Statement {
 
   @Override
   public boolean isFieldWriteWithBase(Val base) {
-    if (isAssignStmt() && isFieldStore()) {
-      Pair<Val, Field> instanceFieldRef = getFieldStore();
-      return instanceFieldRef.getX().equals(base);
+    if (isFieldStore()) {
+      IInstanceFieldRef fieldRef = getFieldStore();
+
+      return fieldRef.getBase().equals(base);
     }
 
     if (isAssignStmt() && isArrayStore()) {
-      Pair<Val, Integer> arrayBase = getArrayBase();
-      return arrayBase.getX().equals(base);
+      IArrayRef arrayBase = getArrayBase();
+
+      return arrayBase.getBase().equals(base);
     }
 
     return false;
@@ -122,9 +126,12 @@ public class JimpleUpStatement extends Statement {
 
   @Override
   public boolean isFieldLoadWithBase(Val base) {
-    if (isAssignStmt() && isFieldLoad()) {
-      return getFieldLoad().getX().equals(base);
+    if (isFieldLoad()) {
+      IInstanceFieldRef fieldRef = getFieldLoad();
+
+      return fieldRef.getBase().equals(base);
     }
+
     return false;
   }
 
@@ -250,23 +257,19 @@ public class JimpleUpStatement extends Statement {
   }
 
   @Override
-  public Pair<Val, Field> getFieldStore() {
+  public IInstanceFieldRef getFieldStore() {
     JAssignStmt assignStmt = (JAssignStmt) delegate;
-    JInstanceFieldRef val = (JInstanceFieldRef) assignStmt.getLeftOp();
-    return new Pair<>(
-        new JimpleUpVal(val.getBase(), method),
-        new JimpleUpField(
-            SootUpFrameworkScope.getInstance().getSootField(val.getFieldSignature())));
+    JInstanceFieldRef fieldRef = (JInstanceFieldRef) assignStmt.getLeftOp();
+
+    return new JimpleUpInstanceFieldRef(fieldRef, method);
   }
 
   @Override
-  public Pair<Val, Field> getFieldLoad() {
+  public IInstanceFieldRef getFieldLoad() {
     JAssignStmt assignStmt = (JAssignStmt) delegate;
-    JInstanceFieldRef val = (JInstanceFieldRef) assignStmt.getRightOp();
-    return new Pair<>(
-        new JimpleUpVal(val.getBase(), method),
-        new JimpleUpField(
-            SootUpFrameworkScope.getInstance().getSootField(val.getFieldSignature())));
+    JInstanceFieldRef fieldRef = (JInstanceFieldRef) assignStmt.getRightOp();
+
+    return new JimpleUpInstanceFieldRef(fieldRef, method);
   }
 
   @Override
@@ -291,9 +294,12 @@ public class JimpleUpStatement extends Statement {
     } else {
       throw new RuntimeException("Statement does not have a static field");
     }
-    return new JimpleUpStaticFieldVal(
-        new JimpleUpField(SootUpFrameworkScope.getInstance().getSootField(v.getFieldSignature())),
-        method);
+
+    // TODO Replace class type
+    WrappedClass declaringClass = new JimpleUpWrappedClass(null);
+    Field field =
+        new JimpleUpField(SootUpFrameworkScope.getInstance().getSootField(v.getFieldSignature()));
+    return new StaticFieldVal(declaringClass, field, method);
   }
 
   @Override
@@ -307,15 +313,19 @@ public class JimpleUpStatement extends Statement {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     if (isArrayLoad()) {
-      Val rightOp = getRightOp();
-      return rightOp.getArrayBase();
+      JAssignStmt assignStmt = (JAssignStmt) delegate;
+      JArrayRef arrayRef = (JArrayRef) assignStmt.getRightOp();
+
+      return new JimpleUpArrayRef(arrayRef, method);
     }
 
     if (isArrayStore()) {
-      Val rightOp = getLeftOp();
-      return rightOp.getArrayBase();
+      JAssignStmt assignStmt = (JAssignStmt) delegate;
+      JArrayRef arrayRef = (JArrayRef) assignStmt.getLeftOp();
+
+      return new JimpleUpArrayRef(arrayRef, method);
     }
 
     throw new RuntimeException("Statement does not deal with an array base");

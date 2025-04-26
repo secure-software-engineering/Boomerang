@@ -15,10 +15,11 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
@@ -30,7 +31,6 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.shrike.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAArrayLoadInstruction;
-import com.ibm.wala.ssa.SSAArrayReferenceInstruction;
 import com.ibm.wala.ssa.SSAArrayStoreInstruction;
 import com.ibm.wala.ssa.SSACheckCastInstruction;
 import com.ibm.wala.ssa.SSAConditionalBranchInstruction;
@@ -164,8 +164,9 @@ public class WALAStatement extends Statement {
       return new WALAVal(delegate, OP.LEFT, (WALAMethod) method);
     }
     if (isStaticFieldStore()) {
-      return new WALAStaticFieldVal(
-          new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);
+      // TODO Declaring class
+      return new StaticFieldVal(
+          null, new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);
     }
     if (isAllocationStatement()) {
       return new WALAVal(delegate.getDef(), (WALAMethod) method);
@@ -217,8 +218,9 @@ public class WALAStatement extends Statement {
       return new WALAVal(((SSAArrayStoreInstruction) delegate).getValue(), (WALAMethod) method);
     }
     if (isStaticFieldLoad()) {
-      return new WALAStaticFieldVal(
-          new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);
+      // TODO Declaring class
+      return new StaticFieldVal(
+          null, new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);
     }
     return null;
   }
@@ -313,17 +315,19 @@ public class WALAStatement extends Statement {
   }
 
   @Override
-  public Pair<Val, Field> getFieldStore() {
-    SSAPutInstruction ins = (SSAPutInstruction) delegate;
+  public IInstanceFieldRef getFieldStore() {
+    /*SSAPutInstruction ins = (SSAPutInstruction) delegate;
     return new Pair<>(
-        new WALAVal(ins.getRef(), (WALAMethod) method), new WALAField(ins.getDeclaredField()));
+        new WALAVal(ins.getRef(), (WALAMethod) method), new WALAField(ins.getDeclaredField()));*/
+    throw new RuntimeException("Not implemented yet");
   }
 
   @Override
-  public Pair<Val, Field> getFieldLoad() {
-    SSAGetInstruction ins = (SSAGetInstruction) delegate;
+  public IInstanceFieldRef getFieldLoad() {
+    /*SSAGetInstruction ins = (SSAGetInstruction) delegate;
     return new Pair<>(
-        new WALAVal(ins.getRef(), (WALAMethod) method), new WALAField(ins.getDeclaredField()));
+        new WALAVal(ins.getRef(), (WALAMethod) method), new WALAField(ins.getDeclaredField()));*/
+    throw new RuntimeException("Not implemented yet");
   }
 
   @Override
@@ -340,7 +344,8 @@ public class WALAStatement extends Statement {
   public StaticFieldVal getStaticField() {
     SSAFieldAccessInstruction stmt = (SSAFieldAccessInstruction) delegate;
     if (!stmt.isStatic()) throw new RuntimeException("Not a static field access statement");
-    return new WALAStaticFieldVal(new WALAField(stmt.getDeclaredField()), method);
+    // TODO Declaring class
+    return new StaticFieldVal(null, new WALAField(stmt.getDeclaredField()), method);
   }
 
   @Override
@@ -388,13 +393,13 @@ public class WALAStatement extends Statement {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
-    if (delegate instanceof SSAArrayReferenceInstruction) {
+  public IArrayRef getArrayBase() {
+    /*if (delegate instanceof SSAArrayReferenceInstruction) {
       SSAArrayReferenceInstruction arrayRefIns = (SSAArrayReferenceInstruction) delegate;
       return new Pair<>(
           new WALAVal(arrayRefIns.getArrayRef(), (WALAMethod) method), arrayRefIns.getIndex());
-    }
-    throw new RuntimeException("Dead code");
+    }*/
+    throw new RuntimeException("Not implemented yet");
   }
 
   @Override
@@ -410,7 +415,6 @@ public class WALAStatement extends Statement {
       bytecodeIndex = method.getBytecodeIndex(delegate.iIndex());
       return method.getLineNumber(bytecodeIndex);
     } catch (InvalidClassFileException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return -1;

@@ -15,9 +15,8 @@
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
-import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
@@ -41,21 +40,21 @@ import soot.jimple.StringConstant;
 
 public class JimpleVal extends Val {
 
-  private final Value v;
+  private final Value delegate;
 
-  public JimpleVal(Value v, Method m) {
-    this(v, m, null);
+  public JimpleVal(Value delegate, Method m) {
+    this(delegate, m, null);
   }
 
-  protected JimpleVal(Value v, Method m, Edge unbalanced) {
+  protected JimpleVal(Value delegate, Method m, Edge unbalanced) {
     super(m, unbalanced);
-    if (v == null) throw new RuntimeException("Value must not be null!");
-    this.v = v;
+    if (delegate == null) throw new RuntimeException("Value must not be null!");
+    this.delegate = delegate;
   }
 
   @Override
   public JimpleType getType() {
-    return v == null ? new JimpleType(NullType.v()) : new JimpleType(v.getType());
+    return delegate == null ? new JimpleType(NullType.v()) : new JimpleType(delegate.getType());
   }
 
   @Override
@@ -65,13 +64,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isNewExpr() {
-    return v instanceof NewExpr;
+    return delegate instanceof NewExpr;
   }
 
   @Override
   public Type getNewExprType() {
     if (isNewExpr()) {
-      return new JimpleType(v.getType());
+      return new JimpleType(delegate.getType());
     }
 
     throw new RuntimeException("Val is not a new expression");
@@ -79,31 +78,29 @@ public class JimpleVal extends Val {
 
   @Override
   public Val asUnbalanced(Edge stmt) {
-    return new JimpleVal(v, m, stmt);
+    return new JimpleVal(delegate, m, stmt);
   }
 
   @Override
   public boolean isLocal() {
-    return v instanceof Local;
+    return delegate instanceof Local;
   }
 
   @Override
   public boolean isArrayAllocationVal() {
-    // TODO Split this into single array and multi array allocation
-    return v instanceof NewArrayExpr || v instanceof NewMultiArrayExpr;
+    return delegate instanceof NewArrayExpr || delegate instanceof NewMultiArrayExpr;
   }
 
   @Override
   public Val getArrayAllocationSize() {
-    // TODO Split this into single array and multi array allocation
-    if (v instanceof NewArrayExpr) {
-      NewArrayExpr newArrayExpr = (NewArrayExpr) v;
+    if (delegate instanceof NewArrayExpr) {
+      NewArrayExpr newArrayExpr = (NewArrayExpr) delegate;
 
       return new JimpleVal(newArrayExpr.getSize(), m);
     }
 
-    if (v instanceof NewMultiArrayExpr) {
-      NewMultiArrayExpr expr = (NewMultiArrayExpr) v;
+    if (delegate instanceof NewMultiArrayExpr) {
+      NewMultiArrayExpr expr = (NewMultiArrayExpr) delegate;
 
       return new JimpleVal(expr.getSize(0), m);
     }
@@ -113,18 +110,18 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isNull() {
-    return v instanceof NullConstant;
+    return delegate instanceof NullConstant;
   }
 
   @Override
   public boolean isStringConstant() {
-    return v instanceof StringConstant;
+    return delegate instanceof StringConstant;
   }
 
   @Override
   public String getStringValue() {
     if (isStringConstant()) {
-      return ((StringConstant) v).value;
+      return ((StringConstant) delegate).value;
     }
 
     throw new RuntimeException("Val is not a String constant");
@@ -147,13 +144,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isCast() {
-    return v instanceof CastExpr;
+    return delegate instanceof CastExpr;
   }
 
   @Override
   public Val getCastOp() {
     if (isCast()) {
-      CastExpr cast = (CastExpr) v;
+      CastExpr cast = (CastExpr) delegate;
       return new JimpleVal(cast.getOp(), m);
     }
 
@@ -161,31 +158,24 @@ public class JimpleVal extends Val {
   }
 
   public boolean isInstanceFieldRef() {
-    return v instanceof soot.jimple.InstanceFieldRef;
+    return delegate instanceof soot.jimple.InstanceFieldRef;
   }
 
   public boolean isStaticFieldRef() {
-    return v instanceof StaticFieldRef;
-  }
-
-  public StaticFieldVal getStaticField() {
-    StaticFieldRef val = (StaticFieldRef) v;
-    return new JimpleStaticFieldVal(new JimpleField(val.getField()), m);
+    return delegate instanceof StaticFieldRef;
   }
 
   @Override
   public boolean isArrayRef() {
-    return v instanceof ArrayRef;
+    return delegate instanceof ArrayRef;
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     if (isArrayRef()) {
-      return new Pair<>(
-          new JimpleVal(((ArrayRef) v).getBase(), m),
-          ((ArrayRef) v).getIndex() instanceof IntConstant
-              ? ((IntConstant) ((ArrayRef) v).getIndex()).value
-              : -1);
+      ArrayRef arrayRef = (ArrayRef) delegate;
+
+      return new JimpleArrayRef(arrayRef, m);
     }
 
     throw new RuntimeException("Val is not an array ref");
@@ -193,13 +183,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isInstanceOfExpr() {
-    return v instanceof InstanceOfExpr;
+    return delegate instanceof InstanceOfExpr;
   }
 
   @Override
   public Val getInstanceOfOp() {
     if (isInstanceOfExpr()) {
-      InstanceOfExpr val = (InstanceOfExpr) v;
+      InstanceOfExpr val = (InstanceOfExpr) delegate;
       return new JimpleVal(val.getOp(), m);
     }
 
@@ -208,13 +198,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isLengthExpr() {
-    return v instanceof LengthExpr;
+    return delegate instanceof LengthExpr;
   }
 
   @Override
   public Val getLengthOp() {
     if (isLengthExpr()) {
-      LengthExpr val = (LengthExpr) v;
+      LengthExpr val = (LengthExpr) delegate;
       return new JimpleVal(val.getOp(), m);
     }
 
@@ -223,13 +213,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isIntConstant() {
-    return v instanceof IntConstant;
+    return delegate instanceof IntConstant;
   }
 
   @Override
   public int getIntValue() {
     if (isIntConstant()) {
-      return ((IntConstant) v).value;
+      return ((IntConstant) delegate).value;
     }
 
     throw new RuntimeException("Val is not an integer constant");
@@ -237,13 +227,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isLongConstant() {
-    return v instanceof LongConstant;
+    return delegate instanceof LongConstant;
   }
 
   @Override
   public long getLongValue() {
     if (isLongConstant()) {
-      return ((LongConstant) v).value;
+      return ((LongConstant) delegate).value;
     }
 
     throw new RuntimeException("Val is not a long constant");
@@ -251,13 +241,13 @@ public class JimpleVal extends Val {
 
   @Override
   public boolean isClassConstant() {
-    return v instanceof ClassConstant;
+    return delegate instanceof ClassConstant;
   }
 
   @Override
   public Type getClassConstantType() {
     if (isClassConstant()) {
-      return new JimpleType(((ClassConstant) v).toSootType());
+      return new JimpleType(((ClassConstant) delegate).toSootType());
     }
 
     throw new RuntimeException("Val is not a class constant");
@@ -270,16 +260,16 @@ public class JimpleVal extends Val {
 
   @Override
   public Val withSecondVal(Val leftOp) {
-    return new JimpleDoubleVal(v, m, leftOp);
+    return new JimpleDoubleVal(delegate, m, leftOp);
   }
 
   @Override
   public String getVariableName() {
-    return v.toString();
+    return delegate.toString();
   }
 
   public Value getDelegate() {
-    return v;
+    return delegate;
   }
 
   @Override
@@ -288,16 +278,20 @@ public class JimpleVal extends Val {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     JimpleVal jimpleVal = (JimpleVal) o;
-    return Objects.equals(v, jimpleVal.v);
+    return Objects.equals(delegate, jimpleVal.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), v);
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override
   public String toString() {
-    return v.toString() + " (" + m + ")" + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
+    return delegate.toString()
+        + " ("
+        + m
+        + ")"
+        + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
   }
 }

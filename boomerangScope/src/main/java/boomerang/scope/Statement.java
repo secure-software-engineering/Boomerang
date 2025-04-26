@@ -194,12 +194,12 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public Pair<Val, Field> getFieldStore() {
+    public IInstanceFieldRef getFieldStore() {
       throw new RuntimeException("Epsilon statement is not a field store statement");
     }
 
     @Override
-    public Pair<Val, Field> getFieldLoad() {
+    public IInstanceFieldRef getFieldLoad() {
       throw new RuntimeException("Epsilon statement is not a field load statement");
     }
 
@@ -229,7 +229,7 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public Pair<Val, Integer> getArrayBase() {
+    public IArrayRef getArrayBase() {
       throw new RuntimeException("Epsilon statement has no array base");
     }
 
@@ -328,7 +328,7 @@ public abstract class Statement implements Location {
     if (value.isStatic()) return true;
     if (assignsValue(value)) return true;
     if (isFieldStore()) {
-      if (getFieldStore().getX().equals(value)) return true;
+      if (getFieldStore().getBase().equals(value)) return true;
     }
     if (isReturnOperator(value)) return true;
     return isParameter(value);
@@ -377,9 +377,9 @@ public abstract class Statement implements Location {
 
   public abstract boolean isIdentityStmt();
 
-  public abstract Pair<Val, Field> getFieldStore();
+  public abstract IInstanceFieldRef getFieldStore();
 
-  public abstract Pair<Val, Field> getFieldLoad();
+  public abstract IInstanceFieldRef getFieldLoad();
 
   public abstract boolean isStaticFieldLoad();
 
@@ -400,7 +400,7 @@ public abstract class Statement implements Location {
 
   public abstract Collection<Val> getPhiVals();
 
-  public abstract Pair<Val, Integer> getArrayBase();
+  public abstract IArrayRef getArrayBase();
 
   public abstract int getStartLineNumber();
 

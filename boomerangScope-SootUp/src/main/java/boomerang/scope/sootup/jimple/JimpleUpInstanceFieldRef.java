@@ -15,14 +15,14 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.Field;
-import boomerang.scope.InstanceFieldRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.Val;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Arrays;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.java.core.JavaSootField;
 
-public class JimpleUpInstanceFieldRef implements InstanceFieldRef {
+public class JimpleUpInstanceFieldRef implements IInstanceFieldRef {
 
   private final JInstanceFieldRef delegate;
   private final JimpleUpMethod method;
@@ -30,6 +30,10 @@ public class JimpleUpInstanceFieldRef implements InstanceFieldRef {
   public JimpleUpInstanceFieldRef(JInstanceFieldRef delegate, JimpleUpMethod method) {
     this.delegate = delegate;
     this.method = method;
+  }
+
+  public JInstanceFieldRef getDelegate() {
+    return delegate;
   }
 
   @Override

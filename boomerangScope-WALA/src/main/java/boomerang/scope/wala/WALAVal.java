@@ -15,8 +15,8 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import com.ibm.wala.analysis.typeInference.PointType;
@@ -308,7 +308,7 @@ public class WALAVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     // TODO Auto-generated method stub
     return null;
   }

@@ -21,9 +21,6 @@ import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
-import boomerang.scope.sootup.jimple.JimpleUpField;
-import boomerang.scope.sootup.jimple.JimpleUpMethod;
-import boomerang.scope.sootup.jimple.JimpleUpStaticFieldVal;
 import boomerang.scope.sootup.jimple.JimpleUpVal;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -87,19 +84,21 @@ public class SootUpFrameworkScope implements FrameworkScope {
   @Override
   @NonNull
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
-    JimpleUpStaticFieldVal val = ((JimpleUpStaticFieldVal) fact);
+    /*JimpleUpStaticFieldVal val = ((JimpleUpStaticFieldVal) fact);
     ClassType declaringClassType =
-        ((JimpleUpField) val.field()).getDelegate().getDeclaringClassType();
+        ((JimpleUpField) val.getField()).getDelegate().getDeclaringClassType();
 
     return view.getClass(declaringClassType).get().getMethods().stream()
         .filter(sootup.core.model.SootMethod::hasBody)
-        .map(JimpleUpMethod::of);
+        .map(JimpleUpMethod::of);*/
+    throw new UnsupportedOperationException("Reimplement");
   }
 
   @Override
   @NonNull
   public StaticFieldVal newStaticFieldVal(Field field, Method m) {
-    return new JimpleUpStaticFieldVal((JimpleUpField) field, m);
+    // return new JimpleUpStaticFieldVal((JimpleUpField) field, m);
+    throw new UnsupportedOperationException("Reimplement");
   }
 
   @Override

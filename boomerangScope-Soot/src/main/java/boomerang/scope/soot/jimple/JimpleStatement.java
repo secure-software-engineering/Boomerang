@@ -15,13 +15,15 @@
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
+import boomerang.scope.WrappedClass;
 import com.google.common.base.Joiner;
 import java.util.Collection;
 import java.util.Objects;
@@ -83,7 +85,7 @@ public class JimpleStatement extends Statement {
     }
 
     if (as.getLeftOp() instanceof ArrayRef) {
-      return Field.array(getArrayBase().getY());
+      return Field.array(getArrayBase().getIndex());
     }
     InstanceFieldRef ifr = (InstanceFieldRef) as.getLeftOp();
     return new JimpleField(ifr.getField());
@@ -91,14 +93,18 @@ public class JimpleStatement extends Statement {
 
   @Override
   public boolean isFieldWriteWithBase(Val base) {
-    if (isAssignStmt() && isFieldStore()) {
-      Pair<Val, Field> instanceFieldRef = getFieldStore();
-      return instanceFieldRef.getX().equals(base);
+    if (isFieldStore()) {
+      IInstanceFieldRef fieldRef = getFieldStore();
+
+      return fieldRef.getBase().equals(base);
     }
-    if (isAssignStmt() && isArrayStore()) {
-      Pair<Val, Integer> arrayBase = getArrayBase();
-      return arrayBase.getX().equals(base);
+
+    if (isArrayStore()) {
+      IArrayRef arrayRef = getArrayBase();
+
+      return arrayRef.getBase().equals(base);
     }
+
     return false;
   }
 
@@ -107,6 +113,7 @@ public class JimpleStatement extends Statement {
     if (isFieldLoad()) {
       AssignStmt as = (AssignStmt) delegate;
       InstanceFieldRef ifr = (InstanceFieldRef) as.getRightOp();
+
       return new JimpleField(ifr.getField());
     }
 
@@ -115,9 +122,12 @@ public class JimpleStatement extends Statement {
 
   @Override
   public boolean isFieldLoadWithBase(Val base) {
-    if (isAssignStmt() && isFieldLoad()) {
-      return getFieldLoad().getX().equals(base);
+    if (isFieldLoad()) {
+      IInstanceFieldRef fieldRef = getFieldLoad();
+
+      return fieldRef.getBase().equals(base);
     }
+
     return false;
   }
 
@@ -130,6 +140,7 @@ public class JimpleStatement extends Statement {
   public Val getLeftOp() {
     if (isAssignStmt()) {
       AssignStmt assignStmt = (AssignStmt) delegate;
+
       return new JimpleVal(assignStmt.getLeftOp(), method);
     }
 
@@ -233,40 +244,6 @@ public class JimpleStatement extends Statement {
     return delegate instanceof IdentityStmt;
   }
 
-  public String getShortLabel() {
-    if (delegate instanceof AssignStmt) {
-      AssignStmt assignStmt = (AssignStmt) delegate;
-      if (assignStmt.getRightOp() instanceof InstanceFieldRef) {
-        InstanceFieldRef fr = (InstanceFieldRef) assignStmt.getRightOp();
-        return assignStmt.getLeftOp() + " = " + fr.getBase() + "." + fr.getField().getName();
-      }
-      if (assignStmt.getLeftOp() instanceof InstanceFieldRef) {
-        InstanceFieldRef fr = (InstanceFieldRef) assignStmt.getLeftOp();
-        return fr.getBase() + "." + fr.getField().getName() + " = " + assignStmt.getRightOp();
-      }
-    }
-    if (containsInvokeExpr()) {
-      InvokeExpr invokeExpr = getInvokeExpr();
-      if (invokeExpr.isStaticInvokeExpr()) {
-        return (isAssignStmt() ? getLeftOp() + " = " : "")
-            + invokeExpr.getDeclaredMethod()
-            + "("
-            + invokeExpr.getArgs().toString().replace("[", "").replace("]", "")
-            + ")";
-      }
-      if (invokeExpr.isInstanceInvokeExpr()) {
-        return (isAssignStmt() ? getLeftOp() + " = " : "")
-            + invokeExpr.getBase()
-            + "."
-            + invokeExpr.getDeclaredMethod()
-            + "("
-            + invokeExpr.getArgs().toString().replace("[", "").replace("]", "")
-            + ")";
-      }
-    }
-    return delegate.toString();
-  }
-
   /**
    * This method kills a data-flow at an if-stmt, it is assumed that the propagated "allocation"
    * site is x = null and fact is the propagated aliased variable. (i.e., y after a statement y =
@@ -348,22 +325,24 @@ public class JimpleStatement extends Statement {
   }
 
   @Override
-  public Pair<Val, Field> getFieldStore() {
+  public IInstanceFieldRef getFieldStore() {
     if (isFieldStore()) {
       AssignStmt ins = (AssignStmt) delegate;
-      soot.jimple.InstanceFieldRef val = (soot.jimple.InstanceFieldRef) ins.getLeftOp();
-      return new Pair<>(new JimpleVal(val.getBase(), method), new JimpleField(val.getField()));
+      InstanceFieldRef fieldRef = (InstanceFieldRef) ins.getLeftOp();
+
+      return new JimpleInstanceFieldRef(fieldRef, method);
     }
 
     throw new RuntimeException("Statement is not a field store statement");
   }
 
   @Override
-  public Pair<Val, Field> getFieldLoad() {
+  public IInstanceFieldRef getFieldLoad() {
     if (isFieldLoad()) {
       AssignStmt ins = (AssignStmt) delegate;
-      soot.jimple.InstanceFieldRef val = (soot.jimple.InstanceFieldRef) ins.getRightOp();
-      return new Pair<>(new JimpleVal(val.getBase(), method), new JimpleField(val.getField()));
+      soot.jimple.InstanceFieldRef fieldRef = (soot.jimple.InstanceFieldRef) ins.getRightOp();
+
+      return new JimpleInstanceFieldRef(fieldRef, method);
     }
 
     throw new RuntimeException("Statement is not a field load statement");
@@ -391,7 +370,10 @@ public class JimpleStatement extends Statement {
     } else {
       throw new RuntimeException("Statement has no static field access");
     }
-    return new JimpleStaticFieldVal(new JimpleField(v.getField()), method);
+
+    WrappedClass declaringClass = new JimpleWrappedClass(v.getField().getDeclaringClass());
+    Field field = new JimpleField(v.getField());
+    return new StaticFieldVal(declaringClass, field, method);
   }
 
   @Override
@@ -405,15 +387,21 @@ public class JimpleStatement extends Statement {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     if (isArrayLoad()) {
-      Val rightOp = getRightOp();
-      return rightOp.getArrayBase();
+      AssignStmt assignStmt = (AssignStmt) delegate;
+      ArrayRef arrayRef = (ArrayRef) assignStmt.getRightOp();
+
+      return new JimpleArrayRef(arrayRef, method);
     }
+
     if (isArrayStore()) {
-      Val rightOp = getLeftOp();
-      return rightOp.getArrayBase();
+      AssignStmt assignStmt = (AssignStmt) delegate;
+      ArrayRef arrayRef = (ArrayRef) assignStmt.getLeftOp();
+
+      return new JimpleArrayRef(arrayRef, method);
     }
+
     throw new RuntimeException("Statement has no array base");
   }
 

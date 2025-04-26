@@ -62,7 +62,7 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
     JimpleStaticFieldVal val = ((JimpleStaticFieldVal) fact);
-    return ((JimpleField) val.field())
+    return ((JimpleField) val.getField())
         .getDelegate().getDeclaringClass().getMethods().stream()
             .filter(SootMethod::hasActiveBody)
             .map(JimpleMethod::of);
@@ -70,7 +70,8 @@ public class SootFrameworkScope implements FrameworkScope {
 
   @Override
   public StaticFieldVal newStaticFieldVal(Field field, Method m) {
-    return new JimpleStaticFieldVal((JimpleField) field, m);
+    // return new JimpleStaticFieldVal((JimpleField) field, m);
+    throw new UnsupportedOperationException("Reimplement");
   }
 
   @Override

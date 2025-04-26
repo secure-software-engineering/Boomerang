@@ -185,6 +185,11 @@ public abstract class Val {
             }
 
             @Override
+            public Val withSecondVal(Val secondVal) {
+              return null;
+            }
+
+            @Override
             public boolean isLongConstant() {
               return false;
             }
@@ -200,7 +205,7 @@ public abstract class Val {
             }
 
             @Override
-            public Pair<Val, Integer> getArrayBase() {
+            public IArrayRef getArrayBase() {
               throw new RuntimeException("ZERO Val has no array base");
             }
 
@@ -226,9 +231,9 @@ public abstract class Val {
 
   public abstract boolean isLocal();
 
-  // TODO Distinguish between single arrays and multi arrays
   public abstract boolean isArrayAllocationVal();
 
+  // TODO Change to list to include all dimensions (not just the first one)
   public abstract Val getArrayAllocationSize();
 
   public abstract boolean isNull();
@@ -263,8 +268,8 @@ public abstract class Val {
 
   public abstract Val withNewMethod(Method callee);
 
-  public Val withSecondVal(Val leftOp) {
-    throw new RuntimeException("Unfinished");
+  public Val withSecondVal(Val secondVal) {
+    throw new UnsupportedOperationException("Not implemented");
   }
 
   public abstract boolean isLongConstant();
@@ -277,7 +282,7 @@ public abstract class Val {
 
   public abstract long getLongValue();
 
-  public abstract Pair<Val, Integer> getArrayBase();
+  public abstract IArrayRef getArrayBase();
 
   public boolean isThisLocal() {
     return !m().isStatic() && m().getThisLocal().equals(this);

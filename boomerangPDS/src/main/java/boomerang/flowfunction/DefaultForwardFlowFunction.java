@@ -17,9 +17,10 @@ package boomerang.flowfunction;
 import boomerang.ForwardQuery;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
@@ -126,10 +127,10 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
       Val rightOp = nextStmt.getRightOp();
       if (rightOp.equals(fact)) {
         if (nextStmt.isFieldStore()) {
-          Pair<Val, Field> ifr = nextStmt.getFieldStore();
+          IInstanceFieldRef ifr = nextStmt.getFieldStore();
           if (options.trackFields()) {
-            if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
-              out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
+            if (options.includeInnerClassFields() || !ifr.getField().isInnerClassField()) {
+              out.add(new PushNode<>(nextEdge, ifr.getBase(), ifr.getField(), PDSSystem.FIELDS));
             }
           }
         } else if (nextStmt.isStaticFieldStore()) {
@@ -138,7 +139,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
             strategies.getStaticFieldStrategy().handleForward(nextEdge, rightOp, sf, out);
           }
         } else if (leftOp.isArrayRef()) {
-          Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
+          IArrayRef arrayBase = nextStmt.getArrayBase();
           if (options.trackFields()) {
             strategies.getArrayHandlingStrategy().handleForward(nextEdge, arrayBase, out);
           }
@@ -147,10 +148,10 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
         }
       }
       if (nextStmt.isFieldLoad()) {
-        Pair<Val, Field> ifr = nextStmt.getFieldLoad();
-        if (ifr.getX().equals(fact)) {
+        IInstanceFieldRef ifr = nextStmt.getFieldLoad();
+        if (ifr.getBase().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(nextEdge, leftOp, ifr.getY());
+              new NodeWithLocation<>(nextEdge, leftOp, ifr.getField());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (nextStmt.isStaticFieldLoad()) {
@@ -159,10 +160,10 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
           out.add(new Node<>(nextEdge, leftOp));
         }
       } else if (rightOp.isArrayRef()) {
-        Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
-        if (arrayBase.getX().equals(fact)) {
+        IArrayRef arrayBase = nextStmt.getArrayBase();
+        if (arrayBase.getBase().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(nextEdge, leftOp, Field.array(arrayBase.getY()));
+              new NodeWithLocation<>(nextEdge, leftOp, Field.array(arrayBase.getIndex()));
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (rightOp.isCast()) {
@@ -196,8 +197,8 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
       if (curr.getLeftOp().equals(value)) {
         // But not for a statement x = x.f
         if (curr.isFieldLoad()) {
-          Pair<Val, Field> ifr = curr.getFieldLoad();
-          return !ifr.getX().equals(value);
+          IInstanceFieldRef ifr = curr.getFieldLoad();
+          return !ifr.getBase().equals(value);
         }
         return true;
       }

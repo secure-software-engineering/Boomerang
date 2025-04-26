@@ -69,7 +69,7 @@ class OpalMethod private (
           val targetVar = stmt.asAssignment.targetVar
 
           if (targetVar.id == -1) {
-            return new OpalLocal(targetVar, this)
+            return new OpalVal(targetVar, this)
           }
         }
       })
@@ -86,7 +86,7 @@ class OpalMethod private (
     if (localCache.isEmpty) {
       localCache = Some(new util.HashSet[Val]())
 
-      tac.getLocals.foreach(l => localCache.get.add(new OpalLocal(l, this)))
+      tac.getLocals.foreach(l => localCache.get.add(new OpalVal(l, this)))
     }
 
     localCache.get
@@ -99,9 +99,9 @@ class OpalMethod private (
       tac.getParameterLocals.foreach(l => {
         // Exclude the 'this' local from the parameters if this is an instance method
         if (isStatic) {
-          parameterLocalCache.get.add(new OpalLocal(l, this))
+          parameterLocalCache.get.add(new OpalVal(l, this))
         } else if (l.id != -1) {
-          parameterLocalCache.get.add(new OpalLocal(l, this))
+          parameterLocalCache.get.add(new OpalVal(l, this))
         }
       })
     }
@@ -117,8 +117,8 @@ class OpalMethod private (
 
   override def getStatements: util.List[Statement] = cfg.getStatements
 
-  override def getDeclaringClass: WrappedClass = OpalWrappedClass(
-    delegate.classFile
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(
+    delegate.classFile.thisType
   )
 
   override def getControlFlowGraph: ControlFlowGraph = cfg.get()

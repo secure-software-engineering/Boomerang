@@ -15,8 +15,8 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.sootup.SootUpFrameworkScope;
@@ -235,15 +235,14 @@ public class JimpleUpVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
-    assert isArrayRef();
+  public IArrayRef getArrayBase() {
+    if (isArrayRef()) {
+      JArrayRef arrayRef = (JArrayRef) delegate;
 
-    JArrayRef arrayRef = (JArrayRef) delegate;
-    return new Pair<>(
-        new JimpleUpVal(arrayRef.getBase(), m),
-        arrayRef.getIndex() instanceof IntConstant
-            ? ((IntConstant) arrayRef.getIndex()).getValue()
-            : -1);
+      return new JimpleUpArrayRef(arrayRef, m);
+    }
+
+    throw new RuntimeException("Val is not an array ref");
   }
 
   @Override

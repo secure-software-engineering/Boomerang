@@ -47,9 +47,9 @@ class OpalArrayTest {
         arrayLoadCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(1, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(1, arrayBase.getIndex)
 
         val rightOp = stmt.getRightOp
         Assert.assertTrue(rightOp.isArrayRef)
@@ -79,9 +79,9 @@ class OpalArrayTest {
         arrayLoadCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(-1, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(-1, arrayBase.getIndex)
 
         val rightOp = stmt.getRightOp
         Assert.assertTrue(rightOp.isArrayRef)
@@ -107,9 +107,9 @@ class OpalArrayTest {
         arrayStoreCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(0, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(0, arrayBase.getIndex)
 
         val leftOp = stmt.getLeftOp
         Assert.assertTrue(leftOp.isArrayRef)
@@ -135,9 +135,9 @@ class OpalArrayTest {
         arrayStoreCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(-1, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(-1, arrayBase.getIndex)
 
         val leftOp = stmt.getLeftOp
         Assert.assertTrue(leftOp.isArrayRef)

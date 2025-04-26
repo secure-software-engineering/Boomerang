@@ -368,7 +368,11 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
     @Override
     public void onAddedTransition(Transition<Edge, INode<Val>> t, W w) {
       if (getControlFlowEdge().getStart().isFieldStore()
-          && !getControlFlowEdge().getStart().getFieldStore().getX().equals(t.getStart().fact())) {
+          && !getControlFlowEdge()
+              .getStart()
+              .getFieldStore()
+              .getBase()
+              .equals(t.getStart().fact())) {
         flowSolver
             .getCallAutomaton()
             .addWeightForTransition(new Transition<>(t.getStart(), t.getLabel(), target), this.w);

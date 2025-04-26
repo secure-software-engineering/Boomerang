@@ -43,7 +43,7 @@ public class SingletonStaticFieldStrategy implements StaticFieldHandlingStrategy
   @Override
   public void handleForward(
       Edge storeStmt, Val storedVal, StaticFieldVal staticVal, Set<State> out) {
-    for (Statement matchingStore : fieldLoadStatements.get(staticVal.field())) {
+    for (Statement matchingStore : fieldLoadStatements.get(staticVal.getField())) {
       if (matchingStore.isAssignStmt()) {
         for (Statement succ :
             matchingStore.getMethod().getControlFlowGraph().getSuccsOf(matchingStore)) {
@@ -58,7 +58,7 @@ public class SingletonStaticFieldStrategy implements StaticFieldHandlingStrategy
   @Override
   public void handleBackward(
       Edge loadStatement, Val loadedVal, StaticFieldVal staticVal, Set<State> out) {
-    for (Statement matchingStore : fieldStoreStatements.get(staticVal.field())) {
+    for (Statement matchingStore : fieldStoreStatements.get(staticVal.getField())) {
       for (Statement pred :
           matchingStore.getMethod().getControlFlowGraph().getPredsOf(matchingStore)) {
         solver.processNormal(

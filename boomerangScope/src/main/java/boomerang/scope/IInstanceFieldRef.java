@@ -14,7 +14,7 @@
  */
 package boomerang.scope;
 
-public interface InstanceFieldRef {
+public interface IInstanceFieldRef {
 
   Val getBase();
 

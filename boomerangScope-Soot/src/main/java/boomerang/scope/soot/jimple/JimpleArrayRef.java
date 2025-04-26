@@ -14,33 +14,25 @@
  */
 package boomerang.scope.soot.jimple;
 
-import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Field;
-import boomerang.scope.InstanceFieldVal;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
-import soot.jimple.InstanceFieldRef;
+import soot.Value;
+import soot.jimple.ArrayRef;
+import soot.jimple.IntConstant;
 
-public class JimpleInstanceFieldRef extends InstanceFieldVal {
+public class JimpleArrayRef implements IArrayRef {
 
-  private final InstanceFieldRef delegate;
+  private final ArrayRef delegate;
   private final Method method;
 
-  public JimpleInstanceFieldRef(InstanceFieldRef delegate, Method method) {
-    this(delegate, method, null);
-  }
-
-  private JimpleInstanceFieldRef(
-      InstanceFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
-    super(method, unbalanced);
-
+  public JimpleArrayRef(ArrayRef delegate, Method method) {
     this.delegate = delegate;
     this.method = method;
   }
 
-  public InstanceFieldRef getDelegate() {
+  public ArrayRef getDelegate() {
     return delegate;
   }
 
@@ -50,35 +42,26 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
   }
 
   @Override
-  public Field getField() {
-    return new JimpleField(delegate.getField());
+  public Val getIndexExpr() {
+    return new JimpleVal(delegate.getIndex(), method);
   }
 
   @Override
-  public Type getType() {
-    return new JimpleType(delegate.getType());
-  }
+  public int getIndex() {
+    Value indexExpr = delegate.getIndex();
 
-  @Override
-  public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleInstanceFieldRef(delegate, method, stmt);
-  }
-
-  @Override
-  public Val withNewMethod(Method callee) {
-    return new JimpleInstanceFieldRef(delegate, callee);
-  }
-
-  @Override
-  public String getVariableName() {
-    return delegate.toString();
+    if (indexExpr instanceof IntConstant) {
+      return ((IntConstant) indexExpr).value;
+    } else {
+      return -1;
+    }
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    JimpleInstanceFieldRef that = (JimpleInstanceFieldRef) o;
+    JimpleArrayRef that = (JimpleArrayRef) o;
     return Objects.equals(delegate, that.delegate) && Objects.equals(method, that.method);
   }
 

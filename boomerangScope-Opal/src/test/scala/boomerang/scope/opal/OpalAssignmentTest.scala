@@ -155,8 +155,6 @@ class OpalAssignmentTest {
 
         val leftOp = stmt.getLeftOp
         val rightOp = stmt.getRightOp
-
-        println()
       }
     })
   }

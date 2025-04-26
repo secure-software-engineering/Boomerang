@@ -184,4 +184,8 @@ public class Field implements Location {
   public Type getType() {
     return null;
   }
+
+  public String getName() {
+    return rep;
+  }
 }

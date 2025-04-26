@@ -15,6 +15,7 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
+import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.TacLocal
 import java.util
 import java.util.Objects
@@ -84,19 +85,23 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     }
 
     if (isArrayStore) {
-      return Field.array(getArrayBase.getY)
+      return Field.array(getArrayBase.getIndex)
     }
 
     throw new RuntimeException("Statement is not a field store operation")
   }
 
   override def isFieldWriteWithBase(base: Val): Boolean = {
-    if (isAssignStmt && isFieldStore) {
-      return getFieldStore.getX.equals(base)
+    if (isFieldStore) {
+      val fieldStore = getFieldStore
+
+      return fieldStore.getBase.equals(base)
     }
 
     if (isAssignStmt && isArrayStore) {
-      return getArrayBase.getX.equals(base)
+      val arrayBase = getArrayBase
+
+      return arrayBase.getBase.equals(base)
     }
 
     false
@@ -124,7 +129,9 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     //  Also consider arrays? Soot does not consider them, but they
     //  are considered in field store operations
     if (isFieldLoad) {
-      return getFieldLoad.getX.equals(base)
+      val fieldLoad = getFieldLoad
+
+      return fieldLoad.getBase.equals(base)
     }
 
     false
@@ -141,40 +148,35 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
   override def getLeftOp: Val = {
     if (isAssignStmt) {
       if (delegate.isAssignment) {
-        return new OpalLocal(delegate.asAssignment.targetVar, m)
+        return new OpalVal(delegate.asAssignment.targetVar, method)
       }
 
       if (isFieldStore) {
         val fieldStore = delegate.asPutField
+        val base = new OpalVal(fieldStore.objRef, method)
+        val field = new OpalField(fieldStore.declaringClass, fieldStore.declaredFieldType, fieldStore.name)
 
         return new OpalInstanceFieldRef(
-          fieldStore.objRef.asVar,
-          fieldStore.declaredFieldType,
-          fieldStore.name,
-          m
+          base,
+          field,
+          method
         )
       }
 
       if (isArrayStore) {
         val base = delegate.asArrayStore.arrayRef
-        val indexValue = delegate.asArrayStore.index
+        val indexExpr = delegate.asArrayStore.index
 
-        if (indexValue.isIntConst) {
-          return new OpalArrayRef(base.asVar, indexValue.asIntConst.value, m)
-        }
-
-        return new OpalArrayRef(base.asVar, -1, m)
+        return new OpalArrayRef(base.asVar, indexExpr, method)
       }
 
       if (isStaticFieldStore) {
         val staticFieldStore = delegate.asPutStatic
+        val declaringClass = new OpalWrappedClass(staticFieldStore.declaringClass)
+        val field =
+          new OpalField(staticFieldStore.declaringClass, staticFieldStore.declaredFieldType, staticFieldStore.name)
 
-        return new OpalStaticFieldRef(
-          staticFieldStore.declaringClass,
-          staticFieldStore.declaredFieldType,
-          staticFieldStore.name,
-          m
-        )
+        return new StaticFieldVal(declaringClass, field, method)
       }
     }
 
@@ -188,72 +190,51 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
         if (rightExpr.isGetField) {
           val getField = rightExpr.asGetField
+          val base = new OpalVal(getField.objRef, method)
+          val field = new OpalField(getField.declaringClass, getField.declaredFieldType, getField.name)
 
           return new OpalInstanceFieldRef(
-            getField.objRef.asVar,
-            getField.declaredFieldType,
-            getField.name,
-            m
+            base,
+            field,
+            method
           )
         }
 
         if (rightExpr.isArrayLoad) {
           val base = rightExpr.asArrayLoad.arrayRef
-          val indexValue = rightExpr.asArrayLoad.index
+          val indexExpr = rightExpr.asArrayLoad.index
 
-          if (indexValue.isIntConst) {
-            return new OpalArrayRef(base.asVar, indexValue.asIntConst.value, m)
-          }
-
-          return new OpalArrayRef(base.asVar, -1, m)
+          return new OpalArrayRef(base.asVar, indexExpr, method)
         }
 
         if (rightExpr.isGetStatic) {
           val staticFieldLoad = rightExpr.asGetStatic
+          val declaringClass = new OpalWrappedClass(staticFieldLoad.declaringClass)
+          val field =
+            new OpalField(staticFieldLoad.declaringClass, staticFieldLoad.declaredFieldType, staticFieldLoad.name)
 
-          return new OpalStaticFieldRef(
-            staticFieldLoad.declaringClass,
-            staticFieldLoad.declaredFieldType,
-            staticFieldLoad.name,
-            m
-          )
+          return new StaticFieldVal(declaringClass, field, method)
         }
 
-        if (rightExpr.isVar) {
-          return new OpalLocal(rightExpr.asVar, m)
-        }
-
-        return new OpalVal(delegate.asAssignment.expr, m)
+        return new OpalVal(rightExpr, method)
       }
 
       if (isFieldStore) {
         val fieldStore = delegate.asPutField
 
-        if (fieldStore.value.isVar) {
-          return new OpalLocal(fieldStore.value.asVar, m)
-        } else {
-          return new OpalVal(fieldStore.value, m)
-        }
+        return new OpalVal(fieldStore.value, method)
       }
 
       if (isArrayStore) {
         val arrayStore = delegate.asArrayStore
 
-        if (arrayStore.value.isVar) {
-          return new OpalLocal(arrayStore.value.asVar, m)
-        } else {
-          return new OpalVal(arrayStore.value, m)
-        }
+        return new OpalVal(arrayStore.value, method)
       }
 
       if (isStaticFieldStore) {
         val staticFieldStore = delegate.asPutStatic
 
-        if (staticFieldStore.value.isVar) {
-          return new OpalLocal(staticFieldStore.value.asVar, m)
-        } else {
-          return new OpalVal(staticFieldStore.value, m)
-        }
+        return new OpalVal(staticFieldStore.value, method)
       }
     }
 
@@ -304,7 +285,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def getReturnOp: Val = {
     if (isReturnStmt) {
-      return new OpalLocal(delegate.asReturnValue.expr.asVar, m)
+      return new OpalVal(delegate.asReturnValue.expr, method)
     }
 
     throw new RuntimeException("Statement is not a return statement")
@@ -341,35 +322,35 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     false
   }
 
-  override def getFieldStore: Pair[Val, Field] = {
+  override def getFieldStore: IInstanceFieldRef = {
     if (isFieldStore) {
       val fieldStore = delegate.asPutField
 
-      val local = new OpalLocal(fieldStore.objRef.asVar, m)
+      val base = new OpalVal(fieldStore.objRef, method)
       val field = new OpalField(
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
         fieldStore.name
       )
 
-      return new Pair(local, field)
+      return new OpalInstanceFieldRef(base, field, method)
     }
 
     throw new RuntimeException("Statement is not a field store operation")
   }
 
-  override def getFieldLoad: Pair[Val, Field] = {
+  override def getFieldLoad: IInstanceFieldRef = {
     if (isFieldLoad) {
       val fieldLoad = delegate.asAssignment.expr.asGetField
 
-      val local = new OpalLocal(fieldLoad.objRef.asVar, m)
+      val base = new OpalVal(fieldLoad.objRef, method)
       val field = new OpalField(
         fieldLoad.declaringClass,
         fieldLoad.declaredFieldType,
         fieldLoad.name
       )
 
-      return new Pair(local, field)
+      return new OpalInstanceFieldRef(base, field, method)
     }
 
     throw new RuntimeException("Statement is not a field load operation")
@@ -384,23 +365,26 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     if (isStaticFieldLoad) {
       val staticFieldLoad = delegate.asAssignment.expr.asGetStatic
 
+      val declaringClass = new OpalWrappedClass(staticFieldLoad.declaringClass)
       val staticField = new OpalField(
         staticFieldLoad.declaringClass,
         staticFieldLoad.declaredFieldType,
         staticFieldLoad.name
       )
-      return new OpalStaticFieldVal(staticField, m)
+      return new StaticFieldVal(declaringClass, staticField, m)
     }
 
     if (isStaticFieldStore) {
       val staticFieldStore = delegate.asPutStatic
 
+      val declaringClass = new OpalWrappedClass(staticFieldStore.declaringClass)
       val staticField = new OpalField(
         staticFieldStore.declaringClass,
         staticFieldStore.declaredFieldType,
         staticFieldStore.name
       )
-      return new OpalStaticFieldVal(staticField, m)
+
+      return new StaticFieldVal(declaringClass, staticField, m)
     }
 
     throw new RuntimeException(
@@ -414,19 +398,21 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     "Not supported"
   )
 
-  override def getArrayBase: Pair[Val, Integer] = {
+  override def getArrayBase: IArrayRef = {
     if (isArrayLoad) {
-      val rightOp = getRightOp
-      return rightOp.getArrayBase
+      val arrayLoad = delegate.asAssignment.expr.asArrayLoad
+
+      return new OpalArrayRef(arrayLoad.arrayRef.asVar, arrayLoad.index, method)
     }
 
     if (isArrayStore) {
-      val leftOp = getLeftOp
-      return leftOp.getArrayBase
+      val arrayStore = delegate.asArrayStore
+
+      return new OpalArrayRef(arrayStore.arrayRef.asVar, arrayStore.index, method)
     }
 
     throw new RuntimeException(
-      "Statement is not an array load or array store operation"
+      "Statement is not an array load or array store statement"
     )
   }
 

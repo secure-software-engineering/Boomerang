@@ -19,47 +19,63 @@ import boomerang.scope.Type
 import boomerang.scope.WrappedClass
 import boomerang.scope.opal.OpalClient
 import java.util
-import org.opalj.br.ClassFile
+import java.util.Objects
+import org.opalj.br.ObjectType
 
-case class OpalWrappedClass(delegate: ClassFile) extends WrappedClass {
+class OpalWrappedClass(val delegate: ObjectType) extends WrappedClass {
 
   override def getMethods: util.Set[Method] = {
-    val methods = new util.HashSet[Method]
+    val classFile = OpalClient.getClassFileForType(delegate)
 
-    delegate.methods.foreach(method => {
-      methods.add(OpalMethod(method))
-    })
+    if (classFile.isDefined) {
+      val methods = new util.HashSet[Method]
 
-    methods
+      classFile.get.methods.foreach(method => {
+        methods.add(OpalMethod(method))
+      })
+
+      return methods
+    }
+
+    throw new RuntimeException("Class file of class not available: " + delegate.fqn)
   }
 
-  override def hasSuperclass: Boolean = delegate.superclassType.isDefined
+  override def hasSuperclass: Boolean = {
+    val classFile = OpalClient.getClassFileForType(delegate)
+
+    if (classFile.isDefined) {
+      return classFile.get.superclassType.isDefined
+    }
+
+    false
+  }
 
   override def getSuperclass: WrappedClass = {
     if (hasSuperclass) {
-      val superClass =
-        OpalClient.getClassFileForType(delegate.superclassType.get)
+      val classFile = OpalClient.getClassFileForType(delegate)
 
-      if (superClass.isDefined) {
-        return OpalWrappedClass(superClass.get)
-      } else {
-        return OpalPhantomWrappedClass(delegate.superclassType.get)
-      }
+      return new OpalWrappedClass(classFile.get.superclassType.get)
     }
 
     throw new RuntimeException(
-      "Class " + delegate.thisType.toJava + " has no super class"
+      "Class " + delegate.fqn + " has no super class"
     )
   }
 
-  override def getType: Type = OpalType(delegate.thisType)
+  override def getType: Type = OpalType(delegate)
 
-  override def isApplicationClass: Boolean =
-    OpalClient.isApplicationClass(delegate)
+  override def isApplicationClass: Boolean = OpalClient.project.get.classFile(delegate).isDefined
 
   override def getFullyQualifiedName: String = delegate.fqn.replace("/", ".")
 
-  override def isPhantom: Boolean = false
+  override def isPhantom: Boolean = OpalClient.project.get.classFile(delegate).isEmpty
+
+  override def hashCode: Int = Objects.hash(delegate)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalWrappedClass => this.delegate == that.delegate
+    case _ => false
+  }
 
   override def toString: String = delegate.toString()
 }

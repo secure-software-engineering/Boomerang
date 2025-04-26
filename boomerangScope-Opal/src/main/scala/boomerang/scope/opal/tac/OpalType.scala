@@ -14,14 +14,16 @@
  */
 package boomerang.scope.opal.tac
 
-import boomerang.scope.AllocVal
 import boomerang.scope.Type
 import boomerang.scope.Val
 import boomerang.scope.WrappedClass
 import boomerang.scope.opal.OpalClient
+import java.util.Objects
+import org.opalj.br.FieldType
 import org.opalj.br.ObjectType
+import org.opalj.value.ValueInformation
 
-case class OpalType(delegate: org.opalj.br.Type) extends Type {
+class OpalType(val delegate: org.opalj.br.Type) extends Type {
 
   override def isNullType: Boolean = false
 
@@ -29,17 +31,11 @@ case class OpalType(delegate: org.opalj.br.Type) extends Type {
 
   override def isArrayType: Boolean = delegate.isArrayType
 
-  override def getArrayBaseType: Type = OpalType(delegate.asArrayType)
+  override def getArrayBaseType: Type = new OpalType(delegate.asArrayType.componentType)
 
   override def getWrappedClass: WrappedClass = {
     if (isRefType) {
-      val declaringClass = OpalClient.getClassFileForType(delegate.asObjectType)
-
-      if (declaringClass.isDefined) {
-        OpalWrappedClass(declaringClass.get)
-      } else {
-        OpalPhantomWrappedClass(delegate.asReferenceType)
-      }
+      return new OpalWrappedClass(delegate.asReferenceType.mostPreciseObjectType)
     }
 
     throw new RuntimeException(
@@ -82,12 +78,49 @@ case class OpalType(delegate: org.opalj.br.Type) extends Type {
     }
 
     OpalClient.getClassHierarchy.isSubtypeOf(
-      ObjectType(subType),
+      ObjectType(subType.replace(".", "/")),
       delegate.asObjectType
     )
   }
 
   override def isBooleanType: Boolean = delegate.isBooleanType
 
+  override def hashCode: Int = Objects.hash(delegate)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalType => this.delegate == that.delegate
+    case _ => false
+  }
+
   override def toString: String = delegate.toJava
+}
+
+object OpalType {
+
+  def apply(fieldType: org.opalj.br.Type): Type = new OpalType(fieldType)
+
+  def apply(value: ValueInformation): Type = {
+    if (value.isPrimitiveValue) {
+      return new OpalType(value.asPrimitiveValue.primitiveType)
+    }
+
+    if (value.isReferenceValue) {
+      if (value.asReferenceValue.isPrecise) {
+        if (value.asReferenceValue.isNull.isYes) {
+          return OpalNullType
+        } else {
+          return new OpalType(value.asReferenceValue.asReferenceType)
+        }
+      } else {
+        return new OpalType(value.asReferenceValue.upperTypeBound.head)
+      }
+    }
+
+    if (value.isVoid) {
+      return new OpalType(ObjectType.Void)
+    }
+
+    // TODO Array and illegal types (not sure if they ever occur)
+    throw new RuntimeException("Type not implemented yet")
+  }
 }

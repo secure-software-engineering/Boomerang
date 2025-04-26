@@ -15,20 +15,43 @@
 package boomerang.scope;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import java.util.Objects;
 
-public abstract class StaticFieldVal extends Val {
+public class StaticFieldVal extends Val implements IStaticFieldRef {
 
-  protected StaticFieldVal(Method m) {
-    super(m);
+  private final WrappedClass declaringClass;
+  private final Field field;
+
+  public StaticFieldVal(WrappedClass declaringClass, Field field, Method method) {
+    this(declaringClass, field, method, null);
   }
 
-  protected StaticFieldVal(Method m, Edge unbalanced) {
-    super(m, unbalanced);
+  protected StaticFieldVal(
+      WrappedClass declaringClass, Field field, Method method, Edge unbalanced) {
+    super(method, unbalanced);
+
+    this.declaringClass = declaringClass;
+    this.field = field;
   }
 
-  public abstract Field field();
+  @Override
+  public WrappedClass getDeclaringClass() {
+    return declaringClass;
+  }
 
-  public abstract Val asUnbalanced(Edge stmt);
+  @Override
+  public Field getField() {
+    return field;
+  }
+
+  public Val asUnbalanced(Edge stmt) {
+    return new StaticFieldVal(declaringClass, field, m, stmt);
+  }
+
+  @Override
+  public Type getType() {
+    return field.getType();
+  }
 
   @Override
   public boolean isStatic() {
@@ -136,6 +159,11 @@ public abstract class StaticFieldVal extends Val {
   }
 
   @Override
+  public Val withNewMethod(Method callee) {
+    return new StaticFieldVal(declaringClass, field, callee);
+  }
+
+  @Override
   public boolean isLongConstant() {
     return false;
   }
@@ -151,7 +179,31 @@ public abstract class StaticFieldVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     throw new RuntimeException("Static field val has no array base");
+  }
+
+  @Override
+  public String getVariableName() {
+    return declaringClass + "." + field.getName();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    StaticFieldVal that = (StaticFieldVal) o;
+    return Objects.equals(declaringClass, that.declaringClass) && Objects.equals(field, that.field);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), declaringClass, field);
+  }
+
+  @Override
+  public String toString() {
+    return getVariableName();
   }
 }

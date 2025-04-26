@@ -44,16 +44,7 @@ case class OpalDeclaredMethod[+V <: Var[V]](
     s"${delegate.declaringClass.toJava}.${delegate.name}"
   )
 
-  override def getDeclaringClass: WrappedClass = {
-    val decClass =
-      OpalClient.getClassFileForType(delegate.declaringClass.asObjectType)
-
-    if (decClass.isDefined) {
-      OpalWrappedClass(decClass.get)
-    } else {
-      OpalPhantomWrappedClass(delegate.declaringClass)
-    }
-  }
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(delegate.declaringClass.mostPreciseObjectType)
 
   override def getParameterTypes: util.List[Type] = {
     val result = new util.ArrayList[Type]()

@@ -12,18 +12,11 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.arrays;
+package boomerang.scope;
 
-import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.IArrayRef;
-import java.util.Set;
-import wpds.interfaces.State;
+public interface IStaticFieldRef {
 
-public class IgnoreArrayStrategy implements ArrayHandlingStrategy {
+  WrappedClass getDeclaringClass();
 
-  @Override
-  public void handleForward(Edge storeStmt, IArrayRef storedVal, Set<State> out) {}
-
-  @Override
-  public void handleBackward(Edge curr, IArrayRef arrayBase, Set<State> out) {}
+  Field getField();
 }

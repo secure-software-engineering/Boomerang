@@ -23,21 +23,18 @@ import org.opalj.tac._
 
 class OpalVal(
     val delegate: Expr[TacLocal],
-    method: OpalMethod,
+    method: Method,
     unbalanced: ControlFlowGraph.Edge = null
 ) extends Val(method, unbalanced) {
 
-  if (delegate.isVar) {
-    throw new RuntimeException("OpalVal cannot hold a variable (use OpalLocal)")
-  }
-
   override def getType: Type = delegate match {
+    case v: TacLocal => OpalType(v.valueInformation)
     case nullExpr: NullExpr => OpalType(nullExpr.tpe)
     case const: Const => OpalType(const.tpe)
     case newExpr: New => OpalType(newExpr.tpe)
     case newArrayExpr: NewArray[_] => OpalType(newArrayExpr.tpe)
     case functionCall: FunctionCall[_] =>
-      OpalType(functionCall.descriptor.returnType)
+      new OpalType(functionCall.descriptor.returnType)
     case _ => throw new RuntimeException("Type not implemented yet")
   }
 
@@ -56,7 +53,7 @@ class OpalVal(
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
     new OpalVal(delegate, method, stmt)
 
-  override def isLocal: Boolean = false
+  override def isLocal: Boolean = delegate.isVar
 
   override def isArrayAllocationVal: Boolean = delegate.isNewArray
 
@@ -69,11 +66,7 @@ class OpalVal(
        *  In the future, we may change it to returning a list of values
        */
       val firstIndex = counts.last
-      if (firstIndex.isVar) {
-        return new OpalLocal(firstIndex.asVar, method)
-      } else {
-        return new OpalVal(firstIndex, method)
-      }
+      return new OpalVal(firstIndex, method)
     }
 
     throw new RuntimeException("Value is not an array allocation expression")
@@ -181,7 +174,7 @@ class OpalVal(
     throw new RuntimeException("Value is not a long constant")
   }
 
-  override def getArrayBase: Pair[Val, Integer] = throw new RuntimeException(
+  override def getArrayBase: IArrayRef = throw new RuntimeException(
     "Value is not an array ref"
   )
 

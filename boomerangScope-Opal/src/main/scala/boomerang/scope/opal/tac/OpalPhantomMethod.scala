@@ -79,9 +79,7 @@ case class OpalPhantomMethod(
     "Statements of phantom method are not available"
   )
 
-  override def getDeclaringClass: WrappedClass = OpalPhantomWrappedClass(
-    declaringClassType
-  )
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClassType)
 
   override def getControlFlowGraph: ControlFlowGraph =
     throw new RuntimeException("CFG of phantom method is not available")

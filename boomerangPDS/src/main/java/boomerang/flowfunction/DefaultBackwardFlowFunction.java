@@ -16,9 +16,10 @@ package boomerang.flowfunction;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
@@ -121,9 +122,9 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
         leftSideMatches = true;
         if (nextStmt.isFieldLoad()) {
           if (options.trackFields()) {
-            Pair<Val, Field> ifr = nextStmt.getFieldLoad();
-            if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
-              out.add(new PushNode<>(nextEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
+            IInstanceFieldRef ifr = nextStmt.getFieldLoad();
+            if (options.includeInnerClassFields() || !ifr.getField().isInnerClassField()) {
+              out.add(new PushNode<>(nextEdge, ifr.getBase(), ifr.getField(), PDSSystem.FIELDS));
             }
           }
         } else if (nextStmt.isStaticFieldLoad()) {
@@ -133,7 +134,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
                 .handleBackward(currEdge, nextStmt.getLeftOp(), nextStmt.getStaticField(), out);
           }
         } else if (rightOp.isArrayRef()) {
-          Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
+          IArrayRef arrayBase = nextStmt.getArrayBase();
           if (options.trackFields()) {
             strategies.getArrayHandlingStrategy().handleBackward(nextEdge, arrayBase, out);
           }
@@ -153,11 +154,11 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
         }
       }
       if (nextStmt.isFieldStore()) {
-        Pair<Val, Field> ifr = nextStmt.getFieldStore();
-        Val base = ifr.getX();
+        IInstanceFieldRef ifr = nextStmt.getFieldStore();
+        Val base = ifr.getBase();
         if (base.equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(nextEdge, rightOp, ifr.getY());
+              new NodeWithLocation<>(nextEdge, rightOp, ifr.getField());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (nextStmt.isStaticFieldStore()) {
@@ -166,10 +167,10 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
           out.add(new Node<>(nextEdge, rightOp));
         }
       } else if (leftOp.isArrayRef()) {
-        Pair<Val, Integer> arrayBase = nextStmt.getArrayBase();
-        if (arrayBase.getX().equals(fact)) {
+        IArrayRef arrayBase = nextStmt.getArrayBase();
+        if (arrayBase.getBase().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(nextEdge, rightOp, Field.array(arrayBase.getY()));
+              new NodeWithLocation<>(nextEdge, rightOp, Field.array(arrayBase.getIndex()));
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       }

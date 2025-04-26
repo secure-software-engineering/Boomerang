@@ -39,8 +39,8 @@ import boomerang.scope.DataFlowScope;
 import boomerang.scope.Field;
 import boomerang.scope.Field.ArrayField;
 import boomerang.scope.FrameworkScope;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
@@ -214,7 +214,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
             if (m.isStaticInitializer()) {
               for (Statement ep : icfg.getEndPointsOf(m)) {
                 StaticFieldVal newVal =
-                    frameworkScope.newStaticFieldVal(((StaticFieldVal) fact).field(), m);
+                    frameworkScope.newStaticFieldVal(((StaticFieldVal) fact).getField(), m);
                 cfg.addPredsOfListener(
                     new PredecessorListener(ep) {
                       @Override
@@ -615,15 +615,16 @@ public abstract class WeightedBoomerang<W extends Weight> {
   }
 
   protected FieldWritePOI createArrayFieldStore(Edge s) {
-    Pair<Val, Integer> base = s.getStart().getArrayBase();
+    IArrayRef base = s.getStart().getArrayBase();
     return fieldWrites.getOrCreate(
-        new FieldWritePOI(s, base.getX(), Field.array(base.getY()), s.getStart().getRightOp()));
+        new FieldWritePOI(
+            s, base.getBase(), Field.array(base.getIndex()), s.getStart().getRightOp()));
   }
 
   protected FieldWritePOI createFieldStore(Edge cfgEdge) {
     Statement s = cfgEdge.getStart();
-    Val base = s.getFieldStore().getX();
-    Field field = s.getFieldStore().getY();
+    Val base = s.getFieldStore().getBase();
+    Field field = s.getFieldStore().getField();
     Val stored = s.getRightOp();
     return fieldWrites.getOrCreate(new FieldWritePOI(cfgEdge, base, field, stored));
   }
@@ -1160,8 +1161,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
     Val var;
     Field field;
     if (stmt.isFieldStore()) {
-      field = stmt.getFieldStore().getY();
-      var = stmt.getFieldStore().getX();
+      field = stmt.getFieldStore().getField();
+      var = stmt.getFieldStore().getBase();
       forwardHandleFieldWrite(
           new Node<>(cfgEdge, stmt.getRightOp()),
           new FieldWritePOI(cfgEdge, var, field, stmt.getRightOp()),

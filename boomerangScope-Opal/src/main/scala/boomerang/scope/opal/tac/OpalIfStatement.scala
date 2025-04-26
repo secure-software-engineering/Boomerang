@@ -44,7 +44,6 @@ class OpalIfStatement(val delegate: If[TacLocal], method: OpalMethod) extends If
     //  Only relevant for PathTrackingBoomerang that is not used and tested;
     //  has to be implemented when used
     if (otherVal.isInstanceOf[OpalVal]) {}
-    if (otherVal.isInstanceOf[OpalLocal]) {}
     if (otherVal.isInstanceOf[OpalArrayRef]) {}
     val left = new OpalVal(delegate.left, method)
     val right = new OpalVal(delegate.right, method)

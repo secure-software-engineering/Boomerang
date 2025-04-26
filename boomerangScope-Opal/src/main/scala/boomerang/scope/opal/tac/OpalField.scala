@@ -32,6 +32,8 @@ class OpalField(
 
   override def getType: Type = OpalType(fieldType)
 
+  override def getName: String = name
+
   override def hashCode: Int = Objects.hash(super.hashCode(), fieldType, name)
 
   override def equals(other: Any): Boolean = other match {
