@@ -111,7 +111,6 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isStatic() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -145,7 +144,6 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isArrayAllocationVal() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -163,37 +161,21 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isStringConstant() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public String getStringValue() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public boolean isCast() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Val getCastOp() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -204,25 +186,21 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isInstanceOfExpr() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Val getInstanceOfOp() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public boolean isLengthExpr() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Val getLengthOp() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -242,13 +220,11 @@ public class WALAVal extends Val {
 
   @Override
   public Type getClassConstantType() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Val withNewMethod(Method callee) {
-    // TODO Auto-generated method stub
     return null;
   }
 

@@ -66,16 +66,6 @@ public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef 
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return false;
-  }
-
-  @Override
   public boolean isCast() {
     return false;
   }

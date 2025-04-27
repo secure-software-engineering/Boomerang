@@ -19,7 +19,6 @@ import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
-import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Arrays;
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
@@ -119,26 +118,6 @@ public class JimpleUpVal extends Val {
   public String getStringValue() {
     assert isStringConstant();
     return ((StringConstant) delegate).getValue();
-  }
-
-  @Override
-  public boolean isStringBufferOrBuilder() {
-    Type type = getType();
-    return type.toString().equals("java.lang.String")
-        || type.toString().equals("java.lang.StringBuilder")
-        || type.toString().equals("java.lang.StringBuffer");
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return SootUpFrameworkScope.getInstance()
-        .getView()
-        .getTypeHierarchy()
-        .isSubtype(
-            ((JimpleUpType) getType()).getDelegate(),
-            SootUpFrameworkScope.getInstance()
-                .getIdentifierFactory()
-                .getClassType("java.lang.Throwable"));
   }
 
   @Override
@@ -273,12 +252,6 @@ public class JimpleUpVal extends Val {
 
   @Override
   public String toString() {
-    return delegate.toString()
-        + " ("
-        + m.getDeclaringClass()
-        + "."
-        + m
-        + ")"
-        + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
+    return delegate.toString() + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
   }
 }

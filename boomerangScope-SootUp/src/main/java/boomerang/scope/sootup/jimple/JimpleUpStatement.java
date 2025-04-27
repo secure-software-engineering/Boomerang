@@ -61,17 +61,6 @@ public class JimpleUpStatement extends Statement {
   }
 
   @Override
-  public boolean containsStaticFieldAccess() {
-    if (delegate instanceof JAssignStmt) {
-      JAssignStmt assignStmt = (JAssignStmt) delegate;
-
-      return assignStmt.getLeftOp() instanceof JStaticFieldRef
-          || assignStmt.getRightOp() instanceof JStaticFieldRef;
-    }
-    return false;
-  }
-
-  @Override
   public boolean containsInvokeExpr() {
     return delegate.isInvokableStmt() && delegate.asInvokableStmt().containsInvokeExpr();
   }
@@ -222,12 +211,6 @@ public class JimpleUpStatement extends Statement {
   }
 
   @Override
-  public boolean isMultiArrayAllocation() {
-    return (delegate instanceof JAssignStmt)
-        && ((JAssignStmt) delegate).getRightOp() instanceof JNewMultiArrayExpr;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return delegate instanceof JAssignStmt
         && ((JAssignStmt) delegate).getLeftOp() instanceof JInstanceFieldRef;
@@ -332,23 +315,8 @@ public class JimpleUpStatement extends Statement {
   }
 
   @Override
-  public int getStartLineNumber() {
+  public int getLineNumber() {
     return delegate.getPositionInfo().getStmtPosition().getFirstLine();
-  }
-
-  @Override
-  public int getStartColumnNumber() {
-    return delegate.getPositionInfo().getStmtPosition().getFirstCol();
-  }
-
-  @Override
-  public int getEndLineNumber() {
-    return delegate.getPositionInfo().getStmtPosition().getLastLine();
-  }
-
-  @Override
-  public int getEndColumnNumber() {
-    return delegate.getPositionInfo().getStmtPosition().getLastCol();
   }
 
   @Override

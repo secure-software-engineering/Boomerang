@@ -36,12 +36,10 @@ import soot.jimple.IfStmt;
 import soot.jimple.InstanceFieldRef;
 import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.NewExpr;
-import soot.jimple.NewMultiArrayExpr;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StaticFieldRef;
 import soot.jimple.Stmt;
 import soot.jimple.ThrowStmt;
-import soot.tagkit.SourceLnPosTag;
 
 public class JimpleStatement extends Statement {
 
@@ -59,16 +57,6 @@ public class JimpleStatement extends Statement {
 
   public static Statement create(Stmt delegate, Method m) {
     return new JimpleStatement(delegate, m);
-  }
-
-  @Override
-  public boolean containsStaticFieldAccess() {
-    if (delegate instanceof AssignStmt) {
-      AssignStmt assignStmt = (AssignStmt) delegate;
-      return assignStmt.getLeftOp() instanceof StaticFieldRef
-          || assignStmt.getRightOp() instanceof StaticFieldRef;
-    }
-    return false;
   }
 
   @Override
@@ -207,12 +195,6 @@ public class JimpleStatement extends Statement {
     }
 
     throw new RuntimeException("Statement is not a return statement");
-  }
-
-  @Override
-  public boolean isMultiArrayAllocation() {
-    return (delegate instanceof AssignStmt)
-        && ((AssignStmt) delegate).getRightOp() instanceof NewMultiArrayExpr;
   }
 
   @Override
@@ -406,33 +388,8 @@ public class JimpleStatement extends Statement {
   }
 
   @Override
-  public int getStartLineNumber() {
+  public int getLineNumber() {
     return delegate.getJavaSourceStartLineNumber();
-  }
-
-  @Override
-  public int getStartColumnNumber() {
-    return delegate.getJavaSourceStartColumnNumber();
-  }
-
-  @Override
-  public int getEndColumnNumber() {
-    // TODO move to Soot
-    SourceLnPosTag tag = (SourceLnPosTag) delegate.getTag("SourceLnPosTag");
-    if (tag != null) {
-      return tag.endPos();
-    }
-    return -1;
-  }
-
-  @Override
-  public int getEndLineNumber() {
-    // TODO move to Soot
-    SourceLnPosTag tag = (SourceLnPosTag) delegate.getTag("SourceLnPosTag");
-    if (tag != null) {
-      return tag.endLn();
-    }
-    return -1;
   }
 
   @Override

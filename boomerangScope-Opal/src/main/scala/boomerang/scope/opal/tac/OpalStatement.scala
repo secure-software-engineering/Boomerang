@@ -15,7 +15,6 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.TacLocal
 import java.util
 import java.util.Objects
@@ -23,9 +22,6 @@ import org.opalj.tac.PrimitiveTypecastExpr
 import org.opalj.tac.Stmt
 
 class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Statement(m) {
-
-  override def containsStaticFieldAccess(): Boolean =
-    isStaticFieldLoad || isStaticFieldStore
 
   override def containsInvokeExpr(): Boolean = {
     if (delegate.isMethodCall) return true
@@ -291,8 +287,6 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     throw new RuntimeException("Statement is not a return statement")
   }
 
-  override def isMultiArrayAllocation: Boolean = false
-
   override def isFieldStore: Boolean = delegate.isPutField
 
   override def isArrayStore: Boolean = delegate.isArrayStore
@@ -416,14 +410,8 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     )
   }
 
-  override def getStartLineNumber: Int =
+  override def getLineNumber: Int =
     m.delegate.body.get.lineNumber(delegate.pc).getOrElse(-1)
-
-  override def getStartColumnNumber: Int = -1
-
-  override def getEndLineNumber: Int = -1
-
-  override def getEndColumnNumber: Int = -1
 
   override def isCatchStmt: Boolean = delegate.isCaughtException
 

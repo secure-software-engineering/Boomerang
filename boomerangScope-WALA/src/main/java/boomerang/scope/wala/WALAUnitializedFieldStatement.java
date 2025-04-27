@@ -41,11 +41,6 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public boolean containsStaticFieldAccess() {
-    return false;
-  }
-
-  @Override
   public boolean containsInvokeExpr() {
     return false;
   }
@@ -127,11 +122,6 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public boolean isMultiArrayAllocation() {
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return true;
   }
@@ -198,7 +188,7 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public int getStartLineNumber() {
+  public int getLineNumber() {
     return 0;
   }
 

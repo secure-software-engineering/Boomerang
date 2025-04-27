@@ -65,11 +65,6 @@ public class WALAStatement extends Statement {
   }
 
   @Override
-  public boolean containsStaticFieldAccess() {
-    return isStaticFieldLoad() || isStaticFieldStore();
-  }
-
-  @Override
   public boolean containsInvokeExpr() {
     return delegate instanceof SSAAbstractInvokeInstruction;
   }
@@ -272,12 +267,6 @@ public class WALAStatement extends Statement {
   }
 
   @Override
-  public boolean isMultiArrayAllocation() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return delegate instanceof SSAPutInstruction && !((SSAPutInstruction) delegate).isStatic();
   }
@@ -403,7 +392,7 @@ public class WALAStatement extends Statement {
   }
 
   @Override
-  public int getStartLineNumber() {
+  public int getLineNumber() {
     IMethod m = ((WALAMethod) method).getIR().getMethod();
     if (m instanceof AstMethod) {
       AstMethod c = (AstMethod) m;
@@ -417,21 +406,6 @@ public class WALAStatement extends Statement {
     } catch (InvalidClassFileException e) {
       e.printStackTrace();
     }
-    return -1;
-  }
-
-  @Override
-  public int getStartColumnNumber() {
-    return -1;
-  }
-
-  @Override
-  public int getEndColumnNumber() {
-    return -1;
-  }
-
-  @Override
-  public int getEndLineNumber() {
     return -1;
   }
 

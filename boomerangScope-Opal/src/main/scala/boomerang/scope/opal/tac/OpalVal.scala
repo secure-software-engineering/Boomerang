@@ -15,10 +15,8 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
-import org.opalj.br.ReferenceType
 import org.opalj.tac._
 
 class OpalVal(
@@ -82,28 +80,6 @@ class OpalVal(
     }
 
     throw new RuntimeException("Value is not a String constant")
-  }
-
-  override def isStringBufferOrBuilder: Boolean = {
-    val thisType = getType
-
-    thisType.toString.equals("java/lang/String") || thisType.toString.equals(
-      "java/lang/StringBuilder"
-    ) || thisType.toString.equals("java/lang/StringBuffer")
-  }
-
-  override def isThrowableAllocationType: Boolean = {
-    val thisType = getType
-
-    if (!thisType.isRefType) {
-      return false
-    }
-
-    val opalType = thisType.asInstanceOf[OpalType].delegate
-    OpalClient.getClassHierarchy.isSubtypeOf(
-      opalType.asReferenceType,
-      ReferenceType("java/lang/Throwable")
-    )
   }
 
   override def isCast: Boolean = delegate.astID == PrimitiveTypecastExpr.ASTID

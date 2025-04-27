@@ -99,16 +99,6 @@ public class StaticFieldVal extends Val implements IStaticFieldRef {
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return false;
-  }
-
-  @Override
   public boolean isCast() {
     return false;
   }

@@ -22,7 +22,6 @@ import boomerang.scope.Val;
 import java.util.Objects;
 import soot.Local;
 import soot.NullType;
-import soot.Scene;
 import soot.Value;
 import soot.jimple.ArrayRef;
 import soot.jimple.CastExpr;
@@ -35,7 +34,6 @@ import soot.jimple.NewArrayExpr;
 import soot.jimple.NewExpr;
 import soot.jimple.NewMultiArrayExpr;
 import soot.jimple.NullConstant;
-import soot.jimple.StaticFieldRef;
 import soot.jimple.StringConstant;
 
 public class JimpleVal extends Val {
@@ -128,21 +126,6 @@ public class JimpleVal extends Val {
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    Type type = getType();
-    return type.toString().equals("java.lang.String")
-        || type.toString().equals("java.lang.StringBuilder")
-        || type.toString().equals("java.lang.StringBuffer");
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return Scene.v()
-        .getOrMakeFastHierarchy()
-        .canStoreType(getType().getDelegate(), Scene.v().getType("java.lang.Throwable"));
-  }
-
-  @Override
   public boolean isCast() {
     return delegate instanceof CastExpr;
   }
@@ -155,14 +138,6 @@ public class JimpleVal extends Val {
     }
 
     throw new RuntimeException("Val is not a cast expression");
-  }
-
-  public boolean isInstanceFieldRef() {
-    return delegate instanceof soot.jimple.InstanceFieldRef;
-  }
-
-  public boolean isStaticFieldRef() {
-    return delegate instanceof StaticFieldRef;
   }
 
   @Override

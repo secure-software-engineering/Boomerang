@@ -120,16 +120,6 @@ public abstract class Val {
             }
 
             @Override
-            public boolean isStringBufferOrBuilder() {
-              return false;
-            }
-
-            @Override
-            public boolean isThrowableAllocationType() {
-              return false;
-            }
-
-            @Override
             public boolean isCast() {
               return false;
             }
@@ -241,10 +231,6 @@ public abstract class Val {
   public abstract boolean isStringConstant();
 
   public abstract String getStringValue();
-
-  public abstract boolean isStringBufferOrBuilder();
-
-  public abstract boolean isThrowableAllocationType();
 
   public abstract boolean isCast();
 

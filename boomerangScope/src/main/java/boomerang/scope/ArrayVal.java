@@ -66,16 +66,6 @@ public abstract class ArrayVal extends Val implements IArrayRef {
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return false;
-  }
-
-  @Override
   public boolean isCast() {
     return false;
   }

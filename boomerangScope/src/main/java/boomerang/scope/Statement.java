@@ -54,11 +54,6 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public boolean containsStaticFieldAccess() {
-      return false;
-    }
-
-    @Override
     public boolean containsInvokeExpr() {
       return false;
     }
@@ -159,11 +154,6 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public boolean isMultiArrayAllocation() {
-      return false;
-    }
-
-    @Override
     public boolean isFieldStore() {
       return false;
     }
@@ -234,22 +224,7 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public int getStartLineNumber() {
-      return -1;
-    }
-
-    @Override
-    public int getStartColumnNumber() {
-      return -1;
-    }
-
-    @Override
-    public int getEndColumnNumber() {
-      return -1;
-    }
-
-    @Override
-    public int getEndLineNumber() {
+    public int getLineNumber() {
       return -1;
     }
 
@@ -272,8 +247,6 @@ public abstract class Statement implements Location {
   public Method getMethod() {
     return this.method;
   }
-
-  public abstract boolean containsStaticFieldAccess();
 
   public abstract boolean containsInvokeExpr();
 
@@ -365,8 +338,6 @@ public abstract class Statement implements Location {
 
   public abstract Val getReturnOp();
 
-  public abstract boolean isMultiArrayAllocation();
-
   public abstract boolean isFieldStore();
 
   public abstract boolean isArrayStore();
@@ -402,13 +373,7 @@ public abstract class Statement implements Location {
 
   public abstract IArrayRef getArrayBase();
 
-  public abstract int getStartLineNumber();
-
-  public abstract int getStartColumnNumber();
-
-  public abstract int getEndLineNumber();
-
-  public abstract int getEndColumnNumber();
+  public abstract int getLineNumber();
 
   public abstract boolean isCatchStmt();
 
