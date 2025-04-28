@@ -49,7 +49,7 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Field getField() {
-    return new JimpleField(delegate.getField());
+    return new JimpleField(delegate.getFieldRef());
   }
 
   @Override

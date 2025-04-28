@@ -365,7 +365,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void checkContainsAllExpectedAccessPath(Set<AccessPath> allAliases) {
-    HashSet<AccessPath> expected = new LinkedHashSet(queryDetector.expectedAccessPaths);
+    HashSet<AccessPath> expected = new LinkedHashSet<>(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);

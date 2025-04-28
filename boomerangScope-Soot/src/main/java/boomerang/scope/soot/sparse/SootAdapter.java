@@ -54,8 +54,7 @@ public class SootAdapter {
     if (val instanceof JimpleStaticFieldRef) {
       JimpleStaticFieldRef staticVal = (JimpleStaticFieldRef) val;
       Field field = staticVal.getField();
-      SootField sootField = ((JimpleField) field).getDelegate();
-      SootFieldRef sootFieldRef = sootField.makeRef();
+      SootFieldRef sootFieldRef = ((JimpleField) field).getDelegate();
       StaticFieldRef srf = new MStaticFieldRef(sootFieldRef);
       return srf;
     }
@@ -64,7 +63,7 @@ public class SootAdapter {
 
   public static SootField asField(Val val) {
     Field field = ((JimpleStaticFieldRef) val).getField();
-    return ((JimpleField) field).getDelegate();
+    return ((JimpleField) field).getDelegate().resolve();
   }
 
   public static SootMethod asSootMethod(Method m) {

@@ -15,7 +15,6 @@
 package boomerang.scope.opal
 
 import boomerang.scope._
-import java.util.stream
 import org.opalj.br.analyses.Project
 
 /**
@@ -43,11 +42,6 @@ class OpalFrameworkScope(
   override def getTrueValue(m: Method): Val = ???
 
   override def getFalseValue(m: Method): Val = ???
-
-  override def handleStaticFieldInitializers(fact: Val): stream.Stream[Method] =
-    ???
-
-  override def newStaticFieldVal(field: Field, m: Method): StaticFieldVal = ???
 }
 
 object OpalFrameworkScope {

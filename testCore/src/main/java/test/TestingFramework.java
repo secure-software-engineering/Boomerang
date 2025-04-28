@@ -45,7 +45,7 @@ public class TestingFramework {
     String framework = System.getProperty("testSetup");
     if (framework == null) {
       // This can be changed when executing tests locally
-      return new SootTestSetup();
+      return new OpalTestSetup();
     }
 
     switch (framework.toLowerCase()) {

@@ -16,17 +16,11 @@ package boomerang.scope.soot;
 
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
-import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
-import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
-import boomerang.scope.soot.jimple.JimpleField;
-import boomerang.scope.soot.jimple.JimpleMethod;
-import boomerang.scope.soot.jimple.JimpleStaticFieldRef;
 import boomerang.scope.soot.jimple.JimpleVal;
 import java.util.Collection;
-import java.util.stream.Stream;
 import org.jspecify.annotations.NonNull;
 import soot.Scene;
 import soot.SootMethod;
@@ -57,21 +51,6 @@ public class SootFrameworkScope implements FrameworkScope {
   @Override
   public Val getFalseValue(Method m) {
     return new JimpleVal(IntConstant.v(0), m);
-  }
-
-  @Override
-  public Stream<Method> handleStaticFieldInitializers(Val fact) {
-    JimpleStaticFieldRef val = ((JimpleStaticFieldRef) fact);
-    return ((JimpleField) val.getField())
-        .getDelegate().getDeclaringClass().getMethods().stream()
-            .filter(SootMethod::hasActiveBody)
-            .map(JimpleMethod::of);
-  }
-
-  @Override
-  public StaticFieldVal newStaticFieldVal(Field field, Method m) {
-    // return new JimpleStaticFieldVal((JimpleField) field, m);
-    throw new UnsupportedOperationException("Reimplement");
   }
 
   @Override

@@ -16,10 +16,8 @@ package boomerang.scope.sootup;
 
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
-import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
-import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
 import boomerang.scope.sootup.jimple.JimpleUpVal;
 import java.nio.file.Paths;
@@ -27,14 +25,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.jspecify.annotations.NonNull;
 import sootup.core.inputlocation.EagerInputLocation;
 import sootup.core.jimple.basic.NoPositionInformation;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.model.ClassModifier;
 import sootup.core.model.SourceType;
-import sootup.core.signatures.FieldSignature;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.ClassType;
 import sootup.java.core.*;
@@ -79,26 +75,6 @@ public class SootUpFrameworkScope implements FrameworkScope {
   @NonNull
   public Val getFalseValue(Method m) {
     return new JimpleUpVal(IntConstant.getInstance(0), m);
-  }
-
-  @Override
-  @NonNull
-  public Stream<Method> handleStaticFieldInitializers(Val fact) {
-    /*JimpleUpStaticFieldVal val = ((JimpleUpStaticFieldVal) fact);
-    ClassType declaringClassType =
-        ((JimpleUpField) val.getField()).getDelegate().getDeclaringClassType();
-
-    return view.getClass(declaringClassType).get().getMethods().stream()
-        .filter(sootup.core.model.SootMethod::hasBody)
-        .map(JimpleUpMethod::of);*/
-    throw new UnsupportedOperationException("Reimplement");
-  }
-
-  @Override
-  @NonNull
-  public StaticFieldVal newStaticFieldVal(Field field, Method m) {
-    // return new JimpleUpStaticFieldVal((JimpleUpField) field, m);
-    throw new UnsupportedOperationException("Reimplement");
   }
 
   @Override
@@ -183,14 +159,6 @@ public class SootUpFrameworkScope implements FrameworkScope {
     return aClass.flatMap(
         javaSootClass -> javaSootClass.getMethod(methodSignature.getSubSignature()));
     // throw new RuntimeException("Method not found: " + methodSignature);
-  }
-
-  public JavaSootField getSootField(FieldSignature fieldSignature) {
-    Optional<JavaSootField> field = view.getField(fieldSignature);
-    if (field.isPresent()) {
-      return field.get();
-    }
-    throw new RuntimeException("Field not found: " + fieldSignature);
   }
 
   public static boolean isConstructor(JavaSootMethod sootMethod) {

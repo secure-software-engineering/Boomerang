@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opalj.br.BooleanType$;
@@ -49,6 +48,7 @@ import org.opalj.br.DoubleType$;
 import org.opalj.br.FieldType;
 import org.opalj.br.FloatType$;
 import org.opalj.br.IntegerType$;
+import org.opalj.br.JVMMethod;
 import org.opalj.br.LongType$;
 import org.opalj.br.MethodDescriptor$;
 import org.opalj.br.ObjectType;
@@ -159,11 +159,15 @@ public class OpalTestSetup implements TestSetup {
   public FrameworkScope createFrameworkScope(DataFlowScope dataFlowScope) {
     CallGraph callGraph = project.get(CHACallGraphKey$.MODULE$);
 
-    return new OpalFrameworkScope(
-        project,
-        callGraph,
-        CollectionConverters.asScala(Set.of(testMethod)).toSet(),
-        dataFlowScope);
+    // Add the static initializers of the test class target and its subclasses to the entry points
+    scala.collection.immutable.Set<org.opalj.br.Method> allClinit =
+        project.allMethodsWithBody().filter(JVMMethod::isStaticInitializer).toSet();
+    scala.collection.immutable.Set<org.opalj.br.Method> clinitInTarget =
+        allClinit.filter(m -> m.classFile().fqn().startsWith(testMethod.classFile().fqn())).toSet();
+    scala.collection.immutable.Set<org.opalj.br.Method> entryPoints =
+        clinitInTarget.$plus(testMethod);
+
+    return new OpalFrameworkScope(project, callGraph, entryPoints, dataFlowScope);
   }
 
   private File[] loadClassPathFiles(

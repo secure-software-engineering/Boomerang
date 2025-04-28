@@ -34,10 +34,12 @@ class OpalField(
 
   override def getName: String = name
 
+  // Important: Do not include the declaring class because subclasses may access the field, too
   override def hashCode: Int = Objects.hash(super.hashCode(), fieldType, name)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalField =>
+      // Important: Do not include the declaring class because subclasses may access the field, too
       this.fieldType == that.fieldType && this.name == that.name
     case _ => false
   }

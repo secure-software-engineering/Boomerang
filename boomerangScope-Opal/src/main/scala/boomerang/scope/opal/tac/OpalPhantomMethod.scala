@@ -25,7 +25,6 @@ import java.util
 import org.opalj.br.MethodDescriptor
 import org.opalj.br.MethodSignature
 import org.opalj.br.ObjectType
-import org.opalj.br.VirtualDeclaredMethod
 
 case class OpalPhantomMethod(
     declaringClassType: ObjectType,

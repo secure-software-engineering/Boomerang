@@ -16,18 +16,18 @@ package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.Field;
 import boomerang.scope.Type;
-import java.util.Arrays;
-import sootup.java.core.JavaSootField;
+import java.util.Objects;
+import sootup.core.signatures.FieldSignature;
 
 public class JimpleUpField extends Field {
 
-  private final JavaSootField delegate;
+  private final FieldSignature delegate;
 
-  public JimpleUpField(JavaSootField delegate) {
+  public JimpleUpField(FieldSignature delegate) {
     this.delegate = delegate;
   }
 
-  public JavaSootField getDelegate() {
+  public FieldSignature getDelegate() {
     return delegate;
   }
 
@@ -47,24 +47,26 @@ public class JimpleUpField extends Field {
   }
 
   @Override
-  public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
+  public String getName() {
+    return delegate.getName();
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleUpField that = (JimpleUpField) o;
+    return Objects.equals(delegate, that.delegate);
+  }
 
-    JimpleUpField other = (JimpleUpField) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override
   public String toString() {
-    return delegate.getName();
+    return delegate.toString();
   }
 }

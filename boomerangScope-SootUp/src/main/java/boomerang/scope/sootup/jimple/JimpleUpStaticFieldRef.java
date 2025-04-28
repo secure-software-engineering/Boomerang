@@ -52,8 +52,7 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
   @Override
   public Field getField() {
-    return new JimpleUpField(
-        SootUpFrameworkScope.getInstance().getSootField(delegate.getFieldSignature()));
+    return new JimpleUpField(delegate.getFieldSignature());
   }
 
   @Override

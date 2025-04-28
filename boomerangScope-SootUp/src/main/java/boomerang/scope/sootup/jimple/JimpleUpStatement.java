@@ -22,7 +22,6 @@ import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.base.Joiner;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +36,6 @@ import sootup.core.jimple.common.stmt.JIfStmt;
 import sootup.core.jimple.common.stmt.JReturnStmt;
 import sootup.core.jimple.common.stmt.JThrowStmt;
 import sootup.core.jimple.common.stmt.Stmt;
-import sootup.java.core.JavaSootField;
 
 public class JimpleUpStatement extends Statement {
 
@@ -69,11 +67,10 @@ public class JimpleUpStatement extends Statement {
     assert isAssignStmt();
 
     JAssignStmt assignStmt = (JAssignStmt) delegate;
-    SootUpFrameworkScope scopeInstance = SootUpFrameworkScope.getInstance();
     if (assignStmt.getLeftOp() instanceof JStaticFieldRef) {
       JStaticFieldRef staticFieldRef = (JStaticFieldRef) assignStmt.getLeftOp();
-      JavaSootField sootField = scopeInstance.getSootField(staticFieldRef.getFieldSignature());
-      return new JimpleUpField(sootField);
+
+      return new JimpleUpField(staticFieldRef.getFieldSignature());
     }
 
     if (assignStmt.getLeftOp() instanceof JArrayRef) {
@@ -81,8 +78,8 @@ public class JimpleUpStatement extends Statement {
     }
 
     JInstanceFieldRef ifr = (JInstanceFieldRef) assignStmt.getLeftOp();
-    JavaSootField sootField = scopeInstance.getSootField(ifr.getFieldSignature());
-    return new JimpleUpField(sootField);
+
+    return new JimpleUpField(ifr.getFieldSignature());
   }
 
   @Override
@@ -107,9 +104,7 @@ public class JimpleUpStatement extends Statement {
     JAssignStmt as = (JAssignStmt) delegate;
     JInstanceFieldRef ifr = (JInstanceFieldRef) as.getRightOp();
 
-    JavaSootField sootField =
-        SootUpFrameworkScope.getInstance().getSootField(ifr.getFieldSignature());
-    return new JimpleUpField(sootField);
+    return new JimpleUpField(ifr.getFieldSignature());
   }
 
   @Override

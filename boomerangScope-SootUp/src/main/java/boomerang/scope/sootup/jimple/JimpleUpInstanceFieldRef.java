@@ -20,10 +20,8 @@ import boomerang.scope.InstanceFieldVal;
 import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
-import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Objects;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
-import sootup.java.core.JavaSootField;
 
 public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
@@ -51,9 +49,7 @@ public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Field getField() {
-    JavaSootField field =
-        SootUpFrameworkScope.getInstance().getSootField(delegate.getFieldSignature());
-    return new JimpleUpField(field);
+    return new JimpleUpField(delegate.getFieldSignature());
   }
 
   @Override

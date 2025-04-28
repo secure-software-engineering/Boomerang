@@ -69,7 +69,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
@@ -204,30 +203,38 @@ public abstract class WeightedBoomerang<W extends Weight> {
   private void handleStaticInitializer(
       Node<Edge, Val> node, BackwardBoomerangSolver<W> backwardSolver) {
     if (options.trackStaticFieldAtEntryPointToClinit()
-        && node.fact().isStatic()
+        && node.fact().isStatic() // Equivalent to "node.fact() instanceof StaticFieldVal"?
+        && node.fact() instanceof StaticFieldVal
         && isFirstStatementOfEntryPoint(node.stmt().getStart())) {
-      Val fact = node.fact();
-      Stream<Method> methodStream = frameworkScope.handleStaticFieldInitializers(fact);
+      StaticFieldVal fact = (StaticFieldVal) node.fact();
 
-      methodStream.forEach(
-          m -> {
-            if (m.isStaticInitializer()) {
-              for (Statement ep : icfg.getEndPointsOf(m)) {
-                StaticFieldVal newVal =
-                    frameworkScope.newStaticFieldVal(((StaticFieldVal) fact).getField(), m);
-                cfg.addPredsOfListener(
-                    new PredecessorListener(ep) {
-                      @Override
-                      public void getPredecessor(Statement pred) {
-                        backwardSolver.addNormalCallFlow(
-                            node, new Node<>(new ControlFlowGraph.Edge(pred, ep), newVal));
-                        backwardSolver.addNormalFieldFlow(
-                            node, new Node<>(new ControlFlowGraph.Edge(pred, ep), newVal));
-                      }
-                    });
-              }
-            }
-          });
+      /* If we reach the first statement of an entry point method, and we have
+       * not found the allocation site yet, we extend the dataflow to the static
+       * initializer method of the fields class
+       */
+      Collection<Method> entryPoints = callGraph.getEntryPoints();
+      for (Method entryPoint : entryPoints) {
+        if (!entryPoint.isStaticInitializer()) {
+          continue;
+        }
+
+        if (entryPoint.getDeclaringClass().equals(fact.getDeclaringClass())) {
+          Val newVal = fact.withNewMethod(entryPoint);
+
+          for (Statement ep : icfg.getEndPointsOf(entryPoint)) {
+            cfg.addPredsOfListener(
+                new PredecessorListener(ep) {
+                  @Override
+                  public void getPredecessor(Statement pred) {
+                    backwardSolver.addNormalFieldFlow(
+                        node, new Node<>(new ControlFlowGraph.Edge(pred, ep), newVal));
+                    backwardSolver.addNormalCallFlow(
+                        node, new Node<>(new ControlFlowGraph.Edge(pred, ep), newVal));
+                  }
+                });
+          }
+        }
+      }
     }
   }
 
