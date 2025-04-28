@@ -59,7 +59,7 @@ public class JimpleField extends Field {
     JimpleField that = (JimpleField) o;
     // Important: Do not include the declaring class because subclasses may access the field, too
     return Objects.equals(delegate.type(), that.delegate.type())
-        && Objects.equals(delegate.name(), delegate.name());
+        && Objects.equals(delegate.name(), that.delegate.name());
   }
 
   @Override
