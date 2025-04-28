@@ -15,6 +15,7 @@
 package boomerang.staticfields;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.IStaticFieldRef;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class FlowSensitiveStaticFieldStrategy implements StaticFieldHandlingStra
   @Override
   public void handleBackward(
       Edge loadStatement, Val loadedVal, StaticFieldVal staticVal, Set<State> out) {
-    out.add(new Node<>(loadStatement, loadStatement.getStart().getStaticField()));
+    IStaticFieldRef staticFieldRef = loadStatement.getStart().getStaticField();
+    out.add(new Node<>(loadStatement, staticFieldRef.asStaticFieldVal()));
   }
 }

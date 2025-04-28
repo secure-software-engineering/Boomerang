@@ -26,7 +26,6 @@ import soot.jimple.InstanceFieldRef;
 public class JimpleInstanceFieldRef extends InstanceFieldVal {
 
   private final InstanceFieldRef delegate;
-  private final Method method;
 
   public JimpleInstanceFieldRef(InstanceFieldRef delegate, Method method) {
     this(delegate, method, null);
@@ -37,7 +36,6 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
     super(method, unbalanced);
 
     this.delegate = delegate;
-    this.method = method;
   }
 
   public InstanceFieldRef getDelegate() {
@@ -46,7 +44,7 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Val getBase() {
-    return new JimpleVal(delegate.getBase(), method);
+    return new JimpleVal(delegate.getBase(), m);
   }
 
   @Override
@@ -61,7 +59,7 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleInstanceFieldRef(delegate, method, stmt);
+    return new JimpleInstanceFieldRef(delegate, m, stmt);
   }
 
   @Override
@@ -78,13 +76,15 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
     JimpleInstanceFieldRef that = (JimpleInstanceFieldRef) o;
-    return Objects.equals(delegate, that.delegate) && Objects.equals(method, that.method);
+    return Objects.equals(delegate.getBase(), that.delegate.getBase())
+        && Objects.equals(delegate.getFieldRef(), that.delegate.getFieldRef());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate, method);
+    return Objects.hash(super.hashCode(), delegate.getBase(), delegate.getFieldRef());
   }
 
   @Override

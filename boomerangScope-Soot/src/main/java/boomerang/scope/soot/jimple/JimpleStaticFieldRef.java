@@ -14,53 +14,43 @@
  */
 package boomerang.scope.soot.jimple;
 
-import boomerang.scope.ArrayVal;
 import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Field;
 import boomerang.scope.Method;
+import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.scope.WrappedClass;
 import java.util.Objects;
-import soot.Value;
-import soot.jimple.ArrayRef;
-import soot.jimple.IntConstant;
+import soot.jimple.StaticFieldRef;
 
-public class JimpleArrayRef extends ArrayVal {
+public class JimpleStaticFieldRef extends StaticFieldVal {
 
-  private final ArrayRef delegate;
+  private final StaticFieldRef delegate;
 
-  public JimpleArrayRef(ArrayRef delegate, Method method) {
+  public JimpleStaticFieldRef(StaticFieldRef delegate, Method method) {
     this(delegate, method, null);
   }
 
-  private JimpleArrayRef(ArrayRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+  private JimpleStaticFieldRef(
+      StaticFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
   }
 
-  public ArrayRef getDelegate() {
+  public StaticFieldRef getDelegate() {
     return delegate;
   }
 
   @Override
-  public Val getBase() {
-    return new JimpleVal(delegate.getBase(), m);
+  public WrappedClass getDeclaringClass() {
+    return new JimpleWrappedClass(delegate.getField().getDeclaringClass());
   }
 
   @Override
-  public Val getIndexExpr() {
-    return new JimpleVal(delegate.getIndex(), m);
-  }
-
-  @Override
-  public int getIndex() {
-    Value indexExpr = delegate.getIndex();
-
-    if (indexExpr instanceof IntConstant) {
-      return ((IntConstant) indexExpr).value;
-    } else {
-      return -1;
-    }
+  public Field getField() {
+    return new JimpleField(delegate.getField());
   }
 
   @Override
@@ -70,12 +60,12 @@ public class JimpleArrayRef extends ArrayVal {
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleArrayRef(delegate, m, stmt);
+    return new JimpleStaticFieldRef(delegate, m, stmt);
   }
 
   @Override
   public Val withNewMethod(Method callee) {
-    return new JimpleArrayRef(delegate, callee);
+    return new JimpleStaticFieldRef(delegate, callee);
   }
 
   @Override
@@ -88,17 +78,17 @@ public class JimpleArrayRef extends ArrayVal {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
-    JimpleArrayRef that = (JimpleArrayRef) o;
-    return Objects.equals(delegate, that.delegate);
+    JimpleStaticFieldRef that = (JimpleStaticFieldRef) o;
+    return Objects.equals(delegate.getFieldRef(), that.delegate.getFieldRef());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    return Objects.hash(super.hashCode(), delegate.getFieldRef());
   }
 
   @Override
   public String toString() {
-    return delegate.toString();
+    return getVariableName();
   }
 }

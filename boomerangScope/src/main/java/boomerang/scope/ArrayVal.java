@@ -21,6 +21,11 @@ public abstract class ArrayVal extends Val implements IArrayRef {
   }
 
   @Override
+  public ArrayVal asArrayVal() {
+    return this;
+  }
+
+  @Override
   public boolean isStatic() {
     return false;
   }

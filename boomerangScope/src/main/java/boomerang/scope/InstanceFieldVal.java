@@ -21,6 +21,11 @@ public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef 
   }
 
   @Override
+  public InstanceFieldVal asInstanceFieldVal() {
+    return this;
+  }
+
+  @Override
   public boolean isStatic() {
     return false;
   }

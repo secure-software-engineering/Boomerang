@@ -115,7 +115,7 @@ class OpalFieldTest {
       if (stmt.isStaticFieldLoad) {
         staticFieldLoadCount += 1
 
-        val staticField = stmt.getStaticField
+        val staticField = stmt.getStaticField.asStaticFieldVal()
         Assert.assertFalse(staticField.getField.isPredefinedField)
         Assert.assertFalse(staticField.getField.isInnerClassField)
 
@@ -151,7 +151,7 @@ class OpalFieldTest {
         Assert.assertFalse(staticField.getField.isPredefinedField)
         Assert.assertFalse(staticField.getField.isInnerClassField)
 
-        val typeName = staticField.getType.toString
+        val typeName = staticField.asStaticFieldVal().getType.toString
         Assert.assertTrue(
           typeName.equals("int") || typeName.equals(classOf[A].getName)
         )

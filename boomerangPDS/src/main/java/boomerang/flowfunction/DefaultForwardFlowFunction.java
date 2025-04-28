@@ -134,7 +134,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
             }
           }
         } else if (nextStmt.isStaticFieldStore()) {
-          StaticFieldVal sf = nextStmt.getStaticField();
+          StaticFieldVal sf = nextStmt.getStaticField().asStaticFieldVal();
           if (options.trackFields()) {
             strategies.getStaticFieldStrategy().handleForward(nextEdge, rightOp, sf, out);
           }
@@ -155,7 +155,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (nextStmt.isStaticFieldLoad()) {
-        StaticFieldVal sf = nextStmt.getStaticField();
+        StaticFieldVal sf = nextStmt.getStaticField().asStaticFieldVal();
         if (fact.isStatic() && fact.equals(sf)) {
           out.add(new Node<>(nextEdge, leftOp));
         }
@@ -203,7 +203,7 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
         return true;
       }
       if (curr.isStaticFieldStore()) {
-        StaticFieldVal sf = curr.getStaticField();
+        StaticFieldVal sf = curr.getStaticField().asStaticFieldVal();
         return value.isStatic() && value.equals(sf);
       }
     }

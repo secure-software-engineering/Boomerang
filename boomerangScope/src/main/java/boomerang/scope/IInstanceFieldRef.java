@@ -19,4 +19,6 @@ public interface IInstanceFieldRef {
   Val getBase();
 
   Field getField();
+
+  InstanceFieldVal asInstanceFieldVal();
 }

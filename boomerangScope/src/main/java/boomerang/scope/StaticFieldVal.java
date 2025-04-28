@@ -15,42 +15,16 @@
 package boomerang.scope;
 
 import boomerang.scope.ControlFlowGraph.Edge;
-import java.util.Objects;
 
-public class StaticFieldVal extends Val implements IStaticFieldRef {
+public abstract class StaticFieldVal extends Val implements IStaticFieldRef {
 
-  private final WrappedClass declaringClass;
-  private final Field field;
-
-  public StaticFieldVal(WrappedClass declaringClass, Field field, Method method) {
-    this(declaringClass, field, method, null);
-  }
-
-  protected StaticFieldVal(
-      WrappedClass declaringClass, Field field, Method method, Edge unbalanced) {
+  protected StaticFieldVal(Method method, Edge unbalanced) {
     super(method, unbalanced);
-
-    this.declaringClass = declaringClass;
-    this.field = field;
   }
 
   @Override
-  public WrappedClass getDeclaringClass() {
-    return declaringClass;
-  }
-
-  @Override
-  public Field getField() {
-    return field;
-  }
-
-  public Val asUnbalanced(Edge stmt) {
-    return new StaticFieldVal(declaringClass, field, m, stmt);
-  }
-
-  @Override
-  public Type getType() {
-    return field.getType();
+  public StaticFieldVal asStaticFieldVal() {
+    return this;
   }
 
   @Override
@@ -149,11 +123,6 @@ public class StaticFieldVal extends Val implements IStaticFieldRef {
   }
 
   @Override
-  public Val withNewMethod(Method callee) {
-    return new StaticFieldVal(declaringClass, field, callee);
-  }
-
-  @Override
   public boolean isLongConstant() {
     return false;
   }
@@ -171,29 +140,5 @@ public class StaticFieldVal extends Val implements IStaticFieldRef {
   @Override
   public IArrayRef getArrayBase() {
     throw new RuntimeException("Static field val has no array base");
-  }
-
-  @Override
-  public String getVariableName() {
-    return declaringClass + "." + field.getName();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    StaticFieldVal that = (StaticFieldVal) o;
-    return Objects.equals(declaringClass, that.declaringClass) && Objects.equals(field, that.field);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), declaringClass, field);
-  }
-
-  @Override
-  public String toString() {
-    return getVariableName();
   }
 }

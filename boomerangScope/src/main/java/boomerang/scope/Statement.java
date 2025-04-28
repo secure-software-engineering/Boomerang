@@ -204,7 +204,7 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public StaticFieldVal getStaticField() {
+    public IStaticFieldRef getStaticField() {
       throw new RuntimeException("Epsilon statement has no static field");
     }
 
@@ -356,7 +356,7 @@ public abstract class Statement implements Location {
 
   public abstract boolean isStaticFieldStore();
 
-  public abstract StaticFieldVal getStaticField();
+  public abstract IStaticFieldRef getStaticField();
 
   /**
    * This method kills a data-flow at an if-stmt, it is assumed that the propagated "allocation"

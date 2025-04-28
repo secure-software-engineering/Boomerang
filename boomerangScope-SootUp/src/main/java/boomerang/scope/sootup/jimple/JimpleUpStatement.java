@@ -17,12 +17,11 @@ package boomerang.scope.sootup.jimple;
 import boomerang.scope.Field;
 import boomerang.scope.IArrayRef;
 import boomerang.scope.IInstanceFieldRef;
+import boomerang.scope.IStaticFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Statement;
-import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
-import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.base.Joiner;
 import java.util.Arrays;
@@ -268,7 +267,7 @@ public class JimpleUpStatement extends Statement {
   }
 
   @Override
-  public StaticFieldVal getStaticField() {
+  public IStaticFieldRef getStaticField() {
     JStaticFieldRef v;
     if (isStaticFieldLoad()) {
       v = (JStaticFieldRef) ((JAssignStmt) delegate).getRightOp();
@@ -278,11 +277,7 @@ public class JimpleUpStatement extends Statement {
       throw new RuntimeException("Statement does not have a static field");
     }
 
-    // TODO Replace class type
-    WrappedClass declaringClass = new JimpleUpWrappedClass(null);
-    Field field =
-        new JimpleUpField(SootUpFrameworkScope.getInstance().getSootField(v.getFieldSignature()));
-    return new StaticFieldVal(declaringClass, field, method);
+    return new JimpleUpStaticFieldRef(v, method);
   }
 
   @Override

@@ -19,4 +19,6 @@ public interface IStaticFieldRef {
   WrappedClass getDeclaringClass();
 
   Field getField();
+
+  StaticFieldVal asStaticFieldVal();
 }

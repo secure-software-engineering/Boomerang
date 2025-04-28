@@ -21,7 +21,7 @@ import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleField;
 import boomerang.scope.soot.jimple.JimpleMethod;
 import boomerang.scope.soot.jimple.JimpleStatement;
-import boomerang.scope.soot.jimple.JimpleStaticFieldVal;
+import boomerang.scope.soot.jimple.JimpleStaticFieldRef;
 import boomerang.scope.soot.jimple.JimpleVal;
 import boomerang.scope.soot.sparse.aliasaware.MStaticFieldRef;
 import soot.*;
@@ -42,7 +42,7 @@ public class SootAdapter {
     if (val instanceof JimpleVal) {
       Value value = asValue(val);
       return value.getType();
-    } else if (val instanceof JimpleStaticFieldVal) {
+    } else if (val instanceof JimpleStaticFieldRef) {
       SootField field = asField(val);
       return field.getType();
     } else {
@@ -51,8 +51,8 @@ public class SootAdapter {
   }
 
   public static Value asValue(Val val) {
-    if (val instanceof JimpleStaticFieldVal) {
-      JimpleStaticFieldVal staticVal = (JimpleStaticFieldVal) val;
+    if (val instanceof JimpleStaticFieldRef) {
+      JimpleStaticFieldRef staticVal = (JimpleStaticFieldRef) val;
       Field field = staticVal.getField();
       SootField sootField = ((JimpleField) field).getDelegate();
       SootFieldRef sootFieldRef = sootField.makeRef();
@@ -63,7 +63,7 @@ public class SootAdapter {
   }
 
   public static SootField asField(Val val) {
-    Field field = ((JimpleStaticFieldVal) val).getField();
+    Field field = ((JimpleStaticFieldRef) val).getField();
     return ((JimpleField) field).getDelegate();
   }
 

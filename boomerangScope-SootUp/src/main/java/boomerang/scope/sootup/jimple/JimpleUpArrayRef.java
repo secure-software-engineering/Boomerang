@@ -14,32 +14,42 @@
  */
 package boomerang.scope.sootup.jimple;
 
-import boomerang.scope.IArrayRef;
+import boomerang.scope.ArrayVal;
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Method;
+import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.ref.JArrayRef;
 
-public class JimpleUpArrayRef implements IArrayRef {
+public class JimpleUpArrayRef extends ArrayVal {
 
   private final JArrayRef delegate;
-  private final Method method;
 
   public JimpleUpArrayRef(JArrayRef delegate, Method method) {
+    this(delegate, method, null);
+  }
+
+  public JimpleUpArrayRef(JArrayRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+    super(method, unbalanced);
+
     this.delegate = delegate;
-    this.method = method;
+  }
+
+  public JArrayRef getDelegate() {
+    return delegate;
   }
 
   @Override
   public Val getBase() {
-    return new JimpleUpVal(delegate.getBase(), method);
+    return new JimpleUpVal(delegate.getBase(), m);
   }
 
   @Override
   public Val getIndexExpr() {
-    return new JimpleUpVal(delegate.getIndex(), method);
+    return new JimpleUpVal(delegate.getIndex(), m);
   }
 
   @Override
@@ -54,16 +64,37 @@ public class JimpleUpArrayRef implements IArrayRef {
   }
 
   @Override
+  public Type getType() {
+    return new JimpleUpType(delegate.getType());
+  }
+
+  @Override
+  public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
+    return new JimpleUpArrayRef(delegate, m, stmt);
+  }
+
+  @Override
+  public Val withNewMethod(Method callee) {
+    return new JimpleUpArrayRef(delegate, callee);
+  }
+
+  @Override
+  public String getVariableName() {
+    return delegate.toString();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
     JimpleUpArrayRef that = (JimpleUpArrayRef) o;
-    return Objects.equals(delegate, that.delegate) && Objects.equals(method, that.method);
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate, method);
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override

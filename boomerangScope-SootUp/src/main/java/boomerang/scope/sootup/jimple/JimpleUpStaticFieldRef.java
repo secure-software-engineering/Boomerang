@@ -12,70 +12,63 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope.soot.jimple;
+package boomerang.scope.sootup.jimple;
 
-import boomerang.scope.ArrayVal;
 import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Field;
 import boomerang.scope.Method;
+import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.scope.WrappedClass;
+import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Objects;
-import soot.Value;
-import soot.jimple.ArrayRef;
-import soot.jimple.IntConstant;
+import sootup.core.jimple.common.ref.JStaticFieldRef;
+import sootup.java.core.JavaSootClass;
+import sootup.java.core.types.JavaClassType;
 
-public class JimpleArrayRef extends ArrayVal {
+public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
-  private final ArrayRef delegate;
+  private final JStaticFieldRef delegate;
 
-  public JimpleArrayRef(ArrayRef delegate, Method method) {
+  public JimpleUpStaticFieldRef(JStaticFieldRef delegate, Method method) {
     this(delegate, method, null);
   }
 
-  private JimpleArrayRef(ArrayRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+  private JimpleUpStaticFieldRef(
+      JStaticFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
   }
 
-  public ArrayRef getDelegate() {
-    return delegate;
+  @Override
+  public WrappedClass getDeclaringClass() {
+    JavaSootClass sootClass =
+        SootUpFrameworkScope.getInstance()
+            .getSootClass((JavaClassType) delegate.getFieldSignature().getDeclClassType());
+    return new JimpleUpWrappedClass(sootClass);
   }
 
   @Override
-  public Val getBase() {
-    return new JimpleVal(delegate.getBase(), m);
-  }
-
-  @Override
-  public Val getIndexExpr() {
-    return new JimpleVal(delegate.getIndex(), m);
-  }
-
-  @Override
-  public int getIndex() {
-    Value indexExpr = delegate.getIndex();
-
-    if (indexExpr instanceof IntConstant) {
-      return ((IntConstant) indexExpr).value;
-    } else {
-      return -1;
-    }
+  public Field getField() {
+    return new JimpleUpField(
+        SootUpFrameworkScope.getInstance().getSootField(delegate.getFieldSignature()));
   }
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.getType());
+    return new JimpleUpType(delegate.getType());
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleArrayRef(delegate, m, stmt);
+    return new JimpleUpStaticFieldRef(delegate, m, stmt);
   }
 
   @Override
   public Val withNewMethod(Method callee) {
-    return new JimpleArrayRef(delegate, callee);
+    return new JimpleUpStaticFieldRef(delegate, callee);
   }
 
   @Override
@@ -88,7 +81,7 @@ public class JimpleArrayRef extends ArrayVal {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
-    JimpleArrayRef that = (JimpleArrayRef) o;
+    JimpleUpStaticFieldRef that = (JimpleUpStaticFieldRef) o;
     return Objects.equals(delegate, that.delegate);
   }
 
@@ -99,6 +92,6 @@ public class JimpleArrayRef extends ArrayVal {
 
   @Override
   public String toString() {
-    return delegate.toString();
+    return getVariableName();
   }
 }

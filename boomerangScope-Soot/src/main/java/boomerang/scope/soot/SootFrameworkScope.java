@@ -23,7 +23,7 @@ import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleField;
 import boomerang.scope.soot.jimple.JimpleMethod;
-import boomerang.scope.soot.jimple.JimpleStaticFieldVal;
+import boomerang.scope.soot.jimple.JimpleStaticFieldRef;
 import boomerang.scope.soot.jimple.JimpleVal;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -61,7 +61,7 @@ public class SootFrameworkScope implements FrameworkScope {
 
   @Override
   public Stream<Method> handleStaticFieldInitializers(Val fact) {
-    JimpleStaticFieldVal val = ((JimpleStaticFieldVal) fact);
+    JimpleStaticFieldRef val = ((JimpleStaticFieldRef) fact);
     return ((JimpleField) val.getField())
         .getDelegate().getDeclaringClass().getMethods().stream()
             .filter(SootMethod::hasActiveBody)

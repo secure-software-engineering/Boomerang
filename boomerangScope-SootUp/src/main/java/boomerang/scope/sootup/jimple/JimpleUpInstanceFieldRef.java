@@ -14,22 +14,30 @@
  */
 package boomerang.scope.sootup.jimple;
 
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Field;
-import boomerang.scope.IInstanceFieldRef;
+import boomerang.scope.InstanceFieldVal;
+import boomerang.scope.Method;
+import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.sootup.SootUpFrameworkScope;
-import java.util.Arrays;
+import java.util.Objects;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.java.core.JavaSootField;
 
-public class JimpleUpInstanceFieldRef implements IInstanceFieldRef {
+public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
   private final JInstanceFieldRef delegate;
-  private final JimpleUpMethod method;
 
-  public JimpleUpInstanceFieldRef(JInstanceFieldRef delegate, JimpleUpMethod method) {
+  public JimpleUpInstanceFieldRef(JInstanceFieldRef delegate, Method method) {
+    this(delegate, method, null);
+  }
+
+  private JimpleUpInstanceFieldRef(
+      JInstanceFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+    super(method, unbalanced);
+
     this.delegate = delegate;
-    this.method = method;
   }
 
   public JInstanceFieldRef getDelegate() {
@@ -38,7 +46,7 @@ public class JimpleUpInstanceFieldRef implements IInstanceFieldRef {
 
   @Override
   public Val getBase() {
-    return new JimpleUpVal(delegate.getBase(), method);
+    return new JimpleUpVal(delegate.getBase(), m);
   }
 
   @Override
@@ -49,20 +57,37 @@ public class JimpleUpInstanceFieldRef implements IInstanceFieldRef {
   }
 
   @Override
-  public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
+  public Type getType() {
+    return new JimpleUpType(delegate.getType());
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+  public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
+    return new JimpleUpInstanceFieldRef(delegate, m, stmt);
+  }
 
-    JimpleUpInstanceFieldRef other = (JimpleUpInstanceFieldRef) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+  @Override
+  public Val withNewMethod(Method callee) {
+    return new JimpleUpInstanceFieldRef(delegate, callee);
+  }
+
+  @Override
+  public String getVariableName() {
+    return delegate.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleUpInstanceFieldRef that = (JimpleUpInstanceFieldRef) o;
+    return Objects.equals(delegate, that.delegate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override

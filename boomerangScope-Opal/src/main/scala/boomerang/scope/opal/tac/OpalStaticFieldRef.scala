@@ -14,43 +14,45 @@
  */
 package boomerang.scope.opal.tac
 
-import boomerang.scope._
-import boomerang.scope.opal.transformation.TacLocal
+import boomerang.scope.ControlFlowGraph
+import boomerang.scope.Field
+import boomerang.scope.Method
+import boomerang.scope.StaticFieldVal
+import boomerang.scope.Type
+import boomerang.scope.Val
+import boomerang.scope.WrappedClass
 import java.util.Objects
 import org.opalj.br.FieldType
 import org.opalj.br.ObjectType
-import org.opalj.tac.Expr
 
-class OpalInstanceFieldRef(
-    val objRef: Expr[TacLocal],
+class OpalStaticFieldRef(
     val declaringClass: ObjectType,
     val fieldType: FieldType,
-    val fieldName: String,
+    val name: String,
     method: Method,
     unbalanced: ControlFlowGraph.Edge = null
-) extends InstanceFieldVal(method, unbalanced) {
+) extends StaticFieldVal(method, unbalanced) {
 
-  override def getBase: Val = new OpalVal(objRef, method)
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClass)
 
-  override def getField: Field = new OpalField(declaringClass, fieldType, fieldName)
+  override def getField: Field = new OpalField(declaringClass, fieldType, name)
 
   override def getType: Type = OpalType(fieldType)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
-    new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, method, stmt)
+    new OpalStaticFieldRef(declaringClass, fieldType, name, method, stmt)
 
-  override def withNewMethod(callee: Method): Val =
-    new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, callee)
+  override def withNewMethod(callee: Method): Val = new OpalStaticFieldRef(declaringClass, fieldType, name, callee)
 
-  override def getVariableName: String = s"$objRef.$fieldName"
+  override def getVariableName: String = s"${declaringClass.fqn}.$name"
 
-  override def hashCode: Int = Objects.hash(super.hashCode(), objRef, declaringClass, fieldType, fieldName)
+  override def hashCode: Int = Objects.hash(super.hashCode(), declaringClass, fieldType, name)
 
   override def equals(other: Any): Boolean = other match {
-    case that: OpalInstanceFieldRef =>
+    case that: OpalStaticFieldRef =>
       super.equals(
         that
-      ) && this.objRef == that.objRef && this.declaringClass == that.declaringClass && this.fieldType == that.fieldType && this.fieldName == that.fieldName
+      ) && this.declaringClass == that.declaringClass && this.fieldType == that.fieldType && this.name == that.name
     case _ => false
   }
 

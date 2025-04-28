@@ -17,16 +17,16 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.Field;
 import boomerang.scope.IArrayRef;
 import boomerang.scope.IInstanceFieldRef;
+import boomerang.scope.IStaticFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
-import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
-import boomerang.scope.WrappedClass;
 import com.google.common.base.Joiner;
 import java.util.Collection;
 import java.util.Objects;
+import soot.Value;
 import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.CastExpr;
@@ -128,8 +128,21 @@ public class JimpleStatement extends Statement {
   public Val getLeftOp() {
     if (isAssignStmt()) {
       AssignStmt assignStmt = (AssignStmt) delegate;
+      Value leftExpr = assignStmt.getLeftOp();
 
-      return new JimpleVal(assignStmt.getLeftOp(), method);
+      if (leftExpr instanceof InstanceFieldRef) {
+        return new JimpleInstanceFieldRef((InstanceFieldRef) leftExpr, method);
+      }
+
+      if (leftExpr instanceof ArrayRef) {
+        return new JimpleArrayRef((ArrayRef) leftExpr, method);
+      }
+
+      if (leftExpr instanceof StaticFieldRef) {
+        return new JimpleStaticFieldRef((StaticFieldRef) leftExpr, method);
+      }
+
+      return new JimpleVal(leftExpr, method);
     }
 
     throw new RuntimeException("Statement is not an assign statement");
@@ -139,7 +152,21 @@ public class JimpleStatement extends Statement {
   public Val getRightOp() {
     if (isAssignStmt()) {
       AssignStmt assignStmt = (AssignStmt) delegate;
-      return new JimpleVal(assignStmt.getRightOp(), method);
+      Value rightExpr = assignStmt.getRightOp();
+
+      if (rightExpr instanceof InstanceFieldRef) {
+        return new JimpleInstanceFieldRef((InstanceFieldRef) rightExpr, method);
+      }
+
+      if (rightExpr instanceof ArrayRef) {
+        return new JimpleArrayRef((ArrayRef) rightExpr, method);
+      }
+
+      if (rightExpr instanceof StaticFieldRef) {
+        return new JimpleStaticFieldRef((StaticFieldRef) rightExpr, method);
+      }
+
+      return new JimpleVal(rightExpr, method);
     }
 
     throw new RuntimeException("Statement is not an assign statement");
@@ -343,7 +370,7 @@ public class JimpleStatement extends Statement {
   }
 
   @Override
-  public StaticFieldVal getStaticField() {
+  public IStaticFieldRef getStaticField() {
     StaticFieldRef v;
     if (isStaticFieldLoad()) {
       v = (StaticFieldRef) ((AssignStmt) delegate).getRightOp();
@@ -353,9 +380,7 @@ public class JimpleStatement extends Statement {
       throw new RuntimeException("Statement has no static field access");
     }
 
-    WrappedClass declaringClass = new JimpleWrappedClass(v.getField().getDeclaringClass());
-    Field field = new JimpleField(v.getField());
-    return new StaticFieldVal(declaringClass, field, method);
+    return new JimpleStaticFieldRef(v, method);
   }
 
   @Override

@@ -21,4 +21,6 @@ public interface IArrayRef {
   Val getIndexExpr();
 
   int getIndex();
+
+  ArrayVal asArrayVal();
 }

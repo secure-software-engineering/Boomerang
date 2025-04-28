@@ -160,8 +160,9 @@ public class WALAStatement extends Statement {
     }
     if (isStaticFieldStore()) {
       // TODO Declaring class
-      return new StaticFieldVal(
-          null, new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);
+      /*return new StaticFieldVal(
+      null, new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);*/
+      throw new UnsupportedOperationException("Not implemented yet");
     }
     if (isAllocationStatement()) {
       return new WALAVal(delegate.getDef(), (WALAMethod) method);
@@ -214,8 +215,9 @@ public class WALAStatement extends Statement {
     }
     if (isStaticFieldLoad()) {
       // TODO Declaring class
-      return new StaticFieldVal(
-          null, new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);
+      /*return new StaticFieldVal(
+      null, new WALAField(((SSAFieldAccessInstruction) delegate).getDeclaredField()), method);*/
+      throw new UnsupportedOperationException("Not implemented yet");
     }
     return null;
   }
@@ -334,7 +336,8 @@ public class WALAStatement extends Statement {
     SSAFieldAccessInstruction stmt = (SSAFieldAccessInstruction) delegate;
     if (!stmt.isStatic()) throw new RuntimeException("Not a static field access statement");
     // TODO Declaring class
-    return new StaticFieldVal(null, new WALAField(stmt.getDeclaredField()), method);
+    // return new StaticFieldVal(null, new WALAField(stmt.getDeclaredField()), method);
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override

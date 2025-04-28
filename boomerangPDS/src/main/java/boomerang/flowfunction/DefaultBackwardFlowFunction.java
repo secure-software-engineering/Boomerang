@@ -18,6 +18,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.IArrayRef;
 import boomerang.scope.IInstanceFieldRef;
+import boomerang.scope.IStaticFieldRef;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
@@ -128,10 +129,12 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
             }
           }
         } else if (nextStmt.isStaticFieldLoad()) {
+          IStaticFieldRef staticFieldRef = nextStmt.getStaticField();
           if (options.trackFields()) {
             strategies
                 .getStaticFieldStrategy()
-                .handleBackward(currEdge, nextStmt.getLeftOp(), nextStmt.getStaticField(), out);
+                .handleBackward(
+                    currEdge, nextStmt.getLeftOp(), staticFieldRef.asStaticFieldVal(), out);
           }
         } else if (rightOp.isArrayRef()) {
           IArrayRef arrayBase = nextStmt.getArrayBase();
@@ -162,7 +165,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (nextStmt.isStaticFieldStore()) {
-        StaticFieldVal staticField = nextStmt.getStaticField();
+        StaticFieldVal staticField = nextStmt.getStaticField().asStaticFieldVal();
         if (fact.isStatic() && fact.equals(staticField)) {
           out.add(new Node<>(nextEdge, rightOp));
         }
