@@ -15,7 +15,7 @@
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Method;
+import boomerang.scope.DefinedMethod;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
@@ -36,7 +36,7 @@ import soot.util.Chain;
  * Class that wraps a {@link SootMethod} with an existing body. All operations provide their
  * corresponding information.
  */
-public class JimpleMethod extends Method {
+public class JimpleMethod extends DefinedMethod {
 
   private final SootMethod delegate;
 
@@ -55,6 +55,10 @@ public class JimpleMethod extends Method {
 
   public static JimpleMethod of(SootMethod m) {
     return INTERNAL_POOL.intern(new JimpleMethod(m));
+  }
+
+  public SootMethod getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -138,16 +142,6 @@ public class JimpleMethod extends Method {
   }
 
   @Override
-  public boolean isDefined() {
-    return true;
-  }
-
-  @Override
-  public boolean isPhantom() {
-    return false;
-  }
-
-  @Override
   public List<Statement> getStatements() {
     return getControlFlowGraph().getStatements();
   }
@@ -178,10 +172,6 @@ public class JimpleMethod extends Method {
   @Override
   public boolean isConstructor() {
     return delegate.isConstructor();
-  }
-
-  public SootMethod getDelegate() {
-    return delegate;
   }
 
   @Override

@@ -12,56 +12,59 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope.soot.jimple;
+package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.PhantomMethod;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
+import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import soot.SootMethod;
-import soot.SootMethodRef;
+import sootup.java.core.JavaSootClass;
+import sootup.java.core.JavaSootMethod;
+import sootup.java.core.types.JavaClassType;
 
-/**
- * Class that wraps a {@link SootMethod} without an existing body. Operations that require
- * information from the body throw an exception.
- */
-public class JimplePhantomMethod extends PhantomMethod {
+public class JimpleUpPhantomMethod extends PhantomMethod {
 
-  private final SootMethodRef delegate;
+  private final JavaSootMethod delegate;
 
-  protected JimplePhantomMethod(SootMethodRef delegate) {
+  public JimpleUpPhantomMethod(JavaSootMethod delegate) {
     this.delegate = delegate;
+
+    if (delegate.hasBody()) {
+      throw new IllegalArgumentException("Cannot build phantom method from method with body");
+    }
   }
 
-  public static JimplePhantomMethod of(SootMethodRef delegate) {
-    return new JimplePhantomMethod(delegate);
+  public JavaSootMethod getDelegate() {
+    return delegate;
   }
 
   @Override
   public boolean isStaticInitializer() {
-    return delegate.getName().equals(SootMethod.staticInitializerName);
+    return delegate.getName().equals(SootUpFrameworkScope.STATIC_INITIALIZER_NAME);
   }
 
   @Override
   public List<Type> getParameterTypes() {
-    List<Type> types = new ArrayList<>();
+    List<Type> result = new ArrayList<>();
 
-    for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type));
+    for (sootup.core.types.Type type : delegate.getParameterTypes()) {
+      result.add(new JimpleUpType(type));
     }
-    return types;
+
+    return result;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index));
+    return new JimpleUpType(delegate.getParameterType(index));
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType());
+    return new JimpleUpType(delegate.getReturnType());
   }
 
   @Override
@@ -71,12 +74,15 @@ public class JimplePhantomMethod extends PhantomMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getDeclaringClass());
+    JavaSootClass declaringClass =
+        SootUpFrameworkScope.getInstance()
+            .getSootClass((JavaClassType) delegate.getDeclaringClassType());
+    return new JimpleUpWrappedClass(declaringClass);
   }
 
   @Override
   public String getSubSignature() {
-    return delegate.getSubSignature().getString();
+    return delegate.getSubSignature().toString();
   }
 
   @Override
@@ -86,14 +92,14 @@ public class JimplePhantomMethod extends PhantomMethod {
 
   @Override
   public boolean isConstructor() {
-    return delegate.isConstructor();
+    return delegate.getName().equals(SootUpFrameworkScope.CONSTRUCTOR_NAME);
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    JimplePhantomMethod that = (JimplePhantomMethod) o;
+    JimpleUpPhantomMethod that = (JimpleUpPhantomMethod) o;
     return Objects.equals(delegate, that.delegate);
   }
 
@@ -104,6 +110,6 @@ public class JimplePhantomMethod extends PhantomMethod {
 
   @Override
   public String toString() {
-    return "PHANTOM:" + delegate.toString();
+    return delegate.toString();
   }
 }

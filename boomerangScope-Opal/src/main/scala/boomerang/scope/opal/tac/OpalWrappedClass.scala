@@ -68,6 +68,8 @@ class OpalWrappedClass(val delegate: ObjectType) extends WrappedClass {
 
   override def getFullyQualifiedName: String = delegate.fqn.replace("/", ".")
 
+  override def isDefined: Boolean = OpalClient.project.get.classFile(delegate).isDefined
+
   override def isPhantom: Boolean = OpalClient.project.get.classFile(delegate).isEmpty
 
   override def hashCode: Int = Objects.hash(delegate)

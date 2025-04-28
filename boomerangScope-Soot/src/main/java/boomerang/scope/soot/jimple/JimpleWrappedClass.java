@@ -33,6 +33,10 @@ public class JimpleWrappedClass implements WrappedClass {
     this.delegate = delegate;
   }
 
+  public SootClass getDelegate() {
+    return delegate;
+  }
+
   public Collection<Method> getMethods() {
     List<SootMethod> ms = delegate.getMethods();
     if (methods == null) {
@@ -66,12 +70,13 @@ public class JimpleWrappedClass implements WrappedClass {
   }
 
   @Override
-  public boolean isPhantom() {
-    return delegate.isPhantom();
+  public boolean isDefined() {
+    return !delegate.isPhantom();
   }
 
-  public SootClass getDelegate() {
-    return delegate;
+  @Override
+  public boolean isPhantom() {
+    return delegate.isPhantom();
   }
 
   @Override

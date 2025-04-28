@@ -14,23 +14,15 @@
  */
 package boomerang.scope;
 
-import java.util.Collection;
+public abstract class DefinedMethod extends Method {
 
-public interface WrappedClass {
+  @Override
+  public boolean isDefined() {
+    return true;
+  }
 
-  Collection<Method> getMethods();
-
-  boolean hasSuperclass();
-
-  WrappedClass getSuperclass();
-
-  Type getType();
-
-  boolean isApplicationClass();
-
-  String getFullyQualifiedName();
-
-  boolean isDefined();
-
-  boolean isPhantom();
+  @Override
+  public boolean isPhantom() {
+    return false;
+  }
 }

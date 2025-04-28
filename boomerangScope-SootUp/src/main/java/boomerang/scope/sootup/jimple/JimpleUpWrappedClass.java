@@ -81,6 +81,12 @@ public class JimpleUpWrappedClass implements WrappedClass {
   }
 
   @Override
+  public boolean isDefined() {
+    // TODO Change
+    return true;
+  }
+
+  @Override
   public boolean isPhantom() {
     // TODO May change
     return false;

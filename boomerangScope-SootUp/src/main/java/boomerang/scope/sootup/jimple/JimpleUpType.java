@@ -37,6 +37,10 @@ public class JimpleUpType implements Type {
     this.delegate = delegate;
   }
 
+  public sootup.core.types.Type getDelegate() {
+    return delegate;
+  }
+
   @Override
   public boolean isNullType() {
     return delegate instanceof NullType;
@@ -162,20 +166,12 @@ public class JimpleUpType implements Type {
     return false;
   }
 
-  public sootup.core.types.Type getDelegate() {
-    return delegate;
-  }
-
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    } else if (o != null && this.getClass() == o.getClass()) {
-      JimpleUpType that = (JimpleUpType) o;
-      return Objects.equals(this.delegate, that.delegate);
-    } else {
-      return false;
-    }
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleUpType that = (JimpleUpType) o;
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override

@@ -24,7 +24,7 @@ import java.util.Objects
 class OpalMethod private (
     val delegate: org.opalj.br.Method,
     val tac: BoomerangTACode
-) extends Method {
+) extends DefinedMethod {
 
   if (delegate.body.isEmpty) {
     throw new RuntimeException("Cannot build OpalMethod without existing body")
@@ -110,10 +110,6 @@ class OpalMethod private (
   }
 
   override def isStatic: Boolean = delegate.isStatic
-
-  override def isDefined: Boolean = true
-
-  override def isPhantom: Boolean = false
 
   override def getStatements: util.List[Statement] = cfg.getStatements
 

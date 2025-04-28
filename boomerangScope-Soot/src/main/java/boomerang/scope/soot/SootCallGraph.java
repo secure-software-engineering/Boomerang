@@ -39,7 +39,7 @@ public class SootCallGraph extends CallGraph {
         if (e.tgt().hasActiveBody()) {
           target = JimpleMethod.of(e.tgt());
         } else {
-          target = JimplePhantomMethod.of(e.tgt());
+          target = JimplePhantomMethod.of(e.tgt().makeRef());
         }
 
         LOGGER.trace("Call edge from {} to target method {}", callSite, e.tgt());

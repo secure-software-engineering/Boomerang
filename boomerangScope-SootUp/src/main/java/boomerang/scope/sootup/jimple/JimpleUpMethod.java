@@ -15,7 +15,7 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Method;
+import boomerang.scope.DefinedMethod;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
@@ -24,16 +24,16 @@ import boomerang.scope.sootup.SootUpFrameworkScope;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import sootup.core.jimple.basic.Local;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
-public class JimpleUpMethod extends Method {
+public class JimpleUpMethod extends DefinedMethod {
 
   protected static Interner<JimpleUpMethod> INTERNAL_POOL = Interners.newWeakInterner();
   private final JavaSootMethod delegate;
@@ -138,16 +138,6 @@ public class JimpleUpMethod extends Method {
   }
 
   @Override
-  public boolean isDefined() {
-    return true;
-  }
-
-  @Override
-  public boolean isPhantom() {
-    return false;
-  }
-
-  @Override
   public List<Statement> getStatements() {
     return getControlFlowGraph().getStatements();
   }
@@ -182,7 +172,7 @@ public class JimpleUpMethod extends Method {
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
+    return Objects.hash(delegate);
   }
 
   @Override
