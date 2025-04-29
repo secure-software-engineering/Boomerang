@@ -32,7 +32,6 @@ class OpalFrameworkScope(
     dataFlowScope: DataFlowScope
 ) extends FrameworkScope {
 
-  OpalClient.init(project)
   private val opalCallGraph = new OpalCallGraph(project, callGraph, entryPoints)
 
   override def getCallGraph: CallGraph = opalCallGraph

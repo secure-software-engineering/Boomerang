@@ -26,21 +26,21 @@ class OpalInstanceFieldRef(
     val declaringClass: ObjectType,
     val fieldType: FieldType,
     val fieldName: String,
-    method: Method,
+    method: OpalMethod,
     unbalanced: ControlFlowGraph.Edge = null
 ) extends InstanceFieldVal(method, unbalanced) {
 
   override def getBase: Val = new OpalVal(objRef, method)
 
-  override def getField: Field = new OpalField(declaringClass, fieldType, fieldName)
+  override def getField: Field = new OpalField(method.project, declaringClass, fieldType, fieldName)
 
-  override def getType: Type = OpalType(fieldType)
+  override def getType: Type = OpalType(fieldType, method.project.classHierarchy)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
     new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, method, stmt)
 
   override def withNewMethod(callee: Method): Val =
-    new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, callee)
+    new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, callee.asInstanceOf[OpalMethod])
 
   override def getVariableName: String = s"$objRef.$fieldName"
 

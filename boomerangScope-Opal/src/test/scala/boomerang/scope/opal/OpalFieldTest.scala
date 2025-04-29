@@ -32,7 +32,7 @@ class OpalFieldTest {
     val signature =
       new MethodSignature(classOf[FieldTarget].getName, "fieldLoad", "Void")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var fieldLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -70,7 +70,7 @@ class OpalFieldTest {
     val signature =
       new MethodSignature(classOf[FieldTarget].getName, "fieldStore", "Void")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var fieldStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -108,7 +108,7 @@ class OpalFieldTest {
       "Void"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var staticFieldLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -140,7 +140,7 @@ class OpalFieldTest {
       "Void"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var staticFieldStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -172,7 +172,7 @@ class OpalFieldTest {
       "Void"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var fieldLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -213,7 +213,7 @@ class OpalFieldTest {
       "Void"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var fieldStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {

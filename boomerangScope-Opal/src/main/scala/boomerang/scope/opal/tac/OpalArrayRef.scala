@@ -17,13 +17,12 @@ package boomerang.scope.opal.tac
 import boomerang.scope._
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
-import org.opalj.br.ObjectType
 import org.opalj.tac.Expr
 
 class OpalArrayRef(
     val base: TacLocal,
     val indexExpr: Expr[TacLocal],
-    method: Method,
+    method: OpalMethod,
     unbalanced: ControlFlowGraph.Edge = null
 ) extends ArrayVal(method, unbalanced) {
 
@@ -31,11 +30,11 @@ class OpalArrayRef(
 
   override def getIndexExpr: Val = new OpalVal(indexExpr, method)
 
-  override def getType: Type = OpalType(base.asVar.valueInformation)
+  override def getType: Type = OpalType(base.asVar.valueInformation, method.project.classHierarchy)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalArrayRef(base, indexExpr, method, stmt)
 
-  override def withNewMethod(callee: Method): Val = new OpalArrayRef(base, indexExpr, callee)
+  override def withNewMethod(callee: Method): Val = new OpalArrayRef(base, indexExpr, callee.asInstanceOf[OpalMethod])
 
   override def getVariableName: String = s"$base[$indexExpr]"
 

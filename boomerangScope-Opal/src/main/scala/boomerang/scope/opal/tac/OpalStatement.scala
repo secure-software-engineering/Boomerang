@@ -21,7 +21,7 @@ import java.util.Objects
 import org.opalj.tac.PrimitiveTypecastExpr
 import org.opalj.tac.Stmt
 
-class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Statement(m) {
+class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extends Statement(opalMethod) {
 
   override def containsInvokeExpr(): Boolean = {
     if (delegate.isMethodCall) return true
@@ -36,20 +36,20 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
   override def getInvokeExpr: InvokeExpr = {
     if (containsInvokeExpr()) {
       if (delegate.isMethodCall) {
-        return new OpalMethodInvokeExpr(delegate.asMethodCall, m)
+        return new OpalMethodInvokeExpr(delegate.asMethodCall, opalMethod)
       }
 
       if (delegate.isAssignment && delegate.asAssignment.expr.isFunctionCall) {
         return new OpalFunctionInvokeExpr(
           delegate.asAssignment.expr.asFunctionCall,
-          m
+          opalMethod
         )
       }
 
       if (delegate.isExprStmt && delegate.asExprStmt.expr.isFunctionCall) {
         return new OpalFunctionInvokeExpr(
           delegate.asExprStmt.expr.asFunctionCall,
-          m
+          opalMethod
         )
       }
     }
@@ -64,6 +64,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       val fieldStore = delegate.asPutField
 
       return new OpalField(
+        opalMethod.project,
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
         fieldStore.name
@@ -74,6 +75,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       val fieldStore = delegate.asPutStatic
 
       return new OpalField(
+        opalMethod.project,
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
         fieldStore.name
@@ -111,6 +113,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
       val fieldLoad = delegate.asAssignment.expr.asGetField
 
       return new OpalField(
+        opalMethod.project,
         fieldLoad.declaringClass,
         fieldLoad.declaredFieldType,
         fieldLoad.name
@@ -144,7 +147,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
   override def getLeftOp: Val = {
     if (isAssignStmt) {
       if (delegate.isAssignment) {
-        return new OpalVal(delegate.asAssignment.targetVar, method)
+        return new OpalVal(delegate.asAssignment.targetVar, opalMethod)
       }
 
       if (isFieldStore) {
@@ -155,7 +158,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
           fieldStore.declaringClass,
           fieldStore.declaredFieldType,
           fieldStore.name,
-          method
+          opalMethod
         )
       }
 
@@ -163,7 +166,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         val base = delegate.asArrayStore.arrayRef
         val indexExpr = delegate.asArrayStore.index
 
-        return new OpalArrayRef(base.asVar, indexExpr, method)
+        return new OpalArrayRef(base.asVar, indexExpr, opalMethod)
       }
 
       if (isStaticFieldStore) {
@@ -173,7 +176,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
           staticFieldStore.declaringClass,
           staticFieldStore.declaredFieldType,
           staticFieldStore.name,
-          method
+          opalMethod
         )
       }
     }
@@ -194,7 +197,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
             getField.declaringClass,
             getField.declaredFieldType,
             getField.name,
-            method
+            opalMethod
           )
         }
 
@@ -202,7 +205,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
           val base = rightExpr.asArrayLoad.arrayRef
           val indexExpr = rightExpr.asArrayLoad.index
 
-          return new OpalArrayRef(base.asVar, indexExpr, method)
+          return new OpalArrayRef(base.asVar, indexExpr, opalMethod)
         }
 
         if (rightExpr.isGetStatic) {
@@ -212,29 +215,29 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
             staticFieldLoad.declaringClass,
             staticFieldLoad.declaredFieldType,
             staticFieldLoad.name,
-            method
+            opalMethod
           )
         }
 
-        return new OpalVal(rightExpr, method)
+        return new OpalVal(rightExpr, opalMethod)
       }
 
       if (isFieldStore) {
         val fieldStore = delegate.asPutField
 
-        return new OpalVal(fieldStore.value, method)
+        return new OpalVal(fieldStore.value, opalMethod)
       }
 
       if (isArrayStore) {
         val arrayStore = delegate.asArrayStore
 
-        return new OpalVal(arrayStore.value, method)
+        return new OpalVal(arrayStore.value, opalMethod)
       }
 
       if (isStaticFieldStore) {
         val staticFieldStore = delegate.asPutStatic
 
-        return new OpalVal(staticFieldStore.value, method)
+        return new OpalVal(staticFieldStore.value, opalMethod)
       }
     }
 
@@ -277,7 +280,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def getIfStmt: IfStatement = {
     if (isIfStmt) {
-      return new OpalIfStatement(delegate.asIf, m)
+      return new OpalIfStatement(delegate.asIf, opalMethod)
     }
 
     throw new RuntimeException("Statement is not an if-statement")
@@ -285,7 +288,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
 
   override def getReturnOp: Val = {
     if (isReturnStmt) {
-      return new OpalVal(delegate.asReturnValue.expr, method)
+      return new OpalVal(delegate.asReturnValue.expr, opalMethod)
     }
 
     throw new RuntimeException("Statement is not a return statement")
@@ -329,7 +332,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
         fieldStore.name,
-        method
+        opalMethod
       )
     }
 
@@ -345,7 +348,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         fieldLoad.declaringClass,
         fieldLoad.declaredFieldType,
         fieldLoad.name,
-        method
+        opalMethod
       )
     }
 
@@ -365,7 +368,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         staticFieldLoad.declaringClass,
         staticFieldLoad.declaredFieldType,
         staticFieldLoad.name,
-        method
+        opalMethod
       )
     }
 
@@ -376,7 +379,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
         staticFieldStore.declaringClass,
         staticFieldStore.declaredFieldType,
         staticFieldStore.name,
-        method
+        opalMethod
       )
     }
 
@@ -395,13 +398,13 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
     if (isArrayLoad) {
       val arrayLoad = delegate.asAssignment.expr.asArrayLoad
 
-      return new OpalArrayRef(arrayLoad.arrayRef.asVar, arrayLoad.index, method)
+      return new OpalArrayRef(arrayLoad.arrayRef.asVar, arrayLoad.index, opalMethod)
     }
 
     if (isArrayStore) {
       val arrayStore = delegate.asArrayStore
 
-      return new OpalArrayRef(arrayStore.arrayRef.asVar, arrayStore.index, method)
+      return new OpalArrayRef(arrayStore.arrayRef.asVar, arrayStore.index, opalMethod)
     }
 
     throw new RuntimeException(
@@ -410,11 +413,11 @@ class OpalStatement(val delegate: Stmt[TacLocal], m: OpalMethod) extends Stateme
   }
 
   override def getLineNumber: Int =
-    m.delegate.body.get.lineNumber(delegate.pc).getOrElse(-1)
+    opalMethod.delegate.body.get.lineNumber(delegate.pc).getOrElse(-1)
 
   override def isCatchStmt: Boolean = delegate.isCaughtException
 
-  override def hashCode: Int = Objects.hash(delegate, m)
+  override def hashCode: Int = Objects.hash(delegate, opalMethod)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalStatement =>

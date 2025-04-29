@@ -29,20 +29,21 @@ class OpalStaticFieldRef(
     val declaringClass: ObjectType,
     val fieldType: FieldType,
     val name: String,
-    method: Method,
+    method: OpalMethod,
     unbalanced: ControlFlowGraph.Edge = null
 ) extends StaticFieldVal(method, unbalanced) {
 
-  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClass)
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(method.project, declaringClass)
 
-  override def getField: Field = new OpalField(declaringClass, fieldType, name)
+  override def getField: Field = new OpalField(method.project, declaringClass, fieldType, name)
 
-  override def getType: Type = OpalType(fieldType)
+  override def getType: Type = OpalType(fieldType, method.project.classHierarchy)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
     new OpalStaticFieldRef(declaringClass, fieldType, name, method, stmt)
 
-  override def withNewMethod(callee: Method): Val = new OpalStaticFieldRef(declaringClass, fieldType, name, callee)
+  override def withNewMethod(callee: Method): Val =
+    new OpalStaticFieldRef(declaringClass, fieldType, name, callee.asInstanceOf[OpalMethod])
 
   override def getVariableName: String = s"${declaringClass.fqn}.$name"
 

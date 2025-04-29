@@ -40,12 +40,12 @@ class OpalInvokeExprTest {
     val signature =
       new MethodSignature(classOf[SingleTarget].getName, "getAndSetField", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
     opalMethod.getControlFlowGraph
 
     // Update the project's config to set the test method as the (single) entry point. See
     // https://github.com/opalj/opal/blob/ff01c1c9e696946a88b090a52881a41445cf07f1/DEVELOPING_OPAL/tools/src/main/scala/org/opalj/support/info/CallGraph.scala#L406
-    var config = OpalClient.project.get.config
+    var config = opalSetup.project.get.config
 
     val key = InitialEntryPointsKey.ConfigKeyPrefix + "entryPoints"
     val currentValues = config.getList(key).unwrapped
@@ -66,7 +66,7 @@ class OpalInvokeExprTest {
       )
     )
     val project = Project.recreate(
-      OpalClient.project.get,
+      opalSetup.project.get,
       config,
       useOldConfigAsFallback = true
     )
@@ -93,7 +93,7 @@ class OpalInvokeExprTest {
       "V"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod(opalSetup.project.get, method)
 
     var checked = false
     opalMethod.getStatements.forEach(stmt => {

@@ -14,14 +14,13 @@
  */
 package boomerang.scope.opal.tac
 
-import boomerang.scope.Method
 import boomerang.scope.Val
 import boomerang.scope.ValWithFalseVariable
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
 import org.opalj.tac.Expr
 
-class OpalDoubleVal(delegate: Expr[TacLocal], method: Method, val falseVal: Val)
+class OpalDoubleVal(delegate: Expr[TacLocal], method: OpalMethod, val falseVal: Val)
     extends OpalVal(delegate, method)
     with ValWithFalseVariable {
 

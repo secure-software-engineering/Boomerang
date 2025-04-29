@@ -19,8 +19,10 @@ import boomerang.scope.Type
 import java.util.Objects
 import org.opalj.br.FieldType
 import org.opalj.br.ObjectType
+import org.opalj.br.analyses.Project
 
 class OpalField(
+    project: Project[_],
     declaringClass: ObjectType,
     val fieldType: FieldType,
     val name: String
@@ -30,7 +32,7 @@ class OpalField(
 
   override def isInnerClassField: Boolean = declaringClass.fqn.contains("$")
 
-  override def getType: Type = OpalType(fieldType)
+  override def getType: Type = OpalType(fieldType, project.classHierarchy)
 
   override def getName: String = name
 

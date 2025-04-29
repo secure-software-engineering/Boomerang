@@ -17,14 +17,9 @@ package boomerang.scope.opal.tac
 import boomerang.scope.IfStatement
 import boomerang.scope.Statement
 import boomerang.scope.Val
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
-import org.opalj.tac.DUVar
-import org.opalj.tac.IdBasedVar
 import org.opalj.tac.If
-import org.opalj.tac.Var
-import org.opalj.value.ValueInformation
 
 class OpalIfStatement(val delegate: If[TacLocal], method: OpalMethod) extends IfStatement {
 

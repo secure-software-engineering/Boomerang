@@ -21,18 +21,18 @@ import org.opalj.tac._
 
 class OpalVal(
     val delegate: Expr[TacLocal],
-    method: Method,
+    method: OpalMethod,
     unbalanced: ControlFlowGraph.Edge = null
 ) extends Val(method, unbalanced) {
 
   override def getType: Type = delegate match {
-    case v: TacLocal => OpalType(v.valueInformation)
-    case nullExpr: NullExpr => OpalType(nullExpr.tpe)
-    case const: Const => OpalType(const.tpe)
-    case newExpr: New => OpalType(newExpr.tpe)
-    case newArrayExpr: NewArray[_] => OpalType(newArrayExpr.tpe)
+    case v: TacLocal => OpalType(v.valueInformation, method.project.classHierarchy)
+    case nullExpr: NullExpr => OpalType(nullExpr.tpe, method.project.classHierarchy)
+    case const: Const => OpalType(const.tpe, method.project.classHierarchy)
+    case newExpr: New => OpalType(newExpr.tpe, method.project.classHierarchy)
+    case newArrayExpr: NewArray[_] => OpalType(newArrayExpr.tpe, method.project.classHierarchy)
     case functionCall: FunctionCall[_] =>
-      new OpalType(functionCall.descriptor.returnType)
+      new OpalType(functionCall.descriptor.returnType, method.project.classHierarchy)
     case _ => throw new RuntimeException("Type not implemented yet")
   }
 
@@ -42,7 +42,7 @@ class OpalVal(
 
   override def getNewExprType: Type = {
     if (isNewExpr) {
-      return OpalType(delegate.asNew.tpe)
+      return OpalType(delegate.asNew.tpe, method.project.classHierarchy)
     }
 
     throw new RuntimeException("Value is not a new expression")
@@ -120,7 +120,7 @@ class OpalVal(
 
   override def getClassConstantType: Type = {
     if (isClassConstant) {
-      return OpalType(delegate.asClassConst.value)
+      return OpalType(delegate.asClassConst.value, method.project.classHierarchy)
     }
 
     throw new RuntimeException("Value is not a class constant")

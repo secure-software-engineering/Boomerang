@@ -18,18 +18,19 @@ import boomerang.scope.DeclaredMethod
 import boomerang.scope.InvokeExpr
 import boomerang.scope.Type
 import boomerang.scope.WrappedClass
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.OpalFrameworkScope
+import boomerang.scope.opal.transformation.TacLocal
 import boomerang.utils.MethodWrapper
 import java.util
+import java.util.Objects
 import org.opalj.br.MethodSignature
 import org.opalj.tac.Call
-import org.opalj.tac.Var
 import scala.jdk.CollectionConverters._
 
-case class OpalDeclaredMethod[+V <: Var[V]](
+case class OpalDeclaredMethod(
     invokeExpr: InvokeExpr,
-    delegate: Call[V]
+    delegate: Call[TacLocal],
+    method: OpalMethod
 ) extends DeclaredMethod(invokeExpr) {
 
   override def getSubSignature: String =
@@ -44,13 +45,14 @@ case class OpalDeclaredMethod[+V <: Var[V]](
     s"${delegate.declaringClass.toJava}.${delegate.name}"
   )
 
-  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(delegate.declaringClass.mostPreciseObjectType)
+  override def getDeclaringClass: WrappedClass =
+    new OpalWrappedClass(method.project, delegate.declaringClass.mostPreciseObjectType)
 
   override def getParameterTypes: util.List[Type] = {
     val result = new util.ArrayList[Type]()
 
     delegate.descriptor.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType))
+      result.add(OpalType(paramType, method.project.classHierarchy))
     })
 
     result
@@ -58,7 +60,7 @@ case class OpalDeclaredMethod[+V <: Var[V]](
 
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+  override def getReturnType: Type = OpalType(delegate.descriptor.returnType, method.project.classHierarchy)
 
   override def toMethodWrapper: MethodWrapper = new MethodWrapper(
     delegate.declaringClass.toJava,
@@ -66,6 +68,13 @@ case class OpalDeclaredMethod[+V <: Var[V]](
     delegate.descriptor.returnType.toJava,
     delegate.descriptor.parameterTypes.map(p => p.toJava).toList.asJava
   )
+
+  override def hashCode(): Int = Objects.hash(super.hashCode(), delegate)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalDeclaredMethod => super.equals(that) && this.delegate == that.delegate
+    case _ => false
+  }
 
   override def toString: String = delegate.descriptor.toJava
 }

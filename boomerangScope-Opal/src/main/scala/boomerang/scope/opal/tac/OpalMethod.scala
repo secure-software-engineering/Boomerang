@@ -15,13 +15,14 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.BoomerangTACode
 import boomerang.scope.opal.transformation.TacBodyBuilder
 import java.util
 import java.util.Objects
+import org.opalj.br.analyses.Project
 
 class OpalMethod private (
+    val project: Project[_],
     val delegate: org.opalj.br.Method,
     val tac: BoomerangTACode
 ) extends DefinedMethod {
@@ -44,7 +45,7 @@ class OpalMethod private (
     val result = new util.ArrayList[Type]()
 
     delegate.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType))
+      result.add(OpalType(paramType, project.classHierarchy))
     })
 
     result
@@ -52,7 +53,7 @@ class OpalMethod private (
 
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+  override def getReturnType: Type = OpalType(delegate.descriptor.returnType, project.classHierarchy)
 
   override def isThisLocal(fact: Val): Boolean = {
     if (isStatic) return false
@@ -114,6 +115,7 @@ class OpalMethod private (
   override def getStatements: util.List[Statement] = cfg.getStatements
 
   override def getDeclaringClass: WrappedClass = new OpalWrappedClass(
+    project,
     delegate.classFile.thisType
   )
 
@@ -137,9 +139,9 @@ class OpalMethod private (
 
 object OpalMethod {
 
-  def apply(delegate: org.opalj.br.Method): OpalMethod =
-    new OpalMethod(delegate, TacBodyBuilder(OpalClient.project.get, delegate))
+  def apply(project: Project[_], delegate: org.opalj.br.Method): OpalMethod =
+    new OpalMethod(project, delegate, TacBodyBuilder(project, delegate))
 
-  def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod =
-    new OpalMethod(delegate, tac)
+  def apply(project: Project[_], delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod =
+    new OpalMethod(project, delegate, tac)
 }
