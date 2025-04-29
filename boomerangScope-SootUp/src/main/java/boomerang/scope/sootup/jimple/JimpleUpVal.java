@@ -61,7 +61,7 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Type getType() {
-    return new JimpleUpType(method.getView(), delegate.getType());
+    return new JimpleUpType(delegate.getType(), method.getView());
   }
 
   @Override
@@ -79,7 +79,7 @@ public class JimpleUpVal extends Val {
     if (isNewExpr()) {
       JNewExpr newExpr = (JNewExpr) delegate;
 
-      return new JimpleUpType(method.getView(), newExpr.getType());
+      return new JimpleUpType(newExpr.getType(), method.getView());
     }
 
     throw new RuntimeException("Val is not a new expression");
@@ -200,7 +200,7 @@ public class JimpleUpVal extends Val {
   public Type getClassConstantType() {
     if (isClassConstant()) {
       ClassConstant constant = (ClassConstant) delegate;
-      return new JimpleUpType(method.getView(), constant.getType());
+      return new JimpleUpType(constant.getType(), method.getView());
     }
 
     throw new RuntimeException("Val is not a class constant");

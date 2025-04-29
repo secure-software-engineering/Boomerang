@@ -39,7 +39,7 @@ public class SootScopeTest {
 
     MethodSignature signature = new MethodSignature(ThisLocalTarget.class.getName(), "call");
     SootMethod method = sootSetup.resolveMethod(signature);
-    Method jimpleMethod = JimpleMethod.of(Scene.v(), method);
+    Method jimpleMethod = JimpleMethod.of(method, Scene.v());
 
     boolean checked = false;
     for (Statement stmt : jimpleMethod.getStatements()) {
@@ -70,7 +70,7 @@ public class SootScopeTest {
     MethodSignature noArgsSignature =
         new MethodSignature(ParameterLocalsTarget.class.getName(), "noParameters");
     SootMethod noArgs = sootSetup.resolveMethod(noArgsSignature);
-    Method noArgsMethod = JimpleMethod.of(Scene.v(), noArgs);
+    Method noArgsMethod = JimpleMethod.of(noArgs, Scene.v());
 
     Assert.assertTrue(noArgsMethod.getParameterLocals().isEmpty());
 
@@ -78,7 +78,7 @@ public class SootScopeTest {
     MethodSignature oneArgSignature =
         new MethodSignature(ParameterLocalsTarget.class.getName(), "oneParameter", List.of("int"));
     SootMethod oneArg = sootSetup.resolveMethod(oneArgSignature);
-    Method oneArgMethod = JimpleMethod.of(Scene.v(), oneArg);
+    Method oneArgMethod = JimpleMethod.of(oneArg, Scene.v());
 
     Assert.assertEquals(1, oneArgMethod.getParameterLocals().size());
     Assert.assertEquals("int", oneArgMethod.getParameterLocal(0).getType().toString());
@@ -90,7 +90,7 @@ public class SootScopeTest {
             "twoParameters",
             List.of("int", A.class.getName()));
     SootMethod twoArgs = sootSetup.resolveMethod(twoArgSignature);
-    Method twoArgsMethod = JimpleMethod.of(Scene.v(), twoArgs);
+    Method twoArgsMethod = JimpleMethod.of(twoArgs, Scene.v());
 
     Assert.assertEquals(2, twoArgsMethod.getParameterLocals().size());
     Assert.assertEquals("int", twoArgsMethod.getParameterLocal(0).getType().toString());
@@ -109,7 +109,7 @@ public class SootScopeTest {
             "parameterCall",
             List.of(A.class.getName(), "int"));
     SootMethod method = sootSetup.resolveMethod(signature);
-    Method jimpleMethod = JimpleMethod.of(Scene.v(), method);
+    Method jimpleMethod = JimpleMethod.of(method, Scene.v());
 
     Val firstArg = jimpleMethod.getParameterLocal(0);
     Val secondArg = jimpleMethod.getParameterLocal(1);

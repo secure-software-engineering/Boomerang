@@ -39,25 +39,25 @@ import soot.util.Chain;
  */
 public class JimpleMethod extends DefinedMethod {
 
-  private final Scene scene;
   private final SootMethod delegate;
+  private final Scene scene;
 
   protected static Interner<JimpleMethod> INTERNAL_POOL = Interners.newWeakInterner();
   protected ControlFlowGraph cfg;
   private List<Val> parameterLocalCache;
   private Collection<Val> localCache;
 
-  protected JimpleMethod(Scene scene, SootMethod delegate) {
-    this.scene = scene;
+  protected JimpleMethod(SootMethod delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
     if (!delegate.hasActiveBody()) {
       throw new RuntimeException(
           "Trying to build a Jimple method for " + delegate + " without active body present");
     }
   }
 
-  public static JimpleMethod of(Scene scene, SootMethod method) {
-    return INTERNAL_POOL.intern(new JimpleMethod(scene, method));
+  public static JimpleMethod of(SootMethod method, Scene scene) {
+    return INTERNAL_POOL.intern(new JimpleMethod(method, scene));
   }
 
   public Scene getScene() {
@@ -89,19 +89,19 @@ public class JimpleMethod extends DefinedMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(scene, type));
+      types.add(new JimpleType(type, scene));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(scene, delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), scene);
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(scene, delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), scene);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class JimpleMethod extends DefinedMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(scene, delegate.getDeclaringClass());
+    return new JimpleWrappedClass(delegate.getDeclaringClass(), scene);
   }
 
   @Override

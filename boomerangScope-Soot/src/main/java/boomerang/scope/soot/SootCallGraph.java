@@ -35,14 +35,14 @@ public class SootCallGraph extends CallGraph {
         continue;
       }
 
-      Statement callSite = JimpleStatement.create(e.srcStmt(), JimpleMethod.of(scene, e.src()));
+      Statement callSite = JimpleStatement.create(e.srcStmt(), JimpleMethod.of(e.src(), scene));
       if (callSite.containsInvokeExpr()) {
         // Distinguish between loaded methods and phantom methods to cover all existing edges
         Method target;
         if (e.tgt().hasActiveBody()) {
-          target = JimpleMethod.of(scene, e.tgt());
+          target = JimpleMethod.of(e.tgt(), scene);
         } else {
-          target = new JimplePhantomMethod(scene, e.tgt().makeRef());
+          target = new JimplePhantomMethod(e.tgt().makeRef(), scene);
         }
 
         LOGGER.trace("Call edge from {} to target method {}", callSite, e.tgt());
@@ -52,7 +52,7 @@ public class SootCallGraph extends CallGraph {
 
     for (SootMethod m : entryPoints) {
       if (m.hasActiveBody()) {
-        this.addEntryPoint(JimpleMethod.of(scene, m));
+        this.addEntryPoint(JimpleMethod.of(m, scene));
         LOGGER.trace("Added entry point: {}", m);
       }
     }

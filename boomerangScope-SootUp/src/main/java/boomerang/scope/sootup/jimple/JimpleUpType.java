@@ -31,12 +31,12 @@ import sootup.java.core.views.JavaView;
 
 public class JimpleUpType implements Type {
 
-  private final JavaView view;
   private final sootup.core.types.Type delegate;
+  private final JavaView view;
 
-  public JimpleUpType(JavaView view, sootup.core.types.Type delegate) {
-    this.view = view;
+  public JimpleUpType(sootup.core.types.Type delegate, JavaView view) {
     this.delegate = delegate;
+    this.view = view;
   }
 
   public sootup.core.types.Type getDelegate() {
@@ -63,7 +63,7 @@ public class JimpleUpType implements Type {
     if (isArrayType()) {
       ArrayType arrayType = (ArrayType) delegate;
 
-      return new JimpleUpType(view, arrayType.getBaseType());
+      return new JimpleUpType(arrayType.getBaseType(), view);
     }
 
     throw new RuntimeException("Type is not an array type: " + delegate);
@@ -72,7 +72,7 @@ public class JimpleUpType implements Type {
   @Override
   public WrappedClass getWrappedClass() {
     if (isRefType()) {
-      return new JimpleUpWrappedClass(view, (ClassType) delegate);
+      return new JimpleUpWrappedClass((ClassType) delegate, view);
     }
 
     throw new RuntimeException("Class of non reference type not available");

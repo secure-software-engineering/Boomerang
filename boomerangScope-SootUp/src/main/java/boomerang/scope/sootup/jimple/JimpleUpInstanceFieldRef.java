@@ -50,12 +50,12 @@ public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Field getField() {
-    return new JimpleUpField(method.getView(), delegate.getFieldSignature());
+    return new JimpleUpField(delegate.getFieldSignature(), method.getView());
   }
 
   @Override
   public Type getType() {
-    return new JimpleUpType(method.getView(), delegate.getType());
+    return new JimpleUpType(delegate.getType(), method.getView());
   }
 
   @Override

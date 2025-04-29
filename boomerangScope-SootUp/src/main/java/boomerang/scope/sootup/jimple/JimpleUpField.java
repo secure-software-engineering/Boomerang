@@ -22,12 +22,12 @@ import sootup.java.core.views.JavaView;
 
 public class JimpleUpField extends Field {
 
-  private final JavaView view;
   private final FieldSignature delegate;
+  private final JavaView view;
 
-  public JimpleUpField(JavaView view, FieldSignature delegate) {
-    this.view = view;
+  public JimpleUpField(FieldSignature delegate, JavaView view) {
     this.delegate = delegate;
+    this.view = view;
   }
 
   public FieldSignature getDelegate() {
@@ -46,7 +46,7 @@ public class JimpleUpField extends Field {
 
   @Override
   public Type getType() {
-    return new JimpleUpType(view, delegate.getType());
+    return new JimpleUpType(delegate.getType(), view);
   }
 
   @Override

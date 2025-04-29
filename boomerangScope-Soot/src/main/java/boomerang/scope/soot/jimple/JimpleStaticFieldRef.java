@@ -47,17 +47,17 @@ public class JimpleStaticFieldRef extends StaticFieldVal {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(method.getScene(), delegate.getField().getDeclaringClass());
+    return new JimpleWrappedClass(delegate.getField().getDeclaringClass(), method.getScene());
   }
 
   @Override
   public Field getField() {
-    return new JimpleField(method.getScene(), delegate.getFieldRef());
+    return new JimpleField(delegate.getFieldRef(), method.getScene());
   }
 
   @Override
   public Type getType() {
-    return new JimpleType(method.getScene(), delegate.getType());
+    return new JimpleType(delegate.getType(), method.getScene());
   }
 
   @Override

@@ -58,7 +58,7 @@ public class JimpleDeclaredMethod extends DeclaredMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(method.getScene(), delegate.getDeclaringClass());
+    return new JimpleWrappedClass(delegate.getDeclaringClass(), method.getScene());
   }
 
   @Override
@@ -66,19 +66,19 @@ public class JimpleDeclaredMethod extends DeclaredMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(method.getScene(), type));
+      types.add(new JimpleType(type, method.getScene()));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(method.getScene(), delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), method.getScene());
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(method.getScene(), delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), method.getScene());
   }
 
   @Override

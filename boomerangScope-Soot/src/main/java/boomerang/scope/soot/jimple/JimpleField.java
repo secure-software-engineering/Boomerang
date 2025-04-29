@@ -22,12 +22,12 @@ import soot.SootFieldRef;
 
 public class JimpleField extends Field {
 
-  private final Scene scene;
   private final SootFieldRef delegate;
+  private final Scene scene;
 
-  public JimpleField(Scene scene, SootFieldRef delegate) {
-    this.scene = scene;
+  public JimpleField(SootFieldRef delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
   }
 
   public SootFieldRef getDelegate() {
@@ -46,7 +46,7 @@ public class JimpleField extends Field {
 
   @Override
   public Type getType() {
-    return new JimpleType(scene, delegate.type());
+    return new JimpleType(delegate.type(), scene);
   }
 
   @Override

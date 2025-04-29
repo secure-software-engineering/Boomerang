@@ -68,14 +68,14 @@ public class JimpleStatement extends Statement {
     AssignStmt as = (AssignStmt) delegate;
     if (as.getLeftOp() instanceof StaticFieldRef) {
       StaticFieldRef staticFieldRef = (StaticFieldRef) as.getLeftOp();
-      return new JimpleField(method.getScene(), staticFieldRef.getFieldRef());
+      return new JimpleField(staticFieldRef.getFieldRef(), method.getScene());
     }
 
     if (as.getLeftOp() instanceof ArrayRef) {
       return Field.array(getArrayBase().getIndex());
     }
     InstanceFieldRef ifr = (InstanceFieldRef) as.getLeftOp();
-    return new JimpleField(method.getScene(), ifr.getFieldRef());
+    return new JimpleField(ifr.getFieldRef(), method.getScene());
   }
 
   @Override
@@ -101,7 +101,7 @@ public class JimpleStatement extends Statement {
       AssignStmt as = (AssignStmt) delegate;
       InstanceFieldRef ifr = (InstanceFieldRef) as.getRightOp();
 
-      return new JimpleField(method.getScene(), ifr.getFieldRef());
+      return new JimpleField(ifr.getFieldRef(), method.getScene());
     }
 
     throw new RuntimeException("Statement is not a field load statement");

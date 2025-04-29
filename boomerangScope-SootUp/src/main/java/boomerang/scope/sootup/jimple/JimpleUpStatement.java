@@ -74,8 +74,7 @@ public class JimpleUpStatement extends Statement {
     JAssignStmt assignStmt = (JAssignStmt) delegate;
     if (assignStmt.getLeftOp() instanceof JStaticFieldRef) {
       JStaticFieldRef staticFieldRef = (JStaticFieldRef) assignStmt.getLeftOp();
-
-      return new JimpleUpField(method.getView(), staticFieldRef.getFieldSignature());
+      return new JimpleUpField(staticFieldRef.getFieldSignature(), method.getView());
     }
 
     if (assignStmt.getLeftOp() instanceof JArrayRef) {
@@ -83,21 +82,18 @@ public class JimpleUpStatement extends Statement {
     }
 
     JInstanceFieldRef ifr = (JInstanceFieldRef) assignStmt.getLeftOp();
-
-    return new JimpleUpField(method.getView(), ifr.getFieldSignature());
+    return new JimpleUpField(ifr.getFieldSignature(), method.getView());
   }
 
   @Override
   public boolean isFieldWriteWithBase(Val base) {
     if (isFieldStore()) {
       IInstanceFieldRef fieldRef = getFieldStore();
-
       return fieldRef.getBase().equals(base);
     }
 
     if (isAssignStmt() && isArrayStore()) {
       IArrayRef arrayBase = getArrayBase();
-
       return arrayBase.getBase().equals(base);
     }
 
@@ -109,7 +105,7 @@ public class JimpleUpStatement extends Statement {
     JAssignStmt as = (JAssignStmt) delegate;
     JInstanceFieldRef ifr = (JInstanceFieldRef) as.getRightOp();
 
-    return new JimpleUpField(method.getView(), ifr.getFieldSignature());
+    return new JimpleUpField(ifr.getFieldSignature(), method.getView());
   }
 
   @Override

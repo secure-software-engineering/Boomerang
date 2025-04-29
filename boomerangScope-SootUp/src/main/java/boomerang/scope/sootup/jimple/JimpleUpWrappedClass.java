@@ -30,11 +30,11 @@ import sootup.java.core.views.JavaView;
 
 public class JimpleUpWrappedClass implements WrappedClass {
 
-  private final JavaView view;
   private final ClassType delegate;
+  private final JavaView view;
   private Collection<Method> methodsCache;
 
-  public JimpleUpWrappedClass(JavaView view, ClassType delegate) {
+  public JimpleUpWrappedClass(ClassType delegate, JavaView view) {
     this.view = view;
     this.delegate = delegate;
   }
@@ -53,7 +53,7 @@ public class JimpleUpWrappedClass implements WrappedClass {
       if (sootClass.isPresent()) {
         for (JavaSootMethod method : sootClass.get().getMethods()) {
           if (method.hasBody()) {
-            methodsCache.add(JimpleUpMethod.of(view, method));
+            methodsCache.add(JimpleUpMethod.of(method, view));
           }
         }
       }
@@ -78,7 +78,7 @@ public class JimpleUpWrappedClass implements WrappedClass {
         throw new RuntimeException("Super class type of " + superClassType + " is not present");
       }
 
-      return new JimpleUpWrappedClass(view, superClassType.get());
+      return new JimpleUpWrappedClass(superClassType.get(), view);
     }
 
     throw new RuntimeException("Class " + delegate + " has no super class");
@@ -86,7 +86,7 @@ public class JimpleUpWrappedClass implements WrappedClass {
 
   @Override
   public Type getType() {
-    return new JimpleUpType(view, delegate);
+    return new JimpleUpType(delegate, view);
   }
 
   @Override

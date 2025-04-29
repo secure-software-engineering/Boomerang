@@ -27,13 +27,13 @@ import soot.SootMethod;
 
 public class JimpleWrappedClass implements WrappedClass {
 
-  private final Scene scene;
   private final SootClass delegate;
+  private final Scene scene;
   private Collection<Method> methods;
 
-  public JimpleWrappedClass(Scene scene, SootClass delegate) {
-    this.scene = scene;
+  public JimpleWrappedClass(SootClass delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
   }
 
   public SootClass getDelegate() {
@@ -45,7 +45,7 @@ public class JimpleWrappedClass implements WrappedClass {
     if (methods == null) {
       methods = new LinkedHashSet<>();
       for (SootMethod m : ms) {
-        if (m.hasActiveBody()) methods.add(JimpleMethod.of(scene, m));
+        if (m.hasActiveBody()) methods.add(JimpleMethod.of(m, scene));
       }
     }
     return methods;
@@ -56,11 +56,11 @@ public class JimpleWrappedClass implements WrappedClass {
   }
 
   public WrappedClass getSuperclass() {
-    return new JimpleWrappedClass(scene, delegate.getSuperclass());
+    return new JimpleWrappedClass(delegate.getSuperclass(), scene);
   }
 
   public Type getType() {
-    return new JimpleType(scene, delegate.getType());
+    return new JimpleType(delegate.getType(), scene);
   }
 
   public boolean isApplicationClass() {

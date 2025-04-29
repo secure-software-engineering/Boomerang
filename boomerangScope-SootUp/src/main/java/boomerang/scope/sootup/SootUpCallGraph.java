@@ -58,15 +58,15 @@ public class SootUpCallGraph extends CallGraph {
               }
 
               Statement callSite =
-                  JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(view, sourceMethod));
-              this.addEdge(new Edge(callSite, JimpleUpMethod.of(view, targetMethod)));
+                  JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(sourceMethod, view));
+              this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetMethod, view)));
 
               LOGGER.trace("Added edge {} -> {}", callSite, targetMethod);
             });
 
     for (JavaSootMethod m : entryPoints) {
       if (m.hasBody()) {
-        this.addEntryPoint(JimpleUpMethod.of(view, m));
+        this.addEntryPoint(JimpleUpMethod.of(m, view));
         LOGGER.trace("Added entry point: {}", m);
       }
     }

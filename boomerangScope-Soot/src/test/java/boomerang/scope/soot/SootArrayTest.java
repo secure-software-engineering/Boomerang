@@ -35,7 +35,7 @@ public class SootArrayTest {
 
     MethodSignature signature = new MethodSignature(ArrayTarget.class.getName(), "arrayStoreIndex");
     SootMethod method = sootSetup.resolveMethod(signature);
-    Method jimpleMethod = JimpleMethod.of(Scene.v(), method);
+    Method jimpleMethod = JimpleMethod.of(method, Scene.v());
 
     int arrayStoreCount = 0;
     for (Statement stmt : jimpleMethod.getStatements()) {

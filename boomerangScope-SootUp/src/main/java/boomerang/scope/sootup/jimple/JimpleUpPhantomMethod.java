@@ -26,12 +26,12 @@ import sootup.java.core.views.JavaView;
 
 public class JimpleUpPhantomMethod extends PhantomMethod {
 
-  private final JavaView view;
   private final JavaSootMethod delegate;
+  private final JavaView view;
 
-  public JimpleUpPhantomMethod(JavaView view, JavaSootMethod delegate) {
-    this.view = view;
+  public JimpleUpPhantomMethod(JavaSootMethod delegate, JavaView view) {
     this.delegate = delegate;
+    this.view = view;
 
     if (delegate.hasBody()) {
       throw new IllegalArgumentException("Cannot build phantom method from method with body");
@@ -52,7 +52,7 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
     List<Type> result = new ArrayList<>();
 
     for (sootup.core.types.Type type : delegate.getParameterTypes()) {
-      result.add(new JimpleUpType(view, type));
+      result.add(new JimpleUpType(type, view));
     }
 
     return result;
@@ -60,12 +60,12 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleUpType(view, delegate.getParameterType(index));
+    return new JimpleUpType(delegate.getParameterType(index), view);
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(view, delegate.getReturnType());
+    return new JimpleUpType(delegate.getReturnType(), view);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleUpWrappedClass(view, delegate.getDeclaringClassType());
+    return new JimpleUpWrappedClass(delegate.getDeclaringClassType(), view);
   }
 
   @Override

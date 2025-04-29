@@ -32,12 +32,12 @@ import soot.SootClass;
 
 public class JimpleType implements Type {
 
-  private final Scene scene;
   private final soot.Type delegate;
+  private final Scene scene;
 
-  public JimpleType(Scene scene, soot.Type type) {
-    this.scene = scene;
+  public JimpleType(soot.Type type, Scene scene) {
     this.delegate = type;
+    this.scene = scene;
   }
 
   public soot.Type getDelegate() {
@@ -69,7 +69,7 @@ public class JimpleType implements Type {
     if (isArrayType()) {
       ArrayType arrayType = (ArrayType) delegate;
 
-      return new JimpleType(scene, arrayType.baseType);
+      return new JimpleType(arrayType.baseType, scene);
     }
 
     throw new RuntimeException("Type is not an array type: " + delegate);
@@ -78,7 +78,7 @@ public class JimpleType implements Type {
   @Override
   public WrappedClass getWrappedClass() {
     if (isRefType()) {
-      return new JimpleWrappedClass(scene, ((RefType) delegate).getSootClass());
+      return new JimpleWrappedClass(((RefType) delegate).getSootClass(), scene);
     }
 
     throw new RuntimeException("Class of non reference type is not available");

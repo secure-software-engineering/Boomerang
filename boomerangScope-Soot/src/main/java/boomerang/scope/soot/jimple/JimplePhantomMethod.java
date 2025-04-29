@@ -30,12 +30,12 @@ import soot.SootMethodRef;
  */
 public class JimplePhantomMethod extends PhantomMethod {
 
-  private final Scene scene;
   private final SootMethodRef delegate;
+  private final Scene scene;
 
-  public JimplePhantomMethod(Scene scene, SootMethodRef delegate) {
-    this.scene = scene;
+  public JimplePhantomMethod(SootMethodRef delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
   }
 
   public Scene getScene() {
@@ -56,19 +56,19 @@ public class JimplePhantomMethod extends PhantomMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(scene, type));
+      types.add(new JimpleType(type, scene));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(scene, delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), scene);
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(scene, delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), scene);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class JimplePhantomMethod extends PhantomMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(scene, delegate.getDeclaringClass());
+    return new JimpleWrappedClass(delegate.getDeclaringClass(), scene);
   }
 
   @Override

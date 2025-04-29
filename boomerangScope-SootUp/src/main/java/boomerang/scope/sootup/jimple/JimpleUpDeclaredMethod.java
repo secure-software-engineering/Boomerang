@@ -63,13 +63,13 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleUpWrappedClass(method.getView(), delegate.getDeclClassType());
+    return new JimpleUpWrappedClass(delegate.getDeclClassType(), method.getView());
   }
 
   @Override
   public List<Type> getParameterTypes() {
     return delegate.getParameterTypes().stream()
-        .map(p -> new JimpleUpType(method.getView(), p))
+        .map(p -> new JimpleUpType(p, method.getView()))
         .collect(Collectors.toList());
   }
 
@@ -80,7 +80,7 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(method.getView(), delegate.getType());
+    return new JimpleUpType(delegate.getType(), method.getView());
   }
 
   @Override

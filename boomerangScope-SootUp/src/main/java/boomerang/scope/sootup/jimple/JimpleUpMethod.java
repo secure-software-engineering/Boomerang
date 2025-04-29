@@ -36,16 +36,16 @@ public class JimpleUpMethod extends DefinedMethod {
 
   protected static Interner<JimpleUpMethod> INTERNAL_POOL = Interners.newWeakInterner();
 
-  private final JavaView view;
   private final JavaSootMethod delegate;
+  private final JavaView view;
   private final JimpleUpControlFlowGraph cfg;
 
   private Set<Val> localCache;
   private List<Val> parameterLocalCache;
 
-  protected JimpleUpMethod(JavaView view, JavaSootMethod delegate) {
-    this.view = view;
+  protected JimpleUpMethod(JavaSootMethod delegate, JavaView view) {
     this.delegate = delegate;
+    this.view = view;
 
     if (!delegate.hasBody()) {
       throw new RuntimeException("Trying to build a Jimple method without body present");
@@ -54,8 +54,8 @@ public class JimpleUpMethod extends DefinedMethod {
     cfg = new JimpleUpControlFlowGraph(this);
   }
 
-  public static JimpleUpMethod of(JavaView view, JavaSootMethod method) {
-    return INTERNAL_POOL.intern(new JimpleUpMethod(view, method));
+  public static JimpleUpMethod of(JavaSootMethod method, JavaView view) {
+    return INTERNAL_POOL.intern(new JimpleUpMethod(method, view));
   }
 
   public JavaView getView() {
@@ -84,7 +84,7 @@ public class JimpleUpMethod extends DefinedMethod {
     List<Type> result = new ArrayList<>();
 
     for (sootup.core.types.Type type : delegate.getParameterTypes()) {
-      result.add(new JimpleUpType(view, type));
+      result.add(new JimpleUpType(type, view));
     }
 
     return result;
@@ -92,12 +92,12 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleUpType(view, delegate.getParameterType(index));
+    return new JimpleUpType(delegate.getParameterType(index), view);
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(view, delegate.getReturnType());
+    return new JimpleUpType(delegate.getReturnType(), view);
   }
 
   @Override
@@ -150,7 +150,7 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleUpWrappedClass(view, delegate.getDeclaringClassType());
+    return new JimpleUpWrappedClass(delegate.getDeclaringClassType(), view);
   }
 
   @Override

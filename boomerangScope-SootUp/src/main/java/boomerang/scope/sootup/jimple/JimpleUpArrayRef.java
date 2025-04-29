@@ -67,7 +67,7 @@ public class JimpleUpArrayRef extends ArrayVal {
 
   @Override
   public Type getType() {
-    return new JimpleUpType(method.getView(), delegate.getType());
+    return new JimpleUpType(delegate.getType(), method.getView());
   }
 
   @Override
