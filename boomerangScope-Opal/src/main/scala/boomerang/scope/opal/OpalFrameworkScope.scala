@@ -37,10 +37,6 @@ class OpalFrameworkScope(
   override def getCallGraph: CallGraph = opalCallGraph
 
   override def getDataFlowScope: DataFlowScope = dataFlowScope
-
-  override def getTrueValue(m: Method): Val = ???
-
-  override def getFalseValue(m: Method): Val = ???
 }
 
 object OpalFrameworkScope {

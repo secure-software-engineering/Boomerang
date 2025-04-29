@@ -17,20 +17,8 @@ package boomerang.scope.wala;
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
-import boomerang.scope.Method;
-import boomerang.scope.Val;
 
 public class WalaFrameworkScope implements FrameworkScope {
-
-  @Override
-  public Val getTrueValue(Method m) {
-    throw new UnsupportedOperationException("implement me!");
-  }
-
-  @Override
-  public Val getFalseValue(Method m) {
-    throw new UnsupportedOperationException("implement me!");
-  }
 
   @Override
   public CallGraph getCallGraph() {

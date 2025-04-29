@@ -23,14 +23,9 @@ import org.opalj.tac.If
 
 class OpalIfStatement(val delegate: If[TacLocal], method: OpalMethod) extends IfStatement {
 
-  override def getTarget: Statement = {
-    /*val tac = OpalClient.getTacForMethod(method.delegate)
-    val target = delegate.targetStmt
+  override def getTarget: Statement = ???
 
-    new OpalStatement(tac.stmts(target), method)*/
-    ???
-  }
-
+  // TODO This requires a complete revisit because nobody knows what is happening here
   override def evaluate(otherVal: Val): IfStatement.Evaluation =
     IfStatement.Evaluation.UNKNOWN
 

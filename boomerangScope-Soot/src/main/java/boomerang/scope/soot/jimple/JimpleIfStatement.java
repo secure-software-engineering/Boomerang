@@ -43,6 +43,7 @@ public class JimpleIfStatement implements IfStatement {
 
   @Override
   public Evaluation evaluate(Val val) {
+    // TODO This requires a complete revisit because nobody knows what is happening here
     if (delegate.getCondition() instanceof EqExpr) {
       EqExpr eqExpr = (EqExpr) delegate.getCondition();
       Value op1 = eqExpr.getOp1();

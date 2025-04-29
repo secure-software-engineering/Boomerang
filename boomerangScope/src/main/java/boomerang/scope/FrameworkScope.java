@@ -19,8 +19,4 @@ public interface FrameworkScope {
   CallGraph getCallGraph();
 
   DataFlowScope getDataFlowScope();
-
-  Val getTrueValue(Method m);
-
-  Val getFalseValue(Method m);
 }

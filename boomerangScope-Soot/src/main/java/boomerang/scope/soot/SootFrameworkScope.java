@@ -17,15 +17,10 @@ package boomerang.scope.soot;
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
-import boomerang.scope.Method;
-import boomerang.scope.Val;
-import boomerang.scope.soot.jimple.JimpleMethod;
-import boomerang.scope.soot.jimple.JimpleVal;
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
 import soot.Scene;
 import soot.SootMethod;
-import soot.jimple.IntConstant;
 
 public class SootFrameworkScope implements FrameworkScope {
 
@@ -42,16 +37,6 @@ public class SootFrameworkScope implements FrameworkScope {
 
     this.sootCallGraph = new SootCallGraph(scene, callGraph, entryPoints);
     this.dataFlowScope = dataFlowScope;
-  }
-
-  @Override
-  public Val getTrueValue(Method m) {
-    return new JimpleVal(IntConstant.v(1), (JimpleMethod) m);
-  }
-
-  @Override
-  public Val getFalseValue(Method m) {
-    return new JimpleVal(IntConstant.v(0), (JimpleMethod) m);
   }
 
   @Override

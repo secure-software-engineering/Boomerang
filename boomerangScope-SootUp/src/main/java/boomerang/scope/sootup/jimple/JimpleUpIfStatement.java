@@ -44,6 +44,7 @@ public class JimpleUpIfStatement implements IfStatement {
 
   @Override
   public Evaluation evaluate(Val val) {
+    // TODO This requires a complete revisit because nobody knows what is happening here
     if (delegate.getCondition() instanceof JEqExpr) {
       JEqExpr eqExpr = (JEqExpr) delegate.getCondition();
 

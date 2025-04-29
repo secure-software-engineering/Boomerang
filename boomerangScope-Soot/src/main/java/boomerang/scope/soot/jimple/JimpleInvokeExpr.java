@@ -17,6 +17,7 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class JimpleInvokeExpr implements InvokeExpr {
   @Override
   public Val getArg(int index) {
     if (delegate.getArg(index) == null) {
-      return Val.zero();
+      return ValCollection.zero();
     }
     return new JimpleVal(delegate.getArg(index), method);
   }

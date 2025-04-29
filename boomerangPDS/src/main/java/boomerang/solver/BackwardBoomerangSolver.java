@@ -32,6 +32,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import com.google.common.collect.Multimap;
 import de.fraunhofer.iem.Location;
 import java.util.AbstractMap.SimpleEntry;
@@ -90,7 +91,9 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     Entry<INode<Node<Edge, Val>>, Field> e = new SimpleEntry<>(d, loc);
     if (!generatedFieldState.containsKey(e)) {
       generatedFieldState.put(
-          e, new GeneratedState<>(new SingleNode<>(new Node<>(epsilonStmt(), Val.zero())), loc));
+          e,
+          new GeneratedState<>(
+              new SingleNode<>(new Node<>(epsilonStmt(), ValCollection.zero())), loc));
     }
     return generatedFieldState.get(e);
   }

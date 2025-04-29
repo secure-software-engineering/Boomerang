@@ -17,13 +17,8 @@ package boomerang.scope.sootup;
 import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
-import boomerang.scope.Method;
-import boomerang.scope.Val;
-import boomerang.scope.sootup.jimple.JimpleUpMethod;
-import boomerang.scope.sootup.jimple.JimpleUpVal;
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
-import sootup.core.jimple.common.constant.IntConstant;
 import sootup.java.core.*;
 import sootup.java.core.views.JavaView;
 
@@ -44,18 +39,6 @@ public class SootUpFrameworkScope implements FrameworkScope {
     this.view = view;
     this.sootUpCallGraph = new SootUpCallGraph(view, callGraph, entryPoints);
     this.dataflowScope = dataFlowScope;
-  }
-
-  @Override
-  @NonNull
-  public Val getTrueValue(Method m) {
-    return new JimpleUpVal(IntConstant.getInstance(1), (JimpleUpMethod) m);
-  }
-
-  @Override
-  @NonNull
-  public Val getFalseValue(Method m) {
-    return new JimpleUpVal(IntConstant.getInstance(0), (JimpleUpMethod) m);
   }
 
   @Override
