@@ -18,12 +18,15 @@ import boomerang.scope.Field;
 import boomerang.scope.Type;
 import java.util.Objects;
 import sootup.core.signatures.FieldSignature;
+import sootup.java.core.views.JavaView;
 
 public class JimpleUpField extends Field {
 
+  private final JavaView view;
   private final FieldSignature delegate;
 
-  public JimpleUpField(FieldSignature delegate) {
+  public JimpleUpField(JavaView view, FieldSignature delegate) {
+    this.view = view;
     this.delegate = delegate;
   }
 
@@ -43,7 +46,7 @@ public class JimpleUpField extends Field {
 
   @Override
   public Type getType() {
-    return new JimpleUpType(delegate.getType());
+    return new JimpleUpType(view, delegate.getType());
   }
 
   @Override

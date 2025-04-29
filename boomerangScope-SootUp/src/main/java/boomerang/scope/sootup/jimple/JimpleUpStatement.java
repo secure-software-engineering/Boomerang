@@ -23,8 +23,9 @@ import boomerang.scope.InvokeExpr;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import com.google.common.base.Joiner;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
+import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JCaughtExceptionRef;
@@ -57,6 +58,10 @@ public class JimpleUpStatement extends Statement {
     return new JimpleUpStatement(delegate, method);
   }
 
+  public Stmt getDelegate() {
+    return delegate;
+  }
+
   @Override
   public boolean containsInvokeExpr() {
     return delegate.isInvokableStmt() && delegate.asInvokableStmt().containsInvokeExpr();
@@ -70,7 +75,7 @@ public class JimpleUpStatement extends Statement {
     if (assignStmt.getLeftOp() instanceof JStaticFieldRef) {
       JStaticFieldRef staticFieldRef = (JStaticFieldRef) assignStmt.getLeftOp();
 
-      return new JimpleUpField(staticFieldRef.getFieldSignature());
+      return new JimpleUpField(method.getView(), staticFieldRef.getFieldSignature());
     }
 
     if (assignStmt.getLeftOp() instanceof JArrayRef) {
@@ -79,7 +84,7 @@ public class JimpleUpStatement extends Statement {
 
     JInstanceFieldRef ifr = (JInstanceFieldRef) assignStmt.getLeftOp();
 
-    return new JimpleUpField(ifr.getFieldSignature());
+    return new JimpleUpField(method.getView(), ifr.getFieldSignature());
   }
 
   @Override
@@ -104,7 +109,7 @@ public class JimpleUpStatement extends Statement {
     JAssignStmt as = (JAssignStmt) delegate;
     JInstanceFieldRef ifr = (JInstanceFieldRef) as.getRightOp();
 
-    return new JimpleUpField(ifr.getFieldSignature());
+    return new JimpleUpField(method.getView(), ifr.getFieldSignature());
   }
 
   @Override
@@ -125,18 +130,50 @@ public class JimpleUpStatement extends Statement {
 
   @Override
   public Val getLeftOp() {
-    assert isAssignStmt();
+    if (isAssignStmt()) {
+      JAssignStmt assignStmt = (JAssignStmt) delegate;
+      Value leftOp = assignStmt.getLeftOp();
 
-    JAssignStmt assignStmt = (JAssignStmt) delegate;
-    return new JimpleUpVal(assignStmt.getLeftOp(), method);
+      if (leftOp instanceof JInstanceFieldRef) {
+        return new JimpleUpInstanceFieldRef((JInstanceFieldRef) leftOp, method);
+      }
+
+      if (leftOp instanceof JArrayRef) {
+        return new JimpleUpArrayRef((JArrayRef) leftOp, method);
+      }
+
+      if (leftOp instanceof JStaticFieldRef) {
+        return new JimpleUpStaticFieldRef((JStaticFieldRef) leftOp, method);
+      }
+
+      return new JimpleUpVal(assignStmt.getLeftOp(), method);
+    }
+
+    throw new RuntimeException("Statement is not an assign statement");
   }
 
   @Override
   public Val getRightOp() {
-    assert isAssignStmt();
+    if (isAssignStmt()) {
+      JAssignStmt assignStmt = (JAssignStmt) delegate;
+      Value rightOp = assignStmt.getRightOp();
 
-    JAssignStmt assignStmt = (JAssignStmt) delegate;
-    return new JimpleUpVal(assignStmt.getRightOp(), method);
+      if (rightOp instanceof JInstanceFieldRef) {
+        return new JimpleUpInstanceFieldRef((JInstanceFieldRef) rightOp, method);
+      }
+
+      if (rightOp instanceof JArrayRef) {
+        return new JimpleUpArrayRef((JArrayRef) rightOp, method);
+      }
+
+      if (rightOp instanceof JStaticFieldRef) {
+        return new JimpleUpStaticFieldRef((JStaticFieldRef) rightOp, method);
+      }
+
+      return new JimpleUpVal(assignStmt.getRightOp(), method);
+    }
+
+    throw new RuntimeException("Statement is not an assign statement");
   }
 
   @Override
@@ -315,25 +352,18 @@ public class JimpleUpStatement extends Statement {
         && ((JIdentityStmt) delegate).getRightOp() instanceof JCaughtExceptionRef;
   }
 
-  public Stmt getDelegate() {
-    return delegate;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleUpStatement that = (JimpleUpStatement) o;
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-
-    JimpleUpStatement other = (JimpleUpStatement) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override

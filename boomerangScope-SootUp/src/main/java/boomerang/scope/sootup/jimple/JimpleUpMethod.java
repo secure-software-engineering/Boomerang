@@ -29,20 +29,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import sootup.core.jimple.basic.Local;
-import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
-import sootup.java.core.types.JavaClassType;
+import sootup.java.core.views.JavaView;
 
 public class JimpleUpMethod extends DefinedMethod {
 
   protected static Interner<JimpleUpMethod> INTERNAL_POOL = Interners.newWeakInterner();
+
+  private final JavaView view;
   private final JavaSootMethod delegate;
   private final JimpleUpControlFlowGraph cfg;
 
   private Set<Val> localCache;
   private List<Val> parameterLocalCache;
 
-  protected JimpleUpMethod(JavaSootMethod delegate) {
+  protected JimpleUpMethod(JavaView view, JavaSootMethod delegate) {
+    this.view = view;
     this.delegate = delegate;
 
     if (!delegate.hasBody()) {
@@ -52,8 +54,12 @@ public class JimpleUpMethod extends DefinedMethod {
     cfg = new JimpleUpControlFlowGraph(this);
   }
 
-  public static JimpleUpMethod of(JavaSootMethod method) {
-    return INTERNAL_POOL.intern(new JimpleUpMethod(method));
+  public static JimpleUpMethod of(JavaView view, JavaSootMethod method) {
+    return INTERNAL_POOL.intern(new JimpleUpMethod(view, method));
+  }
+
+  public JavaView getView() {
+    return view;
   }
 
   public JavaSootMethod getDelegate() {
@@ -62,7 +68,7 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public boolean isStaticInitializer() {
-    return SootUpFrameworkScope.isStaticInitializer(delegate);
+    return delegate.getName().equals(SootUpFrameworkScope.STATIC_INITIALIZER_NAME);
   }
 
   @Override
@@ -78,7 +84,7 @@ public class JimpleUpMethod extends DefinedMethod {
     List<Type> result = new ArrayList<>();
 
     for (sootup.core.types.Type type : delegate.getParameterTypes()) {
-      result.add(new JimpleUpType(type));
+      result.add(new JimpleUpType(view, type));
     }
 
     return result;
@@ -86,12 +92,12 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleUpType(delegate.getParameterType(index));
+    return new JimpleUpType(view, delegate.getParameterType(index));
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(delegate.getReturnType());
+    return new JimpleUpType(view, delegate.getReturnType());
   }
 
   @Override
@@ -144,10 +150,7 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    JavaSootClass sootClass =
-        SootUpFrameworkScope.getInstance()
-            .getSootClass((JavaClassType) delegate.getDeclaringClassType());
-    return new JimpleUpWrappedClass(sootClass);
+    return new JimpleUpWrappedClass(view, delegate.getDeclaringClassType());
   }
 
   @Override
@@ -167,7 +170,7 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public boolean isConstructor() {
-    return SootUpFrameworkScope.isConstructor(delegate);
+    return delegate.getName().equals(SootUpFrameworkScope.CONSTRUCTOR_NAME);
   }
 
   @Override

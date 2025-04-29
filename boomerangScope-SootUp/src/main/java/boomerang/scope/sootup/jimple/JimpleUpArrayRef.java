@@ -16,7 +16,6 @@ package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.ArrayVal;
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
@@ -27,15 +26,18 @@ import sootup.core.jimple.common.ref.JArrayRef;
 public class JimpleUpArrayRef extends ArrayVal {
 
   private final JArrayRef delegate;
+  private final JimpleUpMethod method;
 
-  public JimpleUpArrayRef(JArrayRef delegate, Method method) {
+  public JimpleUpArrayRef(JArrayRef delegate, JimpleUpMethod method) {
     this(delegate, method, null);
   }
 
-  public JimpleUpArrayRef(JArrayRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+  public JimpleUpArrayRef(
+      JArrayRef delegate, JimpleUpMethod method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
+    this.method = method;
   }
 
   public JArrayRef getDelegate() {
@@ -44,12 +46,12 @@ public class JimpleUpArrayRef extends ArrayVal {
 
   @Override
   public Val getBase() {
-    return new JimpleUpVal(delegate.getBase(), m);
+    return new JimpleUpVal(delegate.getBase(), method);
   }
 
   @Override
   public Val getIndexExpr() {
-    return new JimpleUpVal(delegate.getIndex(), m);
+    return new JimpleUpVal(delegate.getIndex(), method);
   }
 
   @Override
@@ -65,12 +67,12 @@ public class JimpleUpArrayRef extends ArrayVal {
 
   @Override
   public Type getType() {
-    return new JimpleUpType(delegate.getType());
+    return new JimpleUpType(method.getView(), delegate.getType());
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleUpArrayRef(delegate, m, stmt);
+    return new JimpleUpArrayRef(delegate, method, stmt);
   }
 
   @Override

@@ -21,15 +21,16 @@ import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
-import sootup.java.core.types.JavaClassType;
+import sootup.java.core.views.JavaView;
 
 public class JimpleUpPhantomMethod extends PhantomMethod {
 
+  private final JavaView view;
   private final JavaSootMethod delegate;
 
-  public JimpleUpPhantomMethod(JavaSootMethod delegate) {
+  public JimpleUpPhantomMethod(JavaView view, JavaSootMethod delegate) {
+    this.view = view;
     this.delegate = delegate;
 
     if (delegate.hasBody()) {
@@ -51,7 +52,7 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
     List<Type> result = new ArrayList<>();
 
     for (sootup.core.types.Type type : delegate.getParameterTypes()) {
-      result.add(new JimpleUpType(type));
+      result.add(new JimpleUpType(view, type));
     }
 
     return result;
@@ -59,12 +60,12 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleUpType(delegate.getParameterType(index));
+    return new JimpleUpType(view, delegate.getParameterType(index));
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(delegate.getReturnType());
+    return new JimpleUpType(view, delegate.getReturnType());
   }
 
   @Override
@@ -74,10 +75,7 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    JavaSootClass declaringClass =
-        SootUpFrameworkScope.getInstance()
-            .getSootClass((JavaClassType) delegate.getDeclaringClassType());
-    return new JimpleUpWrappedClass(declaringClass);
+    return new JimpleUpWrappedClass(view, delegate.getDeclaringClassType());
   }
 
   @Override

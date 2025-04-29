@@ -21,53 +21,54 @@ import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
-import boomerang.scope.sootup.SootUpFrameworkScope;
 import java.util.Objects;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
-import sootup.java.core.JavaSootClass;
-import sootup.java.core.types.JavaClassType;
 
 public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
   private final JStaticFieldRef delegate;
+  private final JimpleUpMethod method;
 
-  public JimpleUpStaticFieldRef(JStaticFieldRef delegate, Method method) {
+  public JimpleUpStaticFieldRef(JStaticFieldRef delegate, JimpleUpMethod method) {
     this(delegate, method, null);
   }
 
   private JimpleUpStaticFieldRef(
-      JStaticFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+      JStaticFieldRef delegate, JimpleUpMethod method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
+    this.method = method;
   }
 
   @Override
   public WrappedClass getDeclaringClass() {
-    JavaSootClass sootClass =
-        SootUpFrameworkScope.getInstance()
-            .getSootClass((JavaClassType) delegate.getFieldSignature().getDeclClassType());
-    return new JimpleUpWrappedClass(sootClass);
+    return new JimpleUpWrappedClass(
+        method.getView(), delegate.getFieldSignature().getDeclClassType());
   }
 
   @Override
   public Field getField() {
-    return new JimpleUpField(delegate.getFieldSignature());
+    return new JimpleUpField(method.getView(), delegate.getFieldSignature());
   }
 
   @Override
   public Type getType() {
-    return new JimpleUpType(delegate.getType());
+    return new JimpleUpType(method.getView(), delegate.getType());
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleUpStaticFieldRef(delegate, m, stmt);
+    return new JimpleUpStaticFieldRef(delegate, method, stmt);
   }
 
   @Override
   public Val withNewMethod(Method callee) {
-    return new JimpleUpStaticFieldRef(delegate, callee);
+    if (callee instanceof JimpleUpMethod) {
+      return new JimpleUpStaticFieldRef(delegate, (JimpleUpMethod) callee);
+    }
+
+    throw new RuntimeException("Cannot apply method that is not a JimpleUpMethod");
   }
 
   @Override
@@ -91,6 +92,6 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
   @Override
   public String toString() {
-    return getVariableName();
+    return delegate.toString();
   }
 }

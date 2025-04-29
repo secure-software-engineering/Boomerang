@@ -17,7 +17,6 @@ package boomerang.scope.sootup.jimple;
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Field;
 import boomerang.scope.InstanceFieldVal;
-import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
@@ -26,16 +25,18 @@ import sootup.core.jimple.common.ref.JInstanceFieldRef;
 public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
   private final JInstanceFieldRef delegate;
+  private final JimpleUpMethod method;
 
-  public JimpleUpInstanceFieldRef(JInstanceFieldRef delegate, Method method) {
+  public JimpleUpInstanceFieldRef(JInstanceFieldRef delegate, JimpleUpMethod method) {
     this(delegate, method, null);
   }
 
   private JimpleUpInstanceFieldRef(
-      JInstanceFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+      JInstanceFieldRef delegate, JimpleUpMethod method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
+    this.method = method;
   }
 
   public JInstanceFieldRef getDelegate() {
@@ -44,22 +45,22 @@ public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Val getBase() {
-    return new JimpleUpVal(delegate.getBase(), m);
+    return new JimpleUpVal(delegate.getBase(), method);
   }
 
   @Override
   public Field getField() {
-    return new JimpleUpField(delegate.getFieldSignature());
+    return new JimpleUpField(method.getView(), delegate.getFieldSignature());
   }
 
   @Override
   public Type getType() {
-    return new JimpleUpType(delegate.getType());
+    return new JimpleUpType(method.getView(), delegate.getType());
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleUpInstanceFieldRef(delegate, m, stmt);
+    return new JimpleUpInstanceFieldRef(delegate, method, stmt);
   }
 
   @Override
