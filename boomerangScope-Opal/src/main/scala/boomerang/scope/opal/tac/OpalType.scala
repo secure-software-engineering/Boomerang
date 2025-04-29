@@ -18,11 +18,11 @@ import boomerang.scope.Type
 import boomerang.scope.Val
 import boomerang.scope.WrappedClass
 import java.util.Objects
-import org.opalj.br.ClassHierarchy
 import org.opalj.br.ObjectType
+import org.opalj.br.analyses.Project
 import org.opalj.value.ValueInformation
 
-class OpalType(val delegate: org.opalj.br.Type, classHierarchy: ClassHierarchy) extends Type {
+class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Type {
 
   override def isNullType: Boolean = false
 
@@ -30,14 +30,14 @@ class OpalType(val delegate: org.opalj.br.Type, classHierarchy: ClassHierarchy) 
 
   override def isArrayType: Boolean = delegate.isArrayType
 
-  override def getArrayBaseType: Type = new OpalType(delegate.asArrayType.componentType, classHierarchy)
+  override def getArrayBaseType: Type = new OpalType(delegate.asArrayType.componentType, project)
 
   override def getWrappedClass: WrappedClass = {
-    /*if (isRefType) {
-      return new OpalWrappedClass(delegate.asReferenceType.mostPreciseObjectType)
-    }*/
+    if (isRefType) {
+      return new OpalWrappedClass(delegate.asReferenceType.mostPreciseObjectType, project)
+    }
 
-    throw new UnsupportedOperationException("Not implemented yet")
+    throw new RuntimeException("Class of non reference type not available")
   }
 
   override def doesCastFail(targetValType: Type, target: Val): Boolean = {
@@ -63,7 +63,7 @@ class OpalType(val delegate: org.opalj.br.Type, classHierarchy: ClassHierarchy) 
       return false
     }
 
-    classHierarchy.isSubtypeOf(
+    project.classHierarchy.isSubtypeOf(
       delegate.asObjectType,
       ObjectType(otherType.replace(".", "/"))
     )
@@ -74,7 +74,7 @@ class OpalType(val delegate: org.opalj.br.Type, classHierarchy: ClassHierarchy) 
       return false
     }
 
-    classHierarchy.isSubtypeOf(
+    project.classHierarchy.isSubtypeOf(
       ObjectType(subType.replace(".", "/")),
       delegate.asObjectType
     )
@@ -94,12 +94,9 @@ class OpalType(val delegate: org.opalj.br.Type, classHierarchy: ClassHierarchy) 
 
 object OpalType {
 
-  def apply(fieldType: org.opalj.br.Type, classHierarchy: ClassHierarchy): Type =
-    new OpalType(fieldType, classHierarchy)
-
-  def apply(value: ValueInformation, classHierarchy: ClassHierarchy): Type = {
+  def valueInformationToType(value: ValueInformation, project: Project[_]): Type = {
     if (value.isPrimitiveValue) {
-      return new OpalType(value.asPrimitiveValue.primitiveType, classHierarchy)
+      return new OpalType(value.asPrimitiveValue.primitiveType, project)
     }
 
     if (value.isReferenceValue) {
@@ -107,15 +104,15 @@ object OpalType {
         if (value.asReferenceValue.isNull.isYes) {
           return OpalNullType
         } else {
-          return new OpalType(value.asReferenceValue.asReferenceType, classHierarchy)
+          return new OpalType(value.asReferenceValue.asReferenceType, project)
         }
       } else {
-        return new OpalType(value.asReferenceValue.upperTypeBound.head, classHierarchy)
+        return new OpalType(value.asReferenceValue.upperTypeBound.head, project)
       }
     }
 
     if (value.isVoid) {
-      return new OpalType(ObjectType.Void, classHierarchy)
+      return new OpalType(ObjectType.Void, project)
     }
 
     // TODO Array and illegal types (not sure if they ever occur)

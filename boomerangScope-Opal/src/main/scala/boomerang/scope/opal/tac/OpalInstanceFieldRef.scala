@@ -32,9 +32,9 @@ class OpalInstanceFieldRef(
 
   override def getBase: Val = new OpalVal(objRef, method)
 
-  override def getField: Field = new OpalField(method.project, declaringClass, fieldType, fieldName)
+  override def getField: Field = new OpalField(declaringClass, fieldType, fieldName, method.project)
 
-  override def getType: Type = OpalType(fieldType, method.project.classHierarchy)
+  override def getType: Type = new OpalType(fieldType, method.project)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
     new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, method, stmt)

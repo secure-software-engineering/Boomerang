@@ -22,17 +22,17 @@ import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 
 class OpalField(
-    project: Project[_],
     declaringClass: ObjectType,
     val fieldType: FieldType,
-    val name: String
+    val name: String,
+    project: Project[_]
 ) extends Field {
 
   override def isPredefinedField: Boolean = false
 
   override def isInnerClassField: Boolean = declaringClass.fqn.contains("$")
 
-  override def getType: Type = OpalType(fieldType, project.classHierarchy)
+  override def getType: Type = new OpalType(fieldType, project)
 
   override def getName: String = name
 

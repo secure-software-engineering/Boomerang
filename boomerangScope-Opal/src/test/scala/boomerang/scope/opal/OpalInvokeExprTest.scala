@@ -40,7 +40,7 @@ class OpalInvokeExprTest {
     val signature =
       new MethodSignature(classOf[SingleTarget].getName, "getAndSetField", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
     opalMethod.getControlFlowGraph
 
     // Update the project's config to set the test method as the (single) entry point. See
@@ -93,7 +93,7 @@ class OpalInvokeExprTest {
       "V"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var checked = false
     opalMethod.getStatements.forEach(stmt => {

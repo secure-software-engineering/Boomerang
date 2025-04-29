@@ -58,7 +58,7 @@ class OpalCallGraph(
 
     tacCode.statements.foreach(stmt => {
       val srcStatement =
-        new OpalStatement(stmt, OpalMethod(project, method.definedMethod, tacCode))
+        new OpalStatement(stmt, OpalMethod(method.definedMethod, tacCode, project))
 
       if (srcStatement.containsInvokeExpr()) {
         // Due to inlining variables, the PC's of statements and invoke expressions may differ
@@ -71,33 +71,33 @@ class OpalCallGraph(
               val method = definedMethod.definedMethod
 
               if (method.body.isDefined) {
-                val targetMethod = OpalMethod(project, method)
+                val targetMethod = OpalMethod(method, project)
 
                 addEdge(new Edge(srcStatement, targetMethod))
               } else {
                 val targetMethod = new OpalPhantomMethod(
-                  project,
                   definedMethod.declaringClassType,
                   definedMethod.name,
                   definedMethod.descriptor,
-                  method.isStatic
+                  method.isStatic,
+                  project
                 )
 
                 addEdge(new Edge(srcStatement, targetMethod))
               }
             case virtualMethod: VirtualDeclaredMethod =>
               val targetMethod = new OpalPhantomMethod(
-                project,
                 virtualMethod.declaringClassType,
                 virtualMethod.name,
                 virtualMethod.descriptor,
-                srcStatement.getInvokeExpr.isStaticInvokeExpr
+                srcStatement.getInvokeExpr.isStaticInvokeExpr,
+                project
               )
 
               addEdge(new Edge(srcStatement, targetMethod))
             case definedMethods: MultipleDefinedMethods =>
               definedMethods.foreachDefinedMethod(method => {
-                val targetMethod = OpalMethod(project, method)
+                val targetMethod = OpalMethod(method, project)
 
                 addEdge(new Edge(srcStatement, targetMethod))
               })
@@ -128,7 +128,7 @@ class OpalCallGraph(
 
   entryPoints.foreach(entryPoint => {
     if (entryPoint.body.isDefined) {
-      addEntryPoint(OpalMethod(project, entryPoint))
+      addEntryPoint(OpalMethod(entryPoint, project))
     }
   })
 }

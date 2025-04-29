@@ -39,7 +39,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -71,7 +71,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -99,7 +99,7 @@ class OpalArrayTest {
     val signature =
       new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreIndex", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var arrayStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -127,7 +127,7 @@ class OpalArrayTest {
     val signature =
       new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreVar", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var arrayStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {

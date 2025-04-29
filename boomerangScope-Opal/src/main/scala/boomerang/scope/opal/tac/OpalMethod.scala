@@ -22,9 +22,9 @@ import java.util.Objects
 import org.opalj.br.analyses.Project
 
 class OpalMethod private (
-    val project: Project[_],
     val delegate: org.opalj.br.Method,
-    val tac: BoomerangTACode
+    val tac: BoomerangTACode,
+    val project: Project[_]
 ) extends DefinedMethod {
 
   if (delegate.body.isEmpty) {
@@ -45,7 +45,7 @@ class OpalMethod private (
     val result = new util.ArrayList[Type]()
 
     delegate.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType, project.classHierarchy))
+      result.add(new OpalType(paramType, project))
     })
 
     result
@@ -53,7 +53,7 @@ class OpalMethod private (
 
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-  override def getReturnType: Type = OpalType(delegate.descriptor.returnType, project.classHierarchy)
+  override def getReturnType: Type = new OpalType(delegate.descriptor.returnType, project)
 
   override def isThisLocal(fact: Val): Boolean = {
     if (isStatic) return false
@@ -115,8 +115,8 @@ class OpalMethod private (
   override def getStatements: util.List[Statement] = cfg.getStatements
 
   override def getDeclaringClass: WrappedClass = new OpalWrappedClass(
-    project,
-    delegate.classFile.thisType
+    delegate.classFile.thisType,
+    project
   )
 
   override def getControlFlowGraph: ControlFlowGraph = cfg.get()
@@ -139,9 +139,9 @@ class OpalMethod private (
 
 object OpalMethod {
 
-  def apply(project: Project[_], delegate: org.opalj.br.Method): OpalMethod =
-    new OpalMethod(project, delegate, TacBodyBuilder(project, delegate))
+  def apply(delegate: org.opalj.br.Method, project: Project[_]): OpalMethod =
+    new OpalMethod(delegate, TacBodyBuilder(project, delegate), project)
 
-  def apply(project: Project[_], delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod =
-    new OpalMethod(project, delegate, tac)
+  def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode, project: Project[_]): OpalMethod =
+    new OpalMethod(delegate, tac, project)
 }

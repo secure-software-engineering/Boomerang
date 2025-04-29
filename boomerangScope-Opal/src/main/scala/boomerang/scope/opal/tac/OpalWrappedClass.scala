@@ -22,7 +22,7 @@ import java.util.Objects
 import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 
-class OpalWrappedClass(val project: Project[_], val delegate: ObjectType) extends WrappedClass {
+class OpalWrappedClass(val delegate: ObjectType, project: Project[_]) extends WrappedClass {
 
   override def getMethods: util.Set[Method] = {
     val classFile = project.classFile(delegate)
@@ -31,7 +31,7 @@ class OpalWrappedClass(val project: Project[_], val delegate: ObjectType) extend
       val methods = new util.HashSet[Method]
 
       classFile.get.methods.foreach(method => {
-        methods.add(OpalMethod(project, method))
+        methods.add(OpalMethod(method, project))
       })
 
       return methods
@@ -54,7 +54,7 @@ class OpalWrappedClass(val project: Project[_], val delegate: ObjectType) extend
     if (hasSuperclass) {
       val classFile = project.classFile(delegate).get
 
-      return new OpalWrappedClass(project, classFile.superclassType.get)
+      return new OpalWrappedClass(classFile.superclassType.get, project)
     }
 
     throw new RuntimeException(
@@ -62,7 +62,7 @@ class OpalWrappedClass(val project: Project[_], val delegate: ObjectType) extend
     )
   }
 
-  override def getType: Type = OpalType(delegate, project.classHierarchy)
+  override def getType: Type = new OpalType(delegate, project)
 
   override def isApplicationClass: Boolean = project.isProjectType(delegate)
 

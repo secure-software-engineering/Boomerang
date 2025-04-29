@@ -26,11 +26,11 @@ import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 
 class OpalPhantomMethod(
-    project: Project[_],
     val declaringClassType: ObjectType,
     val name: String,
     val descriptor: MethodDescriptor,
-    val static: Boolean
+    val static: Boolean,
+    project: Project[_]
 ) extends PhantomMethod {
 
   override def isStaticInitializer: Boolean =
@@ -40,22 +40,22 @@ class OpalPhantomMethod(
     val result = new util.ArrayList[Type]()
 
     descriptor.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType, project.classHierarchy))
+      result.add(new OpalType(paramType, project))
     })
 
     result
   }
 
-  override def getParameterType(index: Int): Type = OpalType(
+  override def getParameterType(index: Int): Type = new OpalType(
     descriptor.parameterType(index),
-    project.classHierarchy
+    project
   )
 
-  override def getReturnType: Type = OpalType(descriptor.returnType, project.classHierarchy)
+  override def getReturnType: Type = new OpalType(descriptor.returnType, project)
 
   override def isStatic: Boolean = static
 
-  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(project, declaringClassType)
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClassType, project)
 
   override def getSubSignature: String =
     MethodSignature(name, descriptor).toJava

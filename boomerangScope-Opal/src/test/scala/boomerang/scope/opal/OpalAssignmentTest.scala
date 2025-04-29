@@ -33,7 +33,7 @@ class OpalAssignmentTest {
       "V"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var arrayAllocationCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -66,7 +66,7 @@ class OpalAssignmentTest {
       "V"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var checked = false
     opalMethod.getStatements.forEach(stmt => {
@@ -100,7 +100,7 @@ class OpalAssignmentTest {
       "Void"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     var constantCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -147,7 +147,7 @@ class OpalAssignmentTest {
       "Void"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(opalSetup.project.get, method)
+    val opalMethod = OpalMethod(method, opalSetup.project.get)
 
     opalMethod.getStatements.forEach(stmt => {
       if (stmt.isFieldStore) {

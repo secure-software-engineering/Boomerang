@@ -64,10 +64,10 @@ class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extend
       val fieldStore = delegate.asPutField
 
       return new OpalField(
-        opalMethod.project,
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
-        fieldStore.name
+        fieldStore.name,
+        opalMethod.project
       )
     }
 
@@ -75,10 +75,10 @@ class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extend
       val fieldStore = delegate.asPutStatic
 
       return new OpalField(
-        opalMethod.project,
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
-        fieldStore.name
+        fieldStore.name,
+        opalMethod.project
       )
     }
 
@@ -113,10 +113,10 @@ class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extend
       val fieldLoad = delegate.asAssignment.expr.asGetField
 
       return new OpalField(
-        opalMethod.project,
         fieldLoad.declaringClass,
         fieldLoad.declaredFieldType,
-        fieldLoad.name
+        fieldLoad.name,
+        opalMethod.project
       )
     }
 

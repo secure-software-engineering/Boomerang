@@ -27,9 +27,9 @@ import org.opalj.br.MethodSignature
 import org.opalj.tac.Call
 import scala.jdk.CollectionConverters._
 
-case class OpalDeclaredMethod(
-    invokeExpr: InvokeExpr,
-    delegate: Call[TacLocal],
+class OpalDeclaredMethod(
+    val invokeExpr: InvokeExpr,
+    val delegate: Call[TacLocal],
     method: OpalMethod
 ) extends DeclaredMethod(invokeExpr) {
 
@@ -46,13 +46,13 @@ case class OpalDeclaredMethod(
   )
 
   override def getDeclaringClass: WrappedClass =
-    new OpalWrappedClass(method.project, delegate.declaringClass.mostPreciseObjectType)
+    new OpalWrappedClass(delegate.declaringClass.mostPreciseObjectType, method.project)
 
   override def getParameterTypes: util.List[Type] = {
     val result = new util.ArrayList[Type]()
 
     delegate.descriptor.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType, method.project.classHierarchy))
+      result.add(new OpalType(paramType, method.project))
     })
 
     result
@@ -60,7 +60,7 @@ case class OpalDeclaredMethod(
 
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-  override def getReturnType: Type = OpalType(delegate.descriptor.returnType, method.project.classHierarchy)
+  override def getReturnType: Type = new OpalType(delegate.descriptor.returnType, method.project)
 
   override def toMethodWrapper: MethodWrapper = new MethodWrapper(
     delegate.declaringClass.toJava,
@@ -69,7 +69,7 @@ case class OpalDeclaredMethod(
     delegate.descriptor.parameterTypes.map(p => p.toJava).toList.asJava
   )
 
-  override def hashCode(): Int = Objects.hash(super.hashCode(), delegate)
+  override def hashCode: Int = Objects.hash(super.hashCode(), delegate)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalDeclaredMethod => super.equals(that) && this.delegate == that.delegate

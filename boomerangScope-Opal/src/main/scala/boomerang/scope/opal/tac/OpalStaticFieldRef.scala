@@ -33,11 +33,11 @@ class OpalStaticFieldRef(
     unbalanced: ControlFlowGraph.Edge = null
 ) extends StaticFieldVal(method, unbalanced) {
 
-  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(method.project, declaringClass)
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClass, method.project)
 
-  override def getField: Field = new OpalField(method.project, declaringClass, fieldType, name)
+  override def getField: Field = new OpalField(declaringClass, fieldType, name, method.project)
 
-  override def getType: Type = OpalType(fieldType, method.project.classHierarchy)
+  override def getType: Type = new OpalType(fieldType, method.project)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
     new OpalStaticFieldRef(declaringClass, fieldType, name, method, stmt)
