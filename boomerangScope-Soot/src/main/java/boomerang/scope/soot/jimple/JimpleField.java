@@ -46,7 +46,7 @@ public class JimpleField extends Field {
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.type(), scene.getOrMakeFastHierarchy());
+    return new JimpleType(scene, delegate.type());
   }
 
   @Override

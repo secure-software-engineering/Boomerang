@@ -89,19 +89,19 @@ public class JimpleMethod extends DefinedMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type, scene.getOrMakeFastHierarchy()));
+      types.add(new JimpleType(scene, type));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index), scene.getOrMakeFastHierarchy());
+    return new JimpleType(scene, delegate.getParameterType(index));
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType(), scene.getOrMakeFastHierarchy());
+    return new JimpleType(scene, delegate.getReturnType());
   }
 
   @Override

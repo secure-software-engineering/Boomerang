@@ -60,7 +60,7 @@ public class JimpleWrappedClass implements WrappedClass {
   }
 
   public Type getType() {
-    return new JimpleType(delegate.getType(), scene.getOrMakeFastHierarchy());
+    return new JimpleType(scene, delegate.getType());
   }
 
   public boolean isApplicationClass() {

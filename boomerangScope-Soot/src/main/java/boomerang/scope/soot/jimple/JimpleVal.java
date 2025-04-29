@@ -54,7 +54,7 @@ public class JimpleVal extends Val {
 
   @Override
   public JimpleType getType() {
-    return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
+    return new JimpleType(method.getScene(), delegate.getType());
   }
 
   @Override
@@ -70,7 +70,7 @@ public class JimpleVal extends Val {
   @Override
   public Type getNewExprType() {
     if (isNewExpr()) {
-      return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
+      return new JimpleType(method.getScene(), delegate.getType());
     }
 
     throw new RuntimeException("Val is not a new expression");
@@ -226,7 +226,7 @@ public class JimpleVal extends Val {
     if (isClassConstant()) {
       ClassConstant constant = (ClassConstant) delegate;
 
-      return new JimpleType(constant.toSootType(), method.getScene().getOrMakeFastHierarchy());
+      return new JimpleType(method.getScene(), constant.toSootType());
     }
 
     throw new RuntimeException("Val is not a class constant");

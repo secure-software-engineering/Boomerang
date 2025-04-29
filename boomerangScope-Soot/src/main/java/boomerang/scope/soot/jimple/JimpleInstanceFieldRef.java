@@ -55,7 +55,7 @@ public class JimpleInstanceFieldRef extends InstanceFieldVal {
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
+    return new JimpleType(method.getScene(), delegate.getType());
   }
 
   @Override
