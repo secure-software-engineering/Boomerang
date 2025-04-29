@@ -69,11 +69,10 @@ jobs:
           fetch-depth: 0
 
       - name: Get latest tag
-        run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
       - name: Create GitHub release
         run: |
-          gh release create "$TAG"
+          gh release create ${{ env.tag }} --title ${{ env.tag }} --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.get_tag.outputs.tag }}
