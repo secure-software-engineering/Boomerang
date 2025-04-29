@@ -20,6 +20,7 @@ import boomerang.scope.WrappedClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import soot.Scene;
 import soot.SootMethod;
 import soot.SootMethodRef;
 
@@ -29,14 +30,20 @@ import soot.SootMethodRef;
  */
 public class JimplePhantomMethod extends PhantomMethod {
 
+  private final Scene scene;
   private final SootMethodRef delegate;
 
-  protected JimplePhantomMethod(SootMethodRef delegate) {
+  public JimplePhantomMethod(Scene scene, SootMethodRef delegate) {
+    this.scene = scene;
     this.delegate = delegate;
   }
 
-  public static JimplePhantomMethod of(SootMethodRef delegate) {
-    return new JimplePhantomMethod(delegate);
+  public Scene getScene() {
+    return scene;
+  }
+
+  public SootMethodRef getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -49,19 +56,19 @@ public class JimplePhantomMethod extends PhantomMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type));
+      types.add(new JimpleType(type, scene.getOrMakeFastHierarchy()));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), scene.getOrMakeFastHierarchy());
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), scene.getOrMakeFastHierarchy());
   }
 
   @Override
@@ -71,7 +78,7 @@ public class JimplePhantomMethod extends PhantomMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getDeclaringClass());
+    return new JimpleWrappedClass(scene, delegate.getDeclaringClass());
   }
 
   @Override

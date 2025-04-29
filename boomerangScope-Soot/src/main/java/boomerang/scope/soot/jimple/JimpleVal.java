@@ -21,7 +21,6 @@ import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
 import soot.Local;
-import soot.NullType;
 import soot.Value;
 import soot.jimple.ArrayRef;
 import soot.jimple.CastExpr;
@@ -39,20 +38,23 @@ import soot.jimple.StringConstant;
 public class JimpleVal extends Val {
 
   private final Value delegate;
+  private final JimpleMethod method;
 
-  public JimpleVal(Value delegate, Method m) {
-    this(delegate, m, null);
+  public JimpleVal(Value delegate, JimpleMethod method) {
+    this(delegate, method, null);
   }
 
-  protected JimpleVal(Value delegate, Method m, Edge unbalanced) {
-    super(m, unbalanced);
+  protected JimpleVal(Value delegate, JimpleMethod method, Edge unbalanced) {
+    super(method, unbalanced);
+
     if (delegate == null) throw new RuntimeException("Value must not be null!");
     this.delegate = delegate;
+    this.method = method;
   }
 
   @Override
   public JimpleType getType() {
-    return delegate == null ? new JimpleType(NullType.v()) : new JimpleType(delegate.getType());
+    return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
   }
 
   @Override
@@ -68,7 +70,7 @@ public class JimpleVal extends Val {
   @Override
   public Type getNewExprType() {
     if (isNewExpr()) {
-      return new JimpleType(delegate.getType());
+      return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
     }
 
     throw new RuntimeException("Val is not a new expression");
@@ -76,7 +78,7 @@ public class JimpleVal extends Val {
 
   @Override
   public Val asUnbalanced(Edge stmt) {
-    return new JimpleVal(delegate, m, stmt);
+    return new JimpleVal(delegate, method, stmt);
   }
 
   @Override
@@ -94,13 +96,13 @@ public class JimpleVal extends Val {
     if (delegate instanceof NewArrayExpr) {
       NewArrayExpr newArrayExpr = (NewArrayExpr) delegate;
 
-      return new JimpleVal(newArrayExpr.getSize(), m);
+      return new JimpleVal(newArrayExpr.getSize(), method);
     }
 
     if (delegate instanceof NewMultiArrayExpr) {
       NewMultiArrayExpr expr = (NewMultiArrayExpr) delegate;
 
-      return new JimpleVal(expr.getSize(0), m);
+      return new JimpleVal(expr.getSize(0), method);
     }
 
     throw new RuntimeException("Val is not an array allocation val");
@@ -134,7 +136,7 @@ public class JimpleVal extends Val {
   public Val getCastOp() {
     if (isCast()) {
       CastExpr cast = (CastExpr) delegate;
-      return new JimpleVal(cast.getOp(), m);
+      return new JimpleVal(cast.getOp(), method);
     }
 
     throw new RuntimeException("Val is not a cast expression");
@@ -150,7 +152,7 @@ public class JimpleVal extends Val {
     if (isArrayRef()) {
       ArrayRef arrayRef = (ArrayRef) delegate;
 
-      return new JimpleArrayRef(arrayRef, m);
+      return new JimpleArrayRef(arrayRef, method);
     }
 
     throw new RuntimeException("Val is not an array ref");
@@ -165,7 +167,7 @@ public class JimpleVal extends Val {
   public Val getInstanceOfOp() {
     if (isInstanceOfExpr()) {
       InstanceOfExpr val = (InstanceOfExpr) delegate;
-      return new JimpleVal(val.getOp(), m);
+      return new JimpleVal(val.getOp(), method);
     }
 
     throw new RuntimeException("Val is not an instanceOf operator");
@@ -180,7 +182,7 @@ public class JimpleVal extends Val {
   public Val getLengthOp() {
     if (isLengthExpr()) {
       LengthExpr val = (LengthExpr) delegate;
-      return new JimpleVal(val.getOp(), m);
+      return new JimpleVal(val.getOp(), method);
     }
 
     throw new RuntimeException("Val is not a length expression");
@@ -222,7 +224,9 @@ public class JimpleVal extends Val {
   @Override
   public Type getClassConstantType() {
     if (isClassConstant()) {
-      return new JimpleType(((ClassConstant) delegate).toSootType());
+      ClassConstant constant = (ClassConstant) delegate;
+
+      return new JimpleType(constant.toSootType(), method.getScene().getOrMakeFastHierarchy());
     }
 
     throw new RuntimeException("Val is not a class constant");
@@ -235,7 +239,7 @@ public class JimpleVal extends Val {
 
   @Override
   public Val withSecondVal(Val leftOp) {
-    return new JimpleDoubleVal(delegate, m, leftOp);
+    return new JimpleDoubleVal(delegate, method, leftOp);
   }
 
   @Override

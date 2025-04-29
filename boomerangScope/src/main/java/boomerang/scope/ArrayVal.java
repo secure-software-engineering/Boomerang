@@ -121,6 +121,11 @@ public abstract class ArrayVal extends Val implements IArrayRef {
   }
 
   @Override
+  public Val withNewMethod(Method callee) {
+    throw new RuntimeException("Only allowed for static fields");
+  }
+
+  @Override
   public boolean isLongConstant() {
     return false;
   }

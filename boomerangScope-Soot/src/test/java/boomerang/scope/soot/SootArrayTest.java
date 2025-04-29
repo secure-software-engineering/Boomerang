@@ -23,6 +23,7 @@ import boomerang.scope.test.MethodSignature;
 import boomerang.scope.test.targets.ArrayTarget;
 import org.junit.Assert;
 import org.junit.Test;
+import soot.Scene;
 import soot.SootMethod;
 
 public class SootArrayTest {
@@ -34,7 +35,7 @@ public class SootArrayTest {
 
     MethodSignature signature = new MethodSignature(ArrayTarget.class.getName(), "arrayStoreIndex");
     SootMethod method = sootSetup.resolveMethod(signature);
-    Method jimpleMethod = JimpleMethod.of(method);
+    Method jimpleMethod = JimpleMethod.of(Scene.v(), method);
 
     int arrayStoreCount = 0;
     for (Statement stmt : jimpleMethod.getStatements()) {

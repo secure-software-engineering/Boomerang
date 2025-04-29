@@ -126,8 +126,7 @@ class OpalVal(
     throw new RuntimeException("Value is not a class constant")
   }
 
-  override def withNewMethod(callee: Method): Val =
-    new OpalVal(delegate, callee.asInstanceOf[OpalMethod])
+  override def withNewMethod(callee: Method): Val = throw new RuntimeException("Only allowed for static fields")
 
   override def withSecondVal(secondVal: Val) =
     new OpalDoubleVal(delegate, method, secondVal)

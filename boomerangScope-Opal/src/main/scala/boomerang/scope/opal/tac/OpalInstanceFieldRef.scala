@@ -39,9 +39,6 @@ class OpalInstanceFieldRef(
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val =
     new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, method, stmt)
 
-  override def withNewMethod(callee: Method): Val =
-    new OpalInstanceFieldRef(objRef, declaringClass, fieldType, fieldName, callee.asInstanceOf[OpalMethod])
-
   override def getVariableName: String = s"$objRef.$fieldName"
 
   override def hashCode: Int = Objects.hash(super.hashCode(), objRef, declaringClass, fieldType, fieldName)

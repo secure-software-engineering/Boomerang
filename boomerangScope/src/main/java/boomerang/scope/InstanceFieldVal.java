@@ -121,6 +121,11 @@ public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef 
   }
 
   @Override
+  public Val withNewMethod(Method callee) {
+    throw new RuntimeException("Only allowed for static fields");
+  }
+
+  @Override
   public boolean isLongConstant() {
     return false;
   }

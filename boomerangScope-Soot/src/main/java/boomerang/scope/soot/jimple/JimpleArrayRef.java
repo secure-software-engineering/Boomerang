@@ -16,7 +16,6 @@ package boomerang.scope.soot.jimple;
 
 import boomerang.scope.ArrayVal;
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
@@ -27,15 +26,17 @@ import soot.jimple.IntConstant;
 public class JimpleArrayRef extends ArrayVal {
 
   private final ArrayRef delegate;
+  private final JimpleMethod method;
 
-  public JimpleArrayRef(ArrayRef delegate, Method method) {
+  public JimpleArrayRef(ArrayRef delegate, JimpleMethod method) {
     this(delegate, method, null);
   }
 
-  private JimpleArrayRef(ArrayRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+  private JimpleArrayRef(ArrayRef delegate, JimpleMethod method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
+    this.method = method;
   }
 
   public ArrayRef getDelegate() {
@@ -44,12 +45,12 @@ public class JimpleArrayRef extends ArrayVal {
 
   @Override
   public Val getBase() {
-    return new JimpleVal(delegate.getBase(), m);
+    return new JimpleVal(delegate.getBase(), method);
   }
 
   @Override
   public Val getIndexExpr() {
-    return new JimpleVal(delegate.getIndex(), m);
+    return new JimpleVal(delegate.getIndex(), method);
   }
 
   @Override
@@ -65,17 +66,12 @@ public class JimpleArrayRef extends ArrayVal {
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.getType());
+    return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleArrayRef(delegate, m, stmt);
-  }
-
-  @Override
-  public Val withNewMethod(Method callee) {
-    return new JimpleArrayRef(delegate, callee);
+    return new JimpleArrayRef(delegate, method, stmt);
   }
 
   @Override

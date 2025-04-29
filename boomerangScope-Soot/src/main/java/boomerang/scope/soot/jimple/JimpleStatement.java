@@ -20,7 +20,6 @@ import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.IStaticFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
-import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import com.google.common.base.Joiner;
@@ -44,19 +43,19 @@ import soot.jimple.ThrowStmt;
 public class JimpleStatement extends Statement {
 
   private final Stmt delegate;
-  private final Method method;
+  private final JimpleMethod method;
 
-  private JimpleStatement(Stmt delegate, Method m) {
-    super(m);
+  private JimpleStatement(Stmt delegate, JimpleMethod method) {
+    super(method);
     if (delegate == null) {
       throw new RuntimeException("Invalid, parameter may not be null");
     }
     this.delegate = delegate;
-    this.method = m;
+    this.method = method;
   }
 
-  public static Statement create(Stmt delegate, Method m) {
-    return new JimpleStatement(delegate, m);
+  public static Statement create(Stmt delegate, JimpleMethod method) {
+    return new JimpleStatement(delegate, method);
   }
 
   @Override
@@ -69,14 +68,14 @@ public class JimpleStatement extends Statement {
     AssignStmt as = (AssignStmt) delegate;
     if (as.getLeftOp() instanceof StaticFieldRef) {
       StaticFieldRef staticFieldRef = (StaticFieldRef) as.getLeftOp();
-      return new JimpleField(staticFieldRef.getFieldRef());
+      return new JimpleField(method.getScene(), staticFieldRef.getFieldRef());
     }
 
     if (as.getLeftOp() instanceof ArrayRef) {
       return Field.array(getArrayBase().getIndex());
     }
     InstanceFieldRef ifr = (InstanceFieldRef) as.getLeftOp();
-    return new JimpleField(ifr.getFieldRef());
+    return new JimpleField(method.getScene(), ifr.getFieldRef());
   }
 
   @Override
@@ -102,7 +101,7 @@ public class JimpleStatement extends Statement {
       AssignStmt as = (AssignStmt) delegate;
       InstanceFieldRef ifr = (InstanceFieldRef) as.getRightOp();
 
-      return new JimpleField(ifr.getFieldRef());
+      return new JimpleField(method.getScene(), ifr.getFieldRef());
     }
 
     throw new RuntimeException("Statement is not a field load statement");

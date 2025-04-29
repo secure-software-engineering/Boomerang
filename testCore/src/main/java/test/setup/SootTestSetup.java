@@ -104,7 +104,7 @@ public class SootTestSetup implements TestSetup {
 
   @Override
   public Method getTestMethod() {
-    return JimpleMethod.of(testMethod);
+    return JimpleMethod.of(Scene.v(), testMethod);
   }
 
   @Override

@@ -17,13 +17,16 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.Field;
 import boomerang.scope.Type;
 import java.util.Objects;
+import soot.Scene;
 import soot.SootFieldRef;
 
 public class JimpleField extends Field {
 
+  private final Scene scene;
   private final SootFieldRef delegate;
 
-  public JimpleField(SootFieldRef delegate) {
+  public JimpleField(Scene scene, SootFieldRef delegate) {
+    this.scene = scene;
     this.delegate = delegate;
   }
 
@@ -43,7 +46,7 @@ public class JimpleField extends Field {
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.type());
+    return new JimpleType(delegate.type(), scene.getOrMakeFastHierarchy());
   }
 
   @Override

@@ -34,8 +34,6 @@ class OpalArrayRef(
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalArrayRef(base, indexExpr, method, stmt)
 
-  override def withNewMethod(callee: Method): Val = new OpalArrayRef(base, indexExpr, callee.asInstanceOf[OpalMethod])
-
   override def getVariableName: String = s"$base[$indexExpr]"
 
   override def getIndex: Int = if (indexExpr.isIntConst) indexExpr.asIntConst.value else -1

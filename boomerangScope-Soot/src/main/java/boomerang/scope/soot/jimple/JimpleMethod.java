@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import soot.Local;
+import soot.Scene;
 import soot.SootMethod;
 import soot.util.Chain;
 
@@ -38,6 +39,7 @@ import soot.util.Chain;
  */
 public class JimpleMethod extends DefinedMethod {
 
+  private final Scene scene;
   private final SootMethod delegate;
 
   protected static Interner<JimpleMethod> INTERNAL_POOL = Interners.newWeakInterner();
@@ -45,7 +47,8 @@ public class JimpleMethod extends DefinedMethod {
   private List<Val> parameterLocalCache;
   private Collection<Val> localCache;
 
-  protected JimpleMethod(SootMethod delegate) {
+  protected JimpleMethod(Scene scene, SootMethod delegate) {
+    this.scene = scene;
     this.delegate = delegate;
     if (!delegate.hasActiveBody()) {
       throw new RuntimeException(
@@ -53,8 +56,12 @@ public class JimpleMethod extends DefinedMethod {
     }
   }
 
-  public static JimpleMethod of(SootMethod m) {
-    return INTERNAL_POOL.intern(new JimpleMethod(m));
+  public static JimpleMethod of(Scene scene, SootMethod method) {
+    return INTERNAL_POOL.intern(new JimpleMethod(scene, method));
+  }
+
+  public Scene getScene() {
+    return scene;
   }
 
   public SootMethod getDelegate() {
@@ -82,19 +89,19 @@ public class JimpleMethod extends DefinedMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type));
+      types.add(new JimpleType(type, scene.getOrMakeFastHierarchy()));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), scene.getOrMakeFastHierarchy());
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), scene.getOrMakeFastHierarchy());
   }
 
   @Override
@@ -148,7 +155,7 @@ public class JimpleMethod extends DefinedMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getDeclaringClass());
+    return new JimpleWrappedClass(scene, delegate.getDeclaringClass());
   }
 
   @Override

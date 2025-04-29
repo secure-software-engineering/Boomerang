@@ -63,11 +63,6 @@ public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
   }
 
   @Override
-  public Val withNewMethod(Method callee) {
-    return new JimpleUpInstanceFieldRef(delegate, callee);
-  }
-
-  @Override
   public String getVariableName() {
     return delegate.toString();
   }

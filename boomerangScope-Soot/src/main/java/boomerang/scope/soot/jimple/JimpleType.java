@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 import soot.ArrayType;
 import soot.BooleanType;
+import soot.FastHierarchy;
 import soot.NullType;
 import soot.PrimType;
 import soot.RefType;
@@ -33,9 +34,15 @@ import soot.SootClass;
 public class JimpleType implements Type {
 
   private final soot.Type delegate;
+  private final FastHierarchy hierarchy;
 
-  public JimpleType(soot.Type type) {
+  public JimpleType(soot.Type type, FastHierarchy hierarchy) {
     this.delegate = type;
+    this.hierarchy = hierarchy;
+  }
+
+  public soot.Type getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -60,16 +67,19 @@ public class JimpleType implements Type {
 
   @Override
   public Type getArrayBaseType() {
-    return new JimpleType(((ArrayType) delegate).baseType);
+    if (isArrayType()) {
+      ArrayType arrayType = (ArrayType) delegate;
+
+      return new JimpleType(arrayType.baseType, hierarchy);
+    }
+
+    throw new RuntimeException("Type is not an array type: " + delegate);
   }
 
   @Override
   public WrappedClass getWrappedClass() {
-    return new JimpleWrappedClass(((RefType) delegate).getSootClass());
-  }
-
-  public soot.Type getDelegate() {
-    return delegate;
+    // return new JimpleWrappedClass(((RefType) delegate).getSootClass());
+    throw new UnsupportedOperationException("Needs reimplementation of resolution strategy");
   }
 
   @Override
@@ -79,7 +89,7 @@ public class JimpleType implements Type {
     if (targetType.getSootClass().isPhantom() || sourceType.getSootClass().isPhantom())
       return false;
     if (target instanceof AllocVal && ((AllocVal) target).getAllocVal().isNewExpr()) {
-      boolean castFails = Scene.v().getOrMakeFastHierarchy().canStoreType(targetType, sourceType);
+      boolean castFails = hierarchy.canStoreType(targetType, sourceType);
       return !castFails;
     }
     // TODO this line is necessary as canStoreType does not properly work for
@@ -88,7 +98,7 @@ public class JimpleType implements Type {
       return false;
     }
     boolean castFails =
-        Scene.v().getOrMakeFastHierarchy().canStoreType(targetType, sourceType)
+        hierarchy.canStoreType(targetType, sourceType)
             || Scene.v().getOrMakeFastHierarchy().canStoreType(sourceType, targetType);
     return !castFails;
   }

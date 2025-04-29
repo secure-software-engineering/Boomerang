@@ -27,16 +27,18 @@ import soot.jimple.StaticFieldRef;
 public class JimpleStaticFieldRef extends StaticFieldVal {
 
   private final StaticFieldRef delegate;
+  private final JimpleMethod method;
 
-  public JimpleStaticFieldRef(StaticFieldRef delegate, Method method) {
+  public JimpleStaticFieldRef(StaticFieldRef delegate, JimpleMethod method) {
     this(delegate, method, null);
   }
 
   private JimpleStaticFieldRef(
-      StaticFieldRef delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+      StaticFieldRef delegate, JimpleMethod method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
 
     this.delegate = delegate;
+    this.method = method;
   }
 
   public StaticFieldRef getDelegate() {
@@ -45,27 +47,31 @@ public class JimpleStaticFieldRef extends StaticFieldVal {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getField().getDeclaringClass());
+    return new JimpleWrappedClass(method.getScene(), delegate.getField().getDeclaringClass());
   }
 
   @Override
   public Field getField() {
-    return new JimpleField(delegate.getFieldRef());
+    return new JimpleField(method.getScene(), delegate.getFieldRef());
   }
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.getType());
+    return new JimpleType(delegate.getType(), method.getScene().getOrMakeFastHierarchy());
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleStaticFieldRef(delegate, m, stmt);
+    return new JimpleStaticFieldRef(delegate, method, stmt);
   }
 
   @Override
   public Val withNewMethod(Method callee) {
-    return new JimpleStaticFieldRef(delegate, callee);
+    if (callee instanceof JimpleMethod) {
+      return new JimpleStaticFieldRef(delegate, (JimpleMethod) callee);
+    }
+
+    throw new RuntimeException("Cannot apply method that is not a JimpleMethod");
   }
 
   @Override
@@ -89,6 +95,6 @@ public class JimpleStaticFieldRef extends StaticFieldVal {
 
   @Override
   public String toString() {
-    return getVariableName();
+    return delegate.toString();
   }
 }

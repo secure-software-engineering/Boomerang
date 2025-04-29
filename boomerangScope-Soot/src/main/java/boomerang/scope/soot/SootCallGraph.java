@@ -21,25 +21,28 @@ import boomerang.scope.soot.jimple.JimpleMethod;
 import boomerang.scope.soot.jimple.JimplePhantomMethod;
 import boomerang.scope.soot.jimple.JimpleStatement;
 import java.util.Collection;
+import soot.Scene;
 import soot.SootMethod;
 
 public class SootCallGraph extends CallGraph {
 
   public SootCallGraph(
-      soot.jimple.toolkits.callgraph.CallGraph callGraph, Collection<SootMethod> entryPoints) {
+      Scene scene,
+      soot.jimple.toolkits.callgraph.CallGraph callGraph,
+      Collection<SootMethod> entryPoints) {
     for (soot.jimple.toolkits.callgraph.Edge e : callGraph) {
       if (!e.src().hasActiveBody() || e.srcStmt() == null) {
         continue;
       }
 
-      Statement callSite = JimpleStatement.create(e.srcStmt(), JimpleMethod.of(e.src()));
+      Statement callSite = JimpleStatement.create(e.srcStmt(), JimpleMethod.of(scene, e.src()));
       if (callSite.containsInvokeExpr()) {
         // Distinguish between loaded methods and phantom methods to cover all existing edges
         Method target;
         if (e.tgt().hasActiveBody()) {
-          target = JimpleMethod.of(e.tgt());
+          target = JimpleMethod.of(scene, e.tgt());
         } else {
-          target = JimplePhantomMethod.of(e.tgt().makeRef());
+          target = new JimplePhantomMethod(scene, e.tgt().makeRef());
         }
 
         LOGGER.trace("Call edge from {} to target method {}", callSite, e.tgt());
@@ -49,7 +52,7 @@ public class SootCallGraph extends CallGraph {
 
     for (SootMethod m : entryPoints) {
       if (m.hasActiveBody()) {
-        this.addEntryPoint(JimpleMethod.of(m));
+        this.addEntryPoint(JimpleMethod.of(scene, m));
         LOGGER.trace("Added entry point: {}", m);
       }
     }

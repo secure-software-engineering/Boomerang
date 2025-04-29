@@ -74,11 +74,6 @@ public class JimpleUpArrayRef extends ArrayVal {
   }
 
   @Override
-  public Val withNewMethod(Method callee) {
-    return new JimpleUpArrayRef(delegate, callee);
-  }
-
-  @Override
   public String getVariableName() {
     return delegate.toString();
   }

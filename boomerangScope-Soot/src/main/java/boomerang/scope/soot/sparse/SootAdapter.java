@@ -31,7 +31,7 @@ import soot.jimple.Stmt;
 public class SootAdapter {
 
   public static Statement asStatement(Unit unit, Method method) {
-    return JimpleStatement.create((Stmt) unit, method);
+    return JimpleStatement.create((Stmt) unit, (JimpleMethod) method);
   }
 
   public static Stmt asStmt(Statement stmt) {
