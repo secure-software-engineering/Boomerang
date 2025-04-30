@@ -24,14 +24,14 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueFactory;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -203,18 +203,25 @@ public class OpalTestSetup implements TestSetup {
 
     try (FileSystem fs =
         FileSystems.newFileSystem(URI.create("jrt:/"), java.util.Collections.emptyMap())) {
+      Path outputDir = Paths.get("jdk_classes");
+      Files.createDirectories(outputDir);
+
       for (String className : includeList) {
-        String pathInJrt = "/modules/java.base/" + className.replace('.', '/') + ".class";
+        Path rootPath = fs.getPath("/modules/java.base/");
+        String pathInJrt = rootPath + "/" + className.replace('.', '/') + ".class";
         Path jrtPath = fs.getPath(pathInJrt);
 
-        // Copy to a temp file
-        Path tempFile = Files.createTempFile(className.replace('.', '_'), ".class");
-        try (InputStream in = Files.newInputStream(jrtPath);
-            OutputStream out = Files.newOutputStream(tempFile)) {
-          in.transferTo(out);
-        }
+        Path relativePath = rootPath.relativize(jrtPath);
+        Path targetPath = outputDir.resolve(relativePath.toString());
 
-        result.add(tempFile.toFile());
+        try {
+          Files.createDirectories(targetPath.getParent());
+          Files.copy(jrtPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+          result.add(targetPath.toFile());
+        } catch (IOException e) {
+          throw new RuntimeException("Could not copy file to target directory: " + e.getMessage());
+        }
       }
     } catch (IOException e) {
       throw new RuntimeException("Could not read classes from JDK: " + e.getMessage());
