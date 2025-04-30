@@ -14,6 +14,12 @@
  */
 package boomerang.scope;
 
+/**
+ * Interface that provides basic methods to deal with array references. An array reference
+ * <i>a[i]</i> consists of a base <i>a</i> and an index expression <i>i</i>. Note that the index may
+ * be an integer or a {@link Val}. The method {@link #getIndex()} defaults to -1 if <i>i</i> is not
+ * an integer constant.
+ */
 public interface IArrayRef {
 
   Val getBase();

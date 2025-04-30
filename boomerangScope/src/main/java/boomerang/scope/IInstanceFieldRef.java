@@ -14,6 +14,10 @@
  */
 package boomerang.scope;
 
+/**
+ * Interface that provides basic methods to deal with instance field references. An instance field
+ * reference <i>o.f</i> consists of a base local <i>o</i> and a field <i>f</i>.
+ */
 public interface IInstanceFieldRef {
 
   Val getBase();

@@ -16,6 +16,10 @@ package boomerang.scope;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 
+/**
+ * Intermediate class that represents a static field reference <i>C.f</i> for a class <i>C</i> and a
+ * field <i>f</i>.
+ */
 public abstract class StaticFieldVal extends Val implements IStaticFieldRef {
 
   protected StaticFieldVal(Method method, Edge unbalanced) {

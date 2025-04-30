@@ -14,6 +14,10 @@
  */
 package boomerang.scope;
 
+/**
+ * Intermediate class that represents an instance field reference <i>o.f</i> for an object reference
+ * <i>o</i> and a field <i>f</i>.
+ */
 public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef {
 
   protected InstanceFieldVal(Method method, ControlFlowGraph.Edge unbalanced) {

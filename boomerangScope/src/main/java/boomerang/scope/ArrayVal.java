@@ -14,6 +14,20 @@
  */
 package boomerang.scope;
 
+/**
+ * Intermediate class that represents an array reference <i>a[i]</i> for an array <i>a</i> with an
+ * index <i>i</i>. Use the method {@link #isArrayRef()} to check for an array reference and {@link
+ * #getArrayBase()} to receive the corresponding {@link IArrayRef}, e.g.
+ *
+ * <pre>{@code
+ * if (val.isArrayRef) {
+ *     IArray arrayRef = val.getArrayBase();
+ *     Val base = arrayRef.getBase();
+ *     int index = arrayRef.getIndex();
+ *     ...
+ * }
+ * }</pre>
+ */
 public abstract class ArrayVal extends Val implements IArrayRef {
 
   protected ArrayVal(Method method, ControlFlowGraph.Edge unbalanced) {

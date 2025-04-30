@@ -16,6 +16,15 @@ package boomerang.scope;
 
 import java.util.Objects;
 
+/**
+ * Class that holds a set of predefined {@link Val}s. Currently, there are three values:
+ *
+ * <ul>
+ *   <li>zero: Zero value that evaluates to <i>false</i> in all cases
+ *   <li>true: Value that represents the boolean expression <i>true</i>
+ *   <li>false: Value that represents the boolean expression <i>false</i>
+ * </ul>
+ */
 public final class ValCollection {
 
   private static Val zeroVal;

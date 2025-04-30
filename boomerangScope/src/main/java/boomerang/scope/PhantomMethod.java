@@ -17,6 +17,10 @@ package boomerang.scope;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Intermediate class that represents a method without an existing body. Methods that require
+ * information from the body, e.g. statements, locals etc. throw an exception.
+ */
 public abstract class PhantomMethod extends Method {
 
   @Override

@@ -14,6 +14,10 @@
  */
 package boomerang.scope;
 
+/**
+ * Intermediate class that represents a method with an existing body. All methods provide their
+ * corresponding information.
+ */
 public abstract class DefinedMethod extends Method {
 
   @Override
