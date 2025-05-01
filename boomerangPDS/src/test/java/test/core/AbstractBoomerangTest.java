@@ -74,7 +74,7 @@ public class AbstractBoomerangTest extends TestingFramework {
 
   /**
    * Fails the test cases, when Boomerang's result set contains any object that does not inherit
-   * from {@link test.core.selfrunning.AllocatedObject}.
+   * from {@link AllocatedObject}.
    */
   private static final boolean TRACK_IMPLICIT_IMPRECISE = false;
 

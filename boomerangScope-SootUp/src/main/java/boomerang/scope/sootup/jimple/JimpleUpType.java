@@ -14,18 +14,16 @@
  */
 package boomerang.scope.sootup.jimple;
 
-import boomerang.scope.AllocVal;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import java.util.Objects;
-import java.util.Optional;
+import sootup.core.typehierarchy.TypeHierarchy;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
 import sootup.core.types.NullType;
 import sootup.core.types.PrimitiveType;
 import sootup.core.types.ReferenceType;
-import sootup.java.core.JavaSootClass;
 import sootup.java.core.types.JavaClassType;
 import sootup.java.core.views.JavaView;
 
@@ -80,7 +78,9 @@ public class JimpleUpType implements Type {
 
   @Override
   public boolean doesCastFail(Type targetVal, Val target) {
-    ClassType targetType = (ClassType) ((JimpleUpType) targetVal).getDelegate();
+    // TODO Requires revisit as it cannot handle NullTypes
+    return false;
+    /*ClassType targetType = (ClassType) ((JimpleUpType) targetVal).getDelegate();
     if (this.getDelegate() instanceof NullType) {
       return true;
     }
@@ -105,7 +105,7 @@ public class JimpleUpType implements Type {
     boolean castFails =
         view.getTypeHierarchy().isSubtype(targetType, sourceType)
             || view.getTypeHierarchy().isSubtype(sourceType, targetType);
-    return !castFails;
+    return !castFails;*/
   }
 
   @Override
@@ -118,26 +118,31 @@ public class JimpleUpType implements Type {
       return false;
     }
 
-    JavaClassType superType = view.getIdentifierFactory().getClassType(type);
-    Optional<JavaSootClass> superClass = view.getClass(superType);
-
-    if (superClass.isEmpty()) {
+    // TODO Deal with Array type and null type
+    if (!(delegate instanceof ClassType)) {
       return false;
     }
 
-    JavaClassType allocatedType = (JavaClassType) delegate;
+    // TODO
+    //  Not sure if this logic is sufficient. Soot computes the complete class
+    //  hierarchy, i.e. all possible super classes and interfaces
+    JavaClassType superType = view.getIdentifierFactory().getClassType(type);
+
+    TypeHierarchy hierarchy = view.getTypeHierarchy();
+    if (!hierarchy.contains((ClassType) delegate) || !hierarchy.contains(superType)) {
+      return false;
+    }
+
+    return view.getTypeHierarchy().isSubtype(superType, delegate);
+
+    /*JavaClassType allocatedType = (JavaClassType) delegate;
     if (!superClass.get().isInterface()) {
       return view.getTypeHierarchy().isSubtype(allocatedType, superClass.get().getType());
     }
-    // TODO: [ms] check if seperation of interface/class is necessary
-    if (view.getTypeHierarchy()
-        .subclassesOf(superClass.get().getType())
-        .anyMatch(t -> t == allocatedType)) {
-      return true;
-    }
+
     return view.getTypeHierarchy()
         .implementersOf(superClass.get().getType())
-        .anyMatch(t -> t == allocatedType);
+        .anyMatch(t -> t == allocatedType);*/
   }
 
   @Override
@@ -149,6 +154,23 @@ public class JimpleUpType implements Type {
       return false;
     }
 
+    // TODO Deal with array type and null
+    if (!(delegate instanceof ClassType)) {
+      return false;
+    }
+
+    // TODO
+    //  Not sure if this logic is sufficient. Soot computes the complete class
+    //  hierarchy, i.e. all possible super classes and interfaces
+    JavaClassType superType = view.getIdentifierFactory().getClassType(subTypeStr);
+
+    TypeHierarchy hierarchy = view.getTypeHierarchy();
+    if (!hierarchy.contains((ClassType) delegate) || !hierarchy.contains(superType)) {
+      return false;
+    }
+
+    return view.getTypeHierarchy().isSubtype(delegate, superType);
+    /*
     JavaClassType subType = view.getIdentifierFactory().getClassType(subTypeStr);
     if (!view.getTypeHierarchy().contains(subType)) {
       return false;
@@ -159,7 +181,7 @@ public class JimpleUpType implements Type {
       return false;
     }
 
-    return view.getTypeHierarchy().isSubtype(subType, thisType);
+    return view.getTypeHierarchy().isSubtype(subType, thisType);*/
   }
 
   @Override
