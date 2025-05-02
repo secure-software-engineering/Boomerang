@@ -36,6 +36,15 @@ public class TestSetupUtils {
 
   private TestSetupUtils() {}
 
+  /**
+   * Copy the class files from the same package as the test class to a new directory {@link
+   * #APP_CLASSES}. Thereby, ignore all classes from the excluded list.
+   *
+   * @param classpath the path that contains the test class files
+   * @param testClassName the current test class
+   * @param excludeList list that contains class names that should not be copied
+   * @return the path to the created directory with the class files
+   */
   public static Path loadTestClasses(
       String classpath, String testClassName, Collection<String> excludeList) {
     Path path = Path.of(classpath);
@@ -117,6 +126,12 @@ public class TestSetupUtils {
     }
   }
 
+  /**
+   * Transform all files in a directory into an array.
+   *
+   * @param directory the directory containing the files
+   * @return the array containing all files within the directory
+   */
   public static File[] getFilesInDirectory(Path directory) {
     try (Stream<Path> stream = Files.walk(directory)) {
       return stream.filter(Files::isRegularFile).map(Path::toFile).toArray(File[]::new);
@@ -125,6 +140,11 @@ public class TestSetupUtils {
     }
   }
 
+  /**
+   * Delete all files within a directory and the directory itself.
+   *
+   * @param directory the directory to be deleted
+   */
   public static void deleteDirectory(String directory) {
     Path dir = Paths.get(directory);
 

@@ -21,6 +21,7 @@ import boomerang.scope.sootup.BoomerangPreInterceptor;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import boomerang.scope.sootup.jimple.JimpleUpMethod;
 import boomerang.utils.MethodWrapper;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -55,13 +56,22 @@ public class SootUpTestSetup implements TestSetup {
     // TODO
     //  - Add required interceptors
     //  - Check if interceptors need a reset in between runs
-    //  - Consider included and excluded packages
 
     List<BodyInterceptor> interceptors = List.of(new BoomerangPreInterceptor());
 
-    AnalysisInputLocation inputLocation =
-        new JavaClassPathAnalysisInputLocation(classPath, SourceType.Application, interceptors);
-    view = new JavaView(inputLocation);
+    Path testClassPath =
+        TestSetupUtils.loadTestClasses(
+            classPath, testMethodWrapper.getDeclaringClass(), excludedPackages);
+    Path jdkClassPath = TestSetupUtils.loadJDKFiles(includedPackages);
+
+    // Create two input locations to distinguish between test classes and jdk classes
+    AnalysisInputLocation testClassInput =
+        new JavaClassPathAnalysisInputLocation(
+            testClassPath.toString(), SourceType.Application, interceptors);
+    AnalysisInputLocation jdkClassInput =
+        new JavaClassPathAnalysisInputLocation(
+            jdkClassPath.toString(), SourceType.Library, interceptors);
+    view = new JavaView(List.of(testClassInput, jdkClassInput));
 
     // Load the test class
     ClassType classType =

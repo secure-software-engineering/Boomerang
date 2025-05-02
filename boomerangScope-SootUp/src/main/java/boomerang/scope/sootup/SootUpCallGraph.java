@@ -71,7 +71,7 @@ public class SootUpCallGraph extends CallGraph {
       }
     }
 
-    if (getEdges().isEmpty()) {
+    if (getEdges().isEmpty() && entryPoints.isEmpty()) {
       throw new IllegalStateException("CallGraph is empty!");
     }
   }
