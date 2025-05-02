@@ -116,22 +116,31 @@ public class SootUpTestSetup implements TestSetup {
     // Add all static initializers to the entry points
     view.getClasses()
         .forEach(
-            c ->
-                c.getMethods()
-                    .forEach(
-                        m -> {
-                          if (m.hasBody()
-                              && m.getName().equals(SootUpFrameworkScope.STATIC_INITIALIZER_NAME)) {
-                            entryPoints.add(m);
-                          }
-                        }));
+            c -> {
+              for (JavaSootMethod method : c.getMethods()) {
+                if (!method.hasBody()) {
+                  continue;
+                }
+
+                if (!method.getName().equals(SootUpFrameworkScope.STATIC_INITIALIZER_NAME)) {
+                  continue;
+                }
+
+                if (method
+                    .getDeclaringClassType()
+                    .getFullyQualifiedName()
+                    .startsWith(testMethod.getDeclaringClassType().getFullyQualifiedName())) {
+                  entryPoints.add(method);
+                }
+              }
+            });
 
     CallGraphAlgorithm cha = new ClassHierarchyAnalysisAlgorithm(view);
     CallGraph callGraph =
         cha.initialize(
             entryPoints.stream().map(SootClassMember::getSignature).collect(Collectors.toList()));
 
-    return new SootUpFrameworkScope(view, callGraph, List.of(testMethod), dataFlowScope);
+    return new SootUpFrameworkScope(view, callGraph, entryPoints, dataFlowScope);
   }
 
   @Override
