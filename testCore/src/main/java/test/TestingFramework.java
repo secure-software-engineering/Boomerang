@@ -45,7 +45,7 @@ public class TestingFramework {
     String framework = System.getProperty("testSetup");
     if (framework == null) {
       // This can be changed when executing tests locally
-      return new SootUpTestSetup();
+      return new OpalTestSetup();
     }
 
     switch (framework.toLowerCase()) {
@@ -131,6 +131,12 @@ public class TestingFramework {
     }
 
     return userDir + "/target/test-classes";
+  }
+
+  public void cleanUp() {
+    if (testSetup != null) {
+      testSetup.cleanUp();
+    }
   }
 
   protected List<String> getIncludedPackages() {

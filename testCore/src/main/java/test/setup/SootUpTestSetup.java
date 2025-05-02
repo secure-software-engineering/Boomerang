@@ -123,4 +123,10 @@ public class SootUpTestSetup implements TestSetup {
 
     return new SootUpFrameworkScope(view, callGraph, List.of(testMethod), dataFlowScope);
   }
+
+  @Override
+  public void cleanUp() {
+    TestSetupUtils.deleteDirectory(TestSetupUtils.APP_CLASSES);
+    TestSetupUtils.deleteDirectory(TestSetupUtils.JDK_CLASSES);
+  }
 }

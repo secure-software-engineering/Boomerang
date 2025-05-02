@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -370,5 +371,10 @@ public class AbstractBoomerangTest extends TestingFramework {
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);
     }
+  }
+
+  @After
+  public void cleanUp() {
+    super.cleanUp();
   }
 }
