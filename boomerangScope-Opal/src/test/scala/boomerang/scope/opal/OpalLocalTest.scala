@@ -70,7 +70,7 @@ class OpalLocalTest {
       "Void"
     )
     val noArgs = opalSetup.resolveMethod(noArgsSignature)
-    val noArgsMethod = OpalMethod(noArgs, opalSetup.project.get)
+    val noArgsMethod = OpalMethod.of(noArgs, opalSetup.project.get)
 
     Assert.assertTrue(noArgsMethod.getParameterLocals.isEmpty)
 
@@ -82,7 +82,7 @@ class OpalLocalTest {
       util.List.of(integerType)
     )
     val oneArg = opalSetup.resolveMethod(oneArgSignature)
-    val oneArgMethod = OpalMethod(oneArg, opalSetup.project.get)
+    val oneArgMethod = OpalMethod.of(oneArg, opalSetup.project.get)
 
     Assert.assertEquals(1, oneArgMethod.getParameterLocals.size)
     Assert.assertEquals(
@@ -98,7 +98,7 @@ class OpalLocalTest {
       util.List.of(integerType, s"L${classOf[A].getName}L")
     )
     val twoArgs = opalSetup.resolveMethod(twoArgSignature)
-    val twoArgsMethod = OpalMethod(twoArgs, opalSetup.project.get)
+    val twoArgsMethod = OpalMethod.of(twoArgs, opalSetup.project.get)
 
     Assert.assertEquals(2, twoArgsMethod.getParameterLocals.size)
     Assert.assertEquals(

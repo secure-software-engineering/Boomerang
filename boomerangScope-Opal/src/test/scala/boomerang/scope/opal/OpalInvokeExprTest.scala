@@ -93,7 +93,7 @@ class OpalInvokeExprTest {
       "V"
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var checked = false
     opalMethod.getStatements.forEach(stmt => {
