@@ -31,7 +31,7 @@ class OpalWrappedClass(val delegate: ObjectType, project: Project[_]) extends Wr
       val methods = new util.HashSet[Method]
 
       classFile.get.methods.foreach(method => {
-        methods.add(OpalMethod(method, project))
+        methods.add(OpalMethod.of(method, project))
       })
 
       return methods

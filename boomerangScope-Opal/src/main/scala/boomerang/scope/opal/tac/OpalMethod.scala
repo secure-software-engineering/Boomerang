@@ -139,9 +139,9 @@ class OpalMethod private (
 
 object OpalMethod {
 
-  def apply(delegate: org.opalj.br.Method, project: Project[_]): OpalMethod =
+  def of(delegate: org.opalj.br.Method, project: Project[_]): OpalMethod =
     new OpalMethod(delegate, TacBodyBuilder(project, delegate), project)
 
-  def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode, project: Project[_]): OpalMethod =
+  def of(delegate: org.opalj.br.Method, tac: BoomerangTACode, project: Project[_]): OpalMethod =
     new OpalMethod(delegate, tac, project)
 }
