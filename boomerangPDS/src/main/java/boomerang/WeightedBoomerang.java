@@ -40,6 +40,7 @@ import boomerang.scope.Field;
 import boomerang.scope.Field.ArrayField;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
@@ -630,10 +631,12 @@ public abstract class WeightedBoomerang<W extends Weight> {
 
   protected FieldWritePOI createFieldStore(Edge cfgEdge) {
     Statement s = cfgEdge.getStart();
-    Val base = s.getFieldStore().getBase();
-    Field field = s.getFieldStore().getField();
-    Val stored = s.getRightOp();
-    return fieldWrites.getOrCreate(new FieldWritePOI(cfgEdge, base, field, stored));
+
+    IInstanceFieldRef fieldRef = s.getFieldStore();
+    Val storedVal = s.getRightOp();
+
+    return fieldWrites.getOrCreate(
+        new FieldWritePOI(cfgEdge, fieldRef.getBase(), fieldRef.getField(), storedVal));
   }
 
   protected void forwardHandleFieldWrite(
@@ -1168,8 +1171,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
     Val var;
     Field field;
     if (stmt.isFieldStore()) {
-      field = stmt.getFieldStore().getField();
-      var = stmt.getFieldStore().getBase();
+      IInstanceFieldRef fieldRef = stmt.getFieldStore();
+
+      var = fieldRef.getBase();
+      field = fieldRef.getField();
       forwardHandleFieldWrite(
           new Node<>(cfgEdge, stmt.getRightOp()),
           new FieldWritePOI(cfgEdge, var, field, stmt.getRightOp()),
