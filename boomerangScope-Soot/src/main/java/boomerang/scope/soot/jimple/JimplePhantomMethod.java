@@ -17,6 +17,8 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.PhantomMethod;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,12 +32,18 @@ import soot.SootMethodRef;
  */
 public class JimplePhantomMethod extends PhantomMethod {
 
+  protected static Interner<JimplePhantomMethod> INTERNAL_POOL = Interners.newWeakInterner();
+
   private final SootMethodRef delegate;
   private final Scene scene;
 
-  public JimplePhantomMethod(SootMethodRef delegate, Scene scene) {
+  protected JimplePhantomMethod(SootMethodRef delegate, Scene scene) {
     this.delegate = delegate;
     this.scene = scene;
+  }
+
+  public static JimplePhantomMethod of(SootMethodRef delegate, Scene scene) {
+    return INTERNAL_POOL.intern(new JimplePhantomMethod(delegate, scene));
   }
 
   public Scene getScene() {

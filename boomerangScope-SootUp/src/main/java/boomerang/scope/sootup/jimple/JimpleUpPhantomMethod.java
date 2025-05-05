@@ -18,6 +18,8 @@ import boomerang.scope.PhantomMethod;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,16 +28,22 @@ import sootup.java.core.views.JavaView;
 
 public class JimpleUpPhantomMethod extends PhantomMethod {
 
+  protected static Interner<JimpleUpPhantomMethod> INTERNAL_POOL = Interners.newWeakInterner();
+
   private final JavaSootMethod delegate;
   private final JavaView view;
 
-  public JimpleUpPhantomMethod(JavaSootMethod delegate, JavaView view) {
+  protected JimpleUpPhantomMethod(JavaSootMethod delegate, JavaView view) {
     this.delegate = delegate;
     this.view = view;
 
     if (delegate.hasBody()) {
       throw new IllegalArgumentException("Cannot build phantom method from method with body");
     }
+  }
+
+  public static JimpleUpPhantomMethod of(JavaSootMethod delegate, JavaView view) {
+    return INTERNAL_POOL.intern(new JimpleUpPhantomMethod(delegate, view));
   }
 
   public JavaSootMethod getDelegate() {
