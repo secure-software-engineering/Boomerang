@@ -39,7 +39,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {

@@ -152,7 +152,7 @@ public class OpalTestSetup implements TestSetup {
 
   @Override
   public Method getTestMethod() {
-    return OpalMethod.apply(testMethod, project);
+    return OpalMethod.of(testMethod, project);
   }
 
   @Override

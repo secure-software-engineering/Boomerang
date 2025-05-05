@@ -36,7 +36,7 @@ class OpalControlFlowGraphTest {
       integerType
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     val cfg = opalMethod.getControlFlowGraph
     Assert.assertTrue(cfg.getStatements.size() > 0)
