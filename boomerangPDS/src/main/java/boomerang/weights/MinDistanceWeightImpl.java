@@ -73,7 +73,7 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
 
   @Override
   public String toString() {
-    return " Distance: " + minDistance;
+    return "Distance: " + minDistance;
   }
 
   @Override
