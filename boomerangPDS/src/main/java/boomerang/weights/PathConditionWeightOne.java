@@ -28,7 +28,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
 
   @NonNull private static final PathConditionWeightOne one = new PathConditionWeightOne();
 
-  public PathConditionWeightOne(
+  private PathConditionWeightOne(
       Map<Statement, ConditionDomain> newIfs,
       Map<Val, ConditionDomain> newVals,
       Set<Val> newReturnVals,
@@ -52,17 +52,17 @@ public class PathConditionWeightOne implements PathConditionWeight {
     throw new IllegalStateException("PathConditionWeightOne.getCalleeToCallSite() - don't");
   }
 
-  public PathConditionWeightOne() {}
+  private PathConditionWeightOne() {}
 
   public static PathConditionWeightOne one() {
     return one;
   }
 
-  public PathConditionWeightOne(Statement callSite, Method callee) {
+  private PathConditionWeightOne(Statement callSite, Method callee) {
     this.getCalleeToCallSite().put(callee, callSite);
   }
 
-  public PathConditionWeightOne(Val returnVal) {
+  private PathConditionWeightOne(Val returnVal) {
     this.getReturnVals().add(returnVal);
   }
 

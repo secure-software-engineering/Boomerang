@@ -27,6 +27,8 @@ public class SetDomainZero implements SetDomain {
 
   @NonNull private static final SetDomainZero zero = new SetDomainZero();
 
+  private SetDomainZero() {}
+
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {

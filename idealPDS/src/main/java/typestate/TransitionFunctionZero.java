@@ -31,7 +31,7 @@ public class TransitionFunctionZero implements TransitionFunction {
 
   @NonNull private static final TransitionFunctionZero zero = new TransitionFunctionZero();
 
-  public TransitionFunctionZero() {}
+  private TransitionFunctionZero() {}
 
   @NonNull
   public static TransitionFunctionZero zero() {
