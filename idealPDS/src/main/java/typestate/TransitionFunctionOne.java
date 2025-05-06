@@ -50,8 +50,9 @@ public class TransitionFunctionOne implements TransitionFunction {
         "TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
   }
 
+  @NonNull
   @Override
-  public Weight extendWith(Weight other) {
+  public Weight extendWith(@NonNull Weight other) {
     if (other.equals(one())) return this;
     if (this.equals(one())) return other;
     if (other.equals(zero()) || this.equals(zero())) {
