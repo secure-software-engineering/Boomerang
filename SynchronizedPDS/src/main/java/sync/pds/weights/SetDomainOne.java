@@ -24,6 +24,8 @@ import wpds.impl.Weight;
 public class SetDomainOne implements SetDomain {
   @NonNull private static final SetDomainOne one = new SetDomainOne();
 
+  private SetDomainOne() {}
+
   public static Weight one() {
     return one;
   }
