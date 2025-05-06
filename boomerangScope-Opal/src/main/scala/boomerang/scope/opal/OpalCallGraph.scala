@@ -58,7 +58,7 @@ class OpalCallGraph(
 
     tacCode.statements.foreach(stmt => {
       val srcStatement =
-        new OpalStatement(stmt, OpalMethod(method.definedMethod, tacCode, project))
+        new OpalStatement(stmt, OpalMethod.of(method.definedMethod, tacCode, project))
 
       if (srcStatement.containsInvokeExpr()) {
         // Due to inlining variables, the PC's of statements and invoke expressions may differ
@@ -71,11 +71,11 @@ class OpalCallGraph(
               val method = definedMethod.definedMethod
 
               if (method.body.isDefined) {
-                val targetMethod = OpalMethod(method, project)
+                val targetMethod = OpalMethod.of(method, project)
 
                 addEdge(new Edge(srcStatement, targetMethod))
               } else {
-                val targetMethod = new OpalPhantomMethod(
+                val targetMethod = OpalPhantomMethod.of(
                   definedMethod.declaringClassType,
                   definedMethod.name,
                   definedMethod.descriptor,
@@ -86,7 +86,7 @@ class OpalCallGraph(
                 addEdge(new Edge(srcStatement, targetMethod))
               }
             case virtualMethod: VirtualDeclaredMethod =>
-              val targetMethod = new OpalPhantomMethod(
+              val targetMethod = OpalPhantomMethod.of(
                 virtualMethod.declaringClassType,
                 virtualMethod.name,
                 virtualMethod.descriptor,
@@ -97,7 +97,7 @@ class OpalCallGraph(
               addEdge(new Edge(srcStatement, targetMethod))
             case definedMethods: MultipleDefinedMethods =>
               definedMethods.foreachDefinedMethod(method => {
-                val targetMethod = OpalMethod(method, project)
+                val targetMethod = OpalMethod.of(method, project)
 
                 addEdge(new Edge(srcStatement, targetMethod))
               })
@@ -128,7 +128,7 @@ class OpalCallGraph(
 
   entryPoints.foreach(entryPoint => {
     if (entryPoint.body.isDefined) {
-      addEntryPoint(OpalMethod(entryPoint, project))
+      addEntryPoint(OpalMethod.of(entryPoint, project))
     }
   })
 }

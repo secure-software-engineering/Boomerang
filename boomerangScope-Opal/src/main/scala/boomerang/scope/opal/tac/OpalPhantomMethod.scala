@@ -25,7 +25,7 @@ import org.opalj.br.MethodSignature
 import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 
-class OpalPhantomMethod(
+class OpalPhantomMethod private (
     val declaringClassType: ObjectType,
     val name: String,
     val descriptor: MethodDescriptor,
@@ -73,4 +73,15 @@ class OpalPhantomMethod(
   }
 
   override def toString: String = s"PHANTOM: ${declaringClassType.toJava} $name"
+}
+
+object OpalPhantomMethod {
+
+  def of(
+      declaringClassType: ObjectType,
+      name: String,
+      descriptor: MethodDescriptor,
+      static: Boolean,
+      project: Project[_]
+  ): OpalPhantomMethod = new OpalPhantomMethod(declaringClassType, name, descriptor, static, project)
 }

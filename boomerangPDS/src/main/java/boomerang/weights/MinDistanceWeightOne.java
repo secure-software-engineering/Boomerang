@@ -25,6 +25,8 @@ public class MinDistanceWeightOne implements MinDistanceWeight {
     return one;
   }
 
+  private MinDistanceWeightOne() {}
+
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight o) {

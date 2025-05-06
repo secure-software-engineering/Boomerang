@@ -19,7 +19,6 @@ import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
 import java.util
 import org.junit.Assert
-import org.junit.Ignore
 import org.junit.Test
 import org.opalj.br.IntegerType
 
@@ -39,7 +38,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -71,7 +70,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -99,7 +98,7 @@ class OpalArrayTest {
     val signature =
       new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreIndex", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -127,7 +126,7 @@ class OpalArrayTest {
     val signature =
       new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreVar", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method, opalSetup.project.get)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
