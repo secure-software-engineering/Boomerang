@@ -21,7 +21,7 @@ import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleField;
 import boomerang.scope.soot.jimple.JimpleMethod;
 import boomerang.scope.soot.jimple.JimpleStatement;
-import boomerang.scope.soot.jimple.JimpleStaticFieldVal;
+import boomerang.scope.soot.jimple.JimpleStaticFieldRef;
 import boomerang.scope.soot.jimple.JimpleVal;
 import boomerang.scope.soot.sparse.aliasaware.MStaticFieldRef;
 import soot.*;
@@ -31,7 +31,7 @@ import soot.jimple.Stmt;
 public class SootAdapter {
 
   public static Statement asStatement(Unit unit, Method method) {
-    return JimpleStatement.create((Stmt) unit, method);
+    return JimpleStatement.create((Stmt) unit, (JimpleMethod) method);
   }
 
   public static Stmt asStmt(Statement stmt) {
@@ -42,7 +42,7 @@ public class SootAdapter {
     if (val instanceof JimpleVal) {
       Value value = asValue(val);
       return value.getType();
-    } else if (val instanceof JimpleStaticFieldVal) {
+    } else if (val instanceof JimpleStaticFieldRef) {
       SootField field = asField(val);
       return field.getType();
     } else {
@@ -51,11 +51,10 @@ public class SootAdapter {
   }
 
   public static Value asValue(Val val) {
-    if (val instanceof JimpleStaticFieldVal) {
-      JimpleStaticFieldVal staticVal = (JimpleStaticFieldVal) val;
-      Field field = staticVal.field();
-      SootField sootField = ((JimpleField) field).getDelegate();
-      SootFieldRef sootFieldRef = sootField.makeRef();
+    if (val instanceof JimpleStaticFieldRef) {
+      JimpleStaticFieldRef staticVal = (JimpleStaticFieldRef) val;
+      Field field = staticVal.getField();
+      SootFieldRef sootFieldRef = ((JimpleField) field).getDelegate();
       StaticFieldRef srf = new MStaticFieldRef(sootFieldRef);
       return srf;
     }
@@ -63,8 +62,8 @@ public class SootAdapter {
   }
 
   public static SootField asField(Val val) {
-    Field field = ((JimpleStaticFieldVal) val).field();
-    return ((JimpleField) field).getDelegate();
+    Field field = ((JimpleStaticFieldRef) val).getField();
+    return ((JimpleField) field).getDelegate().resolve();
   }
 
   public static SootMethod asSootMethod(Method m) {

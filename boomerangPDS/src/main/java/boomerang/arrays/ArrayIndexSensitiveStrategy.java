@@ -16,8 +16,7 @@ package boomerang.arrays;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
-import boomerang.scope.Pair;
-import boomerang.scope.Val;
+import boomerang.scope.IArrayRef;
 import java.util.Set;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
 import sync.pds.solver.nodes.PushNode;
@@ -26,14 +25,16 @@ import wpds.interfaces.State;
 public class ArrayIndexSensitiveStrategy implements ArrayHandlingStrategy {
 
   @Override
-  public void handleForward(Edge curr, Pair<Val, Integer> arrayBase, Set<State> out) {
+  public void handleForward(Edge curr, IArrayRef arrayBase, Set<State> out) {
     out.add(
-        new PushNode<>(curr, arrayBase.getX(), Field.array(arrayBase.getY()), PDSSystem.FIELDS));
+        new PushNode<>(
+            curr, arrayBase.getBase(), Field.array(arrayBase.getIndex()), PDSSystem.FIELDS));
   }
 
   @Override
-  public void handleBackward(Edge curr, Pair<Val, Integer> arrayBase, Set<State> out) {
+  public void handleBackward(Edge curr, IArrayRef arrayBase, Set<State> out) {
     out.add(
-        new PushNode<>(curr, arrayBase.getX(), Field.array(arrayBase.getY()), PDSSystem.FIELDS));
+        new PushNode<>(
+            curr, arrayBase.getBase(), Field.array(arrayBase.getIndex()), PDSSystem.FIELDS));
   }
 }

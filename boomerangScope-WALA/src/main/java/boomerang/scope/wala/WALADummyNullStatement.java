@@ -15,10 +15,11 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Type;
@@ -56,11 +57,6 @@ public class WALADummyNullStatement extends WALAStatement {
             return this == obj;
           }
         };
-  }
-
-  @Override
-  public boolean containsStaticFieldAccess() {
-    return false;
   }
 
   @Override
@@ -149,11 +145,6 @@ public class WALADummyNullStatement extends WALAStatement {
   }
 
   @Override
-  public boolean isMultiArrayAllocation() {
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return false;
   }
@@ -179,12 +170,12 @@ public class WALADummyNullStatement extends WALAStatement {
   }
 
   @Override
-  public Pair<Val, Field> getFieldStore() {
+  public IInstanceFieldRef getFieldStore() {
     throw new RuntimeException("Illegal");
   }
 
   @Override
-  public Pair<Val, Field> getFieldLoad() {
+  public IInstanceFieldRef getFieldLoad() {
     throw new RuntimeException("Illegal");
   }
 
@@ -214,12 +205,12 @@ public class WALADummyNullStatement extends WALAStatement {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     throw new RuntimeException("Illegal");
   }
 
   @Override
-  public int getStartLineNumber() {
+  public int getLineNumber() {
     return 0;
   }
 

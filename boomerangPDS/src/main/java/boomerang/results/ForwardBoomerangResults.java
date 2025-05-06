@@ -29,6 +29,7 @@ import boomerang.scope.IfStatement.Evaluation;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -360,10 +361,10 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
             Evaluation eval = null;
             if (e.getValue().equals(ConditionDomain.TRUE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(scopeFactory.getTrueValue(key.m()));
+              eval = ifStmt1.evaluate(ValCollection.trueVal());
             } else if (e.getValue().equals(ConditionDomain.FALSE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(scopeFactory.getFalseValue(key.m()));
+              eval = ifStmt1.evaluate(ValCollection.falseVal());
             }
             if (eval != null) {
               if (mustBeVal.equals(ConditionDomain.FALSE)) {

@@ -17,7 +17,7 @@ package boomerang.scope.sootup.jimple;
 import boomerang.scope.IfStatement;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import java.util.Arrays;
+import java.util.Objects;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.constant.NullConstant;
@@ -44,6 +44,7 @@ public class JimpleUpIfStatement implements IfStatement {
 
   @Override
   public Evaluation evaluate(Val val) {
+    // TODO This requires a complete revisit because nobody knows what is happening here
     if (delegate.getCondition() instanceof JEqExpr) {
       JEqExpr eqExpr = (JEqExpr) delegate.getCondition();
 
@@ -108,20 +109,16 @@ public class JimpleUpIfStatement implements IfStatement {
   }
 
   @Override
-  public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleUpIfStatement that = (JimpleUpIfStatement) o;
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-
-    JimpleUpIfStatement other = (JimpleUpIfStatement) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+  public int hashCode() {
+    return Objects.hash(delegate);
   }
 
   @Override

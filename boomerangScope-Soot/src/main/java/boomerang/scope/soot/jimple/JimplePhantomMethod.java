@@ -14,45 +14,49 @@
  */
 package boomerang.scope.soot.jimple;
 
-import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Method;
-import boomerang.scope.Statement;
+import boomerang.scope.PhantomMethod;
 import boomerang.scope.Type;
-import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import soot.Scene;
 import soot.SootMethod;
+import soot.SootMethodRef;
 
 /**
  * Class that wraps a {@link SootMethod} without an existing body. Operations that require
  * information from the body throw an exception.
  */
-public class JimplePhantomMethod extends Method {
+public class JimplePhantomMethod extends PhantomMethod {
 
-  private final SootMethod delegate;
+  protected static Interner<JimplePhantomMethod> INTERNAL_POOL = Interners.newWeakInterner();
 
-  protected JimplePhantomMethod(SootMethod delegate) {
+  private final SootMethodRef delegate;
+  private final Scene scene;
+
+  protected JimplePhantomMethod(SootMethodRef delegate, Scene scene) {
     this.delegate = delegate;
-    if (delegate.hasActiveBody()) {
-      throw new RuntimeException("Building phantom method " + delegate + " with existing body");
-    }
+    this.scene = scene;
   }
 
-  public static JimplePhantomMethod of(SootMethod delegate) {
-    return new JimplePhantomMethod(delegate);
+  public static JimplePhantomMethod of(SootMethodRef delegate, Scene scene) {
+    return INTERNAL_POOL.intern(new JimplePhantomMethod(delegate, scene));
+  }
+
+  public Scene getScene() {
+    return scene;
+  }
+
+  public SootMethodRef getDelegate() {
+    return delegate;
   }
 
   @Override
   public boolean isStaticInitializer() {
-    return delegate.isStaticInitializer();
-  }
-
-  @Override
-  public boolean isParameterLocal(Val val) {
-    return false;
+    return delegate.getName().equals(SootMethod.staticInitializerName);
   }
 
   @Override
@@ -60,40 +64,19 @@ public class JimplePhantomMethod extends Method {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type));
+      types.add(new JimpleType(type, scene));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), scene);
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType());
-  }
-
-  @Override
-  public boolean isThisLocal(Val val) {
-    return false;
-  }
-
-  @Override
-  public Collection<Val> getLocals() {
-    throw new RuntimeException("Locals of phantom method are not available");
-  }
-
-  @Override
-  public Val getThisLocal() {
-    throw new RuntimeException("this local of phantom method is not available");
-  }
-
-  @Override
-  public List<Val> getParameterLocals() {
-    throw new RuntimeException(
-        "Parameter locals of phantom method " + delegate + " are not available");
+    return new JimpleType(delegate.getReturnType(), scene);
   }
 
   @Override
@@ -102,33 +85,13 @@ public class JimplePhantomMethod extends Method {
   }
 
   @Override
-  public boolean isDefined() {
-    return false;
-  }
-
-  @Override
-  public boolean isPhantom() {
-    return true;
-  }
-
-  @Override
-  public List<Statement> getStatements() {
-    throw new RuntimeException("Statements of phantom method " + delegate + " are not available");
-  }
-
-  @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getDeclaringClass());
-  }
-
-  @Override
-  public ControlFlowGraph getControlFlowGraph() {
-    throw new RuntimeException("CFG of phantom method " + delegate + " is not available");
+    return new JimpleWrappedClass(delegate.getDeclaringClass(), scene);
   }
 
   @Override
   public String getSubSignature() {
-    return delegate.getSubSignature();
+    return delegate.getSubSignature().getString();
   }
 
   @Override

@@ -125,10 +125,10 @@ public class CallGraph {
   private void computeStaticFieldsLoadAndStores(Method m) {
     for (Statement s : m.getStatements()) {
       if (s.isStaticFieldStore()) {
-        fieldStoreStatements.put(s.getStaticField().field(), s);
+        fieldStoreStatements.put(s.getStaticField().getField(), s);
       }
       if (s.isStaticFieldLoad()) {
-        fieldLoadStatements.put(s.getStaticField().field(), s);
+        fieldLoadStatements.put(s.getStaticField().getField(), s);
       }
     }
   }

@@ -15,12 +15,11 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
-import boomerang.scope.sootup.SootUpFrameworkScope;
-import java.util.Arrays;
+import java.util.Objects;
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.ClassConstant;
@@ -35,32 +34,34 @@ import sootup.core.jimple.common.expr.JNewArrayExpr;
 import sootup.core.jimple.common.expr.JNewExpr;
 import sootup.core.jimple.common.expr.JNewMultiArrayExpr;
 import sootup.core.jimple.common.ref.JArrayRef;
-import sootup.core.types.NullType;
 
 public class JimpleUpVal extends Val {
 
+  private final JimpleUpMethod method;
   private final Value delegate;
 
-  public JimpleUpVal(Value delegate, Method method) {
+  public JimpleUpVal(Value delegate, JimpleUpMethod method) {
     this(delegate, method, null);
   }
 
-  protected JimpleUpVal(Value delegate, Method method, ControlFlowGraph.Edge unbalanced) {
+  protected JimpleUpVal(Value delegate, JimpleUpMethod method, ControlFlowGraph.Edge unbalanced) {
     super(method, unbalanced);
+
+    this.delegate = delegate;
+    this.method = method;
 
     if (delegate == null) {
       throw new RuntimeException("Value must not be null");
     }
-    this.delegate = delegate;
+  }
+
+  public Value getDelegate() {
+    return delegate;
   }
 
   @Override
   public Type getType() {
-    if (delegate == null) {
-      return new JimpleUpType(NullType.getInstance());
-    } else {
-      return new JimpleUpType(delegate.getType());
-    }
+    return new JimpleUpType(delegate.getType(), method.getView());
   }
 
   @Override
@@ -75,13 +76,18 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Type getNewExprType() {
-    assert isNewExpr();
-    return new JimpleUpType(((JNewExpr) delegate).getType());
+    if (isNewExpr()) {
+      JNewExpr newExpr = (JNewExpr) delegate;
+
+      return new JimpleUpType(newExpr.getType(), method.getView());
+    }
+
+    throw new RuntimeException("Val is not a new expression");
   }
 
   @Override
   public Val asUnbalanced(ControlFlowGraph.Edge stmt) {
-    return new JimpleUpVal(delegate, m, stmt);
+    return new JimpleUpVal(delegate, method, stmt);
   }
 
   @Override
@@ -99,7 +105,13 @@ public class JimpleUpVal extends Val {
     if (delegate instanceof JNewArrayExpr) {
       JNewArrayExpr newArrayExpr = (JNewArrayExpr) delegate;
 
-      return new JimpleUpVal(newArrayExpr.getSize(), m);
+      return new JimpleUpVal(newArrayExpr.getSize(), method);
+    }
+
+    if (delegate instanceof JNewMultiArrayExpr) {
+      JNewMultiArrayExpr newMultiArrayExpr = (JNewMultiArrayExpr) delegate;
+
+      return new JimpleUpVal(newMultiArrayExpr.getSize(0), method);
     }
 
     throw new RuntimeException("Val is not an array allocation val");
@@ -117,28 +129,11 @@ public class JimpleUpVal extends Val {
 
   @Override
   public String getStringValue() {
-    assert isStringConstant();
-    return ((StringConstant) delegate).getValue();
-  }
+    if (isStringConstant()) {
+      return ((StringConstant) delegate).getValue();
+    }
 
-  @Override
-  public boolean isStringBufferOrBuilder() {
-    Type type = getType();
-    return type.toString().equals("java.lang.String")
-        || type.toString().equals("java.lang.StringBuilder")
-        || type.toString().equals("java.lang.StringBuffer");
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return SootUpFrameworkScope.getInstance()
-        .getView()
-        .getTypeHierarchy()
-        .isSubtype(
-            ((JimpleUpType) getType()).getDelegate(),
-            SootUpFrameworkScope.getInstance()
-                .getIdentifierFactory()
-                .getClassType("java.lang.Throwable"));
+    throw new RuntimeException("Val is not a String constant");
   }
 
   @Override
@@ -148,10 +143,12 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Val getCastOp() {
-    assert isCast();
+    if (isCast()) {
+      JCastExpr castExpr = (JCastExpr) delegate;
+      return new JimpleUpVal(castExpr.getOp(), method);
+    }
 
-    JCastExpr castExpr = (JCastExpr) delegate;
-    return new JimpleUpVal(castExpr.getOp(), m);
+    throw new RuntimeException("Val is not a cast expression");
   }
 
   @Override
@@ -166,10 +163,12 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Val getInstanceOfOp() {
-    assert isInstanceOfExpr();
+    if (isInstanceOfExpr()) {
+      JInstanceOfExpr instanceOfExpr = (JInstanceOfExpr) delegate;
+      return new JimpleUpVal(instanceOfExpr.getOp(), method);
+    }
 
-    JInstanceOfExpr instanceOfExpr = (JInstanceOfExpr) delegate;
-    return new JimpleUpVal(instanceOfExpr.getOp(), m);
+    throw new RuntimeException("Val is not an instanceOf expression");
   }
 
   @Override
@@ -179,10 +178,12 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Val getLengthOp() {
-    assert isLengthExpr();
+    if (isLengthExpr()) {
+      JLengthExpr lengthExpr = (JLengthExpr) delegate;
+      return new JimpleUpVal(lengthExpr.getOp(), method);
+    }
 
-    JLengthExpr lengthExpr = (JLengthExpr) delegate;
-    return new JimpleUpVal(lengthExpr.getOp(), m);
+    throw new RuntimeException("Val is not a length expression");
   }
 
   @Override
@@ -197,10 +198,12 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Type getClassConstantType() {
-    assert isClassConstant();
+    if (isClassConstant()) {
+      ClassConstant constant = (ClassConstant) delegate;
+      return new JimpleUpType(constant.getType(), method.getView());
+    }
 
-    ClassConstant constant = (ClassConstant) delegate;
-    return new JimpleUpType(constant.getType());
+    throw new RuntimeException("Val is not a class constant");
   }
 
   @Override
@@ -210,7 +213,7 @@ public class JimpleUpVal extends Val {
 
   @Override
   public Val withSecondVal(Val leftOp) {
-    return new JimpleUpDoubleVal(delegate, m, leftOp);
+    return new JimpleUpDoubleVal(delegate, method, leftOp);
   }
 
   @Override
@@ -220,30 +223,33 @@ public class JimpleUpVal extends Val {
 
   @Override
   public int getIntValue() {
-    assert isIntConstant();
+    if (isIntConstant()) {
+      IntConstant intConstant = (IntConstant) delegate;
+      return intConstant.getValue();
+    }
 
-    IntConstant intConstant = (IntConstant) delegate;
-    return intConstant.getValue();
+    throw new RuntimeException("Val is not an int constant");
   }
 
   @Override
   public long getLongValue() {
-    assert isLongConstant();
+    if (isLongConstant()) {
+      LongConstant longConstant = (LongConstant) delegate;
+      return longConstant.getValue();
+    }
 
-    LongConstant longConstant = (LongConstant) delegate;
-    return longConstant.getValue();
+    throw new RuntimeException("Val is not a long constant");
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
-    assert isArrayRef();
+  public IArrayRef getArrayBase() {
+    if (isArrayRef()) {
+      JArrayRef arrayRef = (JArrayRef) delegate;
 
-    JArrayRef arrayRef = (JArrayRef) delegate;
-    return new Pair<>(
-        new JimpleUpVal(arrayRef.getBase(), m),
-        arrayRef.getIndex() instanceof IntConstant
-            ? ((IntConstant) arrayRef.getIndex()).getValue()
-            : -1);
+      return new JimpleUpArrayRef(arrayRef, method);
+    }
+
+    throw new RuntimeException("Val is not an array ref");
   }
 
   @Override
@@ -251,35 +257,22 @@ public class JimpleUpVal extends Val {
     return delegate.toString();
   }
 
-  public Value getDelegate() {
-    return delegate;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleUpVal that = (JimpleUpVal) o;
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(new Object[] {super.hashCode(), delegate});
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-
-    JimpleUpVal other = (JimpleUpVal) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override
   public String toString() {
-    return delegate.toString()
-        + " ("
-        + m.getDeclaringClass()
-        + "."
-        + m
-        + ")"
-        + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
+    return delegate.toString() + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
   }
 }

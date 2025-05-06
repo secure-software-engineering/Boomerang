@@ -30,5 +30,7 @@ public interface WrappedClass {
 
   String getFullyQualifiedName();
 
+  boolean isDefined();
+
   boolean isPhantom();
 }

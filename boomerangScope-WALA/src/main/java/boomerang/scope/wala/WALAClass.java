@@ -32,19 +32,16 @@ public class WALAClass implements WrappedClass {
 
   @Override
   public Collection<Method> getMethods() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public boolean hasSuperclass() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public WrappedClass getSuperclass() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -57,6 +54,11 @@ public class WALAClass implements WrappedClass {
   public boolean isApplicationClass() {
     return delegate.getClassLoader().equals(ClassLoaderReference.Application)
         || delegate.getClassLoader().equals(JavaSourceAnalysisScope.SOURCE);
+  }
+
+  @Override
+  public boolean isDefined() {
+    return false;
   }
 
   @Override

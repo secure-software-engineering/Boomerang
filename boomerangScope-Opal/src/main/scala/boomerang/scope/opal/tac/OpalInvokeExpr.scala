@@ -33,7 +33,7 @@ class OpalMethodInvokeExpr(
     val result = new util.ArrayList[Val]
 
     delegate.params.foreach(param => {
-      result.add(new OpalLocal(param.asVar, method))
+      result.add(new OpalVal(param, method))
     })
 
     result
@@ -44,7 +44,7 @@ class OpalMethodInvokeExpr(
 
   override def getBase: Val = {
     if (isInstanceInvokeExpr) {
-      return new OpalLocal(delegate.asInstanceMethodCall.receiver.asVar, method)
+      return new OpalVal(delegate.asInstanceMethodCall.receiver, method)
     }
 
     throw new RuntimeException(
@@ -53,7 +53,7 @@ class OpalMethodInvokeExpr(
   }
 
   override def getDeclaredMethod: DeclaredMethod =
-    OpalDeclaredMethod(this, delegate)
+    new OpalDeclaredMethod(this, delegate, method)
 
   override def isSpecialInvokeExpr: Boolean =
     delegate.astID == NonVirtualMethodCall.ASTID
@@ -81,7 +81,7 @@ class OpalFunctionInvokeExpr(
     val result = new util.ArrayList[Val]
 
     delegate.params.foreach(param => {
-      result.add(new OpalLocal(param.asVar, method))
+      result.add(new OpalVal(param, method))
     })
 
     result
@@ -92,8 +92,8 @@ class OpalFunctionInvokeExpr(
 
   override def getBase: Val = {
     if (isInstanceInvokeExpr) {
-      return new OpalLocal(
-        delegate.asInstanceFunctionCall.receiver.asVar,
+      return new OpalVal(
+        delegate.asInstanceFunctionCall.receiver,
         method
       )
     }
@@ -104,7 +104,7 @@ class OpalFunctionInvokeExpr(
   }
 
   override def getDeclaredMethod: DeclaredMethod =
-    OpalDeclaredMethod(this, delegate)
+    new OpalDeclaredMethod(this, delegate, method)
 
   override def isSpecialInvokeExpr: Boolean =
     delegate.astID == NonVirtualFunctionCall.ASTID

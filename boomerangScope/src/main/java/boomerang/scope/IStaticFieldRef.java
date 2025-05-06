@@ -14,9 +14,15 @@
  */
 package boomerang.scope;
 
-public interface InstanceFieldRef {
+/**
+ * Interface that provides basic methods to deal with static field references. A static field
+ * reference <i>C.f</i> consists of a declaring class <i>C</i> and a field <i>f</i>.
+ */
+public interface IStaticFieldRef {
 
-  Val getBase();
+  WrappedClass getDeclaringClass();
 
   Field getField();
+
+  StaticFieldVal asStaticFieldVal();
 }

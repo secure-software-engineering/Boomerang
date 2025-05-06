@@ -128,7 +128,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void analyzeWithCallGraph(FrameworkScope frameworkScope, boolean ignoreAllocSites) {
-    LOGGER.info("Running test method " + testName.getMethodName());
+    LOGGER.info("Running test method \"{}\"", testName.getMethodName());
     CallGraph callGraph = frameworkScope.getCallGraph();
     queryDetector = new QueryForCallSiteDetector(callGraph);
     queryForCallSites = queryDetector.computeSeeds();
@@ -365,7 +365,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void checkContainsAllExpectedAccessPath(Set<AccessPath> allAliases) {
-    HashSet<AccessPath> expected = new LinkedHashSet(queryDetector.expectedAccessPaths);
+    HashSet<AccessPath> expected = new LinkedHashSet<>(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);

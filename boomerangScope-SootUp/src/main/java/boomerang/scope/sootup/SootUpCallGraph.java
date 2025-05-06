@@ -23,11 +23,12 @@ import java.util.Optional;
 import sootup.core.jimple.common.stmt.InvokableStmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.core.JavaSootMethod;
+import sootup.java.core.views.JavaView;
 
 public class SootUpCallGraph extends CallGraph {
 
   public SootUpCallGraph(
-      sootup.callgraph.CallGraph callGraph, Collection<JavaSootMethod> entryPoints) {
+      JavaView view, sootup.callgraph.CallGraph callGraph, Collection<JavaSootMethod> entryPoints) {
 
     assert !callGraph.getMethodSignatures().isEmpty();
     assert !entryPoints.isEmpty();
@@ -37,10 +38,9 @@ public class SootUpCallGraph extends CallGraph {
         .flatMap((MethodSignature methodSignature) -> callGraph.callsTo(methodSignature).stream())
         .forEach(
             call -> {
-              Optional<JavaSootMethod> sourceOpt =
-                  SootUpFrameworkScope.getInstance().getSootMethod(call.getSourceMethodSignature());
-              Optional<JavaSootMethod> targetOpt =
-                  SootUpFrameworkScope.getInstance().getSootMethod(call.getTargetMethodSignature());
+              // TODO Integrate Phantom methods
+              Optional<JavaSootMethod> sourceOpt = view.getMethod(call.getSourceMethodSignature());
+              Optional<JavaSootMethod> targetOpt = view.getMethod(call.getTargetMethodSignature());
 
               if (sourceOpt.isEmpty() || targetOpt.isEmpty()) {
                 return;
@@ -58,15 +58,15 @@ public class SootUpCallGraph extends CallGraph {
               }
 
               Statement callSite =
-                  JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(sourceMethod));
-              this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetMethod)));
+                  JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(sourceMethod, view));
+              this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetMethod, view)));
 
               LOGGER.trace("Added edge {} -> {}", callSite, targetMethod);
             });
 
     for (JavaSootMethod m : entryPoints) {
       if (m.hasBody()) {
-        this.addEntryPoint(JimpleUpMethod.of(m));
+        this.addEntryPoint(JimpleUpMethod.of(m, view));
         LOGGER.trace("Added entry point: {}", m);
       }
     }

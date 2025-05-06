@@ -107,16 +107,6 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    return delegate.isStringBufferOrBuilder();
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return delegate.isThrowableAllocationType();
-  }
-
-  @Override
   public boolean isCast() {
     return delegate.isCast();
   }
@@ -192,7 +182,7 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     return delegate.getArrayBase();
   }
 

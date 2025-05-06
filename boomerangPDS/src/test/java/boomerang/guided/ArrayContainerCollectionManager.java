@@ -31,7 +31,7 @@ public class ArrayContainerCollectionManager implements IDemandDrivenGuidedManag
     // Any statement of type someVariable[..] = rightOp
     if (targetStmt.isAssignStmt() && targetStmt.getLeftOp().isArrayRef()) {
       // If propagated fact also matches "someVariable"
-      if (targetStmt.getLeftOp().getArrayBase().getX().equals(dataFlowVal)) {
+      if (targetStmt.getLeftOp().getArrayBase().getBase().equals(dataFlowVal)) {
         // Do start a new backward query for rightOp
         return Collections.singleton(BackwardQuery.make(dataFlowEdge, targetStmt.getRightOp()));
       }

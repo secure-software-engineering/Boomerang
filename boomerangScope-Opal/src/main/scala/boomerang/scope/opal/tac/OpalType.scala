@@ -14,14 +14,15 @@
  */
 package boomerang.scope.opal.tac
 
-import boomerang.scope.AllocVal
 import boomerang.scope.Type
 import boomerang.scope.Val
 import boomerang.scope.WrappedClass
-import boomerang.scope.opal.OpalClient
+import java.util.Objects
 import org.opalj.br.ObjectType
+import org.opalj.br.analyses.Project
+import org.opalj.value.ValueInformation
 
-case class OpalType(delegate: org.opalj.br.Type) extends Type {
+class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Type {
 
   override def isNullType: Boolean = false
 
@@ -29,22 +30,14 @@ case class OpalType(delegate: org.opalj.br.Type) extends Type {
 
   override def isArrayType: Boolean = delegate.isArrayType
 
-  override def getArrayBaseType: Type = OpalType(delegate.asArrayType)
+  override def getArrayBaseType: Type = new OpalType(delegate.asArrayType.componentType, project)
 
   override def getWrappedClass: WrappedClass = {
     if (isRefType) {
-      val declaringClass = OpalClient.getClassFileForType(delegate.asObjectType)
-
-      if (declaringClass.isDefined) {
-        OpalWrappedClass(declaringClass.get)
-      } else {
-        OpalPhantomWrappedClass(delegate.asReferenceType)
-      }
+      return new OpalWrappedClass(delegate.asReferenceType.mostPreciseObjectType, project)
     }
 
-    throw new RuntimeException(
-      "Cannot compute declaring class because type is not a RefType"
-    )
+    throw new RuntimeException("Class of non reference type not available")
   }
 
   override def doesCastFail(targetValType: Type, target: Val): Boolean = {
@@ -70,7 +63,7 @@ case class OpalType(delegate: org.opalj.br.Type) extends Type {
       return false
     }
 
-    OpalClient.getClassHierarchy.isSubtypeOf(
+    project.classHierarchy.isSubtypeOf(
       delegate.asObjectType,
       ObjectType(otherType.replace(".", "/"))
     )
@@ -81,13 +74,48 @@ case class OpalType(delegate: org.opalj.br.Type) extends Type {
       return false
     }
 
-    OpalClient.getClassHierarchy.isSubtypeOf(
-      ObjectType(subType),
+    project.classHierarchy.isSubtypeOf(
+      ObjectType(subType.replace(".", "/")),
       delegate.asObjectType
     )
   }
 
   override def isBooleanType: Boolean = delegate.isBooleanType
 
+  override def hashCode: Int = Objects.hash(delegate)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalType => this.delegate == that.delegate
+    case _ => false
+  }
+
   override def toString: String = delegate.toJava
+}
+
+object OpalType {
+
+  def valueInformationToType(value: ValueInformation, project: Project[_]): Type = {
+    if (value.isPrimitiveValue) {
+      return new OpalType(value.asPrimitiveValue.primitiveType, project)
+    }
+
+    if (value.isReferenceValue) {
+      if (value.asReferenceValue.isPrecise) {
+        if (value.asReferenceValue.isNull.isYes) {
+          return OpalNullType
+        } else {
+          return new OpalType(value.asReferenceValue.asReferenceType, project)
+        }
+      } else {
+        return new OpalType(value.asReferenceValue.upperTypeBound.head, project)
+      }
+    }
+
+    if (value.isVoid) {
+      return new OpalType(ObjectType.Void, project)
+    }
+
+    // TODO Array and illegal types (not sure if they ever occur)
+    throw new RuntimeException("Type not implemented yet")
+  }
 }

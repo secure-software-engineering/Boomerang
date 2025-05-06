@@ -17,14 +17,21 @@ package boomerang.scope.soot.jimple;
 import boomerang.scope.Field;
 import boomerang.scope.Type;
 import java.util.Objects;
-import soot.SootField;
+import soot.Scene;
+import soot.SootFieldRef;
 
 public class JimpleField extends Field {
 
-  private final SootField delegate;
+  private final SootFieldRef delegate;
+  private final Scene scene;
 
-  public JimpleField(SootField delegate) {
+  public JimpleField(SootFieldRef delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
+  }
+
+  public SootFieldRef getDelegate() {
+    return this.delegate;
   }
 
   @Override
@@ -34,16 +41,17 @@ public class JimpleField extends Field {
 
   @Override
   public boolean isInnerClassField() {
-    return this.delegate.getName().contains("$");
+    return this.delegate.name().contains("$");
   }
 
   @Override
   public Type getType() {
-    return new JimpleType(delegate.getType());
+    return new JimpleType(delegate.type(), scene);
   }
 
-  public SootField getDelegate() {
-    return this.delegate;
+  @Override
+  public String getName() {
+    return delegate.name();
   }
 
   @Override
@@ -52,16 +60,19 @@ public class JimpleField extends Field {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     JimpleField that = (JimpleField) o;
-    return Objects.equals(delegate, that.delegate);
+    // Important: Do not include the declaring class because subclasses may access the field, too
+    return Objects.equals(delegate.type(), that.delegate.type())
+        && Objects.equals(delegate.name(), that.delegate.name());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    // Important: Do not include the declaring class because subclasses may access the field, too
+    return Objects.hash(super.hashCode(), delegate.type(), delegate.name());
   }
 
   @Override
   public String toString() {
-    return delegate.getName();
+    return delegate.name();
   }
 }

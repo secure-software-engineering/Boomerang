@@ -33,9 +33,15 @@ import soot.SootClass;
 public class JimpleType implements Type {
 
   private final soot.Type delegate;
+  private final Scene scene;
 
-  public JimpleType(soot.Type type) {
+  public JimpleType(soot.Type type, Scene scene) {
     this.delegate = type;
+    this.scene = scene;
+  }
+
+  public soot.Type getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -60,16 +66,22 @@ public class JimpleType implements Type {
 
   @Override
   public Type getArrayBaseType() {
-    return new JimpleType(((ArrayType) delegate).baseType);
+    if (isArrayType()) {
+      ArrayType arrayType = (ArrayType) delegate;
+
+      return new JimpleType(arrayType.baseType, scene);
+    }
+
+    throw new RuntimeException("Type is not an array type: " + delegate);
   }
 
   @Override
   public WrappedClass getWrappedClass() {
-    return new JimpleWrappedClass(((RefType) delegate).getSootClass());
-  }
+    if (isRefType()) {
+      return new JimpleWrappedClass(((RefType) delegate).getSootClass(), scene);
+    }
 
-  public soot.Type getDelegate() {
-    return delegate;
+    throw new RuntimeException("Class of non reference type is not available");
   }
 
   @Override
@@ -79,7 +91,7 @@ public class JimpleType implements Type {
     if (targetType.getSootClass().isPhantom() || sourceType.getSootClass().isPhantom())
       return false;
     if (target instanceof AllocVal && ((AllocVal) target).getAllocVal().isNewExpr()) {
-      boolean castFails = Scene.v().getOrMakeFastHierarchy().canStoreType(targetType, sourceType);
+      boolean castFails = scene.getOrMakeFastHierarchy().canStoreType(targetType, sourceType);
       return !castFails;
     }
     // TODO this line is necessary as canStoreType does not properly work for
@@ -88,14 +100,14 @@ public class JimpleType implements Type {
       return false;
     }
     boolean castFails =
-        Scene.v().getOrMakeFastHierarchy().canStoreType(targetType, sourceType)
-            || Scene.v().getOrMakeFastHierarchy().canStoreType(sourceType, targetType);
+        scene.getOrMakeFastHierarchy().canStoreType(targetType, sourceType)
+            || scene.getOrMakeFastHierarchy().canStoreType(sourceType, targetType);
     return !castFails;
   }
 
   // TODO Use FullHierarchy
   public boolean isSubtypeOf(String type) {
-    SootClass interfaceType = Scene.v().getSootClass(type);
+    SootClass interfaceType = scene.getSootClass(type);
     if (delegate.toString().equals(type)) return true;
     if (!(delegate instanceof RefType)) {
       if (delegate instanceof ArrayType) {
@@ -109,13 +121,13 @@ public class JimpleType implements Type {
 
     RefType allocatedType = (RefType) delegate;
     if (!interfaceType.isInterface()) {
-      return Scene.v().getFastHierarchy().isSubclass(allocatedType.getSootClass(), interfaceType);
+      return scene.getOrMakeFastHierarchy().isSubclass(allocatedType.getSootClass(), interfaceType);
     }
-    if (Scene.v()
+    if (scene
         .getActiveHierarchy()
         .getSubinterfacesOfIncluding(interfaceType)
         .contains(allocatedType.getSootClass())) return true;
-    return Scene.v()
+    return scene
         .getActiveHierarchy()
         .getImplementersOf(interfaceType)
         .contains(allocatedType.getSootClass());
@@ -130,7 +142,7 @@ public class JimpleType implements Type {
       return false;
     }
 
-    if (!Scene.v().containsClass(subType)) {
+    if (!scene.containsClass(subType)) {
       return false;
     }
 
@@ -140,7 +152,7 @@ public class JimpleType implements Type {
     }
 
     SootClass thisClass = thisType.getSootClass();
-    SootClass subClass = Scene.v().getSootClass(subType);
+    SootClass subClass = scene.getSootClass(subType);
 
     Collection<SootClass> hierarchy = getFullHierarchy(subClass, new HashSet<>());
     return hierarchy.contains(thisClass);
@@ -166,7 +178,7 @@ public class JimpleType implements Type {
     if (sourceClass.isInterface()) {
       // Super interfaces
       Collection<SootClass> superInterfaces =
-          Scene.v().getActiveHierarchy().getSuperinterfacesOf(sourceClass);
+          scene.getActiveHierarchy().getSuperinterfacesOf(sourceClass);
 
       for (SootClass superInterface : superInterfaces) {
         result.addAll(getFullHierarchy(superInterface, visited));
@@ -174,7 +186,7 @@ public class JimpleType implements Type {
     } else {
       // Super classes
       Collection<SootClass> superClasses =
-          Scene.v().getActiveHierarchy().getSuperclassesOf(sourceClass);
+          scene.getActiveHierarchy().getSuperclassesOf(sourceClass);
 
       for (SootClass superClass : superClasses) {
         result.addAll(getFullHierarchy(superClass, visited));

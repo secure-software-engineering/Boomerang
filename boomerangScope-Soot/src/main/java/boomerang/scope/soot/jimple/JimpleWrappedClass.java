@@ -21,16 +21,23 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 
 public class JimpleWrappedClass implements WrappedClass {
 
   private final SootClass delegate;
+  private final Scene scene;
   private Collection<Method> methods;
 
-  public JimpleWrappedClass(SootClass delegate) {
+  public JimpleWrappedClass(SootClass delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
+  }
+
+  public SootClass getDelegate() {
+    return delegate;
   }
 
   public Collection<Method> getMethods() {
@@ -38,7 +45,7 @@ public class JimpleWrappedClass implements WrappedClass {
     if (methods == null) {
       methods = new LinkedHashSet<>();
       for (SootMethod m : ms) {
-        if (m.hasActiveBody()) methods.add(JimpleMethod.of(m));
+        if (m.hasActiveBody()) methods.add(JimpleMethod.of(m, scene));
       }
     }
     return methods;
@@ -49,11 +56,11 @@ public class JimpleWrappedClass implements WrappedClass {
   }
 
   public WrappedClass getSuperclass() {
-    return new JimpleWrappedClass(delegate.getSuperclass());
+    return new JimpleWrappedClass(delegate.getSuperclass(), scene);
   }
 
   public Type getType() {
-    return new JimpleType(delegate.getType());
+    return new JimpleType(delegate.getType(), scene);
   }
 
   public boolean isApplicationClass() {
@@ -66,12 +73,13 @@ public class JimpleWrappedClass implements WrappedClass {
   }
 
   @Override
-  public boolean isPhantom() {
-    return delegate.isPhantom();
+  public boolean isDefined() {
+    return !delegate.isPhantom();
   }
 
-  public SootClass getDelegate() {
-    return delegate;
+  @Override
+  public boolean isPhantom() {
+    return delegate.isPhantom();
   }
 
   @Override

@@ -24,21 +24,20 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueFactory;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opalj.br.BooleanType$;
@@ -49,6 +48,7 @@ import org.opalj.br.DoubleType$;
 import org.opalj.br.FieldType;
 import org.opalj.br.FloatType$;
 import org.opalj.br.IntegerType$;
+import org.opalj.br.JVMMethod;
 import org.opalj.br.LongType$;
 import org.opalj.br.MethodDescriptor$;
 import org.opalj.br.ObjectType;
@@ -152,18 +152,22 @@ public class OpalTestSetup implements TestSetup {
 
   @Override
   public Method getTestMethod() {
-    return OpalMethod.apply(testMethod);
+    return OpalMethod.of(testMethod, project);
   }
 
   @Override
   public FrameworkScope createFrameworkScope(DataFlowScope dataFlowScope) {
     CallGraph callGraph = project.get(CHACallGraphKey$.MODULE$);
 
-    return new OpalFrameworkScope(
-        project,
-        callGraph,
-        CollectionConverters.asScala(Set.of(testMethod)).toSet(),
-        dataFlowScope);
+    // Add the static initializers of the test class target and its subclasses to the entry points
+    scala.collection.immutable.Set<org.opalj.br.Method> allClinit =
+        project.allMethodsWithBody().filter(JVMMethod::isStaticInitializer).toSet();
+    scala.collection.immutable.Set<org.opalj.br.Method> clinitInTarget =
+        allClinit.filter(m -> m.classFile().fqn().startsWith(testMethod.classFile().fqn())).toSet();
+    scala.collection.immutable.Set<org.opalj.br.Method> entryPoints =
+        clinitInTarget.$plus(testMethod);
+
+    return new OpalFrameworkScope(project, callGraph, entryPoints, dataFlowScope);
   }
 
   private File[] loadClassPathFiles(
@@ -199,18 +203,25 @@ public class OpalTestSetup implements TestSetup {
 
     try (FileSystem fs =
         FileSystems.newFileSystem(URI.create("jrt:/"), java.util.Collections.emptyMap())) {
+      Path outputDir = Paths.get("jdk_classes");
+      Files.createDirectories(outputDir);
+
       for (String className : includeList) {
-        String pathInJrt = "/modules/java.base/" + className.replace('.', '/') + ".class";
+        Path rootPath = fs.getPath("/modules/java.base/");
+        String pathInJrt = rootPath + "/" + className.replace('.', '/') + ".class";
         Path jrtPath = fs.getPath(pathInJrt);
 
-        // Copy to a temp file
-        Path tempFile = Files.createTempFile(className.replace('.', '_'), ".class");
-        try (InputStream in = Files.newInputStream(jrtPath);
-            OutputStream out = Files.newOutputStream(tempFile)) {
-          in.transferTo(out);
-        }
+        Path relativePath = rootPath.relativize(jrtPath);
+        Path targetPath = outputDir.resolve(relativePath.toString());
 
-        result.add(tempFile.toFile());
+        try {
+          Files.createDirectories(targetPath.getParent());
+          Files.copy(jrtPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+          result.add(targetPath.toFile());
+        } catch (IOException e) {
+          throw new RuntimeException("Could not copy file to target directory: " + e.getMessage());
+        }
       }
     } catch (IOException e) {
       throw new RuntimeException("Could not read classes from JDK: " + e.getMessage());

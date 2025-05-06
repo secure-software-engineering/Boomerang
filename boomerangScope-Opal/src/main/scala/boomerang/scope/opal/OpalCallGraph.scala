@@ -58,7 +58,7 @@ class OpalCallGraph(
 
     tacCode.statements.foreach(stmt => {
       val srcStatement =
-        new OpalStatement(stmt, OpalMethod(method.definedMethod, tacCode))
+        new OpalStatement(stmt, OpalMethod.of(method.definedMethod, tacCode, project))
 
       if (srcStatement.containsInvokeExpr()) {
         // Due to inlining variables, the PC's of statements and invoke expressions may differ
@@ -71,31 +71,33 @@ class OpalCallGraph(
               val method = definedMethod.definedMethod
 
               if (method.body.isDefined) {
-                val targetMethod = OpalMethod(method)
+                val targetMethod = OpalMethod.of(method, project)
 
                 addEdge(new Edge(srcStatement, targetMethod))
               } else {
-                val targetMethod = OpalPhantomMethod(
+                val targetMethod = OpalPhantomMethod.of(
                   definedMethod.declaringClassType,
                   definedMethod.name,
                   definedMethod.descriptor,
-                  method.isStatic
+                  method.isStatic,
+                  project
                 )
 
                 addEdge(new Edge(srcStatement, targetMethod))
               }
             case virtualMethod: VirtualDeclaredMethod =>
-              val targetMethod = OpalPhantomMethod(
+              val targetMethod = OpalPhantomMethod.of(
                 virtualMethod.declaringClassType,
                 virtualMethod.name,
                 virtualMethod.descriptor,
-                srcStatement.getInvokeExpr.isStaticInvokeExpr
+                srcStatement.getInvokeExpr.isStaticInvokeExpr,
+                project
               )
 
               addEdge(new Edge(srcStatement, targetMethod))
             case definedMethods: MultipleDefinedMethods =>
               definedMethods.foreachDefinedMethod(method => {
-                val targetMethod = OpalMethod(method)
+                val targetMethod = OpalMethod.of(method, project)
 
                 addEdge(new Edge(srcStatement, targetMethod))
               })
@@ -124,22 +126,9 @@ class OpalCallGraph(
     }
   }
 
-  // Explicitly add static initializers (<clinit>) as they are called only implicitly
-  callGraph
-    .reachableMethods()
-    .foreach(method => {
-      method.method match {
-        case definedMethod: DefinedMethod if definedMethod.definedMethod.isStaticInitializer =>
-          if (definedMethod.definedMethod.body.isDefined) {
-            addEntryPoint(OpalMethod(definedMethod.definedMethod))
-          }
-        case _ =>
-      }
-    })
-
   entryPoints.foreach(entryPoint => {
     if (entryPoint.body.isDefined) {
-      addEntryPoint(OpalMethod(entryPoint))
+      addEntryPoint(OpalMethod.of(entryPoint, project))
     }
   })
 }
