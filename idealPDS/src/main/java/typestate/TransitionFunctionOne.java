@@ -31,7 +31,7 @@ public class TransitionFunctionOne implements TransitionFunction {
 
   @NonNull private static final TransitionFunctionOne one = new TransitionFunctionOne();
 
-  public TransitionFunctionOne() {}
+  private TransitionFunctionOne() {}
 
   public static TransitionFunctionOne one() {
     return one;
