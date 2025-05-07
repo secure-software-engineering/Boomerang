@@ -17,6 +17,7 @@ package boomerang.scope.sootup;
 import boomerang.scope.CallGraph;
 import boomerang.scope.Statement;
 import boomerang.scope.sootup.jimple.JimpleUpMethod;
+import boomerang.scope.sootup.jimple.JimpleUpPhantomMethod;
 import boomerang.scope.sootup.jimple.JimpleUpStatement;
 import java.util.Collection;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class SootUpCallGraph extends CallGraph {
 
               JavaSootMethod sourceMethod = sourceOpt.get();
               JavaSootMethod targetMethod = targetOpt.get();
-              if (!sourceMethod.hasBody() || !targetMethod.hasBody()) {
+              if (!sourceMethod.hasBody()) {
                 return;
               }
 
@@ -59,7 +60,12 @@ public class SootUpCallGraph extends CallGraph {
 
               Statement callSite =
                   JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(sourceMethod, view));
-              this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetMethod, view)));
+
+              if (targetMethod.hasBody()) {
+                this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetMethod, view)));
+              } else {
+                this.addEdge(new Edge(callSite, JimpleUpPhantomMethod.of(targetMethod, view)));
+              }
 
               LOGGER.trace("Added edge {} -> {}", callSite, targetMethod);
             });
