@@ -70,7 +70,7 @@ public class SootUpTestSetup implements TestSetup {
             testClassPath.toString(), SourceType.Application, interceptors);
     AnalysisInputLocation jdkClassInput =
         new JavaClassPathAnalysisInputLocation(
-            jdkClassPath.toString(), SourceType.Library, interceptors);
+            jdkClassPath.toString(), SourceType.Application, interceptors);
     view = new JavaView(List.of(testClassInput, jdkClassInput));
 
     // Load the test class
