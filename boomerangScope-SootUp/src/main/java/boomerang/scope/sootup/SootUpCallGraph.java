@@ -21,6 +21,8 @@ import boomerang.scope.sootup.jimple.JimpleUpPhantomMethod;
 import boomerang.scope.sootup.jimple.JimpleUpStatement;
 import java.util.Collection;
 import java.util.Optional;
+import sootup.core.jimple.common.expr.AbstractInvokeExpr;
+import sootup.core.jimple.common.expr.JStaticInvokeExpr;
 import sootup.core.jimple.common.stmt.InvokableStmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.core.JavaSootMethod;
@@ -39,16 +41,12 @@ public class SootUpCallGraph extends CallGraph {
         .flatMap((MethodSignature methodSignature) -> callGraph.callsTo(methodSignature).stream())
         .forEach(
             call -> {
-              // TODO Integrate Phantom methods
               Optional<JavaSootMethod> sourceOpt = view.getMethod(call.getSourceMethodSignature());
-              Optional<JavaSootMethod> targetOpt = view.getMethod(call.getTargetMethodSignature());
-
-              if (sourceOpt.isEmpty() || targetOpt.isEmpty()) {
+              if (sourceOpt.isEmpty()) {
                 return;
               }
 
               JavaSootMethod sourceMethod = sourceOpt.get();
-              JavaSootMethod targetMethod = targetOpt.get();
               if (!sourceMethod.hasBody()) {
                 return;
               }
@@ -61,13 +59,30 @@ public class SootUpCallGraph extends CallGraph {
               Statement callSite =
                   JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(sourceMethod, view));
 
-              if (targetMethod.hasBody()) {
-                this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetMethod, view)));
-              } else {
-                this.addEdge(new Edge(callSite, JimpleUpPhantomMethod.of(targetMethod, view)));
+              MethodSignature targetSig = call.getTargetMethodSignature();
+              Optional<JavaSootMethod> targetOpt = view.getMethod(targetSig);
+
+              Optional<AbstractInvokeExpr> invokeExprOpt = invokableStmt.getInvokeExpr();
+              if (invokeExprOpt.isEmpty()) {
+                return;
               }
 
-              LOGGER.trace("Added edge {} -> {}", callSite, targetMethod);
+              boolean isStaticInvokeExpr = invokeExprOpt.get() instanceof JStaticInvokeExpr;
+              if (targetOpt.isPresent()) {
+                if (targetOpt.get().hasBody()) {
+                  this.addEdge(new Edge(callSite, JimpleUpMethod.of(targetOpt.get(), view)));
+                } else {
+                  this.addEdge(
+                      new Edge(
+                          callSite, JimpleUpPhantomMethod.of(targetSig, view, isStaticInvokeExpr)));
+                }
+              } else {
+                this.addEdge(
+                    new Edge(
+                        callSite, JimpleUpPhantomMethod.of(targetSig, view, isStaticInvokeExpr)));
+              }
+
+              LOGGER.trace("Added edge {} -> {}", callSite, targetSig);
             });
 
     for (JavaSootMethod m : entryPoints) {
