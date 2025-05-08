@@ -36,6 +36,7 @@ import sootup.core.model.SourceType;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.transform.BodyInterceptor;
 import sootup.core.types.ClassType;
+import sootup.interceptors.TypeAssigner;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
@@ -53,11 +54,7 @@ public class SootUpTestSetup implements TestSetup {
       List<String> includedPackages,
       List<String> excludedPackages) {
 
-    // TODO
-    //  - Add required interceptors
-    //  - Check if interceptors need a reset in between runs
-
-    List<BodyInterceptor> interceptors = List.of(new BoomerangPreInterceptor());
+    List<BodyInterceptor> interceptors = List.of(new TypeAssigner(), new BoomerangPreInterceptor());
 
     Path testClassPath =
         TestSetupUtils.loadTestClasses(
