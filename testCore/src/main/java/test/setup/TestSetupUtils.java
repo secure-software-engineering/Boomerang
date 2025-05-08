@@ -148,6 +148,10 @@ public class TestSetupUtils {
   public static void deleteDirectory(String directory) {
     Path dir = Paths.get(directory);
 
+    if (!dir.toFile().exists()) {
+      return;
+    }
+
     try {
       Files.walkFileTree(
           dir,
