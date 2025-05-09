@@ -118,14 +118,19 @@ public class JimpleUpType implements Type {
       return false;
     }
 
-    // TODO Deal with Array type and null type
+    if (delegate instanceof NullType) {
+      return false;
+    }
+
+    if (delegate instanceof ArrayType) {
+      // Java treats array types as references of the object class
+      return type.equals("java.lang.Object");
+    }
+
     if (!(delegate instanceof ClassType)) {
       return false;
     }
 
-    // TODO
-    //  Not sure if this logic is sufficient. Soot computes the complete class
-    //  hierarchy, i.e. all possible super classes and interfaces
     JavaClassType superType = view.getIdentifierFactory().getClassType(type);
 
     TypeHierarchy hierarchy = view.getTypeHierarchy();
@@ -133,16 +138,7 @@ public class JimpleUpType implements Type {
       return false;
     }
 
-    return view.getTypeHierarchy().isSubtype(superType, delegate);
-
-    /*JavaClassType allocatedType = (JavaClassType) delegate;
-    if (!superClass.get().isInterface()) {
-      return view.getTypeHierarchy().isSubtype(allocatedType, superClass.get().getType());
-    }
-
-    return view.getTypeHierarchy()
-        .implementersOf(superClass.get().getType())
-        .anyMatch(t -> t == allocatedType);*/
+    return hierarchy.isSubtype(superType, delegate);
   }
 
   @Override
@@ -154,14 +150,19 @@ public class JimpleUpType implements Type {
       return false;
     }
 
-    // TODO Deal with array type and null
+    if (delegate instanceof NullType) {
+      return false;
+    }
+
+    if (delegate instanceof ArrayType) {
+      // Java treats array types as references of the object class
+      return subTypeStr.equals("java.lang.Object");
+    }
+
     if (!(delegate instanceof ClassType)) {
       return false;
     }
 
-    // TODO
-    //  Not sure if this logic is sufficient. Soot computes the complete class
-    //  hierarchy, i.e. all possible super classes and interfaces
     JavaClassType superType = view.getIdentifierFactory().getClassType(subTypeStr);
 
     TypeHierarchy hierarchy = view.getTypeHierarchy();
@@ -169,19 +170,7 @@ public class JimpleUpType implements Type {
       return false;
     }
 
-    return view.getTypeHierarchy().isSubtype(delegate, superType);
-    /*
-    JavaClassType subType = view.getIdentifierFactory().getClassType(subTypeStr);
-    if (!view.getTypeHierarchy().contains(subType)) {
-      return false;
-    }
-
-    JavaClassType thisType = view.getIdentifierFactory().getClassType(delegate.toString());
-    if (!view.getTypeHierarchy().contains(thisType)) {
-      return false;
-    }
-
-    return view.getTypeHierarchy().isSubtype(subType, thisType);*/
+    return hierarchy.isSubtype(delegate, superType);
   }
 
   @Override
