@@ -23,30 +23,29 @@ import com.google.common.collect.Interners;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import sootup.java.core.JavaSootMethod;
+import sootup.core.signatures.MethodSignature;
 import sootup.java.core.views.JavaView;
 
 public class JimpleUpPhantomMethod extends PhantomMethod {
 
   protected static Interner<JimpleUpPhantomMethod> INTERNAL_POOL = Interners.newWeakInterner();
 
-  private final JavaSootMethod delegate;
+  private final MethodSignature delegate;
   private final JavaView view;
+  private final boolean isStatic;
 
-  protected JimpleUpPhantomMethod(JavaSootMethod delegate, JavaView view) {
+  protected JimpleUpPhantomMethod(MethodSignature delegate, JavaView view, boolean isStatic) {
     this.delegate = delegate;
     this.view = view;
-
-    if (delegate.hasBody()) {
-      throw new IllegalArgumentException("Cannot build phantom method from method with body");
-    }
+    this.isStatic = isStatic;
   }
 
-  public static JimpleUpPhantomMethod of(JavaSootMethod delegate, JavaView view) {
-    return INTERNAL_POOL.intern(new JimpleUpPhantomMethod(delegate, view));
+  public static JimpleUpPhantomMethod of(
+      MethodSignature delegate, JavaView view, boolean isStatic) {
+    return INTERNAL_POOL.intern(new JimpleUpPhantomMethod(delegate, view, isStatic));
   }
 
-  public JavaSootMethod getDelegate() {
+  public MethodSignature getDelegate() {
     return delegate;
   }
 
@@ -73,17 +72,17 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(delegate.getReturnType(), view);
+    return new JimpleUpType(delegate.getType(), view);
   }
 
   @Override
   public boolean isStatic() {
-    return delegate.isStatic();
+    return isStatic;
   }
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleUpWrappedClass(delegate.getDeclaringClassType(), view);
+    return new JimpleUpWrappedClass(delegate.getDeclClassType(), view);
   }
 
   @Override
@@ -116,6 +115,6 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
 
   @Override
   public String toString() {
-    return delegate.toString();
+    return "PHANTOM:" + delegate.toString();
   }
 }

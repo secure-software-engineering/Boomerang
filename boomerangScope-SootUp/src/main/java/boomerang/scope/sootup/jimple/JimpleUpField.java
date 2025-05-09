@@ -60,12 +60,15 @@ public class JimpleUpField extends Field {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     JimpleUpField that = (JimpleUpField) o;
-    return Objects.equals(delegate, that.delegate);
+    // Important: Do not include the declaring class because subclasses may access the field, too
+    return Objects.equals(delegate.getType(), that.delegate.getType())
+        && Objects.equals(delegate.getName(), that.delegate.getName());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    // Important: Do not include the declaring class because subclasses may access the field, too
+    return Objects.hash(super.hashCode(), delegate.getType(), delegate.getName());
   }
 
   @Override

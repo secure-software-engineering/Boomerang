@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -74,7 +75,7 @@ public class AbstractBoomerangTest extends TestingFramework {
 
   /**
    * Fails the test cases, when Boomerang's result set contains any object that does not inherit
-   * from {@link test.core.selfrunning.AllocatedObject}.
+   * from {@link AllocatedObject}.
    */
   private static final boolean TRACK_IMPLICIT_IMPRECISE = false;
 
@@ -370,5 +371,10 @@ public class AbstractBoomerangTest extends TestingFramework {
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);
     }
+  }
+
+  @After
+  public void cleanUp() {
+    super.cleanUp();
   }
 }

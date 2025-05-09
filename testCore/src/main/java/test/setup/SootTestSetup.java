@@ -117,4 +117,7 @@ public class SootTestSetup implements TestSetup {
     return new SootFrameworkScope(
         Scene.v(), Scene.v().getCallGraph(), Scene.v().getEntryPoints(), dataFlowScope);
   }
+
+  @Override
+  public void cleanUp() {}
 }

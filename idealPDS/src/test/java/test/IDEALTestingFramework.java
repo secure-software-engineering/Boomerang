@@ -41,6 +41,7 @@ import ideal.StoreIDEALResultHandler;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -211,5 +212,10 @@ public abstract class IDEALTestingFramework extends TestingFramework {
         queries.add(new MayBeInErrorState(stmt, seed));
       }
     }
+  }
+
+  @After
+  public void cleanUp() {
+    super.cleanUp();
   }
 }

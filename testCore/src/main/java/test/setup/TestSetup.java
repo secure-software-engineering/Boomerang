@@ -31,4 +31,6 @@ public interface TestSetup {
   Method getTestMethod();
 
   FrameworkScope createFrameworkScope(DataFlowScope dataFlowScope);
+
+  void cleanUp();
 }

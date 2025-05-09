@@ -82,7 +82,11 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     JimpleUpStaticFieldRef that = (JimpleUpStaticFieldRef) o;
-    return Objects.equals(delegate, that.delegate);
+    // TODO
+    //  Wrong equals implementation in SootUp. Once fixed, replace this with
+    //  the commented line
+    return (delegate != null && delegate.equals(that.delegate));
+    // return Objects.equals(delegate, that.delegate);
   }
 
   @Override

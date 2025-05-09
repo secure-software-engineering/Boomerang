@@ -23,18 +23,9 @@ import boomerang.utils.MethodWrapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueFactory;
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,13 +73,19 @@ public class OpalTestSetup implements TestSetup {
       List<String> excludedPackages) {
     OPALLogger.updateLogger(GlobalLogContext$.MODULE$, DevNullLogger$.MODULE$);
 
-    File[] classpathFiles =
-        loadClassPathFiles(classPath, methodWrapper.getDeclaringClass(), excludedPackages);
-    File[] includeFiles = loadJDKFiles(includedPackages);
+    // Load the classes from the test package
+    Path testClassFilesPath =
+        TestSetupUtils.loadTestClasses(
+            classPath, methodWrapper.getDeclaringClass(), excludedPackages);
+    File[] testClasses = TestSetupUtils.getFilesInDirectory(testClassFilesPath);
+
+    // Load required JDK classes
+    Path jdkClassFiles = TestSetupUtils.loadJDKFiles(includedPackages);
+    File[] jdkClasses = TestSetupUtils.getFilesInDirectory(jdkClassFiles);
+
     File[] classFiles =
-        Stream.concat(Arrays.stream(classpathFiles), Arrays.stream(includeFiles))
-            .toArray(File[]::new);
-    project = Project.apply(classFiles, new File[0]); // , package$.MODULE$.RTJar());
+        Stream.concat(Arrays.stream(testClasses), Arrays.stream(jdkClasses)).toArray(File[]::new);
+    project = Project.apply(classFiles, new File[0]);
 
     // Load the class that contains the test method
     Option<ClassFile> testClass =
@@ -170,64 +167,10 @@ public class OpalTestSetup implements TestSetup {
     return new OpalFrameworkScope(project, callGraph, entryPoints, dataFlowScope);
   }
 
-  private File[] loadClassPathFiles(
-      String classpath, String testClassName, List<String> excludeList) {
-    Path path = Path.of(classpath);
-
-    try (Stream<Path> stream = Files.walk(path)) {
-      Stream<File> classPathFiles = stream.filter(Files::isRegularFile).map(Path::toFile);
-
-      // Filter for excluded classes. Additionally, exclude all classes from different packages
-      // because CHA in Opal would add edges to methods from other classes
-      String packageName = testClassName.substring(0, testClassName.lastIndexOf("."));
-      return classPathFiles
-          .filter(c -> !isExcludedFile(c, classpath, packageName, excludeList))
-          .toArray(File[]::new);
-    } catch (IOException e) {
-      throw new RuntimeException("Could not read classpath: " + e.getMessage());
-    }
-  }
-
-  private boolean isExcludedFile(
-      File file, String classpath, String packageName, List<String> excludeList) {
-    // Remove the classpath and the .class ending
-    String path = file.getPath().replace("/", ".").replace("\\", ".");
-    String formattedClassPath = classpath.replace("/", ".").replace("\\", ".");
-    String formattedPath = path.replace(formattedClassPath, "").replace(".class", "").substring(1);
-
-    return !formattedPath.startsWith(packageName) || excludeList.contains(formattedPath);
-  }
-
-  private File[] loadJDKFiles(List<String> includeList) {
-    Collection<File> result = new ArrayList<>();
-
-    try (FileSystem fs =
-        FileSystems.newFileSystem(URI.create("jrt:/"), java.util.Collections.emptyMap())) {
-      Path outputDir = Paths.get("jdk_classes");
-      Files.createDirectories(outputDir);
-
-      for (String className : includeList) {
-        Path rootPath = fs.getPath("/modules/java.base/");
-        String pathInJrt = rootPath + "/" + className.replace('.', '/') + ".class";
-        Path jrtPath = fs.getPath(pathInJrt);
-
-        Path relativePath = rootPath.relativize(jrtPath);
-        Path targetPath = outputDir.resolve(relativePath.toString());
-
-        try {
-          Files.createDirectories(targetPath.getParent());
-          Files.copy(jrtPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-          result.add(targetPath.toFile());
-        } catch (IOException e) {
-          throw new RuntimeException("Could not copy file to target directory: " + e.getMessage());
-        }
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Could not read classes from JDK: " + e.getMessage());
-    }
-
-    return result.toArray(new File[0]);
+  @Override
+  public void cleanUp() {
+    TestSetupUtils.deleteDirectory(TestSetupUtils.APP_CLASSES);
+    TestSetupUtils.deleteDirectory(TestSetupUtils.JDK_CLASSES);
   }
 
   private String convertType(String type) {
