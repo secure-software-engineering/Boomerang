@@ -72,7 +72,7 @@ class OpalPhantomMethod private (
     case _ => false
   }
 
-  override def toString: String = s"PHANTOM: ${declaringClassType.toJava} $name"
+  override def toString: String = s"PHANTOM: ${descriptor.toJava}"
 }
 
 object OpalPhantomMethod {
