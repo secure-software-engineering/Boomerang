@@ -330,10 +330,12 @@ public class AbstractBoomerangTest extends TestingFramework {
       AnalysisMode analysis) {
     LOGGER.info(
         "Boomerang Results:\n - {}",
-        results.stream().map(r -> r.fact().toString()).collect(Collectors.joining("\n - ")));
+        results.stream().map(Node::toString).collect(Collectors.joining("\n - ")));
     LOGGER.info(
         "Expected Results:\n - {}",
-        expectedResults.stream().map(r -> r.var().toString()).collect(Collectors.joining("\n - ")));
+        expectedResults.stream()
+            .map(q -> q.asNode().toString())
+            .collect(Collectors.joining("\n - ")));
     Collection<Node<Edge, Val>> falseNegativeAllocationSites = new HashSet<>();
     for (Query res : expectedResults) {
       if (!results.contains(res.asNode())) falseNegativeAllocationSites.add(res.asNode());

@@ -40,6 +40,7 @@ public class FileMustBeClosedStrongUpdate {
     }
     b.close();
     Assertions.mayBeInErrorState(a);
+    Assertions.mayBeInErrorState(e);
     Assertions.mustBeInAcceptingState(b);
   }
 
