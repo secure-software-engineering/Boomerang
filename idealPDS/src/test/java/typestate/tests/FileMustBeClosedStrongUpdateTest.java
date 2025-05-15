@@ -31,7 +31,7 @@ public class FileMustBeClosedStrongUpdateTest extends IDEALTestingFramework {
 
   @Test
   public void noStrongUpdatePossible() {
-    analyze(target, testName.getMethodName(), 2, 2);
+    analyze(target, testName.getMethodName(), 3, 2);
   }
 
   @Test

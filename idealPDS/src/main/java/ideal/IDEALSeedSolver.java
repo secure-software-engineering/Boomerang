@@ -250,7 +250,7 @@ public class IDEALSeedSolver<W extends Weight> {
                 strongUpdateNode,
                 targetFact -> {
                   if (!e.getKey().asNode().equals(seed.asNode())) {
-                    if (!e.getKey().asNode().fact().isNull()) {
+                    if (!e.getKey().getAllocVal().getAllocVal().isNull()) {
                       setWeakUpdate(strongUpdateNode);
                     }
                   }
