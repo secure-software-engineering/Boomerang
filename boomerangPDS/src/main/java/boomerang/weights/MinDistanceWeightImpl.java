@@ -14,6 +14,8 @@
  */
 package boomerang.weights;
 
+import static boomerang.weights.MinDistanceWeightOne.one;
+
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
