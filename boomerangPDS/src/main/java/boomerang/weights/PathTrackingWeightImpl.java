@@ -31,43 +31,93 @@ public class PathTrackingWeightImpl implements PathTrackingWeight {
    */
   @NonNull private final LinkedHashSet<Node<Edge, Val>> shortestPathWitness;
 
-  private PathTrackingWeightImpl(LinkedHashSet<Node<Edge, Val>> allStatement) {
-    this.shortestPathWitness = allStatement;
-  }
+  /**
+   * This set keeps track of all statement along all paths that use an alias from source to sink.
+   */
+  @NonNull private final Set<LinkedHashSet<Node<Edge, Val>>> allPathWitness;
 
   public PathTrackingWeightImpl(Node<Edge, Val> relevantStatement) {
     this.shortestPathWitness = new LinkedHashSet<>();
     this.shortestPathWitness.add(relevantStatement);
+    LinkedHashSet<Node<Edge, Val>> firstDataFlowPath = new LinkedHashSet<>();
+    firstDataFlowPath.add(relevantStatement);
+    this.allPathWitness = new LinkedHashSet<>();
+    this.allPathWitness.add(firstDataFlowPath);
+  }
+
+  public PathTrackingWeightImpl(
+      LinkedHashSet<Node<Edge, Val>> allStatement,
+      Set<LinkedHashSet<Node<Edge, Val>>> allPathWitness) {
+    this.shortestPathWitness = allStatement;
+    this.allPathWitness = allPathWitness;
   }
 
   @NonNull
   @Override
-  public Weight extendWith(@NonNull Weight o) {
-    if (!(o instanceof PathTrackingWeightImpl)) {
-      throw new RuntimeException("Cannot extend to different types of weight!");
-    }
+  public Set<LinkedHashSet<Node<Edge, Val>>> getAllPathWitness() {
+    return allPathWitness;
+  }
 
-    PathTrackingWeightImpl other = (PathTrackingWeightImpl) o;
+  @NonNull
+  @Override
+  public Weight extendWith(Weight o) {
+    if (!(o instanceof PathTrackingWeight))
+      throw new RuntimeException("Cannot extend to different types of weight!");
+    PathTrackingWeight other = (PathTrackingWeight) o;
     LinkedHashSet<Node<Edge, Val>> newAllStatements = new LinkedHashSet<>();
     newAllStatements.addAll(shortestPathWitness);
-    newAllStatements.addAll(other.shortestPathWitness);
+    newAllStatements.addAll(other.getShortestPathWitness());
 
-    return new PathTrackingWeightImpl(newAllStatements);
+    Set<LinkedHashSet<Node<Edge, Val>>> newAllPathStatements = new LinkedHashSet<>();
+    for (LinkedHashSet<Node<Edge, Val>> pathPrefix : allPathWitness) {
+      for (LinkedHashSet<Node<Edge, Val>> pathSuffix : other.getAllPathWitness()) {
+        LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>();
+        combinedPath.addAll(pathPrefix);
+        combinedPath.addAll(pathSuffix);
+        newAllPathStatements.add(combinedPath);
+      }
+    }
+    if (allPathWitness.isEmpty()) {
+      for (LinkedHashSet<Node<Edge, Val>> pathSuffix : other.getAllPathWitness()) {
+        LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>(pathSuffix);
+        newAllPathStatements.add(combinedPath);
+      }
+    }
+    if (other.getAllPathWitness().isEmpty()) {
+      for (LinkedHashSet<Node<Edge, Val>> pathSuffix : allPathWitness) {
+        LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>(pathSuffix);
+        newAllPathStatements.add(combinedPath);
+      }
+    }
+
+    return new PathTrackingWeightImpl(newAllStatements, newAllPathStatements);
   }
 
   @NonNull
   @Override
-  public Weight combineWith(@NonNull Weight o) {
-    if (!(o instanceof PathTrackingWeightImpl)) {
+  public Weight combineWith(Weight o) {
+    if (!(o instanceof PathTrackingWeight))
       throw new RuntimeException("Cannot extend to different types of weight!");
+    PathTrackingWeight other = (PathTrackingWeight) o;
+    Set<LinkedHashSet<Node<Edge, Val>>> newAllPathStatements = new LinkedHashSet<>();
+    for (LinkedHashSet<Node<Edge, Val>> pathPrefix : allPathWitness) {
+      // TODO: [ms] check: do we have to copy or can we just point to it?
+      LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>(pathPrefix);
+      newAllPathStatements.add(combinedPath);
     }
-    PathTrackingWeightImpl other = (PathTrackingWeightImpl) o;
-
-    if (shortestPathWitness.size() > other.shortestPathWitness.size()) {
-      return new PathTrackingWeightImpl(new LinkedHashSet<>(other.shortestPathWitness));
+    for (LinkedHashSet<Node<Edge, Val>> pathPrefix : other.getAllPathWitness()) {
+      // TODO: [ms] check: do we have to copy or can we just point to it?
+      LinkedHashSet<Node<Edge, Val>> combinedPath = new LinkedHashSet<>(pathPrefix);
+      newAllPathStatements.add(combinedPath);
     }
 
-    return new PathTrackingWeightImpl(new LinkedHashSet<>(this.shortestPathWitness));
+    if (shortestPathWitness.size() > other.getShortestPathWitness().size()) {
+      return new PathTrackingWeightImpl(
+          new LinkedHashSet<>(other.getShortestPathWitness()), newAllPathStatements);
+    }
+
+    return new PathTrackingWeightImpl(
+        new LinkedHashSet<>(this.shortestPathWitness), newAllPathStatements);
   }
 
   @Override

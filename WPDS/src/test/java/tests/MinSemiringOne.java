@@ -14,39 +14,43 @@
  */
 package tests;
 
+import static tests.MinSemiringZero.zero;
+
+import de.fraunhofer.iem.Location;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class NumWeightZero implements NumWeight {
+class MinSemiringOne extends MinSemiringImpl {
 
-  @NonNull private static final NumWeightZero zero = new NumWeightZero();
+  private static final MinSemiringOne one = new MinSemiringOne();
 
-  private NumWeightZero() {}
-
-  @NonNull
-  public static NumWeightZero zero() {
-    return zero;
+  private MinSemiringOne() {
+    super(0);
+    /* Singleton */
   }
 
-  @Override
-  public int getI() {
-    return 0;
+  public static <N extends Location> MinSemiringOne one() {
+    return one;
   }
 
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    return this;
+    return other;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    return other;
+    if (other == zero()) {
+      return this;
+    }
+    MinSemiring o = (MinSemiring) other;
+    return new MinSemiringImpl(Math.min(o.getValue(), value));
   }
 
   @Override
   public String toString() {
-    return "<ZERO>";
+    return "<ONE>";
   }
 }

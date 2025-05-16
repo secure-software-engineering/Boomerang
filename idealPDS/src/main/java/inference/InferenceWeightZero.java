@@ -25,20 +25,23 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-import static inference.InferenceWeightOne.one;
-
 import boomerang.scope.Method;
-import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class InferenceWeightZero implements Weight {
+public class InferenceWeightZero implements InferenceWeight {
 
   @NonNull private static final InferenceWeightZero zero = new InferenceWeightZero();
-  ;
 
-  private InferenceWeightZero() {}
+  private InferenceWeightZero() {
+    /* Singleton */
+  }
+
+  @NonNull
+  public static InferenceWeightZero zero() {
+    return zero;
+  }
 
   @NonNull
   public Set<Method> getInvokedMethods() {
@@ -48,27 +51,13 @@ public class InferenceWeightZero implements Weight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    if (other.equals(zero()) || this.equals(zero())) {
-      return zero();
-    }
-    InferenceWeight func = (InferenceWeightImpl) other;
-    Set<Method> otherInvokedMethods = ((InferenceWeightImpl) func).getInvokedMethods();
-    Set<Method> res = new HashSet<>(getInvokedMethods());
-    res.addAll(otherInvokedMethods);
-    return new InferenceWeightImpl((Method) res);
+    return this;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    return extendWith(other);
-  }
-
-  @NonNull
-  public static InferenceWeightZero zero() {
-    return zero;
+    return this;
   }
 
   public String toString() {

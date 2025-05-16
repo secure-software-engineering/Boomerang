@@ -15,12 +15,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
-import static tests.TestHelper.ACC;
-import static tests.TestHelper.t;
-import static tests.TestHelper.waccepts;
-import static tests.TestHelper.wnormal;
-import static tests.TestHelper.wpop;
-import static tests.TestHelper.wpush;
+import static tests.TestHelper.*;
 
 import org.junit.Before;
 import org.junit.Ignore;

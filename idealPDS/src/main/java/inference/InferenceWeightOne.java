@@ -25,10 +25,7 @@ package inference;
  * <p>Contributors: Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-import static inference.InferenceWeightZero.zero;
-
 import boomerang.scope.Method;
-import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
@@ -47,22 +44,13 @@ public class InferenceWeightOne implements InferenceWeight {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    if (other.equals(zero()) || this.equals(zero())) {
-      return zero();
-    }
-    InferenceWeight func = (InferenceWeightImpl) other;
-    Set<Method> otherInvokedMethods = ((InferenceWeightImpl) func).getInvokedMethods();
-    Set<Method> res = new HashSet<>(getInvokedMethods());
-    res.addAll(otherInvokedMethods);
-    return new InferenceWeightImpl((Method) res);
+    return other;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    return extendWith(other);
+    return other;
   }
 
   @NonNull

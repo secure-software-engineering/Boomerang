@@ -14,22 +14,22 @@
  */
 package tests;
 
-import static tests.NumWeightOne.one;
-import static tests.NumWeightZero.zero;
+import static tests.MinSemiringOne.one;
+import static tests.MinSemiringZero.zero;
 
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class NumWeightImpl implements NumWeight {
+public class MinSemiringImpl implements MinSemiring {
 
-  private final int i;
+  protected final int value;
 
-  public NumWeightImpl(int i) {
-    this.i = i;
+  public MinSemiringImpl(int value) {
+    this.value = value;
   }
 
-  public int getI() {
-    return i;
+  public int getValue() {
+    return value;
   }
 
   @NonNull
@@ -38,37 +38,30 @@ public class NumWeightImpl implements NumWeight {
     if (other == one()) {
       return this;
     }
-    if (other == zero()) {
-      return zero();
-    }
-    NumWeight o = (NumWeight) other;
-    return new NumWeightImpl(o.getI() + getI());
+    MinSemiringImpl o = (MinSemiringImpl) other;
+    return new MinSemiringImpl(o.value + value);
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    NumWeightZero zero = zero();
-    if (other == zero) {
+    if (other == zero()) {
       return this;
     }
-    NumWeight o = (NumWeight) other;
-    if (o.getI() == getI()) {
-      return o;
-    }
-    return zero;
+    MinSemiringImpl o = (MinSemiringImpl) other;
+    return new MinSemiringImpl(Math.min(o.value, value));
   }
 
   @Override
   public String toString() {
-    return Integer.toString(i);
+    return Integer.toString(value);
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + i;
+    result = prime * result + value;
     return result;
   }
 
@@ -77,7 +70,7 @@ public class NumWeightImpl implements NumWeight {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    NumWeightImpl other = (NumWeightImpl) obj;
-    return i == other.i;
+    MinSemiringImpl other = (MinSemiringImpl) obj;
+    return value == other.value;
   }
 }
