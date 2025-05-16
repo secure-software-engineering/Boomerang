@@ -16,7 +16,6 @@ package boomerang.guided;
 
 import boomerang.BackwardQuery;
 import boomerang.ForwardQuery;
-import boomerang.Query;
 import boomerang.QueryGraph;
 import boomerang.guided.targets.ArrayContainerTarget;
 import boomerang.guided.targets.BasicTarget;
@@ -568,15 +567,16 @@ public class DemandDrivenGuidedAnalysisTest {
 
     // Filter out query graph's node to only return the queries of interest (ForwardQueries &
     // String/Int Allocation sites).
-    Stream<Query> res =
+    Stream<ForwardQuery> res =
         queryGraph.getNodes().stream()
             .filter(
                 x ->
                     x instanceof ForwardQuery
-                        && isStringOrIntAllocation(x.asNode().stmt().getStart()));
+                        && isStringOrIntAllocation(x.asNode().stmt().getStart()))
+            .map(ForwardQuery.class::cast);
 
     Set<? extends Serializable> collect =
-        res.map(t -> ((AllocVal) t.var()).getAllocVal())
+        res.map(t -> t.getAllocVal().getAllocVal())
             .filter(x -> x.isStringConstant() || x.isIntConstant())
             .map(x -> (x.isIntConstant() ? x.getIntValue() : x.getStringValue()))
             .collect(Collectors.toSet());
