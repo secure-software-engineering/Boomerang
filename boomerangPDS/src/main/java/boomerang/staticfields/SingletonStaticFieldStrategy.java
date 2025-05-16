@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.staticfields;
@@ -40,7 +43,7 @@ public class SingletonStaticFieldStrategy implements StaticFieldHandlingStrategy
   @Override
   public void handleForward(
       Edge storeStmt, Val storedVal, StaticFieldVal staticVal, Set<State> out) {
-    for (Statement matchingStore : fieldLoadStatements.get(staticVal.field())) {
+    for (Statement matchingStore : fieldLoadStatements.get(staticVal.getField())) {
       if (matchingStore.isAssignStmt()) {
         for (Statement succ :
             matchingStore.getMethod().getControlFlowGraph().getSuccsOf(matchingStore)) {
@@ -55,7 +58,7 @@ public class SingletonStaticFieldStrategy implements StaticFieldHandlingStrategy
   @Override
   public void handleBackward(
       Edge loadStatement, Val loadedVal, StaticFieldVal staticVal, Set<State> out) {
-    for (Statement matchingStore : fieldStoreStatements.get(staticVal.field())) {
+    for (Statement matchingStore : fieldStoreStatements.get(staticVal.getField())) {
       for (Statement pred :
           matchingStore.getMethod().getControlFlowGraph().getPredsOf(matchingStore)) {
         solver.processNormal(

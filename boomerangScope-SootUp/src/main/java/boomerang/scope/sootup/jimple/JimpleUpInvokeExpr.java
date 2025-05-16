@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.sootup.jimple;
@@ -14,6 +17,7 @@ package boomerang.scope.sootup.jimple;
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +41,7 @@ public class JimpleUpInvokeExpr implements InvokeExpr {
   @Override
   public Val getArg(int index) {
     if (delegate.getArg(index) == null) {
-      return Val.zero();
+      return ValCollection.zero();
     }
     return new JimpleUpVal(delegate.getArg(index), method);
   }
@@ -68,8 +72,8 @@ public class JimpleUpInvokeExpr implements InvokeExpr {
   }
 
   @Override
-  public DeclaredMethod getMethod() {
-    return new JimpleUpDeclaredMethod(this, delegate.getMethodSignature());
+  public DeclaredMethod getDeclaredMethod() {
+    return new JimpleUpDeclaredMethod(this, delegate.getMethodSignature(), method);
   }
 
   @Override

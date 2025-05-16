@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.wala;
@@ -80,6 +83,11 @@ public class WALAType implements Type {
     return meet.equals(typeAbstraction);
   }
 
+  @Override
+  public boolean isSupertypeOf(String subType) {
+    throw new RuntimeException("Not implemented");
+  }
+
   private TypeAbstraction getDelegate() {
     return typeAbstraction;
   }
@@ -111,11 +119,6 @@ public class WALAType implements Type {
       }
     }
     return typeAbstraction.equals(TypeAbstraction.TOP);
-  }
-
-  @Override
-  public boolean isSupertypeOf(String subType) {
-    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   private boolean hasClassInterface(IClass next, String t) {

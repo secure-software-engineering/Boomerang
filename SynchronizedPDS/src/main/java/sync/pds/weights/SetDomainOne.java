@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package sync.pds.weights;
@@ -18,6 +21,10 @@ import wpds.impl.Weight;
 
 public class SetDomainOne implements SetDomain {
   @NonNull private static final SetDomainOne one = new SetDomainOne();
+
+  private SetDomainOne() {
+    /* Singleton*/
+  }
 
   public static SetDomainOne one() {
     return one;
@@ -32,7 +39,7 @@ public class SetDomainOne implements SetDomain {
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    return one();
+    return this;
   }
 
   @NonNull

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.solver;
@@ -29,10 +32,10 @@ import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -102,7 +105,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(nextStmt.getTarget().getFieldStore().getY())) {
+      if (t.getLabel().equals(nextStmt.getTarget().getFieldStore().getField())) {
         LOGGER.trace("Overwriting field {} at {}", t.getLabel(), nextStmt);
         overwriteFieldAtStatement(nextStmt, t);
       }
@@ -154,7 +157,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(Field.array(nextStmt.getTarget().getArrayBase().getY()))) {
+      if (t.getLabel().equals(Field.array(nextStmt.getTarget().getArrayBase().getIndex()))) {
         LOGGER.trace("Overwriting field {} at {}", t.getLabel(), nextStmt);
         overwriteFieldAtStatement(nextStmt, t);
       }
@@ -331,7 +334,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Val returnedFact) {
     Statement callSite = returnSiteStatement.getStart();
 
-    Set<Node<ControlFlowGraph.Edge, Val>> out = Sets.newHashSet();
+    Set<Node<ControlFlowGraph.Edge, Val>> out = new LinkedHashSet<>();
     if (callSite.containsInvokeExpr()) {
       if (returnedFact.isThisLocal()) {
         if (callSite.getInvokeExpr().isInstanceInvokeExpr()) {
@@ -375,7 +378,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
     Val fact = currNode.fact();
     return flowFunctions.callFlow(callSite, fact, callee).stream()
         .map(x -> new PushNode<>(calleeStartEdge, x, succOfCallSite, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public Query getQuery() {
@@ -407,11 +410,11 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
 
   public void checkForFieldOverwrite(Edge curr, Val value) {
     if ((curr.getTarget().isFieldStore()
-        && curr.getTarget().getFieldStore().getX().equals(value))) {
+        && curr.getTarget().getFieldStore().getBase().equals(value))) {
       Node<ControlFlowGraph.Edge, Val> node = new Node<>(curr, value);
       fieldAutomaton.registerListener(new OverwriteAtFieldStore(new SingleNode<>(node), curr));
     } else if ((curr.getTarget().isArrayStore()
-        && curr.getTarget().getArrayBase().getX().equals(value))) {
+        && curr.getTarget().getArrayBase().getBase().equals(value))) {
       Node<ControlFlowGraph.Edge, Val> node = new Node<>(curr, value);
       fieldAutomaton.registerListener(new OverwriteAtArrayStore(new SingleNode<>(node), curr));
     }
@@ -421,7 +424,8 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Edge fieldWriteStatementEdge, Transition<Field, INode<Node<Edge, Val>>> killedTransition);
 
   @Override
-  public Collection<State> computeNormalFlow(Method method, Edge nextEdge, Val fact) {
+  public Collection<State> computeNormalFlow(
+      Method method, Edge currEdge, Edge nextEdge, Val fact) {
     return flowFunctions.normalFlow(query, nextEdge, fact);
   }
 
@@ -431,7 +435,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Edge callSiteEdge,
       InvokeExpr invokeExpr) {
     assert icfg.isCallStmt(callSiteEdge.getStart());
-    if (dataFlowScope.isExcluded(invokeExpr.getMethod())) {
+    if (dataFlowScope.isExcluded(invokeExpr.getDeclaredMethod())) {
       byPassFlowAtCallSite(caller, currNode, callSiteEdge.getStart());
       return;
     }
@@ -462,7 +466,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
   public Collection<? extends State> computeReturnFlow(Method method, Statement curr, Val value) {
     return flowFunctions.returnFlow(method, curr, value).stream()
         .map(x -> new PopNode<>(x, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   @Override

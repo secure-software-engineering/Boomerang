@@ -1,18 +1,21 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Method;
+import boomerang.scope.DefinedMethod;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
@@ -20,12 +23,13 @@ import boomerang.scope.WrappedClass;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import soot.Local;
+import soot.Scene;
 import soot.SootMethod;
 import soot.util.Chain;
 
@@ -33,25 +37,35 @@ import soot.util.Chain;
  * Class that wraps a {@link SootMethod} with an existing body. All operations provide their
  * corresponding information.
  */
-public class JimpleMethod extends Method {
+public class JimpleMethod extends DefinedMethod {
 
   private final SootMethod delegate;
+  private final Scene scene;
 
   protected static Interner<JimpleMethod> INTERNAL_POOL = Interners.newWeakInterner();
   protected ControlFlowGraph cfg;
   private List<Val> parameterLocalCache;
   private Collection<Val> localCache;
 
-  protected JimpleMethod(SootMethod delegate) {
+  protected JimpleMethod(SootMethod delegate, Scene scene) {
     this.delegate = delegate;
+    this.scene = scene;
     if (!delegate.hasActiveBody()) {
       throw new RuntimeException(
           "Trying to build a Jimple method for " + delegate + " without active body present");
     }
   }
 
-  public static JimpleMethod of(SootMethod m) {
-    return INTERNAL_POOL.intern(new JimpleMethod(m));
+  public static JimpleMethod of(SootMethod method, Scene scene) {
+    return INTERNAL_POOL.intern(new JimpleMethod(method, scene));
+  }
+
+  public Scene getScene() {
+    return scene;
+  }
+
+  public SootMethod getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -75,19 +89,19 @@ public class JimpleMethod extends Method {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type));
+      types.add(new JimpleType(type, scene));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), scene);
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), scene);
   }
 
   @Override
@@ -104,7 +118,7 @@ public class JimpleMethod extends Method {
   @Override
   public Collection<Val> getLocals() {
     if (localCache == null) {
-      localCache = Sets.newHashSet();
+      localCache = new LinkedHashSet<>();
       Chain<Local> locals = delegate.getActiveBody().getLocals();
       for (Local l : locals) {
         localCache.add(new JimpleVal(l, this));
@@ -135,23 +149,13 @@ public class JimpleMethod extends Method {
   }
 
   @Override
-  public boolean isDefined() {
-    return true;
-  }
-
-  @Override
-  public boolean isPhantom() {
-    return false;
-  }
-
-  @Override
   public List<Statement> getStatements() {
     return getControlFlowGraph().getStatements();
   }
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getDeclaringClass());
+    return new JimpleWrappedClass(delegate.getDeclaringClass(), scene);
   }
 
   @Override
@@ -175,10 +179,6 @@ public class JimpleMethod extends Method {
   @Override
   public boolean isConstructor() {
     return delegate.isConstructor();
-  }
-
-  public SootMethod getDelegate() {
-    return delegate;
   }
 
   @Override

@@ -1,17 +1,21 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.wala;
 
 import boomerang.scope.Field;
+import boomerang.scope.Type;
 import com.ibm.wala.types.FieldReference;
 
 public class WALAField extends Field {
@@ -47,7 +51,17 @@ public class WALAField extends Field {
   }
 
   @Override
+  public boolean isPredefinedField() {
+    return false;
+  }
+
+  @Override
   public boolean isInnerClassField() {
+    throw new RuntimeException("Not yet implemented");
+  }
+
+  @Override
+  public Type getType() {
     throw new RuntimeException("Not yet implemented");
   }
 }

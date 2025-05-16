@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.weights;
@@ -25,8 +28,11 @@ public class PathConditionWeightOne implements PathConditionWeight {
 
   @NonNull private static final PathConditionWeightOne one = new PathConditionWeightOne();
 
-  public PathConditionWeightOne(
-      Map<Statement, ConditionDomain> newIfs, Map<Val, ConditionDomain> newVals) {
+  private PathConditionWeightOne(
+      Map<Statement, ConditionDomain> newIfs,
+      Map<Val, ConditionDomain> newVals,
+      Set<Val> newReturnVals,
+      Map<Method, Statement> calleeToCallSiteMapping) {
     throw new IllegalStateException("PathConditionWeightOne.ExtendWeight called");
   }
 
@@ -46,10 +52,18 @@ public class PathConditionWeightOne implements PathConditionWeight {
     throw new IllegalStateException("PathConditionWeightOne.getCalleeToCallSite() - don't");
   }
 
-  public PathConditionWeightOne() {}
+  private PathConditionWeightOne() {}
 
   public static PathConditionWeightOne one() {
     return one;
+  }
+
+  private PathConditionWeightOne(Statement callSite, Method callee) {
+    this.getCalleeToCallSite().put(callee, callSite);
+  }
+
+  private PathConditionWeightOne(Val returnVal) {
+    this.getReturnVals().add(returnVal);
   }
 
   public enum ConditionDomain {
@@ -107,7 +121,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
     newReturnVals.addAll(other.getReturnVals());
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(getCalleeToCallSite());
     calleeToCallSiteMapping.putAll(other.getCalleeToCallSite());
-    return new PathConditionWeightOne(newIfs, newVals);
+    return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
   }
 
   @NonNull
@@ -175,7 +189,7 @@ public class PathConditionWeightOne implements PathConditionWeight {
     newReturnVals.addAll(other.getReturnVals());
     Map<Method, Statement> calleeToCallSiteMapping = Maps.newHashMap(getCalleeToCallSite());
     calleeToCallSiteMapping.putAll(other.getCalleeToCallSite());
-    return new PathConditionWeightOne(newIfs, newVals);
+    return new PathConditionWeightOne(newIfs, newVals, newReturnVals, calleeToCallSiteMapping);
   }
 
   @Override

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package typestate;
@@ -27,7 +30,7 @@ public class TransitionFunctionOne implements TransitionFunction {
 
   @NonNull private static final TransitionFunctionOne one = new TransitionFunctionOne();
 
-  public TransitionFunctionOne() {}
+  private TransitionFunctionOne() {}
 
   public static TransitionFunctionOne one() {
     return one;
@@ -49,8 +52,6 @@ public class TransitionFunctionOne implements TransitionFunction {
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    TransitionFunctionOne one = one();
-    if (other == one) return this;
     return other;
   }
 
@@ -58,29 +59,22 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Override
   public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
-      throw new RuntimeException();
+      throw new IllegalStateException("should not happen!");
     }
-    TransitionFunctionZero zero = zero();
-    TransitionFunction one = one();
 
-    if (other == zero) return this;
-
-    if (other == one && this == one) {
-      return one;
+    if (other == zero() || other == one()) {
+      return this;
     }
 
     TransitionFunction func = (TransitionFunction) other;
-
-    Set<Transition> transitions = new HashSet<>((other == (one) ? getValues() : func.getValues()));
-    Set<Transition> idTransitions = Sets.newHashSet();
+    Set<Transition> transitions = new HashSet<>(func.getValues());
+    Set<Transition> idTransitions = Sets.newHashSetWithExpectedSize(transitions.size());
     for (Transition t : transitions) {
       idTransitions.add(new TransitionImpl(t.from(), t.from()));
     }
     transitions.addAll(idTransitions);
     return new TransitionFunctionImpl(
-        transitions,
-        Sets.newHashSet(
-            (other == (one) ? getStateChangeStatements() : func.getStateChangeStatements())));
+        transitions, Sets.newHashSet(func.getStateChangeStatements()));
   }
 
   public String toString() {

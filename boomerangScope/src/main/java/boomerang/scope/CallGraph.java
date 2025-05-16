@@ -1,20 +1,23 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -23,10 +26,10 @@ import org.slf4j.LoggerFactory;
 public class CallGraph {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(CallGraph.class);
-  private final Set<Edge> edges = Sets.newHashSet();
+  private final Set<Edge> edges = new LinkedHashSet<>();
   private final Multimap<Statement, Edge> edgesOutOf = HashMultimap.create();
   private final Multimap<Method, Edge> edgesInto = HashMultimap.create();
-  private final Set<Method> entryPoints = Sets.newHashSet();
+  private final Set<Method> entryPoints = new LinkedHashSet<>();
   private final Multimap<Field, Statement> fieldLoadStatements = HashMultimap.create();
   private final Multimap<Field, Statement> fieldStoreStatements = HashMultimap.create();
 
@@ -105,7 +108,7 @@ public class CallGraph {
   }
 
   public Set<Method> getReachableMethods() {
-    Set<Method> reachableMethod = Sets.newHashSet();
+    Set<Method> reachableMethod = new LinkedHashSet<>();
     reachableMethod.addAll(entryPoints);
     reachableMethod.addAll(edgesInto.keySet());
     return reachableMethod;
@@ -122,10 +125,10 @@ public class CallGraph {
   private void computeStaticFieldsLoadAndStores(Method m) {
     for (Statement s : m.getStatements()) {
       if (s.isStaticFieldStore()) {
-        fieldStoreStatements.put(s.getStaticField().field(), s);
+        fieldStoreStatements.put(s.getStaticField().getField(), s);
       }
       if (s.isStaticFieldLoad()) {
-        fieldLoadStatements.put(s.getStaticField().field(), s);
+        fieldLoadStatements.put(s.getStaticField().getField(), s);
       }
     }
   }

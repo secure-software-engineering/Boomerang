@@ -1,19 +1,22 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.wala;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.IArrayRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import com.ibm.wala.analysis.typeInference.PointType;
@@ -108,7 +111,6 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isStatic() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -142,7 +144,6 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isArrayAllocationVal() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -160,37 +161,21 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isStringConstant() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public String getStringValue() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public boolean isCast() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Val getCastOp() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -201,25 +186,21 @@ public class WALAVal extends Val {
 
   @Override
   public boolean isInstanceOfExpr() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Val getInstanceOfOp() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public boolean isLengthExpr() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Val getLengthOp() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -239,13 +220,11 @@ public class WALAVal extends Val {
 
   @Override
   public Type getClassConstantType() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Val withNewMethod(Method callee) {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -305,7 +284,7 @@ public class WALAVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     // TODO Auto-generated method stub
     return null;
   }

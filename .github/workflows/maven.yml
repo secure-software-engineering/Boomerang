@@ -11,6 +11,10 @@ on:
 
 jobs:
   BuildAndTest:
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [Soot, SootUp, Opal]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
@@ -22,4 +26,4 @@ jobs:
           java-package: jdk
           java-version: 11
     - name: Build with Maven
-      run: mvn -B clean verify
+      run: mvn -B clean verify -DtestSetup=${{ matrix.framework }}

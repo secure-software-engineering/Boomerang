@@ -1,21 +1,23 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.results;
 
 import boomerang.Query;
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Field;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import java.util.List;
@@ -217,8 +219,8 @@ public class NullPointerDereference implements AffectedLocation {
     }
     if (curr.isAssignStmt()) {
       if (curr.isFieldLoad()) {
-        Pair<Val, Field> ifr = curr.getFieldLoad();
-        if (ifr.getX().equals(fact)) {
+        IInstanceFieldRef ifr = curr.getFieldLoad();
+        if (ifr.getBase().equals(fact)) {
           return true;
         }
       }

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.results;
@@ -26,6 +29,7 @@ import boomerang.scope.IfStatement.Evaluation;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -36,10 +40,15 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
@@ -106,7 +115,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       return HashBasedTable.create();
     }
     Table<Edge, Val, W> res = asEdgeValWeightTable();
-    Set<Method> visitedMethods = Sets.newHashSet();
+    Set<Method> visitedMethods = new LinkedHashSet<>();
     for (Edge s : res.rowKeySet()) {
       visitedMethods.add(s.getMethod());
     }
@@ -117,7 +126,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         for (Statement predOfExit :
             exitStmt.getMethod().getControlFlowGraph().getPredsOf(exitStmt)) {
           Edge exitEdge = new Edge(predOfExit, exitStmt);
-          Set<State> escapes = Sets.newHashSet();
+          Set<State> escapes = new LinkedHashSet<>();
           icfg.addCallerListener(
               new CallerListener<Statement, Method>() {
                 @Override
@@ -163,7 +172,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       ForwardBoomerangSolver<W> forwardSolver) {
     LinkedList<Edge> worklist = Lists.newLinkedList();
     worklist.add(exitStmt);
-    Set<Edge> visited = Sets.newHashSet();
+    Set<Edge> visited = new LinkedHashSet<>();
     while (!worklist.isEmpty()) {
       Edge curr = worklist.poll();
       if (!visited.add(curr)) {
@@ -200,7 +209,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     Map<Edge, DeclaredMethod> invokedMethodsOnInstance = Maps.newHashMap();
     if (query.cfgEdge().getStart().containsInvokeExpr()) {
       invokedMethodsOnInstance.put(
-          query.cfgEdge(), query.cfgEdge().getStart().getInvokeExpr().getMethod());
+          query.cfgEdge(), query.cfgEdge().getStart().getInvokeExpr().getDeclaredMethod());
     }
     queryToSolvers
         .get(query)
@@ -218,7 +227,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
                 if (curr.getInvokeExpr().isInstanceInvokeExpr()) {
                   Val base = curr.getInvokeExpr().getBase();
                   if (base.equals(fact)) {
-                    invokedMethodsOnInstance.put(currEdge, curr.getInvokeExpr().getMethod());
+                    invokedMethodsOnInstance.put(
+                        currEdge, curr.getInvokeExpr().getDeclaredMethod());
                   }
                 }
               }
@@ -244,7 +254,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
 
   public QueryResults getPotentialNullPointerDereferences() {
     // FIXME this should be located nullpointer analysis
-    Set<Node<Edge, Val>> res = Sets.newHashSet();
+    Set<Node<Edge, Val>> res = new LinkedHashSet<>();
     for (Transition<Field, INode<Node<Edge, Val>>> t :
         queryToSolvers.get(query).getFieldAutomaton().getTransitions()) {
       if (!t.getLabel().equals(Field.empty()) || t.getStart() instanceof GeneratedState) {
@@ -256,7 +266,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         res.add(nullPointerNode);
       }
     }
-    Set<AffectedLocation> resWithContext = Sets.newHashSet();
+    Set<AffectedLocation> resWithContext = new LinkedHashSet<>();
     for (Node<Edge, Val> r : res) {
       // Context context = constructContextGraph(query, r);
       if (trackDataFlowPath) {
@@ -351,10 +361,10 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
             Evaluation eval = null;
             if (e.getValue().equals(ConditionDomain.TRUE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(scopeFactory.getTrueValue(key.m()));
+              eval = ifStmt1.evaluate(ValCollection.trueVal());
             } else if (e.getValue().equals(ConditionDomain.FALSE)) {
               // Map first to JimpleVal
-              eval = ifStmt1.evaluate(scopeFactory.getFalseValue(key.m()));
+              eval = ifStmt1.evaluate(ValCollection.falseVal());
             }
             if (eval != null) {
               if (mustBeVal.equals(ConditionDomain.FALSE)) {

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package inference;
@@ -23,11 +26,6 @@ import wpds.impl.Weight;
 
 public class InferenceWeightImpl implements InferenceWeight {
 
-  @NonNull
-  public Set<Method> getInvokedMethods() {
-    return invokedMethods;
-  }
-
   @NonNull private final Set<Method> invokedMethods;
 
   private InferenceWeightImpl(@NonNull Set<Method> res) {
@@ -39,17 +37,23 @@ public class InferenceWeightImpl implements InferenceWeight {
   }
 
   @NonNull
+  public Set<Method> getInvokedMethods() {
+    return invokedMethods;
+  }
+
+  @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    InferenceWeight one = one();
-    if (other == one) return this;
-    InferenceWeight zero = (InferenceWeight) zero();
-    if (other == zero) {
-      return zero;
+    if (other == one()) {
+      return this;
+    }
+    if (other == zero()) {
+      return zero();
     }
     InferenceWeightImpl func = (InferenceWeightImpl) other;
+    Set<Method> otherInvokedMethods = func.invokedMethods;
     Set<Method> res = new HashSet<>(invokedMethods);
-    res.addAll((func).invokedMethods);
+    res.addAll(otherInvokedMethods);
     return new InferenceWeightImpl(res);
   }
 

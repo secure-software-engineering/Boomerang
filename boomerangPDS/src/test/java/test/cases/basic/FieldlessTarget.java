@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.basic;
@@ -20,7 +23,7 @@ public class FieldlessTarget {
 
   @TestMethod
   public void simpleAssignment1() {
-    Object alloc1 = new Allocation();
+    Object alloc1 = new BasicAlloc();
     Object alias1 = alloc1;
     Object query = alias1;
     QueryMethods.queryFor(query);
@@ -40,7 +43,7 @@ public class FieldlessTarget {
     Object alias2 = new AllocatedObject() {};
     if (Math.random() > 0.5) {
       Object alias1 = alias2;
-      alias2 = new Allocation();
+      alias2 = new BasicAlloc();
     }
 
     QueryMethods.queryFor(alias2);
@@ -48,8 +51,8 @@ public class FieldlessTarget {
 
   @TestMethod
   public void branchWithOverwriteSwapped() {
-    Object alias2 = new Allocation();
-    Object alias1 = new Allocation();
+    Object alias2 = new BasicAlloc();
+    Object alias1 = new BasicAlloc();
     if (Math.random() > 0.5) {
       alias2 = alias1;
     }
@@ -70,12 +73,12 @@ public class FieldlessTarget {
 
   @TestMethod
   public void cast() {
-    Allocation alias1 = new Subclass();
+    BasicAlloc alias1 = new Subclass();
     Subclass alias2 = (Subclass) alias1;
     QueryMethods.queryFor(alias2);
   }
 
-  public static class Subclass extends Allocation {}
+  public static class Subclass extends BasicAlloc {}
 
   public AllocatedObject create() {
     AllocatedObject alloc1 = new AllocatedObject() {};

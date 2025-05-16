@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.solver;
@@ -29,11 +32,12 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Location;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -79,7 +83,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     if (value.isStatic()) {
       return false;
     }
-    return m.getLocals().stream().noneMatch(local -> local.toString().equals(value.toString()));
+    return m.getLocals().stream().noneMatch(local -> local.equals(value));
   }
 
   public INode<Node<ControlFlowGraph.Edge, Val>> generateFieldState(
@@ -87,7 +91,9 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     Entry<INode<Node<Edge, Val>>, Field> e = new SimpleEntry<>(d, loc);
     if (!generatedFieldState.containsKey(e)) {
       generatedFieldState.put(
-          e, new GeneratedState<>(new SingleNode<>(new Node<>(epsilonStmt(), Val.zero())), loc));
+          e,
+          new GeneratedState<>(
+              new SingleNode<>(new Node<>(epsilonStmt(), ValCollection.zero())), loc));
     }
     return generatedFieldState.get(e);
   }
@@ -109,12 +115,12 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
       Method method, Statement callerReturnStatement, Val value) {
     return flowFunction.returnFlow(method, callerReturnStatement, value).stream()
         .map(x -> new PopNode<>(x, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   protected void callFlow(Method caller, Node<Edge, Val> curr, Statement callSite) {
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
-    if (dataFlowScope.isExcluded(invokeExpr.getMethod())) {
+    if (dataFlowScope.isExcluded(invokeExpr.getDeclaredMethod())) {
       byPassFlowAtCallsite(caller, curr);
       return;
     }
@@ -129,11 +135,9 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
             .getControlFlowGraph()
             .getPredsOf(curr.stmt().getStart())) {
 
-      Set<State> res =
-          flowFunction
-              .callToReturnFlow(new Edge(returnSite, curr.stmt().getStart()), curr.fact())
-              .stream()
-              .collect(Collectors.toSet());
+      Collection<State> res =
+          flowFunction.callToReturnFlow(
+              curr.stmt(), new Edge(returnSite, curr.stmt().getStart()), curr.fact());
       for (State s : res) {
         propagate(curr, s);
       }
@@ -183,7 +187,8 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     {
       for (Statement pred :
           curr.getStart().getMethod().getControlFlowGraph().getPredsOf(curr.getStart())) {
-        Collection<State> flow = computeNormalFlow(method, new Edge(pred, curr.getStart()), value);
+        Collection<State> flow =
+            computeNormalFlow(method, curr, new Edge(pred, curr.getStart()), value);
         for (State s : flow) {
           options.getSparsificationStrategy().getCounter().countBackwardProgragation();
           propagate(currNode, s);
@@ -233,7 +238,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
     Statement calleeSp = calleeStartEdge.getTarget();
     return flowFunction.callFlow(callSiteEdge.getTarget(), fact, callee, calleeSp).stream()
         .map(x -> new PushNode<>(calleeStartEdge, x, callSiteEdge, PDSSystem.CALLS))
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   @Override
@@ -249,14 +254,15 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
   }
 
   @Override
-  protected Collection<State> computeNormalFlow(Method method, Edge currEdge, Val fact) {
-    return flowFunction.normalFlow(currEdge, fact).stream().collect(Collectors.toSet());
+  protected Collection<State> computeNormalFlow(
+      Method method, Edge currEdge, Edge nextEdge, Val fact) {
+    return flowFunction.normalFlow(currEdge, nextEdge, fact);
   }
 
   @Override
   public void applyCallSummary(
       Edge callSiteEdge, Val factAtSpInCallee, Edge spInCallee, Edge exitStmt, Val exitingFact) {
-    Set<Node<Edge, Val>> out = Sets.newHashSet();
+    Set<Node<Edge, Val>> out = new LinkedHashSet<>();
     Statement callSite = callSiteEdge.getTarget();
     if (callSite.containsInvokeExpr()) {
       if (exitingFact.isThisLocal()) {

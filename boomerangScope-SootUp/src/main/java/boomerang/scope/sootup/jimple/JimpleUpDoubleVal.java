@@ -1,27 +1,29 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.sootup.jimple;
 
-import boomerang.scope.Method;
 import boomerang.scope.Val;
 import boomerang.scope.ValWithFalseVariable;
-import java.util.Arrays;
+import java.util.Objects;
 import sootup.core.jimple.basic.Value;
 
 public class JimpleUpDoubleVal extends JimpleUpVal implements ValWithFalseVariable {
 
   private final Val falseVal;
 
-  public JimpleUpDoubleVal(Value value, Method method, Val falseVal) {
+  public JimpleUpDoubleVal(Value value, JimpleUpMethod method, Val falseVal) {
     super(value, method);
 
     this.falseVal = falseVal;
@@ -33,20 +35,17 @@ public class JimpleUpDoubleVal extends JimpleUpVal implements ValWithFalseVariab
   }
 
   @Override
-  public int hashCode() {
-    return Arrays.hashCode(new Object[] {super.hashCode(), falseVal});
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleUpDoubleVal that = (JimpleUpDoubleVal) o;
+    return Objects.equals(falseVal, that.falseVal);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-
-    JimpleUpDoubleVal other = (JimpleUpDoubleVal) obj;
-    if (falseVal == null) {
-      return other.falseVal == null;
-    } else return falseVal.equals(other.falseVal);
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), falseVal);
   }
 
   @Override

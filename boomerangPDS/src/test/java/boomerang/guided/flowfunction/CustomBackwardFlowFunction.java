@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.guided.flowfunction;
@@ -29,9 +32,9 @@ public class CustomBackwardFlowFunction extends DefaultBackwardFlowFunction {
   }
 
   @Override
-  public Collection<State> normalFlow(Edge edge, Val fact) {
-    if (edge.getTarget().containsInvokeExpr()) {
-      DeclaredMethod method = edge.getTarget().getInvokeExpr().getMethod();
+  public Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact) {
+    if (nextEdge.getTarget().containsInvokeExpr()) {
+      DeclaredMethod method = nextEdge.getTarget().getInvokeExpr().getDeclaredMethod();
       // Avoid any propagations by passing the call site (also when the fact is not used at the call
       // site).
       if (method.getDeclaringClass().getFullyQualifiedName().equals("java.lang.System")
@@ -39,13 +42,13 @@ public class CustomBackwardFlowFunction extends DefaultBackwardFlowFunction {
         return Collections.emptySet();
       }
     }
-    return super.normalFlow(edge, fact);
+    return super.normalFlow(currEdge, nextEdge, fact);
   }
 
   @Override
-  public Collection<State> callToReturnFlow(Edge edge, Val fact) {
-    if (edge.getTarget().containsInvokeExpr()) {
-      DeclaredMethod method = edge.getTarget().getInvokeExpr().getMethod();
+  public Collection<State> callToReturnFlow(Edge currEdge, Edge nextEdge, Val fact) {
+    if (nextEdge.getTarget().containsInvokeExpr()) {
+      DeclaredMethod method = nextEdge.getTarget().getInvokeExpr().getDeclaredMethod();
       // Avoid any propagations by passing the call site (also when the fact is not used at the call
       // site).
       if (method.getDeclaringClass().getFullyQualifiedName().equals("java.lang.System")
@@ -53,7 +56,7 @@ public class CustomBackwardFlowFunction extends DefaultBackwardFlowFunction {
         return Collections.emptySet();
       }
     }
-    return super.callToReturnFlow(edge, fact);
+    return super.callToReturnFlow(currEdge, nextEdge, fact);
   }
 
   @Override

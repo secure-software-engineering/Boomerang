@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.fields;
@@ -19,7 +22,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void doubleWriteAndReadFieldPositive() {
-    Object query = new Alloc();
+    Object query = new FieldAlloc();
     A a = new A();
     B b = new B();
     a.b = query;
@@ -43,7 +46,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void writeWithinCallPositive() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     call(a, query);
     Object alias = a.b;
@@ -61,7 +64,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void writeWithinCallSummarizedPositive() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     call(a, query);
     Object alias = a.b;
@@ -77,7 +80,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void doubleWriteWithinCallPositive() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     B b = callAndReturn(a, query);
     A first = b.a;
@@ -85,7 +88,7 @@ public class NoIndirectionTarget {
     QueryMethods.queryFor(alias);
   }
 
-  private B callAndReturn(A a, Alloc query) {
+  private B callAndReturn(A a, FieldAlloc query) {
     a.b = query;
     B b = new B();
     b.a = a;
@@ -104,7 +107,7 @@ public class NoIndirectionTarget {
 
   @TestMethod
   public void overwriteButPositiveFieldTest() {
-    Alloc query = new Alloc();
+    FieldAlloc query = new FieldAlloc();
     A a = new A();
     a.b = query;
     // a.c = null;

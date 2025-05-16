@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
         <artifactId>Boomerang-Parent</artifactId>
-        <version>4.0.1-SNAPSHOT</version>
+        <version>4.1.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>testCore</artifactId>
@@ -36,6 +36,10 @@
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangScope-SootUp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>boomerangScope-Opal</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

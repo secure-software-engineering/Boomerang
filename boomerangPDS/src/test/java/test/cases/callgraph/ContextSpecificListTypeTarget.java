@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.callgraph;
@@ -15,7 +18,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import test.TestMethod;
-import test.cases.fields.Alloc;
 import test.core.QueryMethods;
 
 @SuppressWarnings("unused")
@@ -27,7 +29,7 @@ public class ContextSpecificListTypeTarget {
   }
 
   public Object method(List<Object> list) {
-    Alloc alloc = new Alloc();
+    CallGraphAlloc alloc = new CallGraphAlloc();
     list.add(alloc);
     return alloc;
   }
@@ -40,7 +42,7 @@ public class ContextSpecificListTypeTarget {
     QueryMethods.queryFor(query);
   }
 
-  private static class WrongList extends LinkedList<Object> {
+  public static class WrongList extends LinkedList<Object> {
     @Override
     public boolean add(Object e) {
       unreachable();

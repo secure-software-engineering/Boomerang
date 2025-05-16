@@ -1,55 +1,67 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package tests;
 
+import static tests.MinSemiringOne.one;
+import static tests.MinSemiringZero.zero;
+
 import org.jspecify.annotations.NonNull;
 import wpds.impl.Weight;
 
-public class MinSemiringImpl implements Weight, MinSemiring {
-  int i;
+public class MinSemiringImpl implements MinSemiring {
 
-  public MinSemiringImpl(int i) {
-    this.i = i;
+  protected final int value;
+
+  public MinSemiringImpl(int value) {
+    this.value = value;
+  }
+
+  public int getValue() {
+    return value;
   }
 
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    MinSemiring one = MinSemiringOne.one();
-    if (other == one) return this;
-    if (this == one) return other;
+    if (other == one()) {
+      return this;
+    }
     MinSemiringImpl o = (MinSemiringImpl) other;
-    return new MinSemiringImpl(o.i + i);
+    return new MinSemiringImpl(o.value + value);
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-    if (other == MinSemiringZero.zero()) return this;
-    if (this == MinSemiringZero.zero()) return other;
+    if (other == zero()) {
+      return this;
+    }
     MinSemiringImpl o = (MinSemiringImpl) other;
-    return new MinSemiringImpl(Math.min(o.i, i));
+    return new MinSemiringImpl(Math.min(o.value, value));
   }
 
   @Override
   public String toString() {
-    return Integer.toString(i);
+    return Integer.toString(value);
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + i;
+    result = prime * result + value;
     return result;
   }
 
@@ -59,11 +71,6 @@ public class MinSemiringImpl implements Weight, MinSemiring {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     MinSemiringImpl other = (MinSemiringImpl) obj;
-    return i == other.i;
-  }
-
-  @Override
-  public int getI() {
-    return 0;
+    return value == other.value;
   }
 }

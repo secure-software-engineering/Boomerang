@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope;
@@ -104,16 +107,6 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public boolean isStringBufferOrBuilder() {
-    return delegate.isStringBufferOrBuilder();
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return delegate.isThrowableAllocationType();
-  }
-
-  @Override
   public boolean isCast() {
     return delegate.isCast();
   }
@@ -189,7 +182,7 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     return delegate.getArrayBase();
   }
 
@@ -217,12 +210,12 @@ public class AllocVal extends Val {
   @Override
   public String toString() {
     return "AllocVal{"
-        + "delegate="
+        + "delegate: "
         + delegate
-        + ", allocStatement="
+        + ", allocStatement: "
         + allocStatement
-        + ", allocationVal="
+        + ", allocationVal: "
         + allocationVal
-        + '}';
+        + "}";
   }
 }

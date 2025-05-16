@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>de.fraunhofer.iem</groupId>
+        <artifactId>Boomerang-Parent</artifactId>
+        <version>4.1.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>boomerangScope-Opal</artifactId>
+
+    <name>BoomerangScope-Opal</name>
+    <description>Scope implementation to run Boomerang and IDEal with Opal</description>
+    <url>https://github.com/secure-software-engineering/Boomerang</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:secure-software-engineering/Boomerang.git</connection>
+        <developerConnection>scm:git:ssh://github.com:secure-software-engineering/Boomerang.git</developerConnection>
+        <url>https://github.com/secure-software-engineering/Boomerang</url>
+    </scm>
+
+    <properties>
+        <opal.version>5.0.0</opal.version>
+        <license.dir>${project.parent.basedir}</license.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>boomerangScope</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>boomerangScope</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.opal-project</groupId>
+            <artifactId>framework_2.13</artifactId>
+            <version>${opal.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>4.9.5</version>
+                <configuration>
+                    <recompileMode>all</recompileMode>
+                    <args>
+                        <arg>-deprecation</arg>
+                    </args>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- We have no Java sources in this submodule, so there won't be any
+                 generated JavaDoc files. To comply with Maven Central, we add an
+                 empty JavaDoc jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <executions>
+                    <execution>
+                        <id>empty-javadoc-jar</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
+    </build>
+</project>

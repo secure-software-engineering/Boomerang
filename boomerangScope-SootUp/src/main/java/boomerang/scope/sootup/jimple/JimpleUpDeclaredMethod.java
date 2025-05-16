@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.sootup.jimple;
@@ -15,21 +18,23 @@ import boomerang.scope.DeclaredMethod;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.scope.sootup.SootUpFrameworkScope;
-import java.util.Arrays;
+import boomerang.utils.MethodWrapper;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import sootup.core.signatures.MethodSignature;
-import sootup.java.core.JavaSootClass;
-import sootup.java.core.types.JavaClassType;
 
 public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
   private final MethodSignature delegate;
+  private final JimpleUpMethod method;
 
-  public JimpleUpDeclaredMethod(JimpleUpInvokeExpr invokeExpr, MethodSignature delegate) {
+  public JimpleUpDeclaredMethod(
+      JimpleUpInvokeExpr invokeExpr, MethodSignature delegate, JimpleUpMethod method) {
     super(invokeExpr);
 
     this.delegate = delegate;
+    this.method = method;
   }
 
   public MethodSignature getDelegate() {
@@ -58,16 +63,13 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    JavaSootClass sootClass =
-        SootUpFrameworkScope.getInstance()
-            .getSootClass((JavaClassType) delegate.getDeclClassType());
-    return new JimpleUpWrappedClass(sootClass);
+    return new JimpleUpWrappedClass(delegate.getDeclClassType(), method.getView());
   }
 
   @Override
   public List<Type> getParameterTypes() {
     return delegate.getParameterTypes().stream()
-        .map(JimpleUpType::new)
+        .map(p -> new JimpleUpType(p, method.getView()))
         .collect(Collectors.toList());
   }
 
@@ -78,24 +80,33 @@ public class JimpleUpDeclaredMethod extends DeclaredMethod {
 
   @Override
   public Type getReturnType() {
-    return new JimpleUpType(delegate.getType());
+    return new JimpleUpType(delegate.getType(), method.getView());
+  }
+
+  @Override
+  public MethodWrapper toMethodWrapper() {
+    List<String> paramTypes =
+        delegate.getParameterTypes().stream().map(Object::toString).collect(Collectors.toList());
+
+    return new MethodWrapper(
+        delegate.getDeclClassType().getFullyQualifiedName(),
+        delegate.getName(),
+        delegate.getType().toString(),
+        paramTypes);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    JimpleUpDeclaredMethod that = (JimpleUpDeclaredMethod) o;
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-
-    JimpleUpDeclaredMethod other = (JimpleUpDeclaredMethod) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+    return Objects.hash(super.hashCode(), delegate);
   }
 
   @Override

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package ideal;
@@ -16,9 +19,9 @@ import boomerang.scope.Val;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import ideal.IDEALSeedSolver.Phases;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +34,14 @@ public class IDEALWeightFunctions<W extends Weight> implements WeightFunctions<E
 
   private static final Logger logger = LoggerFactory.getLogger(IDEALWeightFunctions.class);
   private final WeightFunctions<Edge, Val, Edge, W> delegate;
-  private final Set<NonOneFlowListener> listeners = Sets.newHashSet();
-  private final Set<Edge> potentialStrongUpdates = Sets.newHashSet();
-  private final Set<Edge> weakUpdates = Sets.newHashSet();
-  private final Set<Node<Edge, Val>> nonOneFlowNodes = Sets.newHashSet();
+  private final Set<NonOneFlowListener> listeners = new LinkedHashSet<>();
+  private final Set<Edge> potentialStrongUpdates = new LinkedHashSet<>();
+  private final Set<Edge> weakUpdates = new LinkedHashSet<>();
+  private final Set<Node<Edge, Val>> nonOneFlowNodes = new LinkedHashSet<>();
   private Phases phase;
   private final boolean strongUpdates;
   private final Multimap<Node<Edge, Val>, Node<Edge, Val>> indirectAlias = HashMultimap.create();
-  private final Set<Node<Edge, Val>> nodesWithStrongUpdate = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> nodesWithStrongUpdate = new LinkedHashSet<>();
 
   public IDEALWeightFunctions(WeightFunctions<Edge, Val, Edge, W> delegate, boolean strongUpdates) {
     this.delegate = delegate;

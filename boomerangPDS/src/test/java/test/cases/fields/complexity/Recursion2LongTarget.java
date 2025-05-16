@@ -1,26 +1,29 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.fields.complexity;
 
 import test.TestMethod;
-import test.cases.fields.Alloc;
+import test.cases.fields.FieldAlloc;
 import test.core.QueryMethods;
 
 public class Recursion2LongTarget {
 
   @TestMethod
   public void test() {
-    Alloc alloc = new Alloc();
-    Alloc alias = mainMethod(alloc, new A());
+    FieldAlloc alloc = new FieldAlloc();
+    FieldAlloc alias = mainMethod(alloc, new A());
     QueryMethods.queryFor(alias);
   }
 
@@ -32,10 +35,10 @@ public class Recursion2LongTarget {
 
   public static class DS {
     public DS a;
-    private Alloc result;
+    private FieldAlloc result;
   }
 
-  public Alloc mainMethod(Alloc object, IFoo foo) {
+  public FieldAlloc mainMethod(FieldAlloc object, IFoo foo) {
     DS ds = new DS();
     ds.result = object;
     DS a = foo.before(ds);

@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.results;
@@ -17,9 +20,9 @@ import boomerang.scope.Val;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.util.AccessPath;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import de.fraunhofer.iem.Empty;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import sync.pds.solver.SyncPDSUpdateListener;
@@ -110,10 +113,10 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
       if (t.getLabel().equals(Field.epsilon())) return;
       Collection<Transition<Field, INode<Node<Edge, Val>>>> copiedFields =
-          (fields instanceof Set ? Sets.newHashSet(fields) : Lists.newArrayList(fields));
+          (fields instanceof Set ? new LinkedHashSet(fields) : Lists.newArrayList(fields));
       if (!t.getLabel().equals(Field.empty())) {
         if (copiedFields.contains(t)) {
-          copiedFields = Sets.newHashSet(fields);
+          copiedFields = new LinkedHashSet(fields);
         }
         if (!(t.getLabel() instanceof Empty)) copiedFields.add(t);
       }
@@ -132,7 +135,7 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
       if (fields instanceof List) {
         res = Lists.newArrayList();
       } else {
-        res = Sets.newHashSet();
+        res = new LinkedHashSet<>();
       }
       for (Transition<Field, INode<Node<Edge, Val>>> f : fields) {
         res.add(f.getLabel());

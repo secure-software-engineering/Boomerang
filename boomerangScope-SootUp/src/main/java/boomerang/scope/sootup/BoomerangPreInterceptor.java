@@ -1,12 +1,15 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.scope.sootup;
@@ -19,6 +22,7 @@ import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.ClassConstant;
 import sootup.core.jimple.common.constant.Constant;
+import sootup.core.jimple.common.constant.NullConstant;
 import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.expr.JStaticInvokeExpr;
@@ -27,13 +31,20 @@ import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.model.Body;
+import sootup.core.model.SootClass;
+import sootup.core.model.SootClassMember;
+import sootup.core.model.SootField;
+import sootup.core.signatures.FieldSignature;
 import sootup.core.transform.BodyInterceptor;
+import sootup.core.types.ClassType;
+import sootup.core.types.ReferenceType;
 import sootup.core.views.View;
 
 public class BoomerangPreInterceptor implements BodyInterceptor {
 
   private final boolean TRANSFORM_CONSTANTS_SETTINGS;
 
+  private static final String CONSTRUCTOR = "<init>";
   private static final String LABEL = "varReplacer";
   private int replaceCounter = 0;
 
@@ -48,6 +59,10 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   @Override
   public void interceptBody(Body.@NonNull BodyBuilder bodyBuilder, @NonNull View view) {
     addNopStatementsToMethod(bodyBuilder);
+
+    if (bodyBuilder.getMethodSignature().getName().equals(CONSTRUCTOR)) {
+      addNullifiedFields(bodyBuilder, view);
+    }
 
     if (TRANSFORM_CONSTANTS_SETTINGS) {
       transformConstantsAtFieldWrites(bodyBuilder);
@@ -240,5 +255,84 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
     return value instanceof JInstanceFieldRef
         || value instanceof JStaticFieldRef
         || value instanceof JArrayRef;
+  }
+
+  private void addNullifiedFields(Body.BodyBuilder bodyBuilder, View view) {
+    ClassType classType = bodyBuilder.getMethodSignature().getDeclClassType();
+    Optional<? extends SootClass> sootClass = view.getClass(classType);
+
+    if (sootClass.isEmpty()) {
+      return;
+    }
+
+    Collection<FieldSignature> allFields =
+        sootClass.get().getFields().stream()
+            .map(SootClassMember::getSignature)
+            .collect(Collectors.toSet());
+    Collection<FieldSignature> definedFields = getDefinedFields(bodyBuilder);
+
+    for (FieldSignature fieldSignature : allFields) {
+      if (definedFields.contains(fieldSignature)) {
+        continue;
+      }
+
+      Optional<? extends SootField> field =
+          sootClass.get().getField(fieldSignature.getSubSignature());
+      if (field.isEmpty()) {
+        continue;
+      }
+
+      if (field.get().isStatic() || field.get().isFinal()) {
+        continue;
+      }
+
+      // TODO Consider only Ref types or all types?
+      if (field.get().getType() instanceof ReferenceType) {
+        JInstanceFieldRef nullifiedFieldRef =
+            Jimple.newInstanceFieldRef(bodyBuilder.build().getThisLocal(), fieldSignature);
+        JAssignStmt nullifiedFieldStmt =
+            Jimple.newAssignStmt(
+                nullifiedFieldRef,
+                NullConstant.getInstance(),
+                StmtPositionInfo.getNoStmtPositionInfo());
+
+        Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(bodyBuilder);
+        if (firstNonIdentityStmt.isPresent()) {
+          bodyBuilder.getStmtGraph().insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
+        } else {
+          bodyBuilder.getStmtGraph().addNode(nullifiedFieldStmt);
+        }
+      }
+    }
+  }
+
+  private Collection<FieldSignature> getDefinedFields(Body.BodyBuilder bodyBuilder) {
+    Collection<FieldSignature> definedFields = new LinkedHashSet<>();
+
+    for (Stmt stmt : bodyBuilder.getStmts()) {
+      if (stmt instanceof JAssignStmt) {
+        LValue leftOp = ((JAssignStmt) stmt).getLeftOp();
+
+        if (leftOp instanceof JInstanceFieldRef) {
+          JInstanceFieldRef fieldRef = (JInstanceFieldRef) leftOp;
+
+          definedFields.add(fieldRef.getFieldSignature());
+        }
+      }
+    }
+
+    return definedFields;
+  }
+
+  private Optional<Stmt> findFirstNonIdentityStmt(Body.BodyBuilder bodyBuilder) {
+    for (Stmt stmt : bodyBuilder.getStmts()) {
+      if (stmt instanceof JIdentityStmt) {
+        continue;
+      }
+
+      return Optional.of(stmt);
+    }
+
+    return Optional.empty();
   }
 }

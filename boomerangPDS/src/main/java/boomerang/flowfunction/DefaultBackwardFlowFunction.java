@@ -1,30 +1,35 @@
 /**
  * ***************************************************************************** 
- * Copyright (c) 2025 Fraunhofer IEM, Paderborn, Germany. This program and the
- * accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package boomerang.flowfunction;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
+import boomerang.scope.IStaticFieldRef;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import sync.pds.solver.SyncPDSSolver.PDSSystem;
@@ -46,7 +51,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
   @Override
   public Collection<Val> returnFlow(Method callee, Statement returnStmt, Val returnedVal) {
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     if (!callee.isStatic()) {
       if (callee.getThisLocal().equals(returnedVal)) {
         out.add(returnedVal);
@@ -69,7 +74,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
       throw new RuntimeException("Call site does not contain an invoke expression.");
     }
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
-    Set<Val> out = Sets.newHashSet();
+    Set<Val> out = new LinkedHashSet<>();
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(fact) && !callee.isStatic()) {
         out.add(callee.getThisLocal());
@@ -97,87 +102,93 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
   }
 
   @Override
-  public Collection<State> normalFlow(Edge currEdge, Val fact) {
-    Statement curr = currEdge.getTarget();
-    if (options.allocationSite().getAllocationSite(curr.getMethod(), curr, fact).isPresent()) {
+  public Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact) {
+    Statement nextStmt = nextEdge.getTarget();
+    if (options
+        .allocationSite()
+        .getAllocationSite(nextStmt.getMethod(), nextStmt, fact)
+        .isPresent()) {
       return Collections.emptySet();
     }
-    if (curr.isThrowStmt()) {
+    if (nextStmt.isThrowStmt()) {
       return Collections.emptySet();
     }
-    Set<State> out = Sets.newHashSet();
+    Set<State> out = new LinkedHashSet<>();
 
     boolean leftSideMatches = false;
-    if (curr.isAssignStmt()) {
-      Val leftOp = curr.getLeftOp();
-      Val rightOp = curr.getRightOp();
+    if (nextStmt.isAssignStmt()) {
+      Val leftOp = nextStmt.getLeftOp();
+      Val rightOp = nextStmt.getRightOp();
       if (leftOp.equals(fact)) {
         leftSideMatches = true;
-        if (curr.isFieldLoad()) {
+        if (nextStmt.isFieldLoad()) {
           if (options.trackFields()) {
-            Pair<Val, Field> ifr = curr.getFieldLoad();
-            if (options.includeInnerClassFields() || !ifr.getY().isInnerClassField()) {
-              out.add(new PushNode<>(currEdge, ifr.getX(), ifr.getY(), PDSSystem.FIELDS));
+            IInstanceFieldRef ifr = nextStmt.getFieldLoad();
+            if (options.includeInnerClassFields() || !ifr.getField().isInnerClassField()) {
+              out.add(new PushNode<>(nextEdge, ifr.getBase(), ifr.getField(), PDSSystem.FIELDS));
             }
           }
-        } else if (curr.isStaticFieldLoad()) {
+        } else if (nextStmt.isStaticFieldLoad()) {
+          IStaticFieldRef staticFieldRef = nextStmt.getStaticField();
           if (options.trackFields()) {
             strategies
                 .getStaticFieldStrategy()
-                .handleBackward(currEdge, curr.getLeftOp(), curr.getStaticField(), out);
+                .handleBackward(
+                    currEdge, nextStmt.getLeftOp(), staticFieldRef.asStaticFieldVal(), out);
           }
         } else if (rightOp.isArrayRef()) {
-          Pair<Val, Integer> arrayBase = curr.getArrayBase();
+          IArrayRef arrayBase = nextStmt.getArrayBase();
           if (options.trackFields()) {
-            strategies.getArrayHandlingStrategy().handleBackward(currEdge, arrayBase, out);
+            strategies.getArrayHandlingStrategy().handleBackward(nextEdge, arrayBase, out);
           }
         } else if (rightOp.isCast()) {
-          out.add(new Node<>(currEdge, rightOp.getCastOp()));
-        } else if (curr.isPhiStatement()) {
-          Collection<Val> phiVals = curr.getPhiVals();
+          out.add(new Node<>(nextEdge, rightOp.getCastOp()));
+        } else if (nextStmt.isPhiStatement()) {
+          Collection<Val> phiVals = nextStmt.getPhiVals();
           for (Val v : phiVals) {
-            out.add(new Node<>(currEdge, v));
+            out.add(new Node<>(nextEdge, v));
           }
         } else {
-          if (curr.isFieldLoadWithBase(fact)) {
-            out.add(new ExclusionNode<>(currEdge, fact, curr.getLoadedField()));
+          if (nextStmt.isFieldLoadWithBase(fact)) {
+            out.add(new ExclusionNode<>(nextEdge, fact, nextStmt.getLoadedField()));
           } else {
-            out.add(new Node<>(currEdge, rightOp));
+            out.add(new Node<>(nextEdge, rightOp));
           }
         }
       }
-      if (curr.isFieldStore()) {
-        Pair<Val, Field> ifr = curr.getFieldStore();
-        Val base = ifr.getX();
+      if (nextStmt.isFieldStore()) {
+        IInstanceFieldRef ifr = nextStmt.getFieldStore();
+        Val base = ifr.getBase();
         if (base.equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(currEdge, rightOp, ifr.getY());
+              new NodeWithLocation<>(nextEdge, rightOp, ifr.getField());
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
-      } else if (curr.isStaticFieldStore()) {
-        StaticFieldVal staticField = curr.getStaticField();
+      } else if (nextStmt.isStaticFieldStore()) {
+        StaticFieldVal staticField = nextStmt.getStaticField().asStaticFieldVal();
         if (fact.isStatic() && fact.equals(staticField)) {
-          out.add(new Node<>(currEdge, rightOp));
+          out.add(new Node<>(nextEdge, rightOp));
         }
       } else if (leftOp.isArrayRef()) {
-        Pair<Val, Integer> arrayBase = curr.getArrayBase();
-        if (arrayBase.getX().equals(fact)) {
+        IArrayRef arrayBase = nextStmt.getArrayBase();
+        if (arrayBase.getBase().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(currEdge, rightOp, Field.array(arrayBase.getY()));
+              new NodeWithLocation<>(nextEdge, rightOp, Field.array(arrayBase.getIndex()));
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       }
     }
-    if (!leftSideMatches) out.add(new Node<>(currEdge, fact));
+    if (!leftSideMatches) out.add(new Node<>(nextEdge, fact));
     return out;
   }
 
   @Override
-  public Collection<State> callToReturnFlow(Edge edge, Val fact) {
-    if (FlowFunctionUtils.isSystemArrayCopy(edge.getTarget().getInvokeExpr().getMethod())) {
-      return systemArrayCopyFlow(edge, fact);
+  public Collection<State> callToReturnFlow(Edge currEdge, Edge nextEdge, Val fact) {
+    if (FlowFunctionUtils.isSystemArrayCopy(
+        nextEdge.getTarget().getInvokeExpr().getDeclaredMethod())) {
+      return systemArrayCopyFlow(nextEdge, fact);
     }
-    return normalFlow(edge, fact);
+    return normalFlow(currEdge, nextEdge, fact);
   }
 
   @Override
