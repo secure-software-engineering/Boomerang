@@ -23,7 +23,7 @@ public class ForwardQuery extends Query {
   private final AllocVal allocVal;
 
   public ForwardQuery(ControlFlowGraph.Edge edge, AllocVal allocVal) {
-    super(edge, allocVal.getDelegate());
+    super(edge, allocVal);
 
     this.allocVal = allocVal;
   }
