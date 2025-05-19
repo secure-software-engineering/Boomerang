@@ -21,6 +21,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
@@ -99,12 +100,12 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
 
     if (other == one()) {
-      Set<Transition> transitions = new HashSet<>();
-
-      for (Transition t : values) {
-        transitions.add(new TransitionImpl(t.from(), t.to()));
+      Set<Transition> transitions = new HashSet<>(values);
+      Set<Transition> idTransitions = new HashSet<>();
+      for (Transition t : transitions) {
+        idTransitions.add(new TransitionImpl(t.from(), t.from()));
       }
-
+      transitions.addAll(idTransitions);
       return new TransitionFunctionImpl(transitions, stateChangeStatements);
     }
 
@@ -116,27 +117,21 @@ public class TransitionFunctionImpl implements TransitionFunction {
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
   }
 
-  public String toString() {
-    return "Weight: " + values;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransitionFunctionImpl that = (TransitionFunctionImpl) o;
+    return Objects.equals(values, that.values);
   }
 
   @Override
   public int hashCode() {
-    return values.hashCode();
+    return Objects.hash(values);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    TransitionFunctionImpl other = (TransitionFunctionImpl) obj;
-    return values.equals(other.values);
+  public String toString() {
+    return "Weight: " + values;
   }
 }
