@@ -18,8 +18,6 @@ import static typestate.TransitionFunctionOne.one;
 import static typestate.TransitionFunctionZero.zero;
 
 import boomerang.scope.ControlFlowGraph.Edge;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +29,7 @@ import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
+
   @NonNull private final Set<? extends Transition> values;
   @NonNull private final Set<Edge> stateChangeStatements;
 
@@ -48,7 +47,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Override
   @NonNull
   public Collection<Transition> getValues() {
-    return Lists.newArrayList(values);
+    return new HashSet<>(values);
   }
 
   @NonNull
@@ -92,19 +91,27 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Override
   public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
-      throw new RuntimeException();
+      throw new RuntimeException("Cannot combine TransitionFunction with non TransitionFunction");
     }
+
     if (other == zero()) {
       return this;
     }
-    TransitionFunctionOne one = one();
-    if (other == one) {
-      return one;
+
+    if (other == one()) {
+      Set<Transition> transitions = new HashSet<>();
+
+      for (Transition t : values) {
+        transitions.add(new TransitionImpl(t.from(), t.to()));
+      }
+
+      return new TransitionFunctionImpl(transitions, stateChangeStatements);
     }
+
     TransitionFunction func = (TransitionFunction) other;
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(values);
-    HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
+    Set<Edge> newStateChangeStmts = new HashSet<>(stateChangeStatements);
     newStateChangeStmts.addAll(func.getStateChangeStatements());
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
   }
