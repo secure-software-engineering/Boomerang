@@ -273,10 +273,6 @@ public class JimpleUpVal extends Val {
 
   @Override
   public String toString() {
-    return delegate.toString()
-        + " ("
-        + m
-        + ")"
-        + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
+    return delegate.toString() + (isUnbalanced() ? " unbalanced " + unbalancedStmt : "");
   }
 }
