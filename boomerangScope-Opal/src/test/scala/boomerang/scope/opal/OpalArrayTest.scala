@@ -19,7 +19,6 @@ import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
 import java.util
 import org.junit.Assert
-import org.junit.Ignore
 import org.junit.Test
 import org.opalj.br.IntegerType
 
@@ -39,7 +38,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -47,9 +46,9 @@ class OpalArrayTest {
         arrayLoadCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(1, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(1, arrayBase.getIndex)
 
         val rightOp = stmt.getRightOp
         Assert.assertTrue(rightOp.isArrayRef)
@@ -71,7 +70,7 @@ class OpalArrayTest {
       util.List.of("[" + integerType)
     )
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayLoadCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -79,9 +78,9 @@ class OpalArrayTest {
         arrayLoadCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(-1, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(-1, arrayBase.getIndex)
 
         val rightOp = stmt.getRightOp
         Assert.assertTrue(rightOp.isArrayRef)
@@ -99,7 +98,7 @@ class OpalArrayTest {
     val signature =
       new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreIndex", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -107,9 +106,9 @@ class OpalArrayTest {
         arrayStoreCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(0, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(0, arrayBase.getIndex)
 
         val leftOp = stmt.getLeftOp
         Assert.assertTrue(leftOp.isArrayRef)
@@ -127,7 +126,7 @@ class OpalArrayTest {
     val signature =
       new MethodSignature(classOf[ArrayTarget].getName, "arrayStoreVar", "V")
     val method = opalSetup.resolveMethod(signature)
-    val opalMethod = OpalMethod(method)
+    val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     var arrayStoreCount = 0
     opalMethod.getStatements.forEach(stmt => {
@@ -135,9 +134,9 @@ class OpalArrayTest {
         arrayStoreCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getX.isArrayRef)
-        Assert.assertTrue(arrayBase.getX.isLocal)
-        Assert.assertEquals(-1, arrayBase.getY)
+        Assert.assertFalse(arrayBase.getBase.isArrayRef)
+        Assert.assertTrue(arrayBase.getBase.isLocal)
+        Assert.assertEquals(-1, arrayBase.getIndex)
 
         val leftOp = stmt.getLeftOp
         Assert.assertTrue(leftOp.isArrayRef)

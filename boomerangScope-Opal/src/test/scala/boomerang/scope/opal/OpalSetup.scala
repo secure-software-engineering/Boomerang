@@ -26,14 +26,14 @@ import scala.collection.immutable.ArraySeq
 
 class OpalSetup {
 
+  var project: Option[Project[_]] = None
   var targetClass: Option[ClassFile] = None
 
   def setupOpal(targetClassName: String): Unit = {
     OPALLogger.updateLogger(GlobalLogContext, DevNullLogger)
-    val project = Project(new File(TargetClassPath.TARGET_CLASS_PATH))
+    project = Some(Project(new File(TargetClassPath.TARGET_CLASS_PATH)))
 
-    OpalClient.init(project)
-    targetClass = project.classFile(ObjectType(targetClassName.replace(".", "/")))
+    targetClass = project.get.classFile(ObjectType(targetClassName.replace(".", "/")))
   }
 
   def resolveMethod(methodSignature: MethodSignature): Method = {

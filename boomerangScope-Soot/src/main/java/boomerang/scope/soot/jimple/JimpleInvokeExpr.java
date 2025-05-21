@@ -16,8 +16,8 @@ package boomerang.scope.soot.jimple;
 
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.InvokeExpr;
-import boomerang.scope.Method;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +29,20 @@ import soot.jimple.StaticInvokeExpr;
 public class JimpleInvokeExpr implements InvokeExpr {
 
   private final soot.jimple.InvokeExpr delegate;
-  private final Method m;
+  private final JimpleMethod method;
   private ArrayList<Val> argCache;
 
-  public JimpleInvokeExpr(soot.jimple.InvokeExpr ive, Method m) {
+  public JimpleInvokeExpr(soot.jimple.InvokeExpr ive, JimpleMethod method) {
     this.delegate = ive;
-    this.m = m;
+    this.method = method;
   }
 
   @Override
   public Val getArg(int index) {
     if (delegate.getArg(index) == null) {
-      return Val.zero();
+      return ValCollection.zero();
     }
-    return new JimpleVal(delegate.getArg(index), m);
+    return new JimpleVal(delegate.getArg(index), method);
   }
 
   @Override
@@ -64,12 +64,12 @@ public class JimpleInvokeExpr implements InvokeExpr {
   @Override
   public Val getBase() {
     InstanceInvokeExpr iie = (InstanceInvokeExpr) delegate;
-    return new JimpleVal(iie.getBase(), m);
+    return new JimpleVal(iie.getBase(), method);
   }
 
   @Override
   public DeclaredMethod getDeclaredMethod() {
-    return new JimpleDeclaredMethod(this, delegate.getMethodRef());
+    return new JimpleDeclaredMethod(this, delegate.getMethodRef(), method);
   }
 
   @Override
@@ -87,12 +87,12 @@ public class JimpleInvokeExpr implements InvokeExpr {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleInvokeExpr that = (JimpleInvokeExpr) o;
-    return Objects.equals(delegate, that.delegate) && Objects.equals(m, that.m);
+    return Objects.equals(delegate, that.delegate) && Objects.equals(method, that.method);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate, m);
+    return Objects.hash(delegate, method);
   }
 
   @Override

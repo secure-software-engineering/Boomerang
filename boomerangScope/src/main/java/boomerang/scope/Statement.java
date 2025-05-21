@@ -54,11 +54,6 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public boolean containsStaticFieldAccess() {
-      return false;
-    }
-
-    @Override
     public boolean containsInvokeExpr() {
       return false;
     }
@@ -159,11 +154,6 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public boolean isMultiArrayAllocation() {
-      return false;
-    }
-
-    @Override
     public boolean isFieldStore() {
       return false;
     }
@@ -194,12 +184,12 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public Pair<Val, Field> getFieldStore() {
+    public IInstanceFieldRef getFieldStore() {
       throw new RuntimeException("Epsilon statement is not a field store statement");
     }
 
     @Override
-    public Pair<Val, Field> getFieldLoad() {
+    public IInstanceFieldRef getFieldLoad() {
       throw new RuntimeException("Epsilon statement is not a field load statement");
     }
 
@@ -214,7 +204,7 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public StaticFieldVal getStaticField() {
+    public IStaticFieldRef getStaticField() {
       throw new RuntimeException("Epsilon statement has no static field");
     }
 
@@ -229,27 +219,12 @@ public abstract class Statement implements Location {
     }
 
     @Override
-    public Pair<Val, Integer> getArrayBase() {
+    public IArrayRef getArrayBase() {
       throw new RuntimeException("Epsilon statement has no array base");
     }
 
     @Override
-    public int getStartLineNumber() {
-      return -1;
-    }
-
-    @Override
-    public int getStartColumnNumber() {
-      return -1;
-    }
-
-    @Override
-    public int getEndColumnNumber() {
-      return -1;
-    }
-
-    @Override
-    public int getEndLineNumber() {
+    public int getLineNumber() {
       return -1;
     }
 
@@ -272,8 +247,6 @@ public abstract class Statement implements Location {
   public Method getMethod() {
     return this.method;
   }
-
-  public abstract boolean containsStaticFieldAccess();
 
   public abstract boolean containsInvokeExpr();
 
@@ -328,7 +301,7 @@ public abstract class Statement implements Location {
     if (value.isStatic()) return true;
     if (assignsValue(value)) return true;
     if (isFieldStore()) {
-      if (getFieldStore().getX().equals(value)) return true;
+      if (getFieldStore().getBase().equals(value)) return true;
     }
     if (isReturnOperator(value)) return true;
     return isParameter(value);
@@ -365,8 +338,6 @@ public abstract class Statement implements Location {
 
   public abstract Val getReturnOp();
 
-  public abstract boolean isMultiArrayAllocation();
-
   public abstract boolean isFieldStore();
 
   public abstract boolean isArrayStore();
@@ -377,15 +348,15 @@ public abstract class Statement implements Location {
 
   public abstract boolean isIdentityStmt();
 
-  public abstract Pair<Val, Field> getFieldStore();
+  public abstract IInstanceFieldRef getFieldStore();
 
-  public abstract Pair<Val, Field> getFieldLoad();
+  public abstract IInstanceFieldRef getFieldLoad();
 
   public abstract boolean isStaticFieldLoad();
 
   public abstract boolean isStaticFieldStore();
 
-  public abstract StaticFieldVal getStaticField();
+  public abstract IStaticFieldRef getStaticField();
 
   /**
    * This method kills a data-flow at an if-stmt, it is assumed that the propagated "allocation"
@@ -400,15 +371,9 @@ public abstract class Statement implements Location {
 
   public abstract Collection<Val> getPhiVals();
 
-  public abstract Pair<Val, Integer> getArrayBase();
+  public abstract IArrayRef getArrayBase();
 
-  public abstract int getStartLineNumber();
-
-  public abstract int getStartColumnNumber();
-
-  public abstract int getEndLineNumber();
-
-  public abstract int getEndColumnNumber();
+  public abstract int getLineNumber();
 
   public abstract boolean isCatchStmt();
 

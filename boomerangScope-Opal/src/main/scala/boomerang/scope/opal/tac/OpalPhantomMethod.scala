@@ -14,77 +14,48 @@
  */
 package boomerang.scope.opal.tac
 
-import boomerang.scope.ControlFlowGraph
-import boomerang.scope.Method
-import boomerang.scope.Statement
+import boomerang.scope.PhantomMethod
 import boomerang.scope.Type
-import boomerang.scope.Val
 import boomerang.scope.WrappedClass
 import boomerang.scope.opal.OpalFrameworkScope
 import java.util
+import java.util.Objects
 import org.opalj.br.MethodDescriptor
 import org.opalj.br.MethodSignature
 import org.opalj.br.ObjectType
-import org.opalj.br.VirtualDeclaredMethod
+import org.opalj.br.analyses.Project
 
-case class OpalPhantomMethod(
-    declaringClassType: ObjectType,
-    name: String,
-    descriptor: MethodDescriptor,
-    static: Boolean
-) extends Method {
+class OpalPhantomMethod private (
+    val declaringClassType: ObjectType,
+    val name: String,
+    val descriptor: MethodDescriptor,
+    val static: Boolean,
+    project: Project[_]
+) extends PhantomMethod {
 
   override def isStaticInitializer: Boolean =
     name == OpalFrameworkScope.STATIC_INITIALIZER
-
-  override def isParameterLocal(value: Val): Boolean = false
 
   override def getParameterTypes: util.List[Type] = {
     val result = new util.ArrayList[Type]()
 
     descriptor.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType))
+      result.add(new OpalType(paramType, project))
     })
 
     result
   }
 
-  override def getParameterType(index: Int): Type = OpalType(
-    descriptor.parameterType(index)
+  override def getParameterType(index: Int): Type = new OpalType(
+    descriptor.parameterType(index),
+    project
   )
 
-  override def getReturnType: Type = OpalType(descriptor.returnType)
-
-  override def isThisLocal(value: Val): Boolean = false
-
-  override def getLocals: util.Collection[Val] = throw new RuntimeException(
-    "Locals of phantom method are not available"
-  )
-
-  override def getThisLocal: Val = throw new RuntimeException(
-    "this local of phantom method is not available"
-  )
-
-  override def getParameterLocals: util.List[Val] = throw new RuntimeException(
-    "Parameter locals of phantom method are not available"
-  )
+  override def getReturnType: Type = new OpalType(descriptor.returnType, project)
 
   override def isStatic: Boolean = static
 
-  override def isDefined: Boolean = false
-
-  override def isPhantom: Boolean = true
-
-  override def getStatements: util.List[Statement] = throw new RuntimeException(
-    "Statements of phantom method are not available"
-  )
-
-  override def getDeclaringClass: WrappedClass = OpalPhantomWrappedClass(
-    declaringClassType
-  )
-
-  override def getControlFlowGraph: ControlFlowGraph =
-    throw new RuntimeException("CFG of phantom method is not available")
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClassType, project)
 
   override def getSubSignature: String =
     MethodSignature(name, descriptor).toJava
@@ -93,5 +64,24 @@ case class OpalPhantomMethod(
 
   override def isConstructor: Boolean = name == OpalFrameworkScope.CONSTRUCTOR
 
+  override def hashCode: Int = Objects.hash(declaringClassType, name, descriptor, static)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalPhantomMethod =>
+      this.declaringClassType == that.declaringClassType && this.name == that.name && this.descriptor == that.descriptor && this.static == that.static
+    case _ => false
+  }
+
   override def toString: String = s"PHANTOM: ${descriptor.toJava}"
+}
+
+object OpalPhantomMethod {
+
+  def of(
+      declaringClassType: ObjectType,
+      name: String,
+      descriptor: MethodDescriptor,
+      static: Boolean,
+      project: Project[_]
+  ): OpalPhantomMethod = new OpalPhantomMethod(declaringClassType, name, descriptor, static, project)
 }

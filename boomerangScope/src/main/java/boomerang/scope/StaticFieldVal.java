@@ -16,19 +16,20 @@ package boomerang.scope;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 
-public abstract class StaticFieldVal extends Val {
+/**
+ * Intermediate class that represents a static field reference <i>C.f</i> for a class <i>C</i> and a
+ * field <i>f</i>.
+ */
+public abstract class StaticFieldVal extends Val implements IStaticFieldRef {
 
-  protected StaticFieldVal(Method m) {
-    super(m);
+  protected StaticFieldVal(Method method, Edge unbalanced) {
+    super(method, unbalanced);
   }
 
-  protected StaticFieldVal(Method m, Edge unbalanced) {
-    super(m, unbalanced);
+  @Override
+  public StaticFieldVal asStaticFieldVal() {
+    return this;
   }
-
-  public abstract Field field();
-
-  public abstract Val asUnbalanced(Edge stmt);
 
   @Override
   public boolean isStatic() {
@@ -73,16 +74,6 @@ public abstract class StaticFieldVal extends Val {
   @Override
   public String getStringValue() {
     throw new RuntimeException("Static field val is not a String constant");
-  }
-
-  @Override
-  public boolean isStringBufferOrBuilder() {
-    return false;
-  }
-
-  @Override
-  public boolean isThrowableAllocationType() {
-    return false;
   }
 
   @Override
@@ -151,7 +142,7 @@ public abstract class StaticFieldVal extends Val {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     throw new RuntimeException("Static field val has no array base");
   }
 }

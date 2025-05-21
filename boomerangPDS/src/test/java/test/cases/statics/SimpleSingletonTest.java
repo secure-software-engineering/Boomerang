@@ -14,12 +14,18 @@
  */
 package test.cases.statics;
 
+import java.util.List;
 import org.junit.Test;
 import test.core.AbstractBoomerangTest;
 
 public class SimpleSingletonTest extends AbstractBoomerangTest {
 
   private final String target = SimpleSingletonTarget.class.getName();
+
+  @Override
+  public List<String> getIncludedPackages() {
+    return List.of("java.lang.Runnable");
+  }
 
   @Test
   public void singletonDirect() {

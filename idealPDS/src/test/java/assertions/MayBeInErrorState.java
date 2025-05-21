@@ -52,9 +52,9 @@ public class MayBeInErrorState extends StateResult {
           + " is expected to be in an error state @ "
           + statement
           + " @ line "
-          + statement.getStartLineNumber();
+          + statement.getLineNumber();
     } else {
-      return statement + " @ line " + statement.getStartLineNumber() + " has not been checked";
+      return statement + " @ line " + statement.getLineNumber() + " has not been checked";
     }
   }
 }

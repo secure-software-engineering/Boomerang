@@ -18,13 +18,9 @@ import boomerang.scope.Val
 import boomerang.scope.ValWithFalseVariable
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
-import org.opalj.tac.DUVar
 import org.opalj.tac.Expr
-import org.opalj.tac.IdBasedVar
-import org.opalj.tac.Var
-import org.opalj.value.ValueInformation
 
-class OpalDoubleVal(delegate: Expr[TacLocal], method: OpalMethod, falseVal: Val)
+class OpalDoubleVal(delegate: Expr[TacLocal], method: OpalMethod, val falseVal: Val)
     extends OpalVal(delegate, method)
     with ValWithFalseVariable {
 
@@ -32,13 +28,10 @@ class OpalDoubleVal(delegate: Expr[TacLocal], method: OpalMethod, falseVal: Val)
 
   override def hashCode: Int = Objects.hash(super.hashCode, falseVal)
 
-  private def canEqual(a: Any): Boolean = a.isInstanceOf[OpalDoubleVal]
+  override def equals(other: Any): Boolean = other match {
+    case that: OpalDoubleVal =>
+      super.equals(that) && falseVal == that.falseVal
 
-  override def equals(obj: Any): Boolean = obj match {
-    case other: OpalDoubleVal =>
-      other.canEqual(this) && super.equals(other) && falseVal.equals(
-        other.getFalseVariable
-      )
     case _ => false
   }
 

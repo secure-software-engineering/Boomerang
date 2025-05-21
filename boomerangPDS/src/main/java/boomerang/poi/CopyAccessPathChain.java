@@ -19,6 +19,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Objects;
@@ -104,7 +105,8 @@ public class CopyAccessPathChain<W extends Weight> {
       INode<Node<Edge, Val>> targetState =
           backwardSolver.generateFieldState(
               new SingleNode<>(
-                  new Node<>(new Edge(Statement.epsilon(), Statement.epsilon()), Val.zero())),
+                  new Node<>(
+                      new Edge(Statement.epsilon(), Statement.epsilon()), ValCollection.zero())),
               t.getLabel());
       Transition<Field, INode<Node<Edge, Val>>> insert =
           new Transition<>(stateInBwSolver, t.getLabel(), targetState);

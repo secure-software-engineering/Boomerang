@@ -15,16 +15,17 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.BoomerangTACode
 import boomerang.scope.opal.transformation.TacBodyBuilder
 import java.util
 import java.util.Objects
+import org.opalj.br.analyses.Project
 
 class OpalMethod private (
     val delegate: org.opalj.br.Method,
-    val tac: BoomerangTACode
-) extends Method {
+    val tac: BoomerangTACode,
+    val project: Project[_]
+) extends DefinedMethod {
 
   if (delegate.body.isEmpty) {
     throw new RuntimeException("Cannot build OpalMethod without existing body")
@@ -44,7 +45,7 @@ class OpalMethod private (
     val result = new util.ArrayList[Type]()
 
     delegate.parameterTypes.foreach(paramType => {
-      result.add(OpalType(paramType))
+      result.add(new OpalType(paramType, project))
     })
 
     result
@@ -52,7 +53,7 @@ class OpalMethod private (
 
   override def getParameterType(index: Int): Type = getParameterTypes.get(index)
 
-  override def getReturnType: Type = OpalType(delegate.descriptor.returnType)
+  override def getReturnType: Type = new OpalType(delegate.descriptor.returnType, project)
 
   override def isThisLocal(fact: Val): Boolean = {
     if (isStatic) return false
@@ -69,7 +70,7 @@ class OpalMethod private (
           val targetVar = stmt.asAssignment.targetVar
 
           if (targetVar.id == -1) {
-            return new OpalLocal(targetVar, this)
+            return new OpalVal(targetVar, this)
           }
         }
       })
@@ -86,7 +87,7 @@ class OpalMethod private (
     if (localCache.isEmpty) {
       localCache = Some(new util.HashSet[Val]())
 
-      tac.getLocals.foreach(l => localCache.get.add(new OpalLocal(l, this)))
+      tac.getLocals.foreach(l => localCache.get.add(new OpalVal(l, this)))
     }
 
     localCache.get
@@ -99,9 +100,9 @@ class OpalMethod private (
       tac.getParameterLocals.foreach(l => {
         // Exclude the 'this' local from the parameters if this is an instance method
         if (isStatic) {
-          parameterLocalCache.get.add(new OpalLocal(l, this))
+          parameterLocalCache.get.add(new OpalVal(l, this))
         } else if (l.id != -1) {
-          parameterLocalCache.get.add(new OpalLocal(l, this))
+          parameterLocalCache.get.add(new OpalVal(l, this))
         }
       })
     }
@@ -111,14 +112,11 @@ class OpalMethod private (
 
   override def isStatic: Boolean = delegate.isStatic
 
-  override def isDefined: Boolean = true
-
-  override def isPhantom: Boolean = false
-
   override def getStatements: util.List[Statement] = cfg.getStatements
 
-  override def getDeclaringClass: WrappedClass = OpalWrappedClass(
-    delegate.classFile
+  override def getDeclaringClass: WrappedClass = new OpalWrappedClass(
+    delegate.classFile.thisType,
+    project
   )
 
   override def getControlFlowGraph: ControlFlowGraph = cfg.get()
@@ -141,9 +139,9 @@ class OpalMethod private (
 
 object OpalMethod {
 
-  def apply(delegate: org.opalj.br.Method): OpalMethod =
-    new OpalMethod(delegate, TacBodyBuilder(OpalClient.project.get, delegate))
+  def of(delegate: org.opalj.br.Method, project: Project[_]): OpalMethod =
+    new OpalMethod(delegate, TacBodyBuilder(project, delegate), project)
 
-  def apply(delegate: org.opalj.br.Method, tac: BoomerangTACode): OpalMethod =
-    new OpalMethod(delegate, tac)
+  def of(delegate: org.opalj.br.Method, tac: BoomerangTACode, project: Project[_]): OpalMethod =
+    new OpalMethod(delegate, tac, project)
 }

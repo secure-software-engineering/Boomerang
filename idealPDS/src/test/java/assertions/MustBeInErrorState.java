@@ -52,9 +52,9 @@ public class MustBeInErrorState extends StateResult {
           + " must be in an error state @ "
           + statement
           + " @ line "
-          + statement.getStartLineNumber();
+          + statement.getLineNumber();
     } else {
-      return statement + " @ line " + statement.getStartLineNumber() + " has not been checked";
+      return statement + " @ line " + statement.getLineNumber() + " has not been checked";
     }
   }
 }

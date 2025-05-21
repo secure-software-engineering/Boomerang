@@ -27,7 +27,7 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
 
   @NonNull private static final DataFlowPathWeightOne one = new DataFlowPathWeightOne();
 
-  public DataFlowPathWeightOne() {}
+  private DataFlowPathWeightOne() {}
 
   public static DataFlowPathWeightOne one() {
     return one;

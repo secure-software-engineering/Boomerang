@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -74,7 +75,7 @@ public class AbstractBoomerangTest extends TestingFramework {
 
   /**
    * Fails the test cases, when Boomerang's result set contains any object that does not inherit
-   * from {@link test.core.selfrunning.AllocatedObject}.
+   * from {@link AllocatedObject}.
    */
   private static final boolean TRACK_IMPLICIT_IMPRECISE = false;
 
@@ -128,7 +129,7 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void analyzeWithCallGraph(FrameworkScope frameworkScope, boolean ignoreAllocSites) {
-    LOGGER.info("Running test method " + testName.getMethodName());
+    LOGGER.info("Running test method \"{}\"", testName.getMethodName());
     CallGraph callGraph = frameworkScope.getCallGraph();
     queryDetector = new QueryForCallSiteDetector(callGraph);
     queryForCallSites = queryDetector.computeSeeds();
@@ -329,10 +330,12 @@ public class AbstractBoomerangTest extends TestingFramework {
       AnalysisMode analysis) {
     LOGGER.info(
         "Boomerang Results:\n - {}",
-        results.stream().map(r -> r.fact().toString()).collect(Collectors.joining("\n - ")));
+        results.stream().map(Node::toString).collect(Collectors.joining("\n - ")));
     LOGGER.info(
         "Expected Results:\n - {}",
-        expectedResults.stream().map(r -> r.var().toString()).collect(Collectors.joining("\n - ")));
+        expectedResults.stream()
+            .map(q -> q.asNode().toString())
+            .collect(Collectors.joining("\n - ")));
     Collection<Node<Edge, Val>> falseNegativeAllocationSites = new HashSet<>();
     for (Query res : expectedResults) {
       if (!results.contains(res.asNode())) falseNegativeAllocationSites.add(res.asNode());
@@ -365,10 +368,15 @@ public class AbstractBoomerangTest extends TestingFramework {
   }
 
   private void checkContainsAllExpectedAccessPath(Set<AccessPath> allAliases) {
-    HashSet<AccessPath> expected = new LinkedHashSet(queryDetector.expectedAccessPaths);
+    HashSet<AccessPath> expected = new LinkedHashSet<>(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
       Assert.fail("Did not find all access path! " + expected);
     }
+  }
+
+  @After
+  public void cleanUp() {
+    super.cleanUp();
   }
 }

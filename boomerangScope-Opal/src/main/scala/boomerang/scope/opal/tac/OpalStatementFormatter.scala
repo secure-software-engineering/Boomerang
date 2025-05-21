@@ -16,7 +16,6 @@ package boomerang.scope.opal.tac
 
 import com.google.common.base.Joiner
 import org.opalj.tac.Nop
-import org.opalj.tac.Param
 import org.opalj.tac.PutField
 import org.opalj.tac.Return
 
@@ -49,7 +48,7 @@ object OpalStatementFormatter {
 
       if (stmt.isArrayStore) {
         val base = stmt.getArrayBase
-        return s"${base.getX.getVariableName}[${base.getY}] = ${stmt.getRightOp}"
+        return s"${base.getBase.getVariableName}[${base.getIndex}] = ${stmt.getRightOp}"
       }
 
       if (stmt.isStaticFieldStore) {

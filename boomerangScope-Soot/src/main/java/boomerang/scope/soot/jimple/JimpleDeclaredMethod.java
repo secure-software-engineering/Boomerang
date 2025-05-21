@@ -28,10 +28,12 @@ import soot.SootMethodRef;
 public class JimpleDeclaredMethod extends DeclaredMethod {
 
   private final SootMethodRef delegate;
+  private final JimpleMethod method;
 
-  public JimpleDeclaredMethod(InvokeExpr inv, SootMethodRef method) {
+  public JimpleDeclaredMethod(InvokeExpr inv, SootMethodRef delegate, JimpleMethod method) {
     super(inv);
-    this.delegate = method;
+    this.delegate = delegate;
+    this.method = method;
   }
 
   @Override
@@ -56,7 +58,7 @@ public class JimpleDeclaredMethod extends DeclaredMethod {
 
   @Override
   public WrappedClass getDeclaringClass() {
-    return new JimpleWrappedClass(delegate.getDeclaringClass());
+    return new JimpleWrappedClass(delegate.getDeclaringClass(), method.getScene());
   }
 
   @Override
@@ -64,19 +66,19 @@ public class JimpleDeclaredMethod extends DeclaredMethod {
     List<Type> types = new ArrayList<>();
 
     for (soot.Type type : delegate.getParameterTypes()) {
-      types.add(new JimpleType(type));
+      types.add(new JimpleType(type, method.getScene()));
     }
     return types;
   }
 
   @Override
   public Type getParameterType(int index) {
-    return new JimpleType(delegate.getParameterType(index));
+    return new JimpleType(delegate.getParameterType(index), method.getScene());
   }
 
   @Override
   public Type getReturnType() {
-    return new JimpleType(delegate.getReturnType());
+    return new JimpleType(delegate.getReturnType(), method.getScene());
   }
 
   @Override

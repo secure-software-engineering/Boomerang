@@ -16,6 +16,7 @@ package boomerang;
 
 import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph.Edge;
+import java.util.Objects;
 import wpds.impl.Weight;
 
 public class WeightedForwardQuery<W extends Weight> extends ForwardQuery {
@@ -29,5 +30,24 @@ public class WeightedForwardQuery<W extends Weight> extends ForwardQuery {
 
   public W weight() {
     return weight;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    WeightedForwardQuery<?> that = (WeightedForwardQuery<?>) o;
+    return Objects.equals(weight, that.weight);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), weight);
+  }
+
+  @Override
+  public String toString() {
+    return "Weighted Forward Query: " + getAllocVal() + ", " + weight;
   }
 }

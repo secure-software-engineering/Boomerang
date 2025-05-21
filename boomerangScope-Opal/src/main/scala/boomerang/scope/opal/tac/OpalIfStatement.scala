@@ -17,25 +17,15 @@ package boomerang.scope.opal.tac
 import boomerang.scope.IfStatement
 import boomerang.scope.Statement
 import boomerang.scope.Val
-import boomerang.scope.opal.OpalClient
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
-import org.opalj.tac.DUVar
-import org.opalj.tac.IdBasedVar
 import org.opalj.tac.If
-import org.opalj.tac.Var
-import org.opalj.value.ValueInformation
 
 class OpalIfStatement(val delegate: If[TacLocal], method: OpalMethod) extends IfStatement {
 
-  override def getTarget: Statement = {
-    /*val tac = OpalClient.getTacForMethod(method.delegate)
-    val target = delegate.targetStmt
+  override def getTarget: Statement = ???
 
-    new OpalStatement(tac.stmts(target), method)*/
-    ???
-  }
-
+  // TODO This requires a complete revisit because nobody knows what is happening here
   override def evaluate(otherVal: Val): IfStatement.Evaluation =
     IfStatement.Evaluation.UNKNOWN
 
@@ -44,7 +34,6 @@ class OpalIfStatement(val delegate: If[TacLocal], method: OpalMethod) extends If
     //  Only relevant for PathTrackingBoomerang that is not used and tested;
     //  has to be implemented when used
     if (otherVal.isInstanceOf[OpalVal]) {}
-    if (otherVal.isInstanceOf[OpalLocal]) {}
     if (otherVal.isInstanceOf[OpalArrayRef]) {}
     val left = new OpalVal(delegate.left, method)
     val right = new OpalVal(delegate.right, method)

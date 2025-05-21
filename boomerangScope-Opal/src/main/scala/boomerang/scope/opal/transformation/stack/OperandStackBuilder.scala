@@ -42,10 +42,6 @@ object OperandStackBuilder {
       workList ::= eh
     }
 
-    if (method.toJava.contains("indirectAllocationSiteTwoFields3Address2()")) {
-      println()
-    }
-
     while (workList.nonEmpty) {
       val currPc = workList.head
       val currStmt = tacNaive.stmts(tacNaive.pcToIndex(currPc))

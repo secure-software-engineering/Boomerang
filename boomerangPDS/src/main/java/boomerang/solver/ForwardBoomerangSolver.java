@@ -105,7 +105,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(nextStmt.getTarget().getFieldStore().getY())) {
+      if (t.getLabel().equals(nextStmt.getTarget().getFieldStore().getField())) {
         LOGGER.trace("Overwriting field {} at {}", t.getLabel(), nextStmt);
         overwriteFieldAtStatement(nextStmt, t);
       }
@@ -157,7 +157,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(Field.array(nextStmt.getTarget().getArrayBase().getY()))) {
+      if (t.getLabel().equals(Field.array(nextStmt.getTarget().getArrayBase().getIndex()))) {
         LOGGER.trace("Overwriting field {} at {}", t.getLabel(), nextStmt);
         overwriteFieldAtStatement(nextStmt, t);
       }
@@ -410,11 +410,11 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
 
   public void checkForFieldOverwrite(Edge curr, Val value) {
     if ((curr.getTarget().isFieldStore()
-        && curr.getTarget().getFieldStore().getX().equals(value))) {
+        && curr.getTarget().getFieldStore().getBase().equals(value))) {
       Node<ControlFlowGraph.Edge, Val> node = new Node<>(curr, value);
       fieldAutomaton.registerListener(new OverwriteAtFieldStore(new SingleNode<>(node), curr));
     } else if ((curr.getTarget().isArrayStore()
-        && curr.getTarget().getArrayBase().getX().equals(value))) {
+        && curr.getTarget().getArrayBase().getBase().equals(value))) {
       Node<ControlFlowGraph.Edge, Val> node = new Node<>(curr, value);
       fieldAutomaton.registerListener(new OverwriteAtArrayStore(new SingleNode<>(node), curr));
     }

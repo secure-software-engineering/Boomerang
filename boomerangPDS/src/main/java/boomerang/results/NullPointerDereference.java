@@ -16,9 +16,8 @@ package boomerang.results;
 
 import boomerang.Query;
 import boomerang.scope.ControlFlowGraph;
-import boomerang.scope.Field;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.Method;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import java.util.List;
@@ -220,8 +219,8 @@ public class NullPointerDereference implements AffectedLocation {
     }
     if (curr.isAssignStmt()) {
       if (curr.isFieldLoad()) {
-        Pair<Val, Field> ifr = curr.getFieldLoad();
-        if (ifr.getX().equals(fact)) {
+        IInstanceFieldRef ifr = curr.getFieldLoad();
+        if (ifr.getBase().equals(fact)) {
           return true;
         }
       }

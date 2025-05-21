@@ -17,22 +17,30 @@ package boomerang.scope.sootup.jimple;
 import boomerang.scope.Method;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
-import boomerang.scope.sootup.SootUpFrameworkScope;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
+import sootup.core.model.SootClass;
+import sootup.core.types.ClassType;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
+import sootup.java.core.views.JavaView;
 
 public class JimpleUpWrappedClass implements WrappedClass {
 
-  private final JavaSootClass delegate;
+  private final ClassType delegate;
+  private final JavaView view;
   private Collection<Method> methodsCache;
 
-  public JimpleUpWrappedClass(JavaSootClass delegate) {
+  public JimpleUpWrappedClass(ClassType delegate, JavaView view) {
+    this.view = view;
     this.delegate = delegate;
+  }
+
+  public ClassType getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -40,9 +48,13 @@ public class JimpleUpWrappedClass implements WrappedClass {
     if (methodsCache == null) {
       methodsCache = new HashSet<>();
 
-      for (JavaSootMethod method : delegate.getMethods()) {
-        if (method.hasBody()) {
-          methodsCache.add(JimpleUpMethod.of(method));
+      Optional<JavaSootClass> sootClass = view.getClass(delegate);
+
+      if (sootClass.isPresent()) {
+        for (JavaSootMethod method : sootClass.get().getMethods()) {
+          if (method.hasBody()) {
+            methodsCache.add(JimpleUpMethod.of(method, view));
+          }
         }
       }
     }
@@ -51,64 +63,70 @@ public class JimpleUpWrappedClass implements WrappedClass {
 
   @Override
   public boolean hasSuperclass() {
-    return delegate.hasSuperclass();
+    Optional<JavaSootClass> sootClass = view.getClass(delegate);
+
+    return sootClass.map(SootClass::hasSuperclass).orElse(false);
   }
 
   @Override
   public WrappedClass getSuperclass() {
-    Optional<JavaClassType> superClassType = delegate.getSuperclass();
-    if (superClassType.isEmpty()) {
-      throw new RuntimeException("Super class type of " + superClassType + " is not present");
+    Optional<JavaSootClass> sootClass = view.getClass(delegate);
+    if (sootClass.isPresent() && sootClass.get().hasSuperclass()) {
+
+      Optional<JavaClassType> superClassType = sootClass.get().getSuperclass();
+      if (superClassType.isEmpty()) {
+        throw new RuntimeException("Super class type of " + superClassType + " is not present");
+      }
+
+      return new JimpleUpWrappedClass(superClassType.get(), view);
     }
-    JavaSootClass superClass =
-        SootUpFrameworkScope.getInstance().getSootClass(superClassType.get());
-    return new JimpleUpWrappedClass(superClass);
+
+    throw new RuntimeException("Class " + delegate + " has no super class");
   }
 
   @Override
   public Type getType() {
-    return new JimpleUpType(delegate.getType());
+    return new JimpleUpType(delegate, view);
   }
 
   @Override
   public boolean isApplicationClass() {
-    return delegate.isApplicationClass();
+    Optional<JavaSootClass> sootClass = view.getClass(delegate);
+    return sootClass.map(SootClass::isApplicationClass).orElse(false);
   }
 
   @Override
   public String getFullyQualifiedName() {
-    return delegate.getName();
+    return delegate.getFullyQualifiedName();
+  }
+
+  @Override
+  public boolean isDefined() {
+    Optional<JavaSootClass> sootClass = view.getClass(delegate);
+    return sootClass.isPresent();
   }
 
   @Override
   public boolean isPhantom() {
-    // TODO May change
-    return false;
+    Optional<JavaSootClass> sootClass = view.getClass(delegate);
+    return sootClass.isEmpty();
   }
 
-  public JavaSootClass getDelegate() {
-    return delegate;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    JimpleUpWrappedClass that = (JimpleUpWrappedClass) o;
+    return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(new Object[] {delegate});
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-
-    JimpleUpWrappedClass other = (JimpleUpWrappedClass) obj;
-    if (delegate == null) {
-      return other.delegate == null;
-    } else return delegate.equals(other.delegate);
+    return Objects.hash(delegate);
   }
 
   @Override
   public String toString() {
-    return delegate.getName();
+    return delegate.toString();
   }
 }

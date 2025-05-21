@@ -14,11 +14,7 @@
  */
 package sync.pds.weights;
 
-import static sync.pds.weights.SetDomainOne.one;
-
-import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.HashSet;
 import org.jspecify.annotations.NonNull;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
@@ -27,43 +23,30 @@ public class SetDomainZero implements SetDomain {
 
   @NonNull private static final SetDomainZero zero = new SetDomainZero();
 
+  private SetDomainZero() {
+    /* Singleton */
+  }
+
+  public static SetDomainZero zero() {
+    return zero;
+  }
+
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other.equals(one())) {
-      return this;
-    }
-    if (this.equals(one())) {
-      return other;
-    }
-    return zero();
+    return this;
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight other) {
-
-    if (other.equals(zero())) return this;
-    if (this.equals(zero())) return other;
-    if (this.equals(one()) || other.equals(one())) return one();
-
-    if (other instanceof SetDomainOne) {
-      HashSet<Node> merged = Sets.newHashSet(getNodes());
-      merged.addAll(((SetDomainImpl) other).getNodes());
-      throw new IllegalStateException("SetDomainZero.CombineWith-Dont");
-      //      return new SetDomainImpl<N, Stmt, Fact>(merged);
-    }
-    return zero();
+    return other;
   }
 
   @NonNull
   @Override
   public Collection<Node> getNodes() {
     throw new IllegalStateException("SetDomain.getNodes() - don't");
-  }
-
-  public static SetDomainZero zero() {
-    return zero;
   }
 
   @NonNull

@@ -21,41 +21,48 @@ import wpds.impl.Weight;
 
 public class MinDistanceWeightImpl implements MinDistanceWeight {
 
-  private Integer minDistance = -1;
+  private final int minDistance;
 
   public MinDistanceWeightImpl(Integer minDistance) {
     this.minDistance = minDistance;
   }
 
+  @Override
+  public int getMinDistance() {
+    return minDistance;
+  }
+
   @NonNull
   @Override
   public Weight extendWith(@NonNull Weight o) {
-    if (!(o instanceof MinDistanceWeightImpl)) {
+    if (!(o instanceof MinDistanceWeight)) {
       throw new RuntimeException("Cannot extend to different types of weight!");
     }
-    MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    Integer newDistance = minDistance + other.minDistance;
+    MinDistanceWeight other = (MinDistanceWeight) o;
+    if (other == one()) {
+      return this;
+    }
+    Integer newDistance = getMinDistance() + other.getMinDistance();
     return new MinDistanceWeightImpl(newDistance);
   }
 
   @NonNull
   @Override
   public Weight combineWith(@NonNull Weight o) {
-    if (!(o instanceof MinDistanceWeightImpl))
+    if (!(o instanceof MinDistanceWeight))
       throw new RuntimeException("Cannot extend to different types of weight!");
-    MinDistanceWeightImpl other = (MinDistanceWeightImpl) o;
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    return new MinDistanceWeightImpl(Math.min(other.minDistance, minDistance));
+    MinDistanceWeight other = (MinDistanceWeight) o;
+    if (other == one()) {
+      return this;
+    }
+    return new MinDistanceWeightImpl(Math.min(other.getMinDistance(), getMinDistance()));
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((minDistance == null) ? 0 : minDistance.hashCode());
+    result = prime * result + getMinDistance();
     return result;
   }
 
@@ -63,22 +70,18 @@ public class MinDistanceWeightImpl implements MinDistanceWeight {
   public boolean equals(Object obj) {
     if (this == obj) return true;
     if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
     MinDistanceWeightImpl other = (MinDistanceWeightImpl) obj;
-    if (minDistance == null) {
-      if (other.minDistance != null) return false;
-    } else if (!minDistance.equals(other.minDistance)) return false;
+    if (minDistance != other.minDistance) {
+      return false;
+    }
     return false;
   }
 
   @Override
   public String toString() {
-    final Weight one = new MinDistanceWeightOne();
-    return (this == one) ? "ONE " : " Distance: " + minDistance;
-  }
-
-  @Override
-  public Integer getMinDistance() {
-    return minDistance;
+    return "Distance: " + minDistance;
   }
 }

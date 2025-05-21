@@ -15,9 +15,10 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.Field;
+import boomerang.scope.IArrayRef;
+import boomerang.scope.IInstanceFieldRef;
 import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
-import boomerang.scope.Pair;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
@@ -37,11 +38,6 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
     this.method = method;
     this.thisLocal = thisLocal;
     this.rightOp = rightOp;
-  }
-
-  @Override
-  public boolean containsStaticFieldAccess() {
-    return false;
   }
 
   @Override
@@ -126,11 +122,6 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public boolean isMultiArrayAllocation() {
-    return false;
-  }
-
-  @Override
   public boolean isFieldStore() {
     return true;
   }
@@ -156,12 +147,13 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public Pair<Val, Field> getFieldStore() {
-    return new Pair<Val, Field>(thisLocal, field);
+  public IInstanceFieldRef getFieldStore() {
+    // return new Pair<Val, Field>(thisLocal, field);
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
-  public Pair<Val, Field> getFieldLoad() {
+  public IInstanceFieldRef getFieldLoad() {
     throw new RuntimeException("Illegal");
   }
 
@@ -191,12 +183,12 @@ public class WALAUnitializedFieldStatement extends WALAStatement {
   }
 
   @Override
-  public Pair<Val, Integer> getArrayBase() {
+  public IArrayRef getArrayBase() {
     throw new RuntimeException("Illegal");
   }
 
   @Override
-  public int getStartLineNumber() {
+  public int getLineNumber() {
     return 0;
   }
 

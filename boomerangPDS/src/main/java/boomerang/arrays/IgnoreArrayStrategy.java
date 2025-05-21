@@ -15,16 +15,15 @@
 package boomerang.arrays;
 
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.Pair;
-import boomerang.scope.Val;
+import boomerang.scope.IArrayRef;
 import java.util.Set;
 import wpds.interfaces.State;
 
 public class IgnoreArrayStrategy implements ArrayHandlingStrategy {
 
   @Override
-  public void handleForward(Edge storeStmt, Pair<Val, Integer> storedVal, Set<State> out) {}
+  public void handleForward(Edge storeStmt, IArrayRef storedVal, Set<State> out) {}
 
   @Override
-  public void handleBackward(Edge curr, Pair<Val, Integer> arrayBase, Set<State> out) {}
+  public void handleBackward(Edge curr, IArrayRef arrayBase, Set<State> out) {}
 }

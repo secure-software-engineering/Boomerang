@@ -191,10 +191,11 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
           @Override
           public void callWitness(Transition<ControlFlowGraph.Edge, INode<Val>> t) {
-
             Val targetFact = t.getTarget().fact();
+
             if (targetFact instanceof AllocVal) {
               targetFact = ((AllocVal) targetFact).getDelegate();
+
               if (!potentialCallCandidate.add(targetFact)) return;
               if (potentialFieldCandidate.containsKey(targetFact)) {
                 for (Node<ControlFlowGraph.Edge, Val> w : potentialFieldCandidate.get(targetFact)) {

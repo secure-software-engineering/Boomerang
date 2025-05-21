@@ -26,11 +26,6 @@ import wpds.impl.Weight;
 
 public class InferenceWeightImpl implements InferenceWeight {
 
-  @NonNull
-  public Set<Method> getInvokedMethods() {
-    return invokedMethods;
-  }
-
   @NonNull private final Set<Method> invokedMethods;
 
   private InferenceWeightImpl(@NonNull Set<Method> res) {
@@ -42,15 +37,21 @@ public class InferenceWeightImpl implements InferenceWeight {
   }
 
   @NonNull
+  public Set<Method> getInvokedMethods() {
+    return invokedMethods;
+  }
+
+  @NonNull
   @Override
   public Weight extendWith(@NonNull Weight other) {
-    if (other.equals(one())) return this;
-    if (this.equals(one())) return other;
-    if (other.equals(zero()) || this.equals(zero())) {
+    if (other == one()) {
+      return this;
+    }
+    if (other == zero()) {
       return zero();
     }
-    InferenceWeight func = (InferenceWeightImpl) other;
-    Set<Method> otherInvokedMethods = ((InferenceWeightImpl) func).invokedMethods;
+    InferenceWeightImpl func = (InferenceWeightImpl) other;
+    Set<Method> otherInvokedMethods = func.invokedMethods;
     Set<Method> res = new HashSet<>(invokedMethods);
     res.addAll(otherInvokedMethods);
     return new InferenceWeightImpl(res);
