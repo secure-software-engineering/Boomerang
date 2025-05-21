@@ -25,16 +25,7 @@ class OpalVal(
     unbalanced: ControlFlowGraph.Edge = null
 ) extends Val(method, unbalanced) {
 
-  override def getType: Type = delegate match {
-    case v: TacLocal => OpalType.valueInformationToType(v.valueInformation, method.project)
-    case nullExpr: NullExpr => new OpalType(nullExpr.tpe, method.project)
-    case const: Const => new OpalType(const.tpe, method.project)
-    case newExpr: New => new OpalType(newExpr.tpe, method.project)
-    case newArrayExpr: NewArray[_] => new OpalType(newArrayExpr.tpe, method.project)
-    case functionCall: FunctionCall[_] =>
-      new OpalType(functionCall.descriptor.returnType, method.project)
-    case _ => throw new RuntimeException("Type not implemented yet")
-  }
+  override def getType: Type = OpalType.getTypeForExpr(delegate, method.project)
 
   override def isStatic: Boolean = false
 

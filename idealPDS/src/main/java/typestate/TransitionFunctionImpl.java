@@ -18,11 +18,10 @@ import static typestate.TransitionFunctionOne.one;
 import static typestate.TransitionFunctionZero.zero;
 
 import boomerang.scope.ControlFlowGraph.Edge;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
@@ -31,6 +30,7 @@ import typestate.finiteautomata.TransitionImpl;
 import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
+
   @NonNull private final Set<? extends Transition> values;
   @NonNull private final Set<Edge> stateChangeStatements;
 
@@ -48,7 +48,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Override
   @NonNull
   public Collection<Transition> getValues() {
-    return Lists.newArrayList(values);
+    return new HashSet<>(values);
   }
 
   @NonNull
@@ -92,44 +92,46 @@ public class TransitionFunctionImpl implements TransitionFunction {
   @Override
   public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
-      throw new RuntimeException();
+      throw new RuntimeException("Cannot combine TransitionFunction with non TransitionFunction");
     }
+
     if (other == zero()) {
       return this;
     }
-    TransitionFunctionOne one = one();
-    if (other == one) {
-      return one;
+
+    if (other == one()) {
+      Set<Transition> transitions = new HashSet<>(values);
+      Set<Transition> idTransitions = new HashSet<>();
+      for (Transition t : transitions) {
+        idTransitions.add(new TransitionImpl(t.from(), t.from()));
+      }
+      transitions.addAll(idTransitions);
+      return new TransitionFunctionImpl(transitions, stateChangeStatements);
     }
+
     TransitionFunction func = (TransitionFunction) other;
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(values);
-    HashSet<Edge> newStateChangeStmts = Sets.newHashSet(stateChangeStatements);
+    Set<Edge> newStateChangeStmts = new HashSet<>(stateChangeStatements);
     newStateChangeStmts.addAll(func.getStateChangeStatements());
     return new TransitionFunctionImpl(transitions, newStateChangeStmts);
   }
 
-  public String toString() {
-    return "Weight: " + values;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransitionFunctionImpl that = (TransitionFunctionImpl) o;
+    return Objects.equals(values, that.values);
   }
 
   @Override
   public int hashCode() {
-    return values.hashCode();
+    return Objects.hash(values);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    TransitionFunctionImpl other = (TransitionFunctionImpl) obj;
-    return values.equals(other.values);
+  public String toString() {
+    return "Weight: " + values;
   }
 }
