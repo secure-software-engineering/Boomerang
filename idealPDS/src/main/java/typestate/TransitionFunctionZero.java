@@ -14,9 +14,8 @@
  */
 package typestate;
 
-import boomerang.scope.ControlFlowGraph;
-import java.util.Collection;
-import java.util.Set;
+import boomerang.scope.Statement;
+import java.util.Map;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
@@ -34,14 +33,8 @@ public class TransitionFunctionZero implements TransitionFunction {
 
   @NonNull
   @Override
-  public Collection<Transition> getValues() {
-    throw new IllegalStateException("TransitionZero.getValues() - don't");
-  }
-
-  @NonNull
-  @Override
-  public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
-    throw new IllegalStateException("This should not happen!");
+  public Map<Transition, Statement> getStateChangeStatements() {
+    throw new IllegalStateException("TransitionZero.getStateChangeStatements() - don't");
   }
 
   @NonNull

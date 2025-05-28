@@ -119,6 +119,20 @@ public class FileMustBeClosed {
     Assertions.mustBeInErrorState(other);
   }
 
+  public void test() {
+    otherTest();
+  }
+
+  public static void otherTest() {
+    File file = new File();
+    open(file);
+    file.close();
+  }
+
+  public static void open(File file) {
+    file.open();
+  }
+
   @TestMethod
   public void simple1() {
     File file = new File();

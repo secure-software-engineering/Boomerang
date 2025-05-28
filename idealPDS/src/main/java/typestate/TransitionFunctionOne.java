@@ -16,11 +16,9 @@ package typestate;
 
 import static typestate.TransitionFunctionZero.zero;
 
-import boomerang.scope.ControlFlowGraph;
-import com.google.common.collect.Sets;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import boomerang.scope.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionImpl;
@@ -38,15 +36,8 @@ public class TransitionFunctionOne implements TransitionFunction {
 
   @NonNull
   @Override
-  public Collection<Transition> getValues() {
-    throw new IllegalStateException("TransitionFunctionOne.getValues() - don't");
-  }
-
-  @NonNull
-  @Override
-  public Set<ControlFlowGraph.Edge> getStateChangeStatements() {
-    throw new IllegalStateException(
-        "TransitionFunctionOne.getStateChangeStatements() - This should not happen!");
+  public Map<Transition, Statement> getStateChangeStatements() {
+    throw new IllegalStateException("TransitionFunctionOne.getStateChangeStatements() - don't");
   }
 
   @NonNull
@@ -66,7 +57,7 @@ public class TransitionFunctionOne implements TransitionFunction {
       return this;
     }
 
-    TransitionFunction func = (TransitionFunction) other;
+    /*TransitionFunction func = (TransitionFunction) other;
     Set<Transition> transitions = new HashSet<>(func.getValues());
     Set<Transition> idTransitions = Sets.newHashSetWithExpectedSize(transitions.size());
     for (Transition t : transitions) {
@@ -74,7 +65,17 @@ public class TransitionFunctionOne implements TransitionFunction {
     }
     transitions.addAll(idTransitions);
     return new TransitionFunctionImpl(
-        transitions, Sets.newHashSet(func.getStateChangeStatements()));
+        transitions, Sets.newHashSet(func.getStateChangeStatementsOld()));*/
+    TransitionFunction func = (TransitionFunction) other;
+    Map<Transition, Statement> result = new HashMap<>(func.getStateChangeStatements());
+    for (Transition t : func.getStateChangeStatements().keySet()) {
+      Transition transition = new TransitionImpl(t.from(), t.from());
+      Statement statement = func.getStateChangeStatements().get(t);
+
+      result.put(transition, statement);
+    }
+
+    return new TransitionFunctionImpl(result);
   }
 
   public String toString() {

@@ -18,6 +18,7 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 public class TransitionImpl implements Transition {
+
   @NonNull private final State from;
   @NonNull private final State to;
 
@@ -39,26 +40,16 @@ public class TransitionImpl implements Transition {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(from, to);
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransitionImpl that = (TransitionImpl) o;
+    return Objects.equals(from, that.from) && Objects.equals(to, that.to);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    TransitionImpl other = (TransitionImpl) obj;
-    if (!from.equals(other.from)) {
-      return false;
-    }
-    return to.equals(other.to);
+  public int hashCode() {
+    return Objects.hash(from, to);
   }
 
   @Override

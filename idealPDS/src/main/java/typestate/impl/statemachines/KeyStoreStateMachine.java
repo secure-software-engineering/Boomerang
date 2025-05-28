@@ -93,7 +93,7 @@ public class KeyStoreStateMachine extends TypeStateMachineWeightFunctions {
             new WeightedForwardQuery<>(
                 edge,
                 new AllocVal(unit.getLeftOp(), unit, unit.getRightOp()),
-                initialTransition()));
+                initialTransition(edge)));
       }
     }
     return Collections.emptySet();

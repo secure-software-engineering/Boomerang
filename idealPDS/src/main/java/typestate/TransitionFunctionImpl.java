@@ -18,9 +18,11 @@ import static typestate.TransitionFunctionOne.one;
 import static typestate.TransitionFunctionZero.zero;
 
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.NonNull;
@@ -31,29 +33,31 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
 
-  @NonNull private final Set<? extends Transition> values;
-  @NonNull private final Set<Edge> stateChangeStatements;
+  @NonNull private final Map<Transition, Statement> stateChangeStatements;
 
   public TransitionFunctionImpl(
-      @NonNull Set<? extends Transition> trans, @NonNull Set<Edge> stateChangeStatements) {
-    this.stateChangeStatements = stateChangeStatements;
-    this.values = trans;
+      @NonNull Transition transition, @NonNull Statement stateChangeStatement) {
+    this.stateChangeStatements = Map.of(transition, stateChangeStatement);
   }
 
   public TransitionFunctionImpl(
-      @NonNull Transition trans, @NonNull Set<Edge> stateChangeStatements) {
-    this(Collections.singleton(trans), stateChangeStatements);
+      @NonNull Collection<Transition> transitions, @NonNull Statement stateChangeStatement) {
+    Map<Transition, Statement> map = new HashMap<>();
+    for (Transition transition : transitions) {
+      map.put(transition, stateChangeStatement);
+    }
+
+    this.stateChangeStatements = Map.copyOf(map);
+  }
+
+  public TransitionFunctionImpl(
+      @NonNull Map<Transition, Statement> transitionToStateChangeStatements) {
+    this.stateChangeStatements = Map.copyOf(transitionToStateChangeStatements);
   }
 
   @Override
   @NonNull
-  public Collection<Transition> getValues() {
-    return new HashSet<>(values);
-  }
-
-  @NonNull
-  @Override
-  public Set<Edge> getStateChangeStatements() {
+  public Map<Transition, Statement> getStateChangeStatements() {
     return stateChangeStatements;
   }
 
@@ -67,25 +71,29 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return zero();
     }
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+    Map<Transition, Statement> result = new HashMap<>();
     Set<Transition> ress = new HashSet<>();
     Set<Edge> newStateChangeStatements = new HashSet<>();
-    for (Transition first : values) {
-      for (Transition second : func.values) {
+    for (Transition first : stateChangeStatements.keySet()) {
+      for (Transition second : func.stateChangeStatements.keySet()) {
 
         TransitionIdentity tIdentity = TransitionIdentity.identity();
         if (second == tIdentity) {
-          ress.add(first);
-          newStateChangeStatements.addAll(stateChangeStatements);
+          Statement statement = stateChangeStatements.get(first);
+          result.put(first, statement);
         } else if (first == tIdentity) {
-          ress.add(second);
-          newStateChangeStatements.addAll(func.stateChangeStatements);
+          Statement statement = func.stateChangeStatements.get(second);
+          result.put(second, statement);
         } else if (first.to().equals(second.from())) {
-          ress.add(new TransitionImpl(first.from(), second.to()));
-          newStateChangeStatements.addAll(func.stateChangeStatements);
+          Transition transition = new TransitionImpl(first.from(), second.to());
+          Statement statement = func.stateChangeStatements.get(second);
+          result.put(transition, statement);
+          // ress.add(new TransitionImpl(first.from(), second.to()));
+          // newStateChangeStatements.addAll(func.stateChangeStatementsOld);
         }
       }
     }
-    return new TransitionFunctionImpl(ress, newStateChangeStatements);
+    return new TransitionFunctionImpl(result);
   }
 
   @NonNull
@@ -100,21 +108,37 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
 
     if (other == one()) {
-      Set<Transition> transitions = new HashSet<>(values);
+      /*Set<Transition> transitions = new HashSet<>(values);
       Set<Transition> idTransitions = new HashSet<>();
       for (Transition t : transitions) {
         idTransitions.add(new TransitionImpl(t.from(), t.from()));
       }
       transitions.addAll(idTransitions);
-      return new TransitionFunctionImpl(transitions, stateChangeStatements);
+      return new TransitionFunctionImpl(transitions, stateChangeStatementsOld);*/
+      Map<Transition, Statement> transitions = new HashMap<>(stateChangeStatements);
+      for (Transition t : stateChangeStatements.keySet()) {
+        Transition idTransition = new TransitionImpl(t.from(), t.from());
+        Statement statement = stateChangeStatements.get(t);
+
+        transitions.put(idTransition, statement);
+      }
+
+      return new TransitionFunctionImpl(transitions);
     }
 
-    TransitionFunction func = (TransitionFunction) other;
+    /*TransitionFunction func = (TransitionFunction) other;
     Set<Transition> transitions = new HashSet<>(func.getValues());
     transitions.addAll(values);
-    Set<Edge> newStateChangeStmts = new HashSet<>(stateChangeStatements);
-    newStateChangeStmts.addAll(func.getStateChangeStatements());
-    return new TransitionFunctionImpl(transitions, newStateChangeStmts);
+    Set<Edge> newStateChangeStmts = new HashSet<>(stateChangeStatementsOld);
+    newStateChangeStmts.addAll(func.getStateChangeStatementsOld());
+    return new TransitionFunctionImpl(transitions, newStateChangeStmts);*/
+    TransitionFunction func = (TransitionFunction) other;
+
+    Map<Transition, Statement> result = new HashMap<>();
+    result.putAll(stateChangeStatements);
+    result.putAll(func.getStateChangeStatements());
+
+    return new TransitionFunctionImpl(result);
   }
 
   @Override
@@ -122,16 +146,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     TransitionFunctionImpl that = (TransitionFunctionImpl) o;
-    return Objects.equals(values, that.values);
+    return Objects.equals(stateChangeStatements, that.stateChangeStatements);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(values);
+    return Objects.hash(stateChangeStatements);
   }
 
   @Override
   public String toString() {
-    return "Weight: " + values;
+    return "Weight: " + stateChangeStatements.keySet();
   }
 }

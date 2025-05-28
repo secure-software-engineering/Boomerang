@@ -85,7 +85,7 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
               new WeightedForwardQuery<>(
                   edge,
                   new AllocVal(unit.getLeftOp(), unit, unit.getLeftOp()),
-                  initialTransition()));
+                  initialTransition(edge)));
         }
       }
     }

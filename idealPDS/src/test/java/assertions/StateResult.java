@@ -51,7 +51,7 @@ public abstract class StateResult implements Assertion {
   public void computedResults(TransitionFunction function) {
     Collection<State> states = new HashSet<>();
 
-    for (Transition transition : function.getValues()) {
+    for (Transition transition : function.getStateChangeStatements().keySet()) {
       states.add(transition.to());
     }
 
