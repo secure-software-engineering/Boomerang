@@ -169,5 +169,5 @@ class OpalVal(
     case _ => false
   }
 
-  override def toString: String = s"$getVariableName + ${if (isUnbalanced) " unbalanced " + unbalancedStmt}"
+  override def toString: String = s"$getVariableName${if (isUnbalanced) " unbalanced " + unbalancedStmt else ""}"
 }
