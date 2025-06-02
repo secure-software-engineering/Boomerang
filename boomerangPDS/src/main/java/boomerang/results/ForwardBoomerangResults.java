@@ -41,15 +41,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
@@ -116,10 +113,17 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return asStatementValWeightTable(query);
   }
 
-  public Map<Val, W> computeFinalWeights() {
+  /**
+   * Computes the final weights for the seed. The weights correspond to weight at the last
+   * statements within the method where the object is alive.
+   *
+   * @return a table that maps the last statements to the final existing aliases and there final
+   *     weights
+   */
+  public Table<Statement, Val, W> computeFinalWeights() {
     ForwardBoomerangSolver<W> solver = queryToSolvers.get(query);
     if (solver == null) {
-      return Collections.emptyMap();
+      return HashBasedTable.create();
     }
 
     Table<Statement, Val, W> table = asStatementValWeightTable();
@@ -128,7 +132,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       visitedMethods.add(statement.getMethod());
     }
 
-    Map<Val, W> lastWeights = new HashMap<>();
+    Table<Statement, Val, W> lastWeights = HashBasedTable.create();
     for (Method flowReaches : visitedMethods) {
       for (Statement exitStmt : icfg.getEndPointsOf(flowReaches)) {
         Collection<State> escapeNodes = new LinkedHashSet<>();
@@ -154,50 +158,16 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
             });
 
         if (escapeNodes.isEmpty()) {
-          lastWeights.putAll(applyLastStatementVisitor(exitStmt, table));
+          Map<Val, W> finalWeights = table.row(exitStmt);
+
+          for (Map.Entry<Val, W> entry : finalWeights.entrySet()) {
+            lastWeights.put(exitStmt, entry.getKey(), entry.getValue());
+          }
         }
       }
     }
 
     return lastWeights;
-  }
-
-  private Map<Val, W> applyLastStatementVisitor(
-      Statement returnSite, Table<Statement, Val, W> table) {
-    Map<Val, W> finalWeights = table.row(returnSite);
-    if (!finalWeights.isEmpty()) {
-      return finalWeights;
-    }
-
-    Queue<Statement> workList = new LinkedList<>();
-    workList.add(returnSite);
-
-    Collection<Statement> visited = new HashSet<>();
-
-    while (!workList.isEmpty()) {
-      Statement currStmt = workList.poll();
-
-      if (!visited.add(currStmt)) {
-        continue;
-      }
-
-      if (finalWeights.isEmpty()) {
-        finalWeights.putAll(table.row(currStmt));
-      }
-
-      if (finalWeights.isEmpty()) {
-        cfg.addPredsOfListener(
-            new PredecessorListener(currStmt) {
-
-              @Override
-              public void getPredecessor(Statement succ) {
-                workList.add(succ);
-              }
-            });
-      }
-    }
-
-    return finalWeights;
   }
 
   public Table<ControlFlowGraph.Edge, Val, W> getObjectDestructingStatements() {

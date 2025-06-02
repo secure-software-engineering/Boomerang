@@ -15,12 +15,12 @@
 package typestate;
 
 import boomerang.scope.Statement;
-import java.util.Map;
+import com.google.common.collect.Multimap;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
 public interface TransitionFunction extends Weight {
 
-  @NonNull Map<Transition, Statement> getStateChangeStatements();
+  @NonNull Multimap<Transition, Statement> getStateChangeStatements();
 }

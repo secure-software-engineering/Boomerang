@@ -17,8 +17,9 @@ package typestate;
 import static typestate.TransitionFunctionZero.zero;
 
 import boomerang.scope.Statement;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import java.util.Collection;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionImpl;
@@ -36,7 +37,7 @@ public class TransitionFunctionOne implements TransitionFunction {
 
   @NonNull
   @Override
-  public Map<Transition, Statement> getStateChangeStatements() {
+  public Multimap<Transition, Statement> getStateChangeStatements() {
     throw new IllegalStateException("TransitionFunctionOne.getStateChangeStatements() - don't");
   }
 
@@ -67,12 +68,12 @@ public class TransitionFunctionOne implements TransitionFunction {
     return new TransitionFunctionImpl(
         transitions, Sets.newHashSet(func.getStateChangeStatementsOld()));*/
     TransitionFunction func = (TransitionFunction) other;
-    Map<Transition, Statement> result = new HashMap<>(func.getStateChangeStatements());
+    Multimap<Transition, Statement> result = HashMultimap.create(func.getStateChangeStatements());
     for (Transition t : func.getStateChangeStatements().keySet()) {
       Transition transition = new TransitionImpl(t.from(), t.from());
-      Statement statement = func.getStateChangeStatements().get(t);
+      Collection<Statement> statement = func.getStateChangeStatements().get(t);
 
-      result.put(transition, statement);
+      result.putAll(transition, statement);
     }
 
     return new TransitionFunctionImpl(result);

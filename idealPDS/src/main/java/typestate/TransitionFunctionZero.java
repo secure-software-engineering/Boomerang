@@ -15,7 +15,7 @@
 package typestate;
 
 import boomerang.scope.Statement;
-import java.util.Map;
+import com.google.common.collect.Multimap;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
@@ -33,7 +33,7 @@ public class TransitionFunctionZero implements TransitionFunction {
 
   @NonNull
   @Override
-  public Map<Transition, Statement> getStateChangeStatements() {
+  public Multimap<Transition, Statement> getStateChangeStatements() {
     throw new IllegalStateException("TransitionZero.getStateChangeStatements() - don't");
   }
 

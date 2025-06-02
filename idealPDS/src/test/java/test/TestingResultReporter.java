@@ -23,7 +23,6 @@ import boomerang.scope.Val;
 import com.google.common.collect.Table;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import sync.pds.solver.nodes.Node;
 import typestate.TransitionFunction;
 
@@ -52,8 +51,6 @@ public class TestingResultReporter {
   public void onSeedFinished(
       Node<Edge, Val> seed, ForwardBoomerangResults<TransitionFunction> res) {
     Table<Statement, Val, TransitionFunction> results = res.asStatementValWeightTable();
-    Map<Val, TransitionFunction> last = res.computeFinalWeights();
-    Table<Edge, Val, TransitionFunction> table = res.getObjectDestructingStatements();
 
     for (StateResult stateResult : expectedStateResults) {
       TransitionFunction function = results.get(stateResult.getStmt(), stateResult.getSeed());
