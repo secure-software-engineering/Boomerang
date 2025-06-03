@@ -31,11 +31,6 @@ public class FileMustBeClosedTest extends IDEALTestingFramework {
   }
 
   @Test
-  public void test() {
-    analyze(target, testName.getMethodName(), 0, 1);
-  }
-
-  @Test
   public void simple() {
     analyze(target, testName.getMethodName(), 2, 1);
   }

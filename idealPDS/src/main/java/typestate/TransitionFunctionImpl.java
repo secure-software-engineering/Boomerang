@@ -17,15 +17,12 @@ package typestate;
 import static typestate.TransitionFunctionOne.one;
 import static typestate.TransitionFunctionZero.zero;
 
-import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
@@ -68,13 +65,13 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (other == one()) {
       return this;
     }
+
     if (other == zero()) {
       return zero();
     }
+
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
     Multimap<Transition, Statement> result = HashMultimap.create();
-    Set<Transition> ress = new HashSet<>();
-    Set<Edge> newStateChangeStatements = new HashSet<>();
     for (Transition first : stateChangeStatements.keySet()) {
       for (Transition second : func.stateChangeStatements.keySet()) {
 
@@ -89,8 +86,6 @@ public class TransitionFunctionImpl implements TransitionFunction {
           Transition transition = new TransitionImpl(first.from(), second.to());
           Collection<Statement> statements = func.stateChangeStatements.get(second);
           result.putAll(transition, statements);
-          // ress.add(new TransitionImpl(first.from(), second.to()));
-          // newStateChangeStatements.addAll(func.stateChangeStatementsOld);
         }
       }
     }
@@ -109,13 +104,6 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
 
     if (other == one()) {
-      /*Set<Transition> transitions = new HashSet<>(values);
-      Set<Transition> idTransitions = new HashSet<>();
-      for (Transition t : transitions) {
-        idTransitions.add(new TransitionImpl(t.from(), t.from()));
-      }
-      transitions.addAll(idTransitions);
-      return new TransitionFunctionImpl(transitions, stateChangeStatementsOld);*/
       Multimap<Transition, Statement> transitions = HashMultimap.create(stateChangeStatements);
       for (Transition t : stateChangeStatements.keySet()) {
         Transition idTransition = new TransitionImpl(t.from(), t.from());
@@ -127,12 +115,6 @@ public class TransitionFunctionImpl implements TransitionFunction {
       return new TransitionFunctionImpl(transitions);
     }
 
-    /*TransitionFunction func = (TransitionFunction) other;
-    Set<Transition> transitions = new HashSet<>(func.getValues());
-    transitions.addAll(values);
-    Set<Edge> newStateChangeStmts = new HashSet<>(stateChangeStatementsOld);
-    newStateChangeStmts.addAll(func.getStateChangeStatementsOld());
-    return new TransitionFunctionImpl(transitions, newStateChangeStmts);*/
     TransitionFunction func = (TransitionFunction) other;
 
     Multimap<Transition, Statement> result = HashMultimap.create();

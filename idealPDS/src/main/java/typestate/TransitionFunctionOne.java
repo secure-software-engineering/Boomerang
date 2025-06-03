@@ -58,15 +58,6 @@ public class TransitionFunctionOne implements TransitionFunction {
       return this;
     }
 
-    /*TransitionFunction func = (TransitionFunction) other;
-    Set<Transition> transitions = new HashSet<>(func.getValues());
-    Set<Transition> idTransitions = Sets.newHashSetWithExpectedSize(transitions.size());
-    for (Transition t : transitions) {
-      idTransitions.add(new TransitionImpl(t.from(), t.from()));
-    }
-    transitions.addAll(idTransitions);
-    return new TransitionFunctionImpl(
-        transitions, Sets.newHashSet(func.getStateChangeStatementsOld()));*/
     TransitionFunction func = (TransitionFunction) other;
     Multimap<Transition, Statement> result = HashMultimap.create(func.getStateChangeStatements());
     for (Transition t : func.getStateChangeStatements().keySet()) {
