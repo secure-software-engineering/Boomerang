@@ -155,6 +155,10 @@ object OpalType {
   }
 
   def valueInformationToType(value: ValueInformation, project: Project[_]): Type = {
+    if (value.isIllegalValue) {
+      return new OpalType(ObjectType.Void, project)
+    }
+
     if (value.isPrimitiveValue) {
       return new OpalType(value.asPrimitiveValue.primitiveType, project)
     }
