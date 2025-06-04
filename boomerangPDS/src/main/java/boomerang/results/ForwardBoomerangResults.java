@@ -41,12 +41,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
@@ -158,16 +160,55 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
             });
 
         if (escapeNodes.isEmpty()) {
-          Map<Val, W> finalWeights = table.row(exitStmt);
+          Collection<Statement> lastStatements = computeFinalStatements(exitStmt, table);
+          for (Statement lastStmt : lastStatements) {
+            Map<Val, W> finalWeights = table.row(lastStmt);
 
-          for (Map.Entry<Val, W> entry : finalWeights.entrySet()) {
-            lastWeights.put(exitStmt, entry.getKey(), entry.getValue());
+            for (Map.Entry<Val, W> entry : finalWeights.entrySet()) {
+              lastWeights.put(lastStmt, entry.getKey(), entry.getValue());
+            }
           }
         }
       }
     }
 
     return lastWeights;
+  }
+
+  private Collection<Statement> computeFinalStatements(
+      Statement returnSite, Table<Statement, Val, W> table) {
+    if (table.containsRow(returnSite)) {
+      return Collections.singleton(returnSite);
+    }
+
+    Collection<Statement> finalStatements = new HashSet<>();
+    Queue<Statement> workList = new LinkedList<>();
+    workList.add(returnSite);
+
+    Collection<Statement> visited = new HashSet<>();
+
+    while (!workList.isEmpty()) {
+      Statement currStmt = workList.poll();
+
+      if (!visited.add(currStmt)) {
+        continue;
+      }
+
+      if (table.containsRow(currStmt)) {
+        finalStatements.add(currStmt);
+      } else {
+        cfg.addPredsOfListener(
+            new PredecessorListener(currStmt) {
+
+              @Override
+              public void getPredecessor(Statement succ) {
+                workList.add(succ);
+              }
+            });
+      }
+    }
+
+    return finalStatements;
   }
 
   public Table<ControlFlowGraph.Edge, Val, W> getObjectDestructingStatements() {
