@@ -194,9 +194,13 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         continue;
       }
 
+      boolean added = false;
       if (table.containsRow(currStmt)) {
         finalStatements.add(currStmt);
-      } else {
+        added = true;
+      }
+
+      if (!added && !currStmt.isIdentityStmt()) {
         cfg.addPredsOfListener(
             new PredecessorListener(currStmt) {
 

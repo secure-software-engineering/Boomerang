@@ -18,8 +18,8 @@ import boomerang.BackwardQuery;
 import boomerang.Query;
 import boomerang.scope.AccessPathParser;
 import boomerang.scope.AnalysisScope;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
 import boomerang.util.AccessPath;
@@ -29,15 +29,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-class QueryForCallSiteDetector extends AnalysisScope {
+public class QueryForCallSiteDetector extends AnalysisScope {
 
   boolean resultsMustNotBeEmpty = false;
   boolean accessPathQuery = false;
   boolean integerQueries;
   Set<AccessPath> expectedAccessPaths = new HashSet<>();
 
-  QueryForCallSiteDetector(CallGraph cg) {
-    super(cg);
+  public QueryForCallSiteDetector(FrameworkScope frameworkScope) {
+    super(frameworkScope);
   }
 
   private void getAllExpectedAccessPath(Edge u) {
