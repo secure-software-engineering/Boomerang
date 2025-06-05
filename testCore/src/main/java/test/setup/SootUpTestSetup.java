@@ -17,7 +17,7 @@ package test.setup;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
-import boomerang.scope.sootup.BoomerangPreInterceptor;
+import boomerang.scope.sootup.BoomerangPreInterceptorTestImpl;
 import boomerang.scope.sootup.SootUpFrameworkScope;
 import boomerang.scope.sootup.jimple.JimpleUpMethod;
 import boomerang.utils.MethodWrapper;
@@ -63,7 +63,8 @@ public class SootUpTestSetup implements TestSetup {
      */
     Assume.assumeFalse(testMethodWrapper.getDeclaringClass().equals(HASHMAP_TEST_CLASS));
 
-    List<BodyInterceptor> interceptors = List.of(new TypeAssigner(), new BoomerangPreInterceptor());
+    List<BodyInterceptor> interceptors =
+        List.of(new TypeAssigner(), new BoomerangPreInterceptorTestImpl());
 
     Path testClassPath =
         TestSetupUtils.loadTestClasses(
