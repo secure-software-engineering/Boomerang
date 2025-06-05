@@ -61,16 +61,15 @@ public class MultiQueryBoomerangTest extends TestingFramework {
 
   private void assertResults(FrameworkScope frameworkScope) {
     AnalysisScope analysisScope =
-        new Preanalysis(frameworkScope.getCallGraph(), new FirstArgumentOf("queryFor.*"));
+        new PreAnalysis(frameworkScope, new FirstArgumentOf("queryFor.*"));
     queryForCallSites = analysisScope.computeSeeds();
 
     for (Query q : queryForCallSites) {
       Val arg2 = q.cfgEdge().getStart().getInvokeExpr().getArg(1);
       if (arg2.isClassConstant()) {
-        Preanalysis analysis =
-            new Preanalysis(
-                frameworkScope.getCallGraph(),
-                new AllocationSiteOf(arg2.getClassConstantType().toString()));
+        PreAnalysis analysis =
+            new PreAnalysis(
+                frameworkScope, new AllocationSiteOf(arg2.getClassConstantType().toString()));
         expectedAllocsForQuery.putAll(q, analysis.computeSeeds());
       }
     }

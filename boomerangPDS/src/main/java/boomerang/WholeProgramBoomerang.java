@@ -17,7 +17,6 @@ package boomerang;
 import boomerang.options.BoomerangOptions;
 import boomerang.scope.AllocVal;
 import boomerang.scope.AnalysisScope;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Statement;
@@ -28,11 +27,9 @@ import wpds.impl.Weight;
 public abstract class WholeProgramBoomerang<W extends Weight> extends WeightedBoomerang<W> {
   private int reachableMethodCount;
   private int allocationSites;
-  private final CallGraph callGraph;
 
   public WholeProgramBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
     super(frameworkScope, options);
-    this.callGraph = frameworkScope.getCallGraph();
   }
 
   public WholeProgramBoomerang(FrameworkScope frameworkScope) {
@@ -42,7 +39,7 @@ public abstract class WholeProgramBoomerang<W extends Weight> extends WeightedBo
   public void wholeProgramAnalysis() {
     long before = System.currentTimeMillis();
     AnalysisScope scope =
-        new AnalysisScope(callGraph) {
+        new AnalysisScope(frameworkScope) {
           @Override
           protected Collection<? extends Query> generate(Edge cfgEdge) {
             Statement stmt = cfgEdge.getStart();

@@ -20,8 +20,8 @@ import boomerang.Query;
 import boomerang.options.BoomerangOptions;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.scope.AnalysisScope;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.scope.wala.WALACallGraph;
@@ -56,7 +56,7 @@ public class ExampleMain1 {
       throws CallGraphBuilderCancelException, IOException, ClassHierarchyException {
     String mainClass = "example.BoomerangExampleTarget1";
     WALACallGraph walaCallGraph = setupWALA(mainClass);
-    performAnalysis(walaCallGraph);
+    // performAnalysis(walaCallGraph);
   }
 
   private static WALACallGraph setupWALA(String mainClass)
@@ -95,9 +95,9 @@ public class ExampleMain1 {
     return new WALACallGraph(makeCallGraph, cha);
   }
 
-  protected static void performAnalysis(CallGraph cg) {
+  protected static void performAnalysis(FrameworkScope frameworkScope) {
     AnalysisScope scope =
-        new AnalysisScope(cg) {
+        new AnalysisScope(frameworkScope) {
           @Override
           protected Collection<? extends Query> generate(Edge edge) {
             Statement statement = edge.getStart();

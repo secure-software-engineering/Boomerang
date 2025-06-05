@@ -16,72 +16,75 @@ package boomerang.scope;
 
 import boomerang.Query;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AnalysisScope {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisScope.class);
-  private final CallGraph cg;
-  private boolean scanLibraryClasses = false;
+  protected final FrameworkScope frameworkScope;
 
-  public AnalysisScope(CallGraph cg) {
-    this.cg = cg;
-  }
-
-  private final Set<Query> seeds = new LinkedHashSet<>();
-
-  private final Collection<Method> processed = new LinkedHashSet<>();
-  private int statementCount;
-
-  public void setScanLibraryClasses(boolean enabled) {
-    scanLibraryClasses = enabled;
+  public AnalysisScope(FrameworkScope frameworkScope) {
+    this.frameworkScope = frameworkScope;
   }
 
   public Collection<Query> computeSeeds() {
-    Collection<Method> entryPoints = cg.getEntryPoints();
-    LOGGER.info("Computing seeds starting at {} entry method(s).", entryPoints.size());
+    CallGraph callGraph = frameworkScope.getCallGraph();
+    Collection<Method> entryPoints = callGraph.getEntryPoints();
+    LOGGER.info("Computing seeds starting at {} entry method(s)", entryPoints.size());
+
+    Collection<Query> seeds = new LinkedHashSet<>();
+    Collection<Method> processed = new HashSet<>();
+    int statementCount = 0;
 
     Stopwatch watch = Stopwatch.createStarted();
-    LinkedList<Method> worklist = Lists.newLinkedList();
-    worklist.addAll(entryPoints);
-    while (!worklist.isEmpty()) {
-      Method m = worklist.pop();
+    Queue<Method> workList = new LinkedList<>(entryPoints);
+    while (!workList.isEmpty()) {
+      Method m = workList.poll();
       if (!processed.add(m)) {
         continue;
       }
+
+      if (isExcluded(m)) {
+        continue;
+      }
+
       LOGGER.trace("Processing {}", m);
-      for (Statement u : m.getStatements()) {
+      for (Statement stmt : m.getStatements()) {
         statementCount++;
-        if (u.containsInvokeExpr()) {
-          Collection<CallGraph.Edge> edgesOutOf = cg.edgesOutOf(u);
+
+        if (stmt.containsInvokeExpr()) {
+          Collection<CallGraph.Edge> edgesOutOf = callGraph.edgesOutOf(stmt);
+
           for (CallGraph.Edge e : edgesOutOf) {
             Method tgt = e.tgt();
-            if (tgt.isPhantom()) continue;
-            if (!scanLibraryClasses && !tgt.getDeclaringClass().isApplicationClass()) continue;
+            if (tgt.isPhantom()) {
+              continue;
+            }
 
             if (!processed.contains(tgt)) {
-              worklist.add(tgt);
+              workList.add(tgt);
             }
           }
         }
-        for (Statement succ : u.getMethod().getControlFlowGraph().getSuccsOf(u)) {
-          seeds.addAll(generate(new ControlFlowGraph.Edge(u, succ)));
+
+        for (Statement succ : stmt.getMethod().getControlFlowGraph().getSuccsOf(stmt)) {
+          seeds.addAll(generate(new ControlFlowGraph.Edge(stmt, succ)));
         }
       }
     }
-    LOGGER.info("Found {} seeds in {} in {} LOC .", seeds.size(), watch, statementCount);
+    LOGGER.info("Found {} seed(s) in {} in {} LOC", seeds.size(), watch, statementCount);
 
     return seeds;
   }
 
-  protected boolean analyseClassInitializers() {
-    return false;
+  protected boolean isExcluded(Method method) {
+    return frameworkScope.getDataFlowScope().isExcluded(method);
   }
 
   protected abstract Collection<? extends Query> generate(ControlFlowGraph.Edge seed);
