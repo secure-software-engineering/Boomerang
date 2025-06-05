@@ -14,7 +14,6 @@
  */
 package typestate.tests;
 
-import java.util.List;
 import org.junit.Test;
 import test.IDEALTestingFramework;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
@@ -24,11 +23,6 @@ import typestate.targets.IteratorHasNext;
 public class IteratorHasNextTest extends IDEALTestingFramework {
 
   private final String target = IteratorHasNext.class.getName();
-
-  @Override
-  protected List<String> getIncludedPackages() {
-    return List.of("java.util.Iterator");
-  }
 
   @Override
   protected TypeStateMachineWeightFunctions getStateMachine() {

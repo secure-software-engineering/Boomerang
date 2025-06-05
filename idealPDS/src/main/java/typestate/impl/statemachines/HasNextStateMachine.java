@@ -57,22 +57,23 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
 
   public HasNextStateMachine() {
     addTransition(
-        new MatcherTransition(States.INIT, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCall));
+        new MatcherTransition(
+            States.INIT, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCall));
+            States.ERROR, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.HASNEXT, NEXT_METHOD, Parameter.This, States.INIT, Type.OnCall));
+            States.HASNEXT, NEXT_METHOD, Parameter.This, States.INIT, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.INIT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCall));
+            States.INIT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.HASNEXT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCall));
+            States.HASNEXT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, HAS_NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCall));
+            States.ERROR, HAS_NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCallToReturn));
   }
 
   public Set<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
