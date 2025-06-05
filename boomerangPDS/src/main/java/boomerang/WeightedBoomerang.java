@@ -977,7 +977,6 @@ public abstract class WeightedBoomerang<W extends Weight> {
       analysisWatch.stop();
     }
     return new ForwardBoomerangResults<>(
-        frameworkScope,
         query,
         icfg(),
         cfg(),
@@ -1091,7 +1090,6 @@ public abstract class WeightedBoomerang<W extends Weight> {
       analysisWatch.stop();
     }
     return new ForwardBoomerangResults<>(
-        frameworkScope,
         query,
         icfg(),
         cfg(),

@@ -261,6 +261,10 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
 
       results.put(t.getLabel().getStart(), t.getStart().fact(), w);
+
+      if (icfg.isExitStmt(t.getLabel().getTarget())) {
+        results.put(t.getLabel().getTarget(), t.getStart().fact(), w);
+      }
     }
 
     return results;

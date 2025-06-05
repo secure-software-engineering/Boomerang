@@ -96,9 +96,7 @@ public abstract class TypeStateMachineWeightFunctions
     if (!res.isEmpty()) {
       LOGGER.trace("Typestate transition at {} to {}, [{}]", succ.stmt(), res, Type.OnCallToReturn);
     }
-    return (res.isEmpty()
-        ? getOne()
-        : new TransitionFunctionImpl(res, Collections.singleton(succ.stmt())));
+    return (res.isEmpty() ? getOne() : new TransitionFunctionImpl(res, succ.stmt().getStart()));
   }
 
   private TransitionFunction getMatchingTransitions(
@@ -127,7 +125,7 @@ public abstract class TypeStateMachineWeightFunctions
     if (res.isEmpty()) return getOne();
 
     LOGGER.debug("Typestate transition at {} to {}, [{}]", transitionStmt, res, type);
-    return new TransitionFunctionImpl(res, Collections.singleton(transitionEdge));
+    return new TransitionFunctionImpl(res, transitionStmt);
   }
 
   /*
@@ -148,21 +146,23 @@ public abstract class TypeStateMachineWeightFunctions
     if (s.isAssignStmt()) {
       return Collections.singleton(
           new WeightedForwardQuery<>(
-              edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition()));
+              edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition(edge)));
     }
     return Collections.emptySet();
   }
 
   protected Collection<WeightedForwardQuery<TransitionFunction>> generateAtAllocationSiteOf(
-      Edge edge, Class allocationSuperType) {
+      Edge edge, Class<?> allocationSuperType) {
     Statement s = edge.getStart();
     if (s.isAssignStmt()) {
       if (s.getRightOp().isNewExpr()) {
         boomerang.scope.Type newExprType = s.getRightOp().getNewExprType();
         if (newExprType.isSubtypeOf(allocationSuperType.getName())) {
+          TransitionFunction function =
+              new TransitionFunctionImpl(new TransitionImpl(initialState(), initialState()), s);
           return Collections.singleton(
               new WeightedForwardQuery<>(
-                  edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition()));
+                  edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), function));
         }
       }
     }
@@ -183,7 +183,7 @@ public abstract class TypeStateMachineWeightFunctions
           if (base.getType().isSubtypeOf(declaredType)) {
             return Collections.singleton(
                 new WeightedForwardQuery<>(
-                    edge, new AllocVal(base, unit, base), initialTransition()));
+                    edge, new AllocVal(base, unit, base), initialTransition(edge)));
           }
         }
       }
@@ -198,9 +198,9 @@ public abstract class TypeStateMachineWeightFunctions
 
   public abstract Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge stmt);
 
-  public TransitionFunction initialTransition() {
+  public TransitionFunction initialTransition(Edge edge) {
     return new TransitionFunctionImpl(
-        new TransitionImpl(initialState(), initialState()), Collections.emptySet());
+        new TransitionImpl(initialState(), initialState()), edge.getStart());
   }
 
   protected abstract State initialState();

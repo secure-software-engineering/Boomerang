@@ -14,15 +14,13 @@
  */
 package typestate;
 
-import boomerang.scope.ControlFlowGraph;
-import java.util.Collection;
-import java.util.Set;
+import boomerang.scope.Statement;
+import com.google.common.collect.Multimap;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import wpds.impl.Weight;
 
 public interface TransitionFunction extends Weight {
-  @NonNull Collection<Transition> getValues();
 
-  @NonNull Set<ControlFlowGraph.Edge> getStateChangeStatements();
+  @NonNull Multimap<Transition, Statement> getStateChangeStatements();
 }

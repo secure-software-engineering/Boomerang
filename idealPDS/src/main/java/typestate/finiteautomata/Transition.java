@@ -17,6 +17,7 @@ package typestate.finiteautomata;
 import org.jspecify.annotations.NonNull;
 
 public interface Transition {
+
   @NonNull State from();
 
   @NonNull State to();

@@ -347,7 +347,7 @@ public class CSVBoomerangStatsWriter<W extends Weight> implements IBoomerangStat
 
   @Override
   public void terminated(ForwardQuery query, ForwardBoomerangResults<W> res) {
-    writeToFile(query, res.getAnalysisWatch().elapsed(TimeUnit.MILLISECONDS), res.isTimedout());
+    writeToFile(query, res.getAnalysisWatch().elapsed(TimeUnit.MILLISECONDS), res.isTimedOut());
   }
 
   @Override
