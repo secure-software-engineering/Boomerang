@@ -25,6 +25,7 @@ import sootup.core.jimple.common.constant.Constant;
 import sootup.core.jimple.common.constant.NullConstant;
 import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
+import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
 import sootup.core.jimple.common.expr.JStaticInvokeExpr;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
@@ -202,6 +203,8 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
       newInvokeExpr = ((JStaticInvokeExpr) invokeExpr).withArgs(newArgs);
     } else if (invokeExpr instanceof AbstractInstanceInvokeExpr) {
       newInvokeExpr = ((AbstractInstanceInvokeExpr) invokeExpr).withArgs(newArgs);
+    } else if (invokeExpr instanceof JDynamicInvokeExpr) {
+      newInvokeExpr = ((JDynamicInvokeExpr) invokeExpr).withMethodArgs(newArgs);
     } else {
       throw new IllegalStateException("unknown InvokeExpr.");
     }
