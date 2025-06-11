@@ -17,12 +17,12 @@ package typestate;
 import static typestate.TransitionFunctionOne.one;
 import static typestate.TransitionFunctionZero.zero;
 
-import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.Statement;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
@@ -31,29 +31,31 @@ import wpds.impl.Weight;
 
 public class TransitionFunctionImpl implements TransitionFunction {
 
-  @NonNull private final Set<? extends Transition> values;
-  @NonNull private final Set<Edge> stateChangeStatements;
+  @NonNull private final Multimap<Transition, Statement> stateChangeStatements;
 
   public TransitionFunctionImpl(
-      @NonNull Set<? extends Transition> trans, @NonNull Set<Edge> stateChangeStatements) {
-    this.stateChangeStatements = stateChangeStatements;
-    this.values = trans;
+      @NonNull Transition transition, @NonNull Statement stateChangeStatement) {
+    this.stateChangeStatements = ImmutableMultimap.of(transition, stateChangeStatement);
   }
 
   public TransitionFunctionImpl(
-      @NonNull Transition trans, @NonNull Set<Edge> stateChangeStatements) {
-    this(Collections.singleton(trans), stateChangeStatements);
+      @NonNull Collection<Transition> transitions, @NonNull Statement stateChangeStatement) {
+    Multimap<Transition, Statement> map = HashMultimap.create();
+    for (Transition transition : transitions) {
+      map.put(transition, stateChangeStatement);
+    }
+
+    this.stateChangeStatements = ImmutableMultimap.copyOf(map);
+  }
+
+  public TransitionFunctionImpl(
+      @NonNull Multimap<Transition, Statement> transitionToStateChangeStatements) {
+    this.stateChangeStatements = ImmutableMultimap.copyOf(transitionToStateChangeStatements);
   }
 
   @Override
   @NonNull
-  public Collection<Transition> getValues() {
-    return new HashSet<>(values);
-  }
-
-  @NonNull
-  @Override
-  public Set<Edge> getStateChangeStatements() {
+  public Multimap<Transition, Statement> getStateChangeStatements() {
     return stateChangeStatements;
   }
 
@@ -63,29 +65,31 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (other == one()) {
       return this;
     }
+
     if (other == zero()) {
       return zero();
     }
+
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
-    Set<Transition> ress = new HashSet<>();
-    Set<Edge> newStateChangeStatements = new HashSet<>();
-    for (Transition first : values) {
-      for (Transition second : func.values) {
+    Multimap<Transition, Statement> result = HashMultimap.create();
+    for (Transition first : stateChangeStatements.keySet()) {
+      for (Transition second : func.stateChangeStatements.keySet()) {
 
         TransitionIdentity tIdentity = TransitionIdentity.identity();
         if (second == tIdentity) {
-          ress.add(first);
-          newStateChangeStatements.addAll(stateChangeStatements);
+          Collection<Statement> statements = stateChangeStatements.get(first);
+          result.putAll(first, statements);
         } else if (first == tIdentity) {
-          ress.add(second);
-          newStateChangeStatements.addAll(func.stateChangeStatements);
+          Collection<Statement> statements = func.stateChangeStatements.get(second);
+          result.putAll(second, statements);
         } else if (first.to().equals(second.from())) {
-          ress.add(new TransitionImpl(first.from(), second.to()));
-          newStateChangeStatements.addAll(func.stateChangeStatements);
+          Transition transition = new TransitionImpl(first.from(), second.to());
+          Collection<Statement> statements = func.stateChangeStatements.get(second);
+          result.putAll(transition, statements);
         }
       }
     }
-    return new TransitionFunctionImpl(ress, newStateChangeStatements);
+    return new TransitionFunctionImpl(result);
   }
 
   @NonNull
@@ -100,21 +104,24 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
 
     if (other == one()) {
-      Set<Transition> transitions = new HashSet<>(values);
-      Set<Transition> idTransitions = new HashSet<>();
-      for (Transition t : transitions) {
-        idTransitions.add(new TransitionImpl(t.from(), t.from()));
+      Multimap<Transition, Statement> transitions = HashMultimap.create(stateChangeStatements);
+      for (Transition t : stateChangeStatements.keySet()) {
+        Transition idTransition = new TransitionImpl(t.from(), t.from());
+        Collection<Statement> statements = stateChangeStatements.get(t);
+
+        transitions.putAll(idTransition, statements);
       }
-      transitions.addAll(idTransitions);
-      return new TransitionFunctionImpl(transitions, stateChangeStatements);
+
+      return new TransitionFunctionImpl(transitions);
     }
 
     TransitionFunction func = (TransitionFunction) other;
-    Set<Transition> transitions = new HashSet<>(func.getValues());
-    transitions.addAll(values);
-    Set<Edge> newStateChangeStmts = new HashSet<>(stateChangeStatements);
-    newStateChangeStmts.addAll(func.getStateChangeStatements());
-    return new TransitionFunctionImpl(transitions, newStateChangeStmts);
+
+    Multimap<Transition, Statement> result = HashMultimap.create();
+    result.putAll(stateChangeStatements);
+    result.putAll(func.getStateChangeStatements());
+
+    return new TransitionFunctionImpl(result);
   }
 
   @Override
@@ -122,16 +129,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     TransitionFunctionImpl that = (TransitionFunctionImpl) o;
-    return Objects.equals(values, that.values);
+    return Objects.equals(stateChangeStatements, that.stateChangeStatements);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(values);
+    return Objects.hash(stateChangeStatements);
   }
 
   @Override
   public String toString() {
-    return "Weight: " + values;
+    return "Weight: " + stateChangeStatements.keySet();
   }
 }

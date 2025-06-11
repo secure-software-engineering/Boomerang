@@ -12,15 +12,20 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate;
+package boomerang.scope.sootup;
 
-import boomerang.scope.Statement;
-import com.google.common.collect.Multimap;
 import org.jspecify.annotations.NonNull;
-import typestate.finiteautomata.Transition;
-import wpds.impl.Weight;
+import sootup.core.jimple.common.stmt.Stmt;
 
-public interface TransitionFunction extends Weight {
+public class BoomerangPreInterceptorTestImpl extends BoomerangPreInterceptor {
+  public BoomerangPreInterceptorTestImpl() {}
 
-  @NonNull Multimap<Transition, Statement> getStateChangeStatements();
+  public BoomerangPreInterceptorTestImpl(boolean transformConstantsSettings) {
+    super(transformConstantsSettings);
+  }
+
+  protected boolean filterTransformableInvokeExprs(@NonNull Stmt stmt) {
+    return !stmt.toString().contains("test.assertions.Assertions:")
+        && !stmt.toString().contains("intQueryFor");
+  }
 }

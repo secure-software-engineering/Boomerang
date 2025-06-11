@@ -99,7 +99,7 @@ class OpalVal(
 
   override def getLengthOp: Val = {
     if (isLengthExpr) {
-      return new OpalVal(delegate.asArrayLength, method)
+      return new OpalVal(delegate.asArrayLength.arrayRef, method)
     }
 
     throw new RuntimeException("Value is not a length expression")
@@ -169,5 +169,5 @@ class OpalVal(
     case _ => false
   }
 
-  override def toString: String = getVariableName
+  override def toString: String = s"$getVariableName${if (isUnbalanced) " unbalanced " + unbalancedStmt else ""}"
 }

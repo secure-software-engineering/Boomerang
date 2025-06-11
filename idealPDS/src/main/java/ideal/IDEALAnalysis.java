@@ -46,7 +46,7 @@ public class IDEALAnalysis<W extends Weight> {
   public IDEALAnalysis(final IDEALAnalysisDefinition<W> analysisDefinition) {
     this.analysisDefinition = analysisDefinition;
     this.seedFactory =
-        new AnalysisScope(analysisDefinition.callGraph()) {
+        new AnalysisScope(analysisDefinition.getFrameworkFactory()) {
 
           @Override
           protected Collection<WeightedForwardQuery<W>> generate(Edge stmt) {

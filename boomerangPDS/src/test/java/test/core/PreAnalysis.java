@@ -16,17 +16,17 @@ package test.core;
 
 import boomerang.Query;
 import boomerang.scope.AnalysisScope;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
 import java.util.Collection;
 import java.util.Collections;
 
-public class Preanalysis extends AnalysisScope {
+public class PreAnalysis extends AnalysisScope {
 
   private final ValueOfInterestInUnit f;
 
-  public Preanalysis(CallGraph cg, ValueOfInterestInUnit f) {
-    super(cg);
+  public PreAnalysis(FrameworkScope frameworkScope, ValueOfInterestInUnit f) {
+    super(frameworkScope);
     this.f = f;
   }
 

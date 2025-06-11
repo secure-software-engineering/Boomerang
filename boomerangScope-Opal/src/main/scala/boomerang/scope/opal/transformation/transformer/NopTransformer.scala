@@ -30,7 +30,12 @@ object NopTransformer {
     def addNopStatements(stmtGraph: StmtGraph): StmtGraph = {
       // Add a nop statement in the beginning
       val nop = Nop(INITIAL_NOP)
-      var result = stmtGraph.insertBefore(nop, stmtGraph.heads.head)
+
+      var result = stmtGraph
+      val headStmt = stmtGraph.heads.filter(h => h.pc == 0 || h.pc == -1)
+      assert(headStmt.size == 1)
+
+      result = result.insertBefore(nop, headStmt.iterator.next())
 
       var beforeStmtInsert = List.empty[Stmt[TacLocal]]
       tac.zipWithIndex.foreach(stmt => {

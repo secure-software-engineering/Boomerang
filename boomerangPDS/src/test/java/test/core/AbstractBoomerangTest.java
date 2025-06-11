@@ -23,7 +23,6 @@ import boomerang.options.BoomerangOptions;
 import boomerang.options.IntAndStringAllocationSite;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.scope.AllocVal;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.Field;
@@ -130,24 +129,23 @@ public class AbstractBoomerangTest extends TestingFramework {
 
   private void analyzeWithCallGraph(FrameworkScope frameworkScope, boolean ignoreAllocSites) {
     LOGGER.info("Running test method \"{}\"", testName.getMethodName());
-    CallGraph callGraph = frameworkScope.getCallGraph();
-    queryDetector = new QueryForCallSiteDetector(callGraph);
+    queryDetector = new QueryForCallSiteDetector(frameworkScope);
     queryForCallSites = queryDetector.computeSeeds();
 
     if (queryDetector.integerQueries) {
-      Preanalysis an = new Preanalysis(callGraph, new IntegerAllocationSiteOf());
+      PreAnalysis an = new PreAnalysis(frameworkScope, new IntegerAllocationSiteOf());
       expectedAllocationSites = an.computeSeeds();
       if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
         Assert.fail("Did not find any allocation sites. Nothing is tested");
       }
     } else {
-      Preanalysis an =
-          new Preanalysis(callGraph, new AllocationSiteOf(AllocatedObject.class.getName()));
+      PreAnalysis an =
+          new PreAnalysis(frameworkScope, new AllocationSiteOf(AllocatedObject.class.getName()));
       expectedAllocationSites = an.computeSeeds();
       if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
         Assert.fail("Did not find any allocation sites. Nothing is tested");
       }
-      an = new Preanalysis(callGraph, new AllocationSiteOf(NoAllocatedObject.class.getName()));
+      an = new PreAnalysis(frameworkScope, new AllocationSiteOf(NoAllocatedObject.class.getName()));
       explicitlyUnexpectedAllocationSites =
           an.computeSeeds().stream().map(Query::asNode).collect(Collectors.toList());
     }

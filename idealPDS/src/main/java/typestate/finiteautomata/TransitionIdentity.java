@@ -42,11 +42,6 @@ public class TransitionIdentity implements Transition {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    return this == obj;
-  }
-
-  @Override
   @NonNull
   public String toString() {
     return "ID -> ID";
