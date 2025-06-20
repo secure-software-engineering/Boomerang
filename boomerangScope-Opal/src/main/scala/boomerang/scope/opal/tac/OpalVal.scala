@@ -171,3 +171,16 @@ class OpalVal(
 
   override def toString: String = s"$getVariableName${if (isUnbalanced) " unbalanced " + unbalancedStmt else ""}"
 }
+
+object OpalVal {
+
+  /**
+   * Creates an [[OpalVal]] from an arbitrary expression. Note that the generic type is cast to [[TacLocal]].
+   * Hence, the expression should align with this Boomerang scope.
+   *
+   * @param expr the expression to wrap
+   * @param method the method from the expression
+   * @return the [[OpalVal]] wrapper for the expression
+   */
+  def createUnsafe(expr: Expr[_], method: OpalMethod) = new OpalVal(expr.asInstanceOf[Expr[TacLocal]], method)
+}
