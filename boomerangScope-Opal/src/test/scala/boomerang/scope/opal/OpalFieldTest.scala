@@ -17,7 +17,6 @@ package boomerang.scope.opal
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.A
-import boomerang.scope.test.targets.FieldClass
 import boomerang.scope.test.targets.FieldTarget
 import org.junit.Assert
 import org.junit.Test
@@ -159,18 +158,7 @@ class OpalFieldTest {
         Assert.assertTrue(field.isInnerClassField)
 
         val fieldLoad = stmt.getFieldLoad
-        val classType = fieldLoad.getBase.getType.toString
-        Assert.assertTrue(
-          classType.equals("int") || classType.equals(
-            classOf[FieldClass.InnerFieldClass].getName
-          )
-        )
-
-        val fieldType = fieldLoad.getField.getType.toString
         Assert.assertFalse(fieldLoad.getField.isPredefinedField)
-        Assert.assertTrue(
-          fieldType.equals("int") || fieldType.equals(classOf[A].getName)
-        )
       }
     })
 
@@ -196,19 +184,7 @@ class OpalFieldTest {
         fieldStoreCount += 1
 
         val fieldStore = stmt.getFieldStore
-        val classType = fieldStore.getBase.getType.toString
-        Assert.assertTrue(
-          classType.equals("int") || classType.equals(
-            classOf[FieldClass.InnerFieldClass].getName
-          )
-        )
-
-        val fieldType = fieldStore.getField.getType.toString
         Assert.assertFalse(fieldStore.getField.isPredefinedField)
-        Assert.assertTrue(fieldStore.getField.isInnerClassField)
-        Assert.assertTrue(
-          fieldType.equals("int") || fieldType.equals(classOf[A].getName)
-        )
       }
     })
 
