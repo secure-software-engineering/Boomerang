@@ -19,20 +19,17 @@ import boomerang.scope.opal.transformation.StmtGraph
 import boomerang.scope.opal.transformation.TacLocal
 import org.opalj.br.ComputationalTypeReference
 import org.opalj.br.Field
-import org.opalj.br.FieldType
 import org.opalj.br.Method
-import org.opalj.br.analyses.Project
 import org.opalj.tac.Assignment
 import org.opalj.tac.Expr
 import org.opalj.tac.NullExpr
 import org.opalj.tac.PutField
-import org.opalj.value.ValueInformation
 
 object NullifyFieldsTransformer {
 
   private final val NULLIFIED_FIELD = -2
 
-  def apply(project: Project[_], method: Method, stmtGraph: StmtGraph): StmtGraph = {
+  def apply(method: Method, stmtGraph: StmtGraph): StmtGraph = {
     if (!method.isConstructor || method.isStatic) {
       return stmtGraph
     }
@@ -41,7 +38,7 @@ object NullifyFieldsTransformer {
     var localCounter = 0
 
     def isFieldDefined(field: Field): Boolean = {
-      // TODO Soot considers super classes, too (not sure if required
+      // TODO Soot considers super classes, too (not sure if required)
       tac.foreach {
         // TODO Maybe also match 'this' local?
         case PutField(_, _, field.name, field.fieldType, _, _) => return true
@@ -61,14 +58,10 @@ object NullifyFieldsTransformer {
       )
     }
 
-    def createNullifiedLocal(
-        localCounter: Int,
-        fieldType: FieldType
-    ): NullifiedLocal = {
+    def createNullifiedLocal(localCounter: Int): NullifiedLocal = {
       new NullifiedLocal(
         localCounter,
-        ComputationalTypeReference,
-        ValueInformation.forProperValue(fieldType)(project.classHierarchy)
+        ComputationalTypeReference
       )
     }
 
@@ -79,7 +72,7 @@ object NullifyFieldsTransformer {
     var result = stmtGraph
 
     undefinedFields.foreach(field => {
-      val local = createNullifiedLocal(localCounter, field.fieldType)
+      val local = createNullifiedLocal(localCounter)
       localCounter += 1
 
       val defSite =
