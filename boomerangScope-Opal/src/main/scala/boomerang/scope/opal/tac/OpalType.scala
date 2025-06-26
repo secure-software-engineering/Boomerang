@@ -20,7 +20,15 @@ import boomerang.scope.WrappedClass
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
 import org.opalj.br.ArrayType
+import org.opalj.br.ComputationalType
+import org.opalj.br.ComputationalTypeDouble
+import org.opalj.br.ComputationalTypeFloat
+import org.opalj.br.ComputationalTypeInt
+import org.opalj.br.ComputationalTypeLong
+import org.opalj.br.ComputationalTypeReference
+import org.opalj.br.ComputationalTypeReturnAddress
 import org.opalj.br.DoubleType
+import org.opalj.br.FieldType
 import org.opalj.br.FloatType
 import org.opalj.br.IntegerType
 import org.opalj.br.LongType
@@ -52,7 +60,6 @@ import org.opalj.tac.PrimitiveTypecastExpr
 import org.opalj.tac.StaticFunctionCall
 import org.opalj.tac.StringConst
 import org.opalj.tac.VirtualFunctionCall
-import org.opalj.value.ValueInformation
 
 class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Type {
 
@@ -147,39 +154,23 @@ object OpalType {
       case functionCall: NonVirtualFunctionCall[_] => return new OpalType(functionCall.descriptor.returnType, project)
       case functionCall: VirtualFunctionCall[_] => return new OpalType(functionCall.descriptor.returnType, project)
       case functionCall: StaticFunctionCall[_] => return new OpalType(functionCall.descriptor.returnType, project)
-      case v: TacLocal => return valueInformationToType(v.valueInformation, project)
+      case v: TacLocal => return new OpalType(computationalTypeToFieldType(v.cTpe), project)
       case _ => throw new RuntimeException("Unknown expression: " + expr)
     }
 
     throw new RuntimeException("Cannot compute type for expression: " + expr)
   }
 
-  def valueInformationToType(value: ValueInformation, project: Project[_]): Type = {
-    if (value.isIllegalValue) {
-      return new OpalType(ObjectType.Void, project)
+  def computationalTypeToFieldType(cTpe: ComputationalType): FieldType = {
+    cTpe match {
+      case ComputationalTypeInt => IntegerType
+      case ComputationalTypeFloat => FloatType
+      case ComputationalTypeLong => LongType
+      case ComputationalTypeDouble => DoubleType
+      case ComputationalTypeReference => ObjectType.Object
+      case ComputationalTypeReturnAddress => ObjectType.Object
+      case _ =>
+        throw new RuntimeException("Unknown computational type " + cTpe)
     }
-
-    if (value.isPrimitiveValue) {
-      return new OpalType(value.asPrimitiveValue.primitiveType, project)
-    }
-
-    if (value.isReferenceValue) {
-      if (value.asReferenceValue.isPrecise) {
-        if (value.asReferenceValue.isNull.isYes) {
-          return OpalNullType
-        } else {
-          return new OpalType(value.asReferenceValue.asReferenceType, project)
-        }
-      } else {
-        return new OpalType(value.asReferenceValue.upperTypeBound.head, project)
-      }
-    }
-
-    if (value.isVoid) {
-      return new OpalType(ObjectType.Void, project)
-    }
-
-    // TODO Array and illegal types (not sure if they ever occur)
-    throw new RuntimeException("Type not implemented yet")
   }
 }

@@ -20,25 +20,8 @@ import boomerang.scope.opal.transformation.RegisterLocal
 import boomerang.scope.opal.transformation.StackLocal
 import boomerang.scope.opal.transformation.TacLocal
 import boomerang.scope.opal.transformation.stack.OperandStackHandler
-import org.opalj.ai.AIResult
-import org.opalj.ai.BaseAI
-import org.opalj.ai.Domain
-import org.opalj.br.ComputationalType
-import org.opalj.br.ComputationalTypeDouble
-import org.opalj.br.ComputationalTypeFloat
-import org.opalj.br.ComputationalTypeInt
-import org.opalj.br.ComputationalTypeLong
-import org.opalj.br.ComputationalTypeReference
-import org.opalj.br.ComputationalTypeReturnAddress
-import org.opalj.br.DoubleType
-import org.opalj.br.FieldType
-import org.opalj.br.FloatType
-import org.opalj.br.IntegerType
-import org.opalj.br.LongType
 import org.opalj.br.Method
-import org.opalj.br.ObjectType
 import org.opalj.br.PC
-import org.opalj.br.analyses.Project
 import org.opalj.tac.ArrayLength
 import org.opalj.tac.ArrayLoad
 import org.opalj.tac.ArrayStore
@@ -91,27 +74,19 @@ import org.opalj.tac.Switch
 import org.opalj.tac.Throw
 import org.opalj.tac.VirtualFunctionCall
 import org.opalj.tac.VirtualMethodCall
-import org.opalj.value.ValueInformation
 import scala.collection.mutable
 
 object LocalTransformer {
 
   def apply(
-      project: Project[_],
       method: Method,
       tac: NaiveTACode[_],
-      stackHandler: OperandStackHandler,
-      domain: Domain
+      stackHandler: OperandStackHandler
   ): Array[Stmt[TacLocal]] = {
     var paramCount = -1
     var exceptionCount = -1
     val currentLocals = mutable.Map.empty[Int, TacLocal]
     val exceptionHandlers = tac.exceptionHandlers.map(eh => eh.handlerPC)
-
-    // Domain components
-    val aiResult: AIResult = BaseAI(method, domain)
-    val operandsArray: aiResult.domain.OperandsArray = aiResult.operandsArray
-    val localArray: aiResult.domain.LocalsArray = aiResult.localsArray
 
     def transformStmt(stmt: Stmt[IdBasedVar]): Stmt[TacLocal] = {
       stmt match {
@@ -320,38 +295,22 @@ object LocalTransformer {
     def createParameterLocal(
         idBasedVar: IdBasedVar,
         paramName: Option[String] = Option.empty
-    ): TacLocal = {
-      val local = localArray(0)
-
+    ): TacLocal =
       new RegisterLocal(
         idBasedVar.id,
         idBasedVar.cTpe,
-        local(-idBasedVar.id - 1),
         isThisVar(idBasedVar),
         paramName
       )
-    }
 
     def createStackLocal(
         pc: PC,
         idBasedVar: IdBasedVar,
         isThis: Boolean
     ): TacLocal = {
-      val nextPc = method.body.get.pcOfNextInstruction(pc)
-      val value = operandsArray(nextPc)
       val counter = stackHandler.defSiteAtPc(pc)
 
-      if (value == null) {
-        val fieldType = computationalTypeToFieldType(idBasedVar.cTpe)
-        new StackLocal(
-          counter,
-          idBasedVar.cTpe,
-          ValueInformation.forProperValue(fieldType)(project.classHierarchy),
-          isThis
-        )
-      } else {
-        new StackLocal(counter, idBasedVar.cTpe, value.head, isThis)
-      }
+      new StackLocal(counter, idBasedVar.cTpe, isThis)
     }
 
     def createRegisterLocal(
@@ -360,76 +319,26 @@ object LocalTransformer {
         isThis: Boolean
     ): TacLocal = {
       val nextPc = method.body.get.pcOfNextInstruction(pc)
-      val locals = localArray(nextPc)
-
       val index = -idBasedVar.id - 1
 
       val local = method.body.get.localVariable(nextPc, index)
       if (local.isDefined) {
-        if (locals == null) {
-          val fieldType = computationalTypeToFieldType(idBasedVar.cTpe)
-          return new RegisterLocal(
-            idBasedVar.id,
-            idBasedVar.cTpe,
-            ValueInformation.forProperValue(fieldType)(project.classHierarchy),
-            isThis,
-            Option(local.get.name)
-          )
-        } else {
-          return new RegisterLocal(
-            idBasedVar.id,
-            idBasedVar.cTpe,
-            locals(index),
-            isThis,
-            Option(local.get.name)
-          )
-        }
-      }
-
-      if (locals == null) {
-        val fieldType = computationalTypeToFieldType(idBasedVar.cTpe)
-        new RegisterLocal(
+        return new RegisterLocal(
           idBasedVar.id,
           idBasedVar.cTpe,
-          ValueInformation.forProperValue(fieldType)(project.classHierarchy),
-          isThis
+          isThis,
+          Option(local.get.name)
         )
-      } else {
-        new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, locals(index), isThis)
       }
+
+      new RegisterLocal(idBasedVar.id, idBasedVar.cTpe, isThis)
     }
 
     def createExceptionLocal(
         pc: PC,
         idBasedVar: IdBasedVar,
         localId: Int
-    ): TacLocal = {
-      val value = operandsArray(pc)
-
-      if (value == null) {
-        val fieldType = computationalTypeToFieldType(idBasedVar.cTpe)
-        new ExceptionLocal(
-          localId,
-          idBasedVar.cTpe,
-          ValueInformation.forProperValue(fieldType)(project.classHierarchy)
-        )
-      } else {
-        new ExceptionLocal(localId, idBasedVar.cTpe, value.head)
-      }
-    }
-
-    def computationalTypeToFieldType(cTpe: ComputationalType): FieldType = {
-      cTpe match {
-        case ComputationalTypeInt => IntegerType
-        case ComputationalTypeFloat => FloatType
-        case ComputationalTypeLong => LongType
-        case ComputationalTypeDouble => DoubleType
-        case ComputationalTypeReference => ObjectType.Object
-        case ComputationalTypeReturnAddress => ObjectType.Object
-        case _ =>
-          throw new RuntimeException("Unknown computational type " + cTpe)
-      }
-    }
+    ): TacLocal = new ExceptionLocal(localId, idBasedVar.cTpe)
 
     def transformExpr(pc: PC, expr: Expr[IdBasedVar]): Expr[TacLocal] = {
       expr match {

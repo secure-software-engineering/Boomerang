@@ -18,7 +18,6 @@ import java.util.Objects
 import org.opalj.br.ComputationalType
 import org.opalj.tac.DUVar
 import org.opalj.tac.Var
-import org.opalj.value.IsNullValue
 import org.opalj.value.ValueInformation
 
 trait TacLocal extends Var[TacLocal] {
@@ -37,8 +36,6 @@ trait TacLocal extends Var[TacLocal] {
 
   def cTpe: ComputationalType
 
-  def valueInformation: ValueInformation
-
   final def isSideEffectFree: Boolean = true
 
   override def toCanonicalForm(implicit
@@ -55,7 +52,6 @@ trait TacLocal extends Var[TacLocal] {
 class StackLocal(
     identifier: Int,
     computationalType: ComputationalType,
-    valueInfo: ValueInformation,
     isThis: Boolean = false
 ) extends TacLocal {
 
@@ -69,8 +65,6 @@ class StackLocal(
 
   override def cTpe: ComputationalType = computationalType
 
-  override def valueInformation: ValueInformation = valueInfo
-
   override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
   override def equals(other: Any): Boolean = other match {
@@ -83,7 +77,6 @@ class StackLocal(
 class RegisterLocal(
     identifier: Int,
     computationalType: ComputationalType,
-    valueInfo: ValueInformation,
     isThis: Boolean = false,
     localName: Option[String] = Option.empty
 ) extends TacLocal {
@@ -102,8 +95,6 @@ class RegisterLocal(
   }
 
   override def cTpe: ComputationalType = computationalType
-
-  override def valueInformation: ValueInformation = valueInfo
 
   override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
 
@@ -126,11 +117,6 @@ class ParameterLocal(
 
   override def cTpe: ComputationalType = computationalType
 
-  override def valueInformation: ValueInformation =
-    throw new UnsupportedOperationException(
-      "No value information available for parameter local"
-    )
-
   override def name: String = paramName
 
   override def hashCode: Int = Objects.hash(this.getClass.hashCode(), id)
@@ -141,14 +127,11 @@ class ParameterLocal(
   }
 }
 
-class NullifiedLocal(identifier: Int, computationalType: ComputationalType, valueInfo: ValueInformation)
-    extends TacLocal {
+class NullifiedLocal(identifier: Int, computationalType: ComputationalType) extends TacLocal {
 
   override def id: Int = identifier
 
   override def cTpe: ComputationalType = computationalType
-
-  override def valueInformation: ValueInformation = valueInfo
 
   override def name: String = s"n$identifier"
 
@@ -162,8 +145,7 @@ class NullifiedLocal(identifier: Int, computationalType: ComputationalType, valu
 
 class ExceptionLocal(
     identifier: Int,
-    computationalType: ComputationalType,
-    valueInfo: ValueInformation
+    computationalType: ComputationalType
 ) extends TacLocal {
 
   override def id: Int = identifier
@@ -171,8 +153,6 @@ class ExceptionLocal(
   override def isExceptionLocal: Boolean = true
 
   override def cTpe: ComputationalType = computationalType
-
-  override def valueInformation: ValueInformation = valueInfo
 
   override def name: String = s"e$identifier"
 
