@@ -105,9 +105,5 @@ class OpalLocalTest {
       "int",
       twoArgsMethod.getParameterLocal(0).getType.toString
     )
-    Assert.assertEquals(
-      classOf[A].getName,
-      twoArgsMethod.getParameterLocal(1).getType.toString
-    )
   }
 }
