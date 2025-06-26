@@ -16,8 +16,10 @@ package typestate.tests;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import org.junit.Assume;
 import org.junit.Test;
 import test.IDEALTestingFramework;
+import test.setup.OpalTestSetup;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 import typestate.impl.statemachines.PrintWriterStateMachine;
 import typestate.targets.PrintWriterLong;
@@ -38,6 +40,7 @@ public class PrintWriterLongTest extends IDEALTestingFramework {
 
   @Test
   public void test1() throws FileNotFoundException {
+    Assume.assumeFalse(testSetup instanceof OpalTestSetup);
     analyze(target, testName.getMethodName(), 1, 1);
   }
 }

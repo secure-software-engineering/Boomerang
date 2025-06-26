@@ -35,7 +35,7 @@ public class TestingFramework {
   private static final String SOOT_UP = "sootup";
   private static final String OPAL = "opal";
 
-  private final TestSetup testSetup;
+  protected final TestSetup testSetup;
 
   public TestingFramework() {
     this.testSetup = getTestSetup();

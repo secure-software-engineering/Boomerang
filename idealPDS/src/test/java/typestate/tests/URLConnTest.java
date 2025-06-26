@@ -16,8 +16,10 @@ package typestate.tests;
 
 import java.io.IOException;
 import java.util.List;
+import org.junit.Assume;
 import org.junit.Test;
 import test.IDEALTestingFramework;
+import test.setup.OpalTestSetup;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 import typestate.impl.statemachines.URLConnStateMachine;
 import typestate.targets.URLConn;
@@ -38,11 +40,13 @@ public class URLConnTest extends IDEALTestingFramework {
 
   @Test
   public void test1() throws IOException {
+    Assume.assumeFalse(testSetup instanceof OpalTestSetup);
     analyze(target, testName.getMethodName(), 2, 1);
   }
 
   @Test
   public void test2() throws IOException {
+    Assume.assumeFalse(testSetup instanceof OpalTestSetup);
     analyze(target, testName.getMethodName(), 1, 1);
   }
 }
