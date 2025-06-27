@@ -29,7 +29,7 @@ import typestate.impl.statemachines.VectorStateMachine;
 @TestConfig(
     stateMachine = VectorStateMachine.class,
     includedClasses = {java.util.Stack.class, java.util.Vector.class})
-public class StackLongTest {
+public class StackTest {
 
   private boolean staticallyUnknown() {
     return Math.random() > 0.5;

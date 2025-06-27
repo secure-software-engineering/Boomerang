@@ -27,7 +27,7 @@ import typestate.impl.statemachines.VectorStateMachine;
 @TestConfig(
     stateMachine = VectorStateMachine.class,
     includedClasses = {java.util.Vector.class})
-public class VectorLongTest {
+public class VectorTest {
 
   private boolean staticallyUnknown() {
     return Math.random() > 0.5;

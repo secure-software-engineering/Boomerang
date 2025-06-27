@@ -32,7 +32,7 @@ import typestate.impl.statemachines.SocketStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
 @TestConfig(stateMachine = SocketStateMachine.class)
-public class SocketLongTest {
+public class SocketTest {
 
   @Test
   @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)

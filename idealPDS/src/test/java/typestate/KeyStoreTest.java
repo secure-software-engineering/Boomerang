@@ -31,7 +31,7 @@ import typestate.impl.statemachines.KeyStoreStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
 @TestConfig(stateMachine = KeyStoreStateMachine.class)
-public class KeyStoreLongTest {
+public class KeyStoreTest {
 
   @Test
   @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)

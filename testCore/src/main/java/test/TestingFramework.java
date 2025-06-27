@@ -37,8 +37,17 @@ public class TestingFramework {
 
   protected final TestSetup testSetup;
 
+  private final Collection<String> includedClasses;
+  private final Collection<String> excludedClasses;
+
   public TestingFramework() {
+    this(Collections.emptySet(), Collections.emptySet());
+  }
+
+  public TestingFramework(Collection<String> includedClasses, Collection<String> excludedClasses) {
     this.testSetup = getTestSetup();
+    this.includedClasses = includedClasses;
+    this.excludedClasses = excludedClasses;
   }
 
   private TestSetup getTestSetup() {
@@ -70,7 +79,11 @@ public class TestingFramework {
   public FrameworkScope getFrameworkScope(
       MethodWrapper methodWrapper, DataFlowScope dataFlowScope) {
     String classPath = buildClassPath();
-    testSetup.initialize(classPath, methodWrapper, getIncludedPackages(), getExcludedPackages());
+    testSetup.initialize(
+        classPath,
+        methodWrapper,
+        List.copyOf(getIncludedPackages()),
+        List.copyOf(getExcludedPackages()));
 
     return testSetup.createFrameworkScope(dataFlowScope);
   }
@@ -139,11 +152,11 @@ public class TestingFramework {
     }
   }
 
-  protected List<String> getIncludedPackages() {
-    return Collections.emptyList();
+  protected Collection<String> getIncludedPackages() {
+    return includedClasses;
   }
 
-  protected List<String> getExcludedPackages() {
-    return Collections.emptyList();
+  protected Collection<String> getExcludedPackages() {
+    return excludedClasses;
   }
 }

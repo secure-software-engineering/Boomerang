@@ -16,40 +16,26 @@ package typestate;
 
 import assertions.Assertions;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
-import typestate.impl.statemachines.PrintStreamStateMachine;
+import typestate.impl.statemachines.PrintWriterStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
-@TestConfig(stateMachine = PrintStreamStateMachine.class)
-public class PrintStreamLongTest {
+@TestConfig(
+    stateMachine = PrintWriterStateMachine.class,
+    includedClasses = {java.io.PrintWriter.class})
+public class PrintWriterTest {
 
   @Test
   @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws FileNotFoundException {
-    PrintStream inputStream = new PrintStream("");
+    PrintWriter inputStream = new PrintWriter("");
     inputStream.close();
     inputStream.flush();
     Assertions.mustBeInErrorState(inputStream);
-  }
-
-  @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
-  public void test() {
-    try {
-      FileOutputStream out = new FileOutputStream("foo.txt");
-      PrintStream p = new PrintStream(out);
-      p.close();
-      p.println("foo!");
-      p.write(42);
-      Assertions.mustBeInErrorState(p);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 }

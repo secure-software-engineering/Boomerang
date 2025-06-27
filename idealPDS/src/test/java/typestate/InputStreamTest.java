@@ -29,7 +29,7 @@ import typestate.impl.statemachines.InputStreamStateMachine;
 @TestConfig(
     stateMachine = InputStreamStateMachine.class,
     includedClasses = {java.io.FileInputStream.class})
-public class InputStreamLongTest {
+public class InputStreamTest {
 
   @Test
   @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
