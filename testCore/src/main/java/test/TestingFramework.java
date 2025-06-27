@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import test.setup.OpalTestSetup;
 import test.setup.SootTestSetup;
 import test.setup.SootUpTestSetup;
@@ -120,7 +120,7 @@ public class TestingFramework {
     }
 
     if (!unsound.isEmpty()) {
-      Assert.fail(
+      Assertions.fail(
           "Unsound results:\n- "
               + unsound.stream()
                   .map(Assertion::getAssertedMessage)
@@ -128,7 +128,7 @@ public class TestingFramework {
     }
 
     if (!imprecise.isEmpty() && failOnImprecise) {
-      Assert.fail(
+      Assertions.fail(
           "Imprecise results:\n- "
               + imprecise.stream()
                   .map(Assertion::getAssertedMessage)

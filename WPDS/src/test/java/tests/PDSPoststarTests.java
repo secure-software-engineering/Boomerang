@@ -14,7 +14,6 @@
  */
 package tests;
 
-import static org.junit.Assert.assertTrue;
 import static tests.TestHelper.ACC;
 import static tests.TestHelper.a;
 import static tests.TestHelper.accepts;
@@ -25,8 +24,9 @@ import static tests.TestHelper.s;
 import static tests.TestHelper.t;
 
 import java.util.Collection;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import tests.TestHelper.Abstraction;
 import tests.TestHelper.StackSymbol;
 import wpds.impl.PAutomaton;
@@ -37,9 +37,9 @@ public class PDSPoststarTests {
 
   private PushdownSystem<StackSymbol, Abstraction> pds;
 
-  @Before
+  @BeforeEach
   public void init() {
-    pds = new PushdownSystem<StackSymbol, Abstraction>() {};
+    pds = new PushdownSystem<>() {};
   }
 
   @Test
@@ -50,8 +50,8 @@ public class PDSPoststarTests {
     PAutomaton<StackSymbol, Abstraction> fa = accepts(2, "b");
     fa.addTransition(new Transition<StackSymbol, Abstraction>(a(3), fa.epsilon(), a(2)));
     pds.poststar(fa);
-    assertTrue(fa.getTransitions().contains(t(3, "EPS", 2)));
-    assertTrue(fa.getTransitions().contains(t(2, "b", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(3, "EPS", 2)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(2, "b", ACC)));
   }
 
   @Test
@@ -61,8 +61,8 @@ public class PDSPoststarTests {
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "b");
     fa.addTransition(new Transition<StackSymbol, Abstraction>(a(0), fa.epsilon(), a(1)));
     pds.poststar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "d", ACC)));
-    assertTrue(fa.getTransitions().contains(t(0, "EPS", 1)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "d", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(0, "EPS", 1)));
   }
 
   @Test
@@ -72,7 +72,7 @@ public class PDSPoststarTests {
     pds.addRule(pop(1, "c", 1));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "a");
     pds.poststar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "d", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "d", ACC)));
   }
 
   @Test
@@ -86,8 +86,8 @@ public class PDSPoststarTests {
     pds.addRule(normal(1, "e", 1, "k"));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "a");
     pds.poststar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
-    assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
   }
 
   @Test
@@ -101,8 +101,8 @@ public class PDSPoststarTests {
     pds.addRule(normal(1, "e", 1, "k"));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "a");
     pds.poststar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
-    assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
     //        assertTrue(fa.getTransitions().contains(t(1, fa.epsilon(), new Abstraction(a(1),
     // s("d")))));
   }
@@ -124,7 +124,7 @@ public class PDSPoststarTests {
     transitions.remove(t(1, s("d"), a(1, "d")));
     transitions.remove(t(1, s("h"), a(1, "d")));
     transitions.remove(t(1, fa.epsilon(), a(1, "d")));
-    assertTrue(transitions.isEmpty());
+    Assertions.assertTrue(transitions.isEmpty());
   }
 
   // Example taken from http://research.cs.wisc.edu/wpis/papers/fsttcs07.invited.pdf
@@ -152,6 +152,6 @@ public class PDSPoststarTests {
     transitions.remove(t(1, "n8", a(1, "n7")));
     transitions.remove(t(a(1, "n7"), "n4", ACC));
     transitions.remove(t(a(1, "n7"), "n5", ACC));
-    assertTrue(transitions.isEmpty());
+    Assertions.assertTrue(transitions.isEmpty());
   }
 }

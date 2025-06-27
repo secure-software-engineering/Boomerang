@@ -14,15 +14,51 @@
  */
 package test.cases.typing;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class InterfaceInvocationTest extends AbstractBoomerangTest {
-
-  private final String target = InterfaceInvocationTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class InterfaceInvocationTest {
 
   @Test
   public void invokesInterface() {
-    analyze(target, testName.getMethodName());
+    B b = new B();
+    wrappedFoo(b);
+    A a1 = new A();
+    A a2 = new A();
+    A a = null;
+    if (Math.random() > 0.5) {
+      a = a1;
+    } else {
+      a = a2;
+    }
+    wrappedFoo(a);
+    QueryMethods.queryFor(a);
+  }
+
+  private void wrappedFoo(I a) {
+    foo(a);
+  }
+
+  private void foo(I a) {
+    a.bar();
+  }
+
+  private interface I {
+    void bar();
+  }
+
+  private static class A implements I, AllocatedObject {
+    @Override
+    public void bar() {}
+  }
+
+  private static class B implements I {
+
+    @Override
+    public void bar() {}
   }
 }

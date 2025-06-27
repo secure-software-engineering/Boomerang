@@ -24,9 +24,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.impl.statemachines.KeyStoreStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
@@ -34,7 +34,7 @@ import typestate.impl.statemachines.KeyStoreStateMachine;
 public class KeyStoreTest {
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws GeneralSecurityException, IOException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
@@ -51,7 +51,7 @@ public class KeyStoreTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test4() throws GeneralSecurityException, IOException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
     KeyStore x = ks;
@@ -62,7 +62,7 @@ public class KeyStoreTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() throws KeyStoreException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
     ks.aliases();
@@ -70,7 +70,7 @@ public class KeyStoreTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3()
       throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -89,7 +89,7 @@ public class KeyStoreTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void catchClause() {
     try {
       final KeyStore keyStore = KeyStore.getInstance("JKS");

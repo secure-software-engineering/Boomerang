@@ -14,36 +14,97 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.TestParameters;
+import test.core.selfrunning.AllocatedObject;
+import test.core.selfrunning.NullableField;
 
 // TODO The test does nothing?
-public class FailOnVisitMethodTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class FailOnVisitMethodTest {
 
-  private final String target = FailOnVisitMethodTarget.class.getName();
+  private class A {
+    B b = new B();
+    E e = new E();
+  }
+
+  private static class B implements AllocatedObject {}
+
+  private static class E {
+    public void bar() {}
+  }
 
   @Test
   public void failOnVisitBar() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    B alias = a.b;
+    E e = a.e;
+    e.bar();
+    QueryMethods.queryFor(alias);
+  }
+
+  private static class C {
+    B b = null;
+    E e = null;
   }
 
   @Test
   public void failOnVisitBarSameMethod() {
-    analyze(target, testName.getMethodName());
+    C a = new C();
+    a.b = new B();
+    B alias = a.b;
+    E e = a.e;
+    e.bar();
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void failOnVisitBarSameMethodAlloc() {
-    analyze(target, testName.getMethodName());
+    C a = new C();
+    a.b = new B();
+    a.e = new E();
+    B alias = a.b;
+    E e = a.e;
+    e.bar();
+    QueryMethods.queryFor(alias);
   }
 
   @Test
+  @TestParameters(ignoreAllocSites = true)
   public void failOnVisitBarSameMethodSimpleAlloc() {
-    analyze(target, testName.getMethodName(), true);
+    Simplified a = new Simplified();
+    a.e = new E();
+    N alias = a.b;
+    E e = a.e;
+    e.bar();
+    QueryMethods.queryFor(alias);
+  }
+
+  private static class Simplified {
+    E e = null;
+    N b = null;
   }
 
   @Test
+  @TestParameters(ignoreAllocSites = true)
   public void doNotVisitBar() {
-    analyze(target, testName.getMethodName(), true);
+    O a = new O();
+    N alias = a.nullableField;
+    QueryMethods.queryFor(alias);
   }
+
+  private static class O {
+    N nullableField = null;
+    E e = null;
+
+    private O() {
+      e = new E();
+      e.bar();
+    }
+  }
+
+  private static class N implements NullableField {}
 }

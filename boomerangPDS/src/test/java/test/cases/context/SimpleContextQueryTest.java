@@ -14,25 +14,41 @@
  */
 package test.cases.context;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class SimpleContextQueryTest extends AbstractBoomerangTest {
-
-  private final String target = SimpleContextQueryTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class SimpleContextQueryTest {
 
   @Test
   public void outerAllocation() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alloc = new ContextAlloc();
+    methodOfQuery(alloc);
+  }
+
+  private void methodOfQuery(AllocatedObject allocInner) {
+    AllocatedObject alias = allocInner;
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void outerAllocation2() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alloc = new AllocatedObject() {};
+    AllocatedObject same = alloc;
+    methodOfQuery(alloc, same);
   }
 
   @Test
   public void outerAllocation3() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alloc = new AllocatedObject() {};
+    Object same = new Object();
+    methodOfQuery(alloc, same);
+  }
+
+  private void methodOfQuery(Object alloc, Object alias) {
+    QueryMethods.queryFor(alloc);
   }
 }

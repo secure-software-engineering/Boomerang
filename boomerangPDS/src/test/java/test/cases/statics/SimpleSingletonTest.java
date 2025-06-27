@@ -14,36 +14,50 @@
  */
 package test.cases.statics;
 
-import java.util.List;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.TestConfig;
 
-public class SimpleSingletonTest extends AbstractBoomerangTest {
-
-  private final String target = SimpleSingletonTarget.class.getName();
-
-  @Override
-  public List<String> getIncludedPackages() {
-    return List.of("java.lang.Runnable");
-  }
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+@TestConfig(includedClasses = {"java.lang.Runnable"})
+public class SimpleSingletonTest {
 
   @Test
   public void singletonDirect() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc singleton = alloc;
+    QueryMethods.queryForAndNotEmpty(singleton);
   }
+
+  private static StaticsAlloc alloc = new StaticsAlloc();
 
   @Test
   public void staticInnerAccessDirect() {
-    analyze(target, testName.getMethodName());
+    Runnable r =
+        new Runnable() {
+
+          @Override
+          public void run() {
+            StaticsAlloc singleton = alloc;
+            QueryMethods.queryForAndNotEmpty(singleton);
+          }
+        };
+    r.run();
   }
 
   @Test
   public void simpleWithAssign() {
-    analyze(target, testName.getMethodName());
+    alloc = new StaticsAlloc();
+    Object b = alloc;
+    QueryMethods.queryFor(b);
   }
 
   @Test
   public void simpleWithAssign2() {
-    analyze(target, testName.getMethodName());
+    alloc = new StaticsAlloc();
+    Object b = alloc;
+    Object a = alloc;
+    QueryMethods.queryFor(b);
   }
 }

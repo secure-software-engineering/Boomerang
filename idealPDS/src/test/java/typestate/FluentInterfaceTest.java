@@ -17,9 +17,9 @@ package typestate;
 import assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.helper.File;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
@@ -28,7 +28,7 @@ import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 public class FluentInterfaceTest {
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void fluentOpen() {
     File file = new File();
     file = file.open();
@@ -36,7 +36,7 @@ public class FluentInterfaceTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void fluentOpenAndClose() {
     File file = new File();
     file = file.open();

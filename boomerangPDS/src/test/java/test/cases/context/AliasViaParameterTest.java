@@ -14,20 +14,42 @@
  */
 package test.cases.context;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class AliasViaParameterTest extends AbstractBoomerangTest {
-
-  private final String target = AliasViaParameterTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class AliasViaParameterTest {
 
   @Test
   public void aliasViaParameter() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = a;
+    setAndLoadFieldOnAlias(a, b);
+    AllocatedObject query = a.field;
+    QueryMethods.queryFor(query);
   }
 
   @Test
   public void aliasViaParameterWrapped() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = a;
+    passThrough(a, b);
+    AllocatedObject query = a.field;
+    QueryMethods.queryFor(query);
+  }
+
+  private void passThrough(A a, A b) {
+    setAndLoadFieldOnAlias(a, b);
+  }
+
+  private void setAndLoadFieldOnAlias(A a, A b) {
+    b.field = new AllocatedObject() {};
+  }
+
+  public static class A {
+    AllocatedObject field;
   }
 }

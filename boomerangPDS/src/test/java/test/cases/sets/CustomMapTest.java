@@ -14,30 +14,76 @@
  */
 package test.cases.sets;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class CustomMapTest extends AbstractBoomerangTest {
-
-  private final String target = CustomMapTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class CustomMapTest {
 
   @Test
   public void storeAndLoad() {
-    analyze(target, testName.getMethodName());
+    SetAlloc alloc = new SetAlloc();
+    Map map = new Map();
+    map.add(alloc);
+    Object alias = map.get();
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void storeAndLoadSimple() {
-    analyze(target, testName.getMethodName());
+    SetAlloc alloc = new SetAlloc();
+    Map map = new Map();
+    map.add(alloc);
+    Object alias = map.m.content;
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void onlyInnerMapSimple() {
-    analyze(target, testName.getMethodName());
+    SetAlloc alloc = new SetAlloc();
+    InnerMap map = new InnerMap();
+    map.innerAdd(alloc);
+    Object alias = map.content;
+    QueryMethods.queryFor(alias);
+  }
+
+  public static class Map {
+    public InnerMap m = new InnerMap();
+
+    public void add(Object o) {
+      InnerMap map = this.m;
+      map.innerAdd(o);
+      InnerMap alias = this.m;
+      Object retrieved = alias.content;
+    }
+
+    public Object get() {
+      InnerMap map = this.m;
+      return map.get();
+    }
+  }
+
+  public static class InnerMap {
+    public Object content = null;
+
+    public void innerAdd(Object o) {
+      content = o;
+    }
+
+    public Object get() {
+      return content;
+    }
   }
 
   @Test
   public void storeAndLoadSimpleNoInnerClasses() {
-    analyze(target, testName.getMethodName());
+    SetAlloc alloc = new SetAlloc();
+    MyMap map = new MyMap();
+    map.add(alloc);
+    MyInnerMap load = map.m;
+    Object alias = load.content;
+    QueryMethods.queryFor(alias);
   }
 }

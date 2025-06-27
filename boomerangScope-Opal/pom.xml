@@ -42,10 +42,6 @@
             <artifactId>framework_2.13</artifactId>
             <version>${opal.version}</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

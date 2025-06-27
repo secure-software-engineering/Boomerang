@@ -14,16 +14,14 @@
  */
 package analysis.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import de.fraunhofer.iem.Location;
 import de.fraunhofer.iem.wildcard.ExclusionWildcard;
 import de.fraunhofer.iem.wildcard.Wildcard;
 import java.util.Collection;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.OneWeightFunctions;
@@ -194,9 +192,9 @@ public class DoublePDSTest {
     solve(node(1, "u"));
     // TODO needs inspection
     // assertFalse(solver.getReachedStates().contains(node(11, "s")));
-    assertTrue(solver.getReachedStates().contains(node(5, "w")));
-    assertTrue(solver.getReachedStates().contains(node(6, "x")));
-    assertFalse(solver.getReachedStates().contains(node(7, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(5, "w")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "x")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(7, "y")));
   }
 
   @Test
@@ -213,10 +211,10 @@ public class DoublePDSTest {
     addFieldPop(node(4, "y"), f("g"), node(7, "y"));
     solve(node(1, "u"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(5, "y")));
-    assertTrue(solver.getReachedStates().contains(node(4, "y")));
-    assertFalse(solver.getReachedStates().contains(node(6, "y")));
-    assertFalse(solver.getReachedStates().contains(node(7, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(5, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(4, "y")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(6, "y")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(7, "y")));
   }
 
   @Test
@@ -225,8 +223,8 @@ public class DoublePDSTest {
     addFieldPop(node(3, "x"), f("g"), node(3, "y"));
     addFieldPop(node(3, "y"), f("g"), node(3, "z"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(3, "y")));
-    assertFalse(solver.getReachedStates().contains(node(3, "z")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(3, "y")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(3, "z")));
   }
 
   @Test
@@ -241,7 +239,7 @@ public class DoublePDSTest {
     calleeToCallerMapping(node(4, "q"), node(5, "w"));
     solve(node(1, "u"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(6, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "x")));
   }
 
   @Test
@@ -249,7 +247,7 @@ public class DoublePDSTest {
     addNormal(node(1, "u"), node(5, "q"));
     addNormal(node(5, "q"), node(6, "x"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(6, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "x")));
   }
 
   @Test
@@ -257,7 +255,7 @@ public class DoublePDSTest {
     addFieldPush(node(1, "u"), f("h"), node(2, "v"));
     addFieldPop(node(2, "v"), f("h"), node(6, "x"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(6, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "x")));
   }
 
   @Test
@@ -273,7 +271,7 @@ public class DoublePDSTest {
     calleeToCallerMapping(node(6, "x"), node(4, "k"));
     solve(node(1, "v"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(6, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "y")));
   }
 
   @Test
@@ -284,7 +282,7 @@ public class DoublePDSTest {
 
     solve(node(1, "v"));
     solver.debugOutput();
-    assertFalse(solver.getReachedStates().contains(node(7, "w")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(7, "w")));
   }
 
   @Test
@@ -297,7 +295,7 @@ public class DoublePDSTest {
 
     solve(node(1, "v"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(7, "w")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "w")));
   }
 
   @Test
@@ -313,7 +311,7 @@ public class DoublePDSTest {
 
     solve(node(1, "v"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(7, "w")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "w")));
   }
 
   @Test
@@ -327,7 +325,7 @@ public class DoublePDSTest {
 
     solve(node(1, "v"));
     solver.debugOutput();
-    assertFalse(solver.getReachedStates().contains(node(7, "w")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(7, "w")));
   }
 
   @Test
@@ -339,7 +337,7 @@ public class DoublePDSTest {
 
     solve(node(1, "v"));
     solver.debugOutput();
-    assertFalse(solver.getReachedStates().contains(node(7, "w")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(7, "w")));
   }
 
   @Test
@@ -353,7 +351,7 @@ public class DoublePDSTest {
 
     solve(node(1, "v"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(7, "w")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "w")));
   }
 
   @Test
@@ -366,7 +364,7 @@ public class DoublePDSTest {
 
     calleeToCallerMapping(node(5, "q"), node(4, "w"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(7, "t")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "t")));
   }
 
   @Test
@@ -386,11 +384,11 @@ public class DoublePDSTest {
 
     solve(node(1, "u"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(7, "t")));
-    assertTrue(solver.getReachedStates().contains(node(8, "s")));
-    assertTrue(solver.getReachedStates().contains(node(9, "x")));
-    assertTrue(solver.getReachedStates().contains(node(10, "y")));
-    assertFalse(solver.getReachedStates().contains(node(11, "z")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "t")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(8, "s")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(9, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(10, "y")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(11, "z")));
   }
 
   @Test
@@ -401,8 +399,8 @@ public class DoublePDSTest {
     addNormal(node(3, "w"), node(4, "kkk"));
     addFieldPop(node(4, "x"), f("h"), node(5, "y"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(4, "x")));
-    assertTrue(solver.getReachedStates().contains(node(5, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(4, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(5, "y")));
   }
 
   @Test
@@ -412,8 +410,8 @@ public class DoublePDSTest {
     addFieldPop(node(3, "w"), f("h"), node(4, "x"));
     addFieldPop(node(4, "x"), f("g"), node(5, "y"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(4, "x")));
-    assertFalse(solver.getReachedStates().contains(node(5, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(4, "x")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(5, "y")));
   }
 
   @Test
@@ -423,7 +421,7 @@ public class DoublePDSTest {
     addFieldPop(node(2, "v"), f("h"), node(2, "x"));
     solve(node(0, "u"));
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(2, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(2, "x")));
   }
 
   @Test
@@ -432,7 +430,7 @@ public class DoublePDSTest {
     addFieldPop(node(1, "u"), f("h"), node(2, "v"));
     addFieldPop(node(2, "v"), f("h"), node(2, "x"));
     solve(node(0, "u"));
-    assertFalse(solver.getReachedStates().contains(node(2, "x")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(2, "x")));
   }
 
   @Test
@@ -440,7 +438,7 @@ public class DoublePDSTest {
     addNormal(node(0, "u"), node(1, "u"));
     addFieldPop(node(1, "u"), f("h"), node(2, "v"));
     solve(node(0, "u"));
-    assertFalse(solver.getReachedStates().contains(node(2, "v")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(2, "v")));
   }
 
   @Test
@@ -448,7 +446,7 @@ public class DoublePDSTest {
     addFieldPop(node(0, "u"), f("h"), node(2, "v"));
     solve(node(0, "u"));
     System.out.println(solver.getReachedStates());
-    assertFalse(solver.getReachedStates().contains(node(2, "v")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(2, "v")));
   }
 
   @Test
@@ -456,7 +454,7 @@ public class DoublePDSTest {
     addFieldPush(node(1, "u"), f("h"), node(2, "v"));
     addFieldPop(node(2, "v"), f("h"), node(2, "x"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(2, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(2, "x")));
   }
 
   @Test
@@ -466,7 +464,7 @@ public class DoublePDSTest {
     addNormal(node(3, "w"), node(4, "w"));
     addFieldPop(node(4, "w"), f("h"), node(5, "w"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(5, "w")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(5, "w")));
   }
 
   @Test
@@ -477,8 +475,8 @@ public class DoublePDSTest {
     addFieldPop(node(3, "w"), f("h"), node(4, "x"));
     addFieldPop(node(4, "x"), f("h"), node(5, "y"));
     solve(node(1, "u"));
-    assertTrue(solver.getReachedStates().contains(node(4, "x")));
-    assertTrue(solver.getReachedStates().contains(node(5, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(4, "x")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(5, "y")));
   }
 
   @Test
@@ -490,7 +488,7 @@ public class DoublePDSTest {
     addFieldPop(node(3, "w"), f("h"), node(4, "x"));
     addFieldPop(node(4, "x"), f("g"), node(5, "y"));
     solve(node(0, "a"));
-    assertTrue(solver.getReachedStates().contains(node(5, "y")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(5, "y")));
   }
 
   @Test
@@ -521,9 +519,9 @@ public class DoublePDSTest {
     solve(node(0, "c"));
     System.out.println(solver.getReachedStates());
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(7, "h")));
-    assertTrue(solver.getReachedStates().contains(node(8, "g")));
-    assertTrue(solver.getReachedStates().contains(node(9, "z")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "h")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(8, "g")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(9, "z")));
     // assertFalse(solver.getReachedStates().contains( node(9,"y")));//False Positive
   }
 
@@ -553,8 +551,8 @@ public class DoublePDSTest {
     solve(node(0, "c"));
     System.out.println(solver.getReachedStates());
     solver.debugOutput();
-    assertTrue(solver.getReachedStates().contains(node(7, "h")));
-    assertTrue(solver.getReachedStates().contains(node(8, "l")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "h")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(8, "l")));
   }
 
   @Test
@@ -568,7 +566,7 @@ public class DoublePDSTest {
 
     calleeToCallerMapping(node(3, "u"), node(4, "a"));
     solve(node(0, "c"));
-    assertTrue(solver.getReachedStates().contains(node(6, "f")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "f")));
   }
 
   @Test
@@ -585,7 +583,7 @@ public class DoublePDSTest {
     calleeToCallerMapping(node(3, "u"), node(4, "a"));
     calleeToCallerMapping(node(3, "u"), node(6, "e"));
     solve(node(0, "c"));
-    assertTrue(solver.getReachedStates().contains(node(7, "h")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(7, "h")));
   }
 
   @Test
@@ -598,7 +596,7 @@ public class DoublePDSTest {
     calleeToCallerMapping(node(2, "u"), node(6, "e"));
 
     solve(node(1, "a"));
-    assertTrue(solver.getReachedStates().contains(node(6, "e")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(6, "e")));
   }
 
   @Test
@@ -614,7 +612,7 @@ public class DoublePDSTest {
 
     calleeToCallerMapping(node(7, "g"), node(4, "a"));
     solve(node(1, "a"));
-    assertTrue(solver.getReachedStates().contains(node(4, "a")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(4, "a")));
   }
 
   @Test
@@ -630,7 +628,7 @@ public class DoublePDSTest {
 
     calleeToCallerMapping(node(7, "g"), node(4, "a"));
     solve(node(1, "a"));
-    assertTrue(solver.getReachedStates().contains(node(4, "a")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(4, "a")));
   }
 
   @Test
@@ -638,7 +636,7 @@ public class DoublePDSTest {
     addFieldPush(node(1, "u"), f("h"), node(2, "v"));
     addFieldPop(node(2, "v"), f("f"), node(3, "w"));
     solve(node(1, "u"));
-    assertFalse(solver.getReachedStates().contains(node(3, "w")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(3, "w")));
   }
 
   @Test
@@ -648,7 +646,7 @@ public class DoublePDSTest {
     addNormal(node(3, "w"), node(4, "w"));
     solve(node(1, "u"));
     System.out.println(solver.getReachedStates());
-    assertFalse(solver.getReachedStates().contains(node(3, "w")));
+    Assertions.assertFalse(solver.getReachedStates().contains(node(3, "w")));
   }
 
   @Test
@@ -660,7 +658,7 @@ public class DoublePDSTest {
     calleeToCallerMapping(node(4, "v"), node(2, "w"));
     solve(node(1, "u"));
     //   verify(solver,times(1)).applyCallSummary(any(),any(),any(),any(),any());
-    assertTrue(solver.getReachedStates().contains(node(3, "w")));
+    Assertions.assertTrue(solver.getReachedStates().contains(node(3, "w")));
   }
 
   private Variable var(String v) {
@@ -676,10 +674,10 @@ public class DoublePDSTest {
   }
 
   public static Node<Statement, Variable> node(int stmt, String var) {
-    return new Node<Statement, Variable>(new Statement(stmt), new Variable(var));
+    return new Node<>(new Statement(stmt), new Variable(var));
   }
 
-  private static class Statement extends StringBasedObj implements Location {
+  public static class Statement extends StringBasedObj implements Location {
     public Statement(int name) {
       super(Integer.toString(name));
     }
@@ -690,7 +688,7 @@ public class DoublePDSTest {
     }
   }
 
-  private static class Variable extends StringBasedObj {
+  public static class Variable extends StringBasedObj {
     public Variable(String name) {
       super(name);
     }

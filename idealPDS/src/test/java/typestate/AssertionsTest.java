@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.helper.File;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
@@ -30,7 +30,7 @@ import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 public class AssertionsTest {
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void positiveMustBeInAcceptingStateTest() {
     File file = new File();
     file.open();
@@ -39,7 +39,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
+  @TestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
   public void negativeMustBeInAcceptingStateTest() {
     assertThrows(
         AssertionError.class,
@@ -52,7 +52,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void positiveMustBeInErrorStateTest() {
     File file = new File();
     file.open();
@@ -61,7 +61,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
+  @TestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
   public void negativeMustBeInErrorStateTest() {
     assertThrows(
         AssertionError.class,
@@ -74,7 +74,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void positiveMayBeInAcceptingState() {
     File file = new File();
     file.open();
@@ -86,7 +86,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
+  @TestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
   public void negativeMayBeInAcceptingState() {
     assertThrows(
         AssertionError.class,
@@ -99,7 +99,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void positiveMayBeInErrorState() {
     File file = new File();
     file.open();
@@ -111,7 +111,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
+  @TestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
   public void negativeMayBeInErrorState() {
     assertThrows(
         AssertionError.class,
@@ -124,7 +124,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 0)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 0)
   public void positiveShouldNotBeAnalyzedTest() {
     File file = new File();
     // wrappedOpen(file);
@@ -132,7 +132,7 @@ public class AssertionsTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
+  @TestParameters(expectedSeedCount = 0, expectedAssertionCount = 0)
   public void negativeShouldNotBeAnalyzedTest() {
     assertThrows(
         AssertionError.class,

@@ -14,57 +14,121 @@
  */
 package test.cases.statics;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class StaticFieldFlowsTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class StaticFieldFlowsTest {
 
-  private final String target = StaticFieldFlowsTarget.class.getName();
+  private static Object alloc;
+  private static StaticsAlloc instance;
+  private static StaticsAlloc i;
 
   @Test
   public void simple() {
-    analyze(target, testName.getMethodName());
+    alloc = new StaticsAlloc();
+    Object alias = alloc;
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void simple2() {
-    analyze(target, testName.getMethodName());
+    alloc = new StaticsAlloc();
+    Object sr = new Object();
+    Object r = new String();
+    QueryMethods.queryFor(alloc);
   }
 
   @Test
   public void withCallInbetween() {
-    analyze(target, testName.getMethodName());
+    alloc = new StaticsAlloc();
+    alloc.toString();
+    foo();
+    QueryMethods.queryFor(alloc);
   }
+
+  private void foo() {}
 
   @Test
   public void singleton() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc singleton = v();
+    Object alias = singleton;
+    QueryMethods.queryFor(alias);
   }
 
+  @Disabled
   @Test
-  @Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
   public void getAndSet() {
-    analyze(target, testName.getMethodName());
+    setStatic();
+    Object alias = getStatic();
+    QueryMethods.queryFor(alias);
+  }
+
+  private Object getStatic() {
+    return i;
+  }
+
+  private void setStatic() {
+    i = new StaticsAlloc();
   }
 
   @Test
   public void doubleUnbalancedSingleton() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc singleton = returns();
+    Object alias = singleton;
+    QueryMethods.queryFor(alias);
+  }
+
+  private static StaticsAlloc returns() {
+    return v();
+  }
+
+  private static StaticsAlloc v() {
+    if (instance == null) instance = new StaticsAlloc();
+    StaticsAlloc loaded = instance;
+    return loaded;
   }
 
   @Test
   public void overwriteStatic() {
-    analyze(target, testName.getMethodName());
+    alloc = new Object();
+    alloc = new StaticsAlloc();
+    Object alias = alloc;
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void overwriteStaticInter() {
-    analyze(target, testName.getMethodName());
+    alloc = new Object();
+    update();
+    irrelevantFlow();
+    Object alias = alloc;
+    QueryMethods.queryFor(alias);
+  }
+
+  private int irrelevantFlow() {
+    int x = 1;
+    x = 2;
+    x = 3;
+    x = 4;
+    return x;
+  }
+
+  private void update() {
+    alloc = new StaticsAlloc();
   }
 
   @Test
   public void intraprocedural() {
-    analyze(target, testName.getMethodName());
+    setStaticField();
+    Object alias = alloc;
+    QueryMethods.queryFor(alias);
+  }
+
+  private void setStaticField() {
+    alloc = new StaticsAlloc();
   }
 }

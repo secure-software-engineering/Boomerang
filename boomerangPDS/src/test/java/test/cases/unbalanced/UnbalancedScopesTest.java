@@ -14,35 +14,80 @@
  */
 package test.cases.unbalanced;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.cases.fields.B;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class UnbalancedScopesTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class UnbalancedScopesTest {
 
-  private final String target = UnbalancedScopesTarget.class.getName();
+  private boolean staticallyUnknown() {
+    return Math.random() > 0.5;
+  }
 
   @Test
   public void closingContext() {
-    analyze(target, testName.getMethodName());
+    Object object = create();
+    QueryMethods.queryFor(object);
   }
 
   @Test
   public void openingContext() {
-    analyze(target, testName.getMethodName());
+    Object object = create();
+    Object y = object;
+    inner(y);
   }
 
   @Test
   public void doubleClosingContext() {
-    analyze(target, testName.getMethodName());
+    Object object = wrappedCreate();
+    QueryMethods.queryFor(object);
   }
 
   @Test
   public void branchedReturn() {
-    analyze(target, testName.getMethodName());
+    Object object = aOrB();
+    QueryMethods.queryFor(object);
   }
 
   @Test
   public void summaryReuse() {
-    analyze(target, testName.getMethodName());
+    Object object = createA();
+    Object y = object;
+    Object x = id(y);
+    QueryMethods.queryFor(x);
+  }
+
+  private Object createA() {
+    UnbalancedAlloc c = new UnbalancedAlloc();
+    Object d = id(c);
+    return d;
+  }
+
+  private Object id(Object c) {
+    return c;
+  }
+
+  private Object aOrB() {
+    if (staticallyUnknown()) {
+      return new UnbalancedAlloc();
+    }
+    return new B();
+  }
+
+  public Object wrappedCreate() {
+    if (staticallyUnknown()) return create();
+    return wrappedCreate();
+  }
+
+  private void inner(Object inner) {
+    Object x = inner;
+    QueryMethods.queryFor(x);
+  }
+
+  private Object create() {
+    return new UnbalancedAlloc();
   }
 }

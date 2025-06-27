@@ -20,9 +20,9 @@ import java.util.Stack;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.impl.statemachines.VectorStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
@@ -36,7 +36,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test1() {
     Stack<Object> s = new Stack<>();
     if (staticallyUnknown()) s.peek();
@@ -49,7 +49,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test4simple() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -59,7 +59,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() {
     Stack<Object> s = new Stack<>();
     s.add(new Object());
@@ -69,7 +69,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test6() {
     ArrayList<Object> l = new ArrayList<>();
     Stack<Object> s = new Stack<>();
@@ -86,7 +86,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test3() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -96,7 +96,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test5() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -104,7 +104,7 @@ public class StackTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test4() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -120,7 +120,7 @@ public class StackTest {
 
   @Disabled("Broken since refactoring scope")
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void testInNewObject() {
     ObjectWithStack oWithStack = new ObjectWithStack();
     oWithStack.pushStack(new Object());

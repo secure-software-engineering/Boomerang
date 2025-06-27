@@ -18,8 +18,8 @@ import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ArrayTarget
 import java.util
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.opalj.br.IntegerType
 
 class OpalArrayTest {
@@ -46,16 +46,16 @@ class OpalArrayTest {
         arrayLoadCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getBase.isArrayRef)
-        Assert.assertTrue(arrayBase.getBase.isLocal)
-        Assert.assertEquals(1, arrayBase.getIndex)
+        Assertions.assertFalse(arrayBase.getBase.isArrayRef)
+        Assertions.assertTrue(arrayBase.getBase.isLocal)
+        Assertions.assertEquals(1, arrayBase.getIndex)
 
         val rightOp = stmt.getRightOp
-        Assert.assertTrue(rightOp.isArrayRef)
+        Assertions.assertTrue(rightOp.isArrayRef)
       }
     })
 
-    Assert.assertEquals(1, arrayLoadCount)
+    Assertions.assertEquals(1, arrayLoadCount)
   }
 
   @Test
@@ -78,16 +78,16 @@ class OpalArrayTest {
         arrayLoadCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getBase.isArrayRef)
-        Assert.assertTrue(arrayBase.getBase.isLocal)
-        Assert.assertEquals(-1, arrayBase.getIndex)
+        Assertions.assertFalse(arrayBase.getBase.isArrayRef)
+        Assertions.assertTrue(arrayBase.getBase.isLocal)
+        Assertions.assertEquals(-1, arrayBase.getIndex)
 
         val rightOp = stmt.getRightOp
-        Assert.assertTrue(rightOp.isArrayRef)
+        Assertions.assertTrue(rightOp.isArrayRef)
       }
     })
 
-    Assert.assertEquals(1, arrayLoadCount)
+    Assertions.assertEquals(1, arrayLoadCount)
   }
 
   @Test
@@ -106,16 +106,16 @@ class OpalArrayTest {
         arrayStoreCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getBase.isArrayRef)
-        Assert.assertTrue(arrayBase.getBase.isLocal)
-        Assert.assertEquals(0, arrayBase.getIndex)
+        Assertions.assertFalse(arrayBase.getBase.isArrayRef)
+        Assertions.assertTrue(arrayBase.getBase.isLocal)
+        Assertions.assertEquals(0, arrayBase.getIndex)
 
         val leftOp = stmt.getLeftOp
-        Assert.assertTrue(leftOp.isArrayRef)
+        Assertions.assertTrue(leftOp.isArrayRef)
       }
     })
 
-    Assert.assertEquals(1, arrayStoreCount)
+    Assertions.assertEquals(1, arrayStoreCount)
   }
 
   @Test
@@ -134,15 +134,15 @@ class OpalArrayTest {
         arrayStoreCount += 1
 
         val arrayBase = stmt.getArrayBase
-        Assert.assertFalse(arrayBase.getBase.isArrayRef)
-        Assert.assertTrue(arrayBase.getBase.isLocal)
-        Assert.assertEquals(-1, arrayBase.getIndex)
+        Assertions.assertFalse(arrayBase.getBase.isArrayRef)
+        Assertions.assertTrue(arrayBase.getBase.isLocal)
+        Assertions.assertEquals(-1, arrayBase.getIndex)
 
         val leftOp = stmt.getLeftOp
-        Assert.assertTrue(leftOp.isArrayRef)
+        Assertions.assertTrue(leftOp.isArrayRef)
       }
     })
 
-    Assert.assertEquals(1, arrayStoreCount)
+    Assertions.assertEquals(1, arrayStoreCount)
   }
 }

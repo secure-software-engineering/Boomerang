@@ -20,9 +20,9 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.impl.statemachines.PrintStreamStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
@@ -30,7 +30,7 @@ import typestate.impl.statemachines.PrintStreamStateMachine;
 public class PrintStreamTest {
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws FileNotFoundException {
     PrintStream inputStream = new PrintStream("");
     inputStream.close();
@@ -39,7 +39,7 @@ public class PrintStreamTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test() {
     try {
       FileOutputStream out = new FileOutputStream("foo.txt");

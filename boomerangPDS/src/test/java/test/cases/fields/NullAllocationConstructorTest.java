@@ -14,15 +14,26 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.TestParameters;
 
-public class NullAllocationConstructorTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class NullAllocationConstructorTest {
 
-  private final String target = NullAllocationConstructorTarget.class.getName();
+  private class A {
+    B f = null;
+  }
+
+  private class B {}
 
   @Test
+  @TestParameters(ignoreAllocSites = true)
   public void nullAllocationOfField() {
-    analyze(target, testName.getMethodName(), true);
+    A a = new A();
+    B variable = a.f;
+    QueryMethods.queryFor(variable);
   }
 }

@@ -14,28 +14,58 @@
  */
 package test.cases.statics;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import test.core.QueryMethods;
 
-public class SingletonTest extends AbstractBoomerangTest {
+public class SingletonTest {
 
-  private final String target = SingletonTarget.class.getName();
-
+  @Disabled("Static fields are not handled correctly")
   @Test
-  @Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
   public void doubleSingleton() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc singleton = i();
+    Object alias = singleton;
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void doubleSingletonDirect() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc singleton = objectGetter.getG();
+    Object alias = singleton;
+    QueryMethods.queryFor(alias);
   }
 
+  @Disabled("Static fields are not handled correctly")
   @Test
-  @Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
   public void singletonDirect() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc singleton = alloc;
+    QueryMethods.queryFor(singleton);
   }
+
+  public static StaticsAlloc i() {
+    GlobalObjectGetter getter = objectGetter;
+    StaticsAlloc allocation = getter.getG();
+    return allocation;
+  }
+
+  public interface GlobalObjectGetter {
+    StaticsAlloc getG();
+
+    void reset();
+  }
+
+  private static StaticsAlloc alloc;
+  private static final GlobalObjectGetter objectGetter =
+      new GlobalObjectGetter() {
+
+        StaticsAlloc instance = new StaticsAlloc();
+
+        public StaticsAlloc getG() {
+          return instance;
+        }
+
+        public void reset() {
+          instance = new StaticsAlloc();
+        }
+      };
 }

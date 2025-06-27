@@ -14,30 +14,60 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class IntraproceduralStrongUpdateTest extends AbstractBoomerangTest {
-
-  private final String target = IntraproceduralStrongUpdateTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class IntraproceduralStrongUpdateTest {
 
   @Test
   public void strongUpdateWithField() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    a.field = new Object();
+    A b = a;
+    b.field = new AllocatedObject() {};
+    Object alias = a.field;
+    QueryMethods.queryFor(alias);
   }
 
   @Test
   public void strongUpdateWithFieldSwapped() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = a;
+    b.field = new Object();
+    a.field = new AllocatedObject() {};
+    Object alias = a.field;
+    QueryMethods.queryFor(alias);
+  }
+
+  private class A {
+    Object field;
   }
 
   @Test
   public void innerClass() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = a;
+    b.field = new I();
+    Object alias = a.field;
+    QueryMethods.queryFor(alias);
+  }
+
+  private class I implements AllocatedObject {}
+
+  private static class B {
+    Object field;
   }
 
   @Test
   public void anonymousClass() {
-    analyze(target, testName.getMethodName());
+    B a = new B();
+    B b = a;
+    b.field = new AllocatedObject() {};
+    Object alias = a.field;
+    QueryMethods.queryFor(alias);
   }
 }

@@ -14,15 +14,41 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class MeetPOITest extends AbstractBoomerangTest {
-
-  private final String target = MeetPOITarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class MeetPOITest {
 
   @Test
   public void wrappedAlloc() {
-    analyze(target, testName.getMethodName());
+    A e = new A();
+    A g = e;
+    wrapper(g);
+    C h = e.b.c;
+    QueryMethods.queryFor(h);
+  }
+
+  private void wrapper(A g) {
+    alloc(g);
+  }
+
+  private void alloc(A g) {
+    g.b.c = new C();
+  }
+
+  public class A {
+    B b = new B();
+  }
+
+  public class B {
+    C c;
+  }
+
+  public class C implements AllocatedObject {
+    String g;
   }
 }

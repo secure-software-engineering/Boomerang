@@ -14,25 +14,72 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class FieldsBranchedTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class FieldsBranchedTest {
 
-  private final String target = FieldsBranchedTarget.class.getName();
+  private boolean staticallyUnknown() {
+    return Math.random() > 0.5;
+  }
 
   @Test
   public void twoFieldsNoLoop() {
-    analyze(target, testName.getMethodName());
+    Node x = new Node();
+    if (staticallyUnknown()) {
+      x.left.right = x;
+    } else if (staticallyUnknown()) {
+      x.right.left = x;
+    }
+    Node t;
+    if (staticallyUnknown()) {
+      t = x.left.right;
+    } else {
+      t = x.right.left;
+    }
+    Node h = t;
+    QueryMethods.queryFor(h);
   }
 
   @Test
   public void twoFieldsNoLoop2() {
-    analyze(target, testName.getMethodName());
+    Node x = new Node();
+    Node t = null;
+    if (staticallyUnknown()) {
+      x.left.right = x;
+      t = x.left.right;
+    } else if (staticallyUnknown()) {
+      x.right.left = x;
+      t = x.right.left;
+    }
+    Node h = t;
+    QueryMethods.queryFor(h);
   }
 
   @Test
   public void oneFieldsNoLoop() {
-    analyze(target, testName.getMethodName());
+    Node x = new Node();
+    if (staticallyUnknown()) {
+      x.left = x;
+    } else if (staticallyUnknown()) {
+      x.right = x;
+    }
+    Node t;
+    if (staticallyUnknown()) {
+      t = x.left;
+    } else {
+      t = x.right;
+    }
+    Node h = t;
+    QueryMethods.queryFor(h);
+  }
+
+  private static class Node implements AllocatedObject {
+    Node left = new Node();
+    Node right = new Node();
   }
 }

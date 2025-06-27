@@ -17,9 +17,9 @@ package typestate;
 import assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.helper.File;
 import typestate.helper.ObjectWithField;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
@@ -33,7 +33,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simple() {
     File file = new File();
     file.open();
@@ -43,7 +43,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void simple2() {
     File file = new File();
     file.open();
@@ -51,7 +51,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simple0() {
     File file = new File();
     file.open();
@@ -60,7 +60,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simple0a() {
     File file = new File();
     file.open();
@@ -70,7 +70,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simpleStrongUpdate() {
     File file = new File();
     File alias = file;
@@ -83,7 +83,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void simpleStrongUpdate1() {
     File file = new File();
     File alias = file;
@@ -92,7 +92,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simpleStrongUpdate1a() {
     File file = new File();
     File alias = file;
@@ -102,7 +102,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simpleStrongUpdate2() {
     File x = new File();
     File y = x;
@@ -113,7 +113,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void recursion() {
     File file = new File();
     file.open();
@@ -135,7 +135,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void simple1() {
     File file = new File();
     File alias = file;
@@ -145,7 +145,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 2, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 2, expectedAssertionCount = 3)
   public void simpleNoStrongUpdate() {
     File file = new File();
     File alias;
@@ -162,7 +162,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void branching() {
     File file = new File();
     if (staticallyUnknown()) file.open();
@@ -172,7 +172,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test222() {
     File file = new File();
     if (staticallyUnknown()) {
@@ -183,7 +183,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void branchingMay() {
     File file = new File();
     if (staticallyUnknown()) file.open();
@@ -194,7 +194,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void continued() {
     File file = new File();
     file.open();
@@ -206,7 +206,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void aliasing() {
     File file = new File();
     File alias = file;
@@ -218,7 +218,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 2, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 2, expectedAssertionCount = 3)
   public void summaryTest() {
     File file1 = new File();
     call(file1);
@@ -234,7 +234,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void simpleAlias() {
     File y = new File();
     File x = y;
@@ -251,7 +251,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void wrappedOpenCall() {
     File file1 = new File();
     call3(file1, file1);
@@ -264,7 +264,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void interprocedural() {
     File file = new File();
     file.open();
@@ -278,7 +278,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void interprocedural2() {
     File file = new File();
     file.open();
@@ -291,7 +291,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void intraprocedural() {
     File file = new File();
     file.open();
@@ -302,7 +302,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void flowViaField() {
     ObjectWithField container = new ObjectWithField();
     flows(container);
@@ -318,7 +318,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void flowViaFieldDirect() {
     ObjectWithField container = new ObjectWithField();
     container.field = new File();
@@ -329,7 +329,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void flowViaFieldDirect2() {
     ObjectWithField container = new ObjectWithField();
     container.field = new File();
@@ -342,7 +342,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void flowViaFieldNotUnbalanced() {
     ObjectWithField container = new ObjectWithField();
     container.field = new File();
@@ -361,7 +361,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void indirectFlow() {
     ObjectWithField a = new ObjectWithField();
     ObjectWithField b = a;
@@ -380,7 +380,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void parameterAlias() {
     File file = new File();
     File alias = file;
@@ -396,7 +396,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void parameterAlias2() {
     File file = new File();
     File alias = file;
@@ -411,7 +411,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void aliasInInnerScope() {
     ObjectWithField a = new ObjectWithField();
     ObjectWithField b = a;
@@ -424,7 +424,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void noStrongUpdate() {
     ObjectWithField a = new ObjectWithField();
     ObjectWithField b = new ObjectWithField();
@@ -441,14 +441,14 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void unbalancedReturn1() {
     File second = createOpenedFile();
     Assertions.mustBeInErrorState(second);
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void unbalancedReturn2() {
     File first = createOpenedFile();
     int x = 1;
@@ -460,7 +460,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void unbalancedReturnAndBalanced() {
     File first = createOpenedFile();
     int x = 1;
@@ -484,7 +484,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void lateWriteToField() {
     ObjectWithField a = new ObjectWithField();
     ObjectWithField b = a;
@@ -503,7 +503,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void fieldStoreAndLoad1() {
     ObjectWithField container = new ObjectWithField();
     File file = new File();
@@ -515,7 +515,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void fieldStoreAndLoad2() {
     ObjectWithField container = new ObjectWithField();
     container.field = new File();
@@ -536,7 +536,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
   public void wrappedClose() {
     File file = new File();
     File alias = file;
@@ -549,7 +549,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void wrappedClose2() {
     File file = new File();
     file.open();
@@ -559,7 +559,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void wrappedOpen2() {
     File file = new File();
     wrappedParamOpen(file);
@@ -576,7 +576,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void wrappedClose1() {
     File file = new File();
     file.open();
@@ -595,7 +595,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void wrappedOpen() {
     File file = new File();
     change(file);
@@ -607,7 +607,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
   public void multipleStates() {
     File file = new File();
     file.open();
@@ -619,7 +619,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void doubleBranching() {
     File file = new File();
     if (staticallyUnknown()) {
@@ -633,7 +633,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void whileLoopBranching() {
     File file = new File();
     while (staticallyUnknown()) {
@@ -651,7 +651,7 @@ public class FileMustBeClosedTest {
   static File v;
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void staticFlow() {
     File a = new File();
     v = a;
@@ -663,7 +663,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void staticFlowSimple() {
     File a = new File();
     v = a;
@@ -674,7 +674,7 @@ public class FileMustBeClosedTest {
   public static void foo() {}
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void storedInObject() {
     InnerObject o = new InnerObject();
     File file = o.file;
@@ -706,7 +706,7 @@ public class FileMustBeClosedTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
   public void storedInObject2() {
     InnerObject o = new InnerObject("");
     o.doOpen();

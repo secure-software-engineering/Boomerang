@@ -18,9 +18,9 @@ import assertions.Assertions;
 import java.util.Vector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.impl.statemachines.VectorStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
@@ -34,7 +34,7 @@ public class VectorTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() {
     Vector<Object> s = new Vector<>();
     s.lastElement();
@@ -42,7 +42,7 @@ public class VectorTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() {
     Vector<Object> s = new Vector<>();
     s.add(new Object());
@@ -51,7 +51,7 @@ public class VectorTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3() {
     Vector<Object> v = new Vector<>();
     try {
@@ -64,7 +64,7 @@ public class VectorTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void test4() {
     Vector<Object> v = new Vector<>();
     v.add(new Object());
@@ -83,7 +83,7 @@ public class VectorTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void test6() {
     Vector<Object> v = new Vector<>();
     v.add(new Object());
@@ -97,7 +97,7 @@ public class VectorTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test5() {
     Vector<Object> s = new Vector<>();
     s.add(new Object());
@@ -111,7 +111,7 @@ public class VectorTest {
   public static void foo() {}
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void staticAccessTest() {
     Vector<Object> x = new Vector<>();
     v = x;

@@ -76,8 +76,7 @@ public class IDEalTestRunnerInterceptor
         Arrays.stream(testConfig.excludedClasses())
             .map(Class::getName)
             .collect(Collectors.toList());
-    this.testingFramework =
-        new IDEalTestingFramework(stateMachine, includedClasses, excludedClasses);
+    testingFramework = new IDEalTestingFramework(stateMachine, includedClasses, excludedClasses);
   }
 
   @Override
@@ -88,8 +87,8 @@ public class IDEalTestRunnerInterceptor
     String testClassName = invocationContext.getExecutable().getDeclaringClass().getName();
     String testMethodName = invocationContext.getExecutable().getName();
 
-    ExpectedTestParameters parameters =
-        invocationContext.getExecutable().getAnnotation(ExpectedTestParameters.class);
+    TestParameters parameters =
+        invocationContext.getExecutable().getAnnotation(TestParameters.class);
     if (parameters == null) {
       throw new RuntimeException(
           "Test method '"

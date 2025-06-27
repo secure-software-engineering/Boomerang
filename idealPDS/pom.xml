@@ -49,9 +49,5 @@
             <groupId>de.fraunhofer.iem</groupId>
             <artifactId>testCore</artifactId>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
     </dependencies>
 </project>

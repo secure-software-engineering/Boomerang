@@ -14,15 +14,34 @@
  */
 package test.cases.subclassing;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class SubclassingTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class SubclassingTest {
 
-  private final String target = SubclassingTarget.class.getName();
+  private static class Superclass {
+    AllocatedObject o = new AllocatedObject() {};
+  }
+
+  private static class Subclass extends Superclass {}
+
+  private static class ClassWithSubclassField {
+    Subclass f;
+
+    public ClassWithSubclassField(Subclass t) {
+      this.f = t;
+    }
+  }
 
   @Test
   public void typingIssue() {
-    analyze(target, testName.getMethodName());
+    Subclass subclass = new Subclass();
+    ClassWithSubclassField classWithSubclassField = new ClassWithSubclassField(subclass);
+    AllocatedObject query = classWithSubclassField.f.o;
+    QueryMethods.queryFor(query);
   }
 }

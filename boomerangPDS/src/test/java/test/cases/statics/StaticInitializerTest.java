@@ -14,15 +14,19 @@
  */
 package test.cases.statics;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class StaticInitializerTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class StaticInitializerTest {
 
-  private final String target = StaticInitializerTarget.class.getName();
+  private static final Object alloc = new StaticsAlloc();
 
   @Test
   public void doubleSingleton() {
-    analyze(target, testName.getMethodName());
+    Object alias = alloc;
+    QueryMethods.queryFor(alias);
   }
 }

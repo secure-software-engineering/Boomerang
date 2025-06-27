@@ -14,15 +14,46 @@
  */
 package test.cases.subclassing;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class AbstractClassWithInnerSubclassTest extends AbstractBoomerangTest {
-
-  private final String target = AbstractClassWithInnerSubclassTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class AbstractClassWithInnerSubclassTest {
 
   @Test
   public void typingIssue() {
-    analyze(target, testName.getMethodName());
+    Subclass subclass2 = new Subclass();
+    AllocatedObject query = subclass2.e.get().o;
+    QueryMethods.queryFor(query);
+  }
+
+  private static class Superclass {
+    Element e;
+  }
+
+  private static class Subclass extends Superclass {
+    Subclass() {
+      e = new Subclass.InnerClass();
+    }
+
+    private static class InnerClass implements Element {
+      AnotherClass c = new AnotherClass();
+
+      @Override
+      public AnotherClass get() {
+        return c;
+      }
+    }
+  }
+
+  private static class AnotherClass {
+    AllocatedObject o = new AllocatedObject() {};
+  }
+
+  private interface Element {
+    AnotherClass get();
   }
 }

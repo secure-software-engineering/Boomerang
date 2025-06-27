@@ -14,10 +14,11 @@
  */
 package tests;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 public class SummaryPDSPostStarTests extends PDSPoststarTests {
-  @Before
+
+  @BeforeEach
   public void init() {
     super.init();
   }

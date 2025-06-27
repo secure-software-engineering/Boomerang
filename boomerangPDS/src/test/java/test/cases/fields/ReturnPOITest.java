@@ -14,40 +14,112 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class ReturnPOITest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ReturnPOITest {
 
-  private final String target = ReturnPOITarget.class.getName();
+  public class A {
+    B b;
+  }
+
+  public class B {
+    C c;
+  }
+
+  public class C implements AllocatedObject {}
 
   @Test
   public void indirectAllocationSite() {
-    analyze(target, testName.getMethodName());
+    B a = new B();
+    B e = a;
+    allocation(a);
+    C alias = e.c;
+    C query = a.c;
+    QueryMethods.queryFor(query);
+  }
+
+  private void allocation(B a) {
+    C d = new C();
+    a.c = d;
   }
 
   @Test
   public void unbalancedReturnPOI1() {
-    analyze(target, testName.getMethodName());
+    C a = new C();
+    B b = new B();
+    B c = b;
+    setField(b, a);
+    C alias = c.c;
+    QueryMethods.queryFor(a);
+  }
+
+  private void setField(B a2, C a) {
+    a2.c = a;
   }
 
   @Test
   public void unbalancedReturnPOI3() {
-    analyze(target, testName.getMethodName());
+    B b = new B();
+    B c = b;
+    setField(c);
+    C query = c.c;
+    QueryMethods.queryFor(query);
+  }
+
+  private void setField(B c) {
+    c.c = new C();
   }
 
   @Test
   public void whyRecursiveReturnPOIIsNecessary() {
-    analyze(target, testName.getMethodName());
+    C c = new C();
+    B b = new B();
+    A a = new A();
+    A a2 = a;
+    a2.b = b;
+    B b2 = b;
+    setFieldTwo(a, c);
+    C alias = a2.b.c;
+    QueryMethods.queryFor(c);
   }
 
   @Test
   public void whysRecursiveReturnPOIIsNecessary() {
-    analyze(target, testName.getMethodName());
+    C c = new C();
+    B b = new B();
+    A a = new A();
+    A a2 = a;
+    a2.b = b;
+    B b2 = b;
+    setFieldTwo(a, c);
+    C alias = a2.b.c;
+    QueryMethods.queryFor(alias);
+  }
+
+  private void setFieldTwo(A b, C a) {
+    b.b.c = a;
   }
 
   @Test
   public void whysRecursiveReturnPOIIsNecessary3Addressed() {
-    analyze(target, testName.getMethodName());
+    C x = new C();
+    B y = new B();
+    A z = new A();
+    A aliasOuter = z;
+    aliasOuter.b = y;
+    setFieldTwo3Addresses(z, x);
+    B l1 = aliasOuter.b;
+    C alias = l1.c;
+    QueryMethods.queryFor(alias);
+  }
+
+  private void setFieldTwo3Addresses(A base, C overwrite) {
+    B loaded = base.b;
+    loaded.c = overwrite;
   }
 }

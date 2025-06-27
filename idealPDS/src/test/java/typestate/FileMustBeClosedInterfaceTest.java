@@ -17,9 +17,9 @@ package typestate;
 import assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.helper.File;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
@@ -32,7 +32,7 @@ public class FileMustBeClosedInterfaceTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void mainTest() {
     File file = new File();
     Flow flow = (staticallyUnknown() ? new ImplFlow1() : new ImplFlow2());
@@ -42,7 +42,7 @@ public class FileMustBeClosedInterfaceTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
   public void otherTest() {
     File file = new File();
     if (staticallyUnknown()) {

@@ -14,87 +14,219 @@
  */
 package test.cases.accesspath;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-@Ignore
-public class AccessPathTest extends AbstractBoomerangTest {
+@Disabled
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class AccessPathTest {
 
-  private final String target = AccessPathTarget.class.getName();
+  private boolean staticallyUnknown() {
+    return Math.random() > 0.5;
+  }
+
+  private static class A {
+    B b = null;
+    A g;
+  }
+
+  private static class AllocA extends A implements AllocatedObject {}
+
+  private static class B implements AllocatedObject {
+    B c = null;
+    B d = null;
+    public B b;
+  }
+
+  private static class C {
+    B b = null;
+    A attr = new A();
+  }
 
   @Test
   public void getAllAliases() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    B alloc = new B();
+    a.b = alloc;
+    QueryMethods.accessPathQueryFor(alloc, "a[b]");
   }
 
   @Test
   public void sameField() {
-    analyze(target, testName.getMethodName());
+    AllocA alloc = new AllocA();
+    A b = new A();
+    A c = new A();
+    b.g = alloc;
+    c.g = b;
+    QueryMethods.accessPathQueryFor(alloc, "b[g];c[g,g]");
   }
 
   @Test
   public void getAllAliasesBranched() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = new A();
+    B alloc = new B();
+    if (staticallyUnknown()) {
+      a.b = alloc;
+    } else {
+      b.b = alloc;
+    }
+    QueryMethods.accessPathQueryFor(alloc, "a[b];b[b]");
   }
 
   @Test
   public void getAllAliasesLooped() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    B alloc = new B();
+    a.b = alloc;
+    for (int i = 0; i < 10; i++) {
+      B d = alloc;
+      alloc.c = d;
+    }
+    QueryMethods.accessPathQueryFor(alloc, "a[b];alloc[c]*");
   }
 
   @Test
   public void getAllAliasesLoopedComplex() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    B alloc = new B();
+    a.b = alloc;
+    for (int i = 0; i < 10; i++) {
+      B d = alloc;
+      if (staticallyUnknown()) alloc.c = d;
+      if (staticallyUnknown()) alloc.d = d;
+    }
+    QueryMethods.accessPathQueryFor(alloc, "a[b];alloc[c]*;alloc[d]*;alloc[c,d];alloc[d,c]");
   }
 
   @Test
   public void simpleIndirect() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = a;
+    B alloc = new B();
+    a.b = alloc;
+    QueryMethods.accessPathQueryFor(alloc, "a[b];b[b]");
   }
 
   @Test
   public void doubleIndirect() {
-    analyze(target, testName.getMethodName());
+    C b = new C();
+    B alloc = new B();
+    b.attr.b = alloc;
+    QueryMethods.accessPathQueryFor(alloc, "b[attr,b]");
   }
 
   @Test
   public void contextQuery() {
-    analyze(target, testName.getMethodName());
+    B a = new B();
+    B b = a;
+    context(a, b);
+  }
+
+  private void context(B a, B b) {
+    QueryMethods.accessPathQueryFor(a, "a;b");
   }
 
   @Test
   public void doubleContextQuery() {
-    analyze(target, testName.getMethodName());
+    B a = new B();
+    B b = a;
+    context1(a, b);
   }
+
+  private void context1(B a, B b) {
+    context(a, b);
+  }
+
+  static void use(Object b) {}
 
   @Test
   public void twoLevelTest() {
-    analyze(target, testName.getMethodName());
+    C b = new C();
+    taintMe(b);
   }
 
   @Test
   public void threeLevelTest() {
-    analyze(target, testName.getMethodName());
+    C b = new C();
+    taintOnNextLevel(b);
+  }
+
+  private void taintMe(C b) {
+    B alloc = new B();
+    b.attr.b = alloc;
+    QueryMethods.accessPathQueryFor(alloc, "alloc;b[attr,b]");
+  }
+
+  private void taintOnNextLevel(C b) {
+    taintMe(b);
   }
 
   @Test
   public void hiddenFieldLoad() {
-    analyze(target, testName.getMethodName());
+    ClassWithField a = new ClassWithField();
+    a.field = new ObjectOfInterest();
+    ClassWithField b = a;
+    NestedClassWithField n = new NestedClassWithField();
+    n.nested = b;
+    staticCallOnFile(a, n);
+  }
+
+  private static void staticCallOnFile(ClassWithField x, NestedClassWithField n) {
+    ObjectOfInterest queryVariable = x.field;
+    // The analysis triggers a query for the following variable
+    QueryMethods.accessPathQueryFor(queryVariable, "x[field];n[nested,field]");
+  }
+
+  public static class ClassWithField {
+    public ObjectOfInterest field;
+  }
+
+  public static class ObjectOfInterest implements AllocatedObject {}
+
+  public static class NestedClassWithField {
+    public ClassWithField nested;
   }
 
   @Test
   public void hiddenFieldLoad2() {
-    analyze(target, testName.getMethodName());
+    ObjectOfInterest alloc = new ObjectOfInterest();
+    NestedClassWithField n = new NestedClassWithField();
+    store(n, alloc);
+    QueryMethods.accessPathQueryFor(alloc, "n[nested,field]");
+  }
+
+  private void store(NestedClassWithField o1, ObjectOfInterest oOfInterest) {
+    ClassWithField a = new ClassWithField();
+    a.field = oOfInterest;
+    ClassWithField b = a;
+    o1.nested = b;
   }
 
   @Test
   public void hiddenFieldLoad3() {
-    analyze(target, testName.getMethodName());
+    ObjectOfInterest alloc = new ObjectOfInterest();
+    NestedClassWithField n = new NestedClassWithField();
+    NestedClassWithField t = n;
+    store(n, alloc);
+    QueryMethods.accessPathQueryFor(alloc, "n[nested,field];t[nested,field]");
+    use(t);
   }
 
   @Test
   public void hiddenFieldLoad4() {
-    analyze(target, testName.getMethodName());
+    ObjectOfInterest alloc = new ObjectOfInterest();
+    NestedClassWithField n = new NestedClassWithField();
+    NestedClassWithField t = n;
+    store(n, alloc);
+    load(t);
+  }
+
+  private void load(NestedClassWithField t) {
+    QueryMethods.queryFor(t.nested.field);
   }
 }

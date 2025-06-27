@@ -14,52 +14,82 @@
  */
 package test.cases.integers;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import java.math.BigInteger;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-@Ignore("Extend IntAndStringAllocationSite")
-public class IntTest extends AbstractBoomerangTest {
-
-  private final String target = IntTarget.class.getName();
+@Disabled("Extend IntAndStringAllocationSite")
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class IntTest {
 
   @Test
   public void simpleAssign() {
-    analyze(target, testName.getMethodName());
+    int allocation = 1;
+    QueryMethods.intQueryFor(allocation, "1");
   }
 
   @Test
   public void simpleAssignBranched() {
-    analyze(target, testName.getMethodName());
+    int allocation = 2;
+    if (Math.random() > 0.5) {
+      allocation = 1;
+    }
+    QueryMethods.intQueryFor(allocation, "1,2");
   }
 
   @Test
   public void simpleIntraAssign() {
-    analyze(target, testName.getMethodName());
+    int allocation = 1;
+    int y = allocation;
+    QueryMethods.intQueryFor(y, "1");
   }
 
   @Test
   public void simpleInterAssign() {
-    analyze(target, testName.getMethodName());
+    int allocation = 1;
+    int y = foo(allocation);
+    QueryMethods.intQueryFor(y, "1");
   }
 
   @Test
   public void returnDirect() {
-    analyze(target, testName.getMethodName());
+    int allocation = getVal();
+    QueryMethods.intQueryFor(allocation, "1");
   }
 
   @Test
   public void returnInDirect() {
-    analyze(target, testName.getMethodName());
+    int x = getValIndirect();
+    QueryMethods.intQueryFor(x, "1");
+  }
+
+  private int getValIndirect() {
+    int allocation = 1;
+    return allocation;
+  }
+
+  private int getVal() {
+    return 1;
+  }
+
+  private int foo(int x) {
+    int y = x;
+    return y;
   }
 
   @Test
   public void wrappedType() {
-    analyze(target, testName.getMethodName());
+    Integer integer = new Integer(1);
+    int allocation = integer;
+    QueryMethods.intQueryFor(allocation, "1");
   }
 
   @Test
   public void wrappedTypeBigInteger() {
-    analyze(target, testName.getMethodName());
+    BigInteger integer = BigInteger.valueOf(1);
+    QueryMethods.intQueryFor(integer, "1L");
   }
 }

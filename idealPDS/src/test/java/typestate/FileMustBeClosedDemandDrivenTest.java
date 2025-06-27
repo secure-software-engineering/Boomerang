@@ -18,9 +18,9 @@ import assertions.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.helper.File;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
@@ -30,7 +30,7 @@ import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 public class FileMustBeClosedDemandDrivenTest {
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void notCaughtByCHA() {
     I b = new B();
     callOnInterface(b);
@@ -44,7 +44,7 @@ public class FileMustBeClosedDemandDrivenTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void notCaughtByRTA() {
     I a = new A();
     I b = new B();

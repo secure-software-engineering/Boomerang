@@ -14,20 +14,34 @@
  */
 package test.cases.reflection;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.TestParameters;
 
-public class ReflectionTest extends AbstractBoomerangTest {
-
-  private final String target = ReflectionTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ReflectionTest {
 
   @Test
-  public void bypassClassForName() {
-    analyze(target, testName.getMethodName());
+  public void bypassClassForName() throws ClassNotFoundException {
+    ReflectionAlloc query = new ReflectionAlloc();
+    Class<?> cls = Class.forName(A.class.getName());
+    QueryMethods.queryFor(query);
   }
 
   @Test
-  public void loadObject() {
-    analyze(target, testName.getMethodName(), true);
+  @TestParameters(ignoreAllocSites = true)
+  public void loadObject()
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    Class<?> cls = Class.forName(A.class.getName());
+    Object newInstance = cls.newInstance();
+    A a = (A) newInstance;
+    ReflectionAlloc query = a.field;
+    QueryMethods.queryFor(query);
+  }
+
+  private static class A {
+    ReflectionAlloc field = new ReflectionAlloc();
   }
 }

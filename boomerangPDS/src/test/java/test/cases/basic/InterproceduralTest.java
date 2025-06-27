@@ -14,102 +14,253 @@
  */
 package test.cases.basic;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class InterproceduralTest extends AbstractBoomerangTest {
-
-  private final String target = InterproceduralTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class InterproceduralTest {
 
   @Test
   public void identityTest() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = new AllocatedObject() {};
+    AllocatedObject alias2 = identity(alias1);
+    QueryMethods.queryFor(alias2);
   }
 
   @Test
   public void simpleAnonymous() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = new AllocatedObject() {};
+    QueryMethods.queryFor(alias1);
   }
 
   @Test
   public void simpleNonAnonymous() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = new BasicAlloc();
+    QueryMethods.queryFor(alias1);
   }
 
   @Test
   public void identityTest1() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias1 = new BasicAlloc();
+    Object alias2 = alias1;
+    identity(alias1);
+    otherCall(alias2);
+    QueryMethods.queryFor(alias1);
   }
+
+  private void otherCall(Object alias2) {}
 
   @Test
   public void summaryReuseTest1() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = new AllocatedObject() {}, alias2, alias3, alias4;
+    alias2 = identity(alias1);
+    alias3 = identity(alias2);
+    alias4 = alias1;
+    QueryMethods.queryFor(alias4);
   }
 
   @Test
-  @Ignore("Soot fails")
   public void failedCast() {
-    analyze(target, testName.getMethodName());
+    Object o = new BasicAlloc();
+    Object returned = flow(o);
+    String t = (String) returned;
+    QueryMethods.queryFor(t);
+  }
+
+  private Object flow(Object o) {
+    return o;
   }
 
   @Test
   public void summaryReuseTest4() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias2;
+    if (Math.random() > 0.5) {
+      BasicAlloc alias1 = new BasicAlloc();
+      alias2 = nestedIdentity(alias1);
+    } else {
+      BasicAlloc alias1 = new BasicAlloc();
+      alias2 = nestedIdentity(alias1);
+    }
+    QueryMethods.queryFor(alias2);
   }
 
   @Test
   public void branchWithCall() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc a1 = new BasicAlloc();
+    BasicAlloc a2 = new BasicAlloc();
+    Object a = null;
+    if (Math.random() > 0.5) {
+      a = a1;
+    } else {
+      a = a2;
+    }
+    wrappedFoo(a);
+    QueryMethods.queryFor(a);
+  }
+
+  private void wrappedFoo(Object param) {}
+
+  private BasicAlloc nestedIdentity(BasicAlloc param2) {
+    int shouldNotSeeThis = 1;
+    BasicAlloc returnVal = param2;
+    return returnVal;
   }
 
   @Test
   public void summaryReuseTest2() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = new AllocatedObject() {}, alias2, alias3, alias4;
+    alias2 = identity(alias1);
+    alias3 = identity(alias2);
+    alias4 = alias1;
+    QueryMethods.queryFor(alias3);
   }
 
   @Test
   public void summaryReuseTest3() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = new AllocatedObject() {}, alias2, alias3, alias4;
+    alias2 = identity(alias1);
+    alias3 = identity(alias2);
+    alias4 = alias1;
+    QueryMethods.queryFor(alias2);
   }
 
   @Test
   public void interLoop() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias = new BasicAlloc() {};
+    AllocatedObject aliased2;
+    Object aliased = new AllocatedObject() {}, notAlias = new Object();
+    for (int i = 0; i < 20; i++) {
+      aliased = identity(alias);
+    }
+    aliased2 = (AllocatedObject) aliased;
+    QueryMethods.queryFor(aliased);
   }
 
   @Test
   public void wrappedAllocationSite() {
-    analyze(target, testName.getMethodName());
+    AllocatedObject alias1 = wrappedCreate();
+    QueryMethods.queryFor(alias1);
   }
 
   @Test
   public void branchedObjectCreation() {
-    analyze(target, testName.getMethodName());
+    Object alias1;
+    if (Math.random() > 0.5) alias1 = create();
+    else {
+      AllocatedObject intermediate = create();
+      alias1 = intermediate;
+    }
+    Object query = alias1;
+    QueryMethods.queryFor(query);
   }
 
   @Test
   public void unbalancedCreation() {
-    analyze(target, testName.getMethodName());
+    Object alias1 = create();
+    Object query = alias1;
+    QueryMethods.queryFor(query);
   }
 
   @Test
   public void unbalancedCreationStatic() {
-    analyze(target, testName.getMethodName());
+    Object alias1 = createStatic();
+    Object query = alias1;
+    QueryMethods.queryFor(query);
+  }
+
+  private Object createStatic() {
+    return new BasicAlloc();
+  }
+
+  public AllocatedObject wrappedCreate() {
+    return create();
+  }
+
+  public AllocatedObject create() {
+    AllocatedObject alloc1 = new AllocatedObject() {};
+    return alloc1;
+  }
+
+  private AllocatedObject identity(AllocatedObject param) {
+    AllocatedObject mapped = param;
+    return mapped;
   }
 
   @Test
   public void heavySummary() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias1 = new BasicAlloc();
+    Object q;
+    if (Math.random() > 0.5) {
+      q = doSummarize(alias1);
+    } else if (Math.random() > 0.5) {
+      BasicAlloc alias2 = new BasicAlloc();
+      q = doSummarize(alias2);
+    } else {
+      BasicAlloc alias3 = new BasicAlloc();
+      q = doSummarize(alias3);
+    }
+
+    QueryMethods.queryFor(q);
+  }
+
+  private BasicAlloc doSummarize(BasicAlloc alias1) {
+    BasicAlloc a = alias1;
+    BasicAlloc b = a;
+    BasicAlloc c = b;
+    BasicAlloc d = c;
+
+    BasicAlloc e = d;
+    BasicAlloc f = evenFurtherNested(e);
+    BasicAlloc g = alias1;
+    if (Math.random() > 0.5) {
+      g = f;
+    }
+    BasicAlloc h = g;
+    return f;
+  }
+
+  private BasicAlloc evenFurtherNested(BasicAlloc e) {
+    return e;
   }
 
   @Test
   public void summaryTest() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias1 = new BasicAlloc();
+    Object q;
+    if (Math.random() > 0.5) {
+      q = summary(alias1);
+    } else {
+      BasicAlloc alias2 = new BasicAlloc();
+      q = summary(alias2);
+    }
+
+    QueryMethods.queryFor(q);
+  }
+
+  private Object summary(BasicAlloc inner) {
+    BasicAlloc ret = inner;
+    return ret;
   }
 
   @Test
   public void doubleNestedSummary() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias1 = new BasicAlloc();
+    Object q;
+    if (Math.random() > 0.5) {
+      q = nestedSummary(alias1);
+    } else {
+      BasicAlloc alias2 = new BasicAlloc();
+      q = nestedSummary(alias2);
+    }
+
+    QueryMethods.queryFor(q);
+  }
+
+  private Object nestedSummary(BasicAlloc inner) {
+    Object ret = summary(inner);
+    return ret;
   }
 }

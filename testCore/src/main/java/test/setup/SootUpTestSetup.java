@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.junit.Assume;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
@@ -45,8 +44,6 @@ import sootup.java.core.views.JavaView;
 
 public class SootUpTestSetup implements TestSetup {
 
-  private static final String HASHMAP_TEST_CLASS = "test.cases.hashmap.KeySensitiveTarget";
-
   private JavaView view;
   private JavaSootMethod testMethod;
 
@@ -56,12 +53,6 @@ public class SootUpTestSetup implements TestSetup {
       MethodWrapper testMethodWrapper,
       List<String> includedPackages,
       List<String> excludedPackages) {
-
-    /* The handling of Maps is not implemented correctly if there are aliases for the Map objects.
-     * Compared to Soot and Opal, SootUp constructs a Jimple code that uses such aliases, hence,
-     * it cannot deal with such cases for now. Once the problem is fixed, the test can be executed.
-     */
-    Assume.assumeFalse(testMethodWrapper.getDeclaringClass().equals(HASHMAP_TEST_CLASS));
 
     List<BodyInterceptor> interceptors =
         List.of(new TypeAssigner(), new BoomerangPreInterceptorTestImpl());

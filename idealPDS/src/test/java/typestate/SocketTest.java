@@ -25,9 +25,9 @@ import java.util.LinkedList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.ExpectedTestParameters;
 import test.IDEalTestRunnerInterceptor;
 import test.TestConfig;
+import test.TestParameters;
 import typestate.impl.statemachines.SocketStateMachine;
 
 @ExtendWith(IDEalTestRunnerInterceptor.class)
@@ -35,7 +35,7 @@ import typestate.impl.statemachines.SocketStateMachine;
 public class SocketTest {
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws IOException {
     Socket socket = new Socket();
     socket.connect(new SocketAddress() {});
@@ -44,7 +44,7 @@ public class SocketTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() throws IOException {
     Socket socket = new Socket();
     socket.sendUrgentData(2);
@@ -52,7 +52,7 @@ public class SocketTest {
   }
 
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3() throws IOException {
     Socket socket = new Socket();
     socket.sendUrgentData(2);
@@ -62,7 +62,7 @@ public class SocketTest {
 
   @Disabled("Reading sockets from an iterator is too complex")
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test4() throws IOException {
     Collection<Socket> sockets = createSockets();
     for (Iterator<Socket> it = sockets.iterator(); it.hasNext(); ) {
@@ -85,7 +85,7 @@ public class SocketTest {
 
   @Disabled("Reading sockets from an iterator is too complex")
   @Test
-  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test5() {
     Collection<Socket> sockets = createSockets();
     for (Iterator<Socket> it = sockets.iterator(); it.hasNext(); ) {

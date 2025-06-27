@@ -14,15 +14,38 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class ReuseOfSummaryTest extends AbstractBoomerangTest {
-
-  private final String target = ReuseOfSummaryTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ReuseOfSummaryTest {
 
   @Test
   public void summaryTest() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    A b = new A();
+
+    Object c = new FieldAlloc(); // o1
+    foo(a, b, c);
+    foo(a, a, c);
+
+    /*
+     * the test case extracts all allocated object of type Alloc and assumes these objects to flow
+     * as argument to queryFor(var). In this example var and a.f point to o1
+     */
+    Object var = a.f;
+    QueryMethods.queryFor(var);
+  }
+
+  private void foo(A c, A d, Object f) {
+    d.f = f;
+  }
+
+  private static class A {
+    Object f;
+
+    public A() {}
   }
 }

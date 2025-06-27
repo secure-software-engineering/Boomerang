@@ -14,22 +14,45 @@
  */
 package test.cases.statics;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-@Ignore("Static fields are not handled correctly (see TODO in WeightedBoomerang")
-public class StaticWithSuperClassesTest extends AbstractBoomerangTest {
-
-  private final String target = StaticWithSuperClassesTarget.class.getName();
+@Disabled("Static fields are not handled correctly")
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class StaticWithSuperClassesTest {
 
   @Test
   public void simple() {
-    analyze(target, testName.getMethodName());
+    List list = new List();
+    Object o = list.get();
+    QueryMethods.queryForAndNotEmpty(o);
+  }
+
+  private static class List {
+
+    private static final Object elementData = new StaticsAlloc();
+
+    public Object get() {
+      return elementData;
+    }
   }
 
   @Test
   public void superClass() {
-    analyze(target, testName.getMethodName());
+    MyList list = new MyList();
+    Object o = list.get();
+    QueryMethods.queryForAndNotEmpty(o);
+  }
+
+  private static class MyList extends List {
+
+    private static final Object elementData2 = new StaticsAlloc();
+
+    public Object get() {
+      return elementData2;
+    }
   }
 }

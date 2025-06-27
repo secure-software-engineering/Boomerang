@@ -41,8 +41,6 @@ import ideal.StoreIDEALResultHandler;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.After;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
@@ -59,6 +57,8 @@ public class IDEalTestingFramework extends TestingFramework {
       TypeStateMachineWeightFunctions stateMachine,
       Collection<String> includedClasses,
       Collection<String> excludedClasses) {
+    super(includedClasses, excludedClasses);
+
     this.stateMachine = stateMachine;
   }
 
@@ -79,7 +79,7 @@ public class IDEalTestingFramework extends TestingFramework {
     Collection<Assertion> assertions =
         parseExpectedQueryResults(frameworkScope.getCallGraph(), testMethod);
     if (assertions.size() != expectedAssertions) {
-      Assert.fail(
+      org.junit.jupiter.api.Assertions.fail(
           "Unexpected number of assertions in target program. Expected "
               + expectedAssertions
               + ", got "
@@ -96,7 +96,7 @@ public class IDEalTestingFramework extends TestingFramework {
     Collection<WeightedForwardQuery<TransitionFunction>> seeds =
         resultHandler.getResults().keySet();
     if (seeds.size() != expectedSeeds) {
-      Assert.fail(
+      org.junit.jupiter.api.Assertions.fail(
           "Unexpected number of seeds. Expected " + expectedSeeds + ", got " + seeds.size());
     }
 
@@ -211,10 +211,5 @@ public class IDEalTestingFramework extends TestingFramework {
         queries.add(new MayBeInErrorState(stmt, seed));
       }
     }
-  }
-
-  @After
-  public void cleanUp() {
-    super.cleanUp();
   }
 }

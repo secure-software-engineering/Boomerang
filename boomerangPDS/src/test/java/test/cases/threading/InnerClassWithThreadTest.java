@@ -14,28 +14,72 @@
  */
 package test.cases.threading;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class InnerClassWithThreadTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class InnerClassWithThreadTest {
 
-  private final String target = InnerClassWithThreadTarget.class.getName();
+  private static ThreadingAlloc param;
 
-  @Ignore
+  @Disabled
   @Test
   public void runWithThreadStatic() {
-    analyze(target, testName.getMethodName());
+    param = new ThreadingAlloc();
+    Runnable r =
+        new Runnable() {
+
+          @Override
+          public void run() {
+            String cmd = System.getProperty("");
+            // if(cmd!=null){
+            // param = new Allocation();
+            // }
+            for (int i = 1; i < 3; i++) {
+              Object t = param;
+              Object a = t;
+              QueryMethods.queryFor(a);
+            }
+          }
+        };
+    Thread t = new Thread(r);
+    t.start();
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void runWithThread() {
-    analyze(target, testName.getMethodName());
+    final ThreadingAlloc u = new ThreadingAlloc();
+    Runnable r =
+        new Runnable() {
+
+          @Override
+          public void run() {
+            // String cmd = System.getProperty("");
+            // if(cmd!=null){
+            // param = new Allocation();
+            // }
+            for (int i = 1; i < 3; i++) {
+              QueryMethods.queryFor(u);
+            }
+          }
+        };
+    Thread t = new Thread(r);
+    t.start();
   }
 
   @Test
   public void threadQuery() {
-    analyze(target, testName.getMethodName());
+    for (int i = 1; i < 3; i++) {
+      Thread t = new MyThread();
+      t.start();
+      QueryMethods.queryFor(t);
+    }
   }
+
+  private static class MyThread extends Thread implements AllocatedObject {}
 }
