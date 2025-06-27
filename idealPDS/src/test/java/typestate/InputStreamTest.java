@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.IDEalTestRunnerInterceptor;
+import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
 import typestate.impl.statemachines.InputStreamStateMachine;
 
-@ExtendWith(IDEalTestRunnerInterceptor.class)
+@ExtendWith(IDEALTestRunnerInterceptor.class)
 @TestConfig(
     stateMachine = InputStreamStateMachine.class,
     includedClasses = {java.io.FileInputStream.class})

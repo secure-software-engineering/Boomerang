@@ -17,14 +17,14 @@ package typestate;
 import assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.IDEalTestRunnerInterceptor;
+import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
 import typestate.helper.File;
 import typestate.helper.ObjectWithField;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
-@ExtendWith(IDEalTestRunnerInterceptor.class)
+@ExtendWith(IDEALTestRunnerInterceptor.class)
 @TestConfig(stateMachine = FileMustBeClosedStateMachine.class)
 public class FileMustBeClosedTest {
 

@@ -18,10 +18,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import test.TestingFramework;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface TestParameters {
 
   boolean ignoreAllocSites() default false;
+
+  TestingFramework.Framework[] skipFramework() default {};
 }

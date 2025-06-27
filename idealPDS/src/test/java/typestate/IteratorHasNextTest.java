@@ -21,12 +21,12 @@ import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.IDEalTestRunnerInterceptor;
+import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
 import typestate.impl.statemachines.HasNextStateMachine;
 
-@ExtendWith(IDEalTestRunnerInterceptor.class)
+@ExtendWith(IDEALTestRunnerInterceptor.class)
 @TestConfig(stateMachine = HasNextStateMachine.class)
 public class IteratorHasNextTest {
 

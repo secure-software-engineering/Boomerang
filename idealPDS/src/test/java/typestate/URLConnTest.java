@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.IDEalTestRunnerInterceptor;
+import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
 import typestate.impl.statemachines.URLConnStateMachine;
 
-@ExtendWith(IDEalTestRunnerInterceptor.class)
+@ExtendWith(IDEALTestRunnerInterceptor.class)
 @TestConfig(
     stateMachine = URLConnStateMachine.class,
     includedClasses = {java.net.URLConnection.class, java.net.HttpURLConnection.class})

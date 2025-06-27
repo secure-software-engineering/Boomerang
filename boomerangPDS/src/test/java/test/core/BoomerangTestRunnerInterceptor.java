@@ -20,11 +20,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import test.TestingFramework;
 
 public class BoomerangTestRunnerInterceptor
     implements BeforeAllCallback, InvocationInterceptor, AfterEachCallback {
@@ -62,6 +64,11 @@ public class BoomerangTestRunnerInterceptor
     if (parameters == null) {
       testingFramework.analyze(testClassName, testMethodName);
     } else {
+      for (TestingFramework.Framework framework : parameters.skipFramework()) {
+        Assumptions.assumeFalse(
+            framework == testingFramework.getFramework(),
+            "Test is configured to skip with " + framework);
+      }
       testingFramework.analyze(testClassName, testMethodName, parameters.ignoreAllocSites());
     }
 

@@ -18,14 +18,14 @@ import assertions.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.IDEalTestRunnerInterceptor;
+import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
 import typestate.helper.File;
 import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
 @Disabled("Adapt call graph algorithms")
-@ExtendWith(IDEalTestRunnerInterceptor.class)
+@ExtendWith(IDEALTestRunnerInterceptor.class)
 @TestConfig(stateMachine = FileMustBeClosedStateMachine.class)
 public class FileMustBeClosedDemandDrivenTest {
 

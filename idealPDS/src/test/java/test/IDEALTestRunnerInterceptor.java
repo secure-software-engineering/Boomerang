@@ -27,10 +27,10 @@ import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
-public class IDEalTestRunnerInterceptor
+public class IDEALTestRunnerInterceptor
     implements BeforeAllCallback, InvocationInterceptor, AfterEachCallback {
 
-  private IDEalTestingFramework testingFramework;
+  private IDEALTestingFramework testingFramework;
 
   @Override
   public void beforeAll(ExtensionContext context) {
@@ -76,7 +76,7 @@ public class IDEalTestRunnerInterceptor
         Arrays.stream(testConfig.excludedClasses())
             .map(Class::getName)
             .collect(Collectors.toList());
-    testingFramework = new IDEalTestingFramework(stateMachine, includedClasses, excludedClasses);
+    testingFramework = new IDEALTestingFramework(stateMachine, includedClasses, excludedClasses);
   }
 
   @Override

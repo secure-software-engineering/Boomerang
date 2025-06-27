@@ -20,12 +20,12 @@ import java.util.Stack;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import test.IDEalTestRunnerInterceptor;
+import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
 import typestate.impl.statemachines.VectorStateMachine;
 
-@ExtendWith(IDEalTestRunnerInterceptor.class)
+@ExtendWith(IDEALTestRunnerInterceptor.class)
 @TestConfig(
     stateMachine = VectorStateMachine.class,
     includedClasses = {java.util.Stack.class, java.util.Vector.class})

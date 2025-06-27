@@ -47,13 +47,13 @@ import sync.pds.solver.WeightFunctions;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
-public class IDEalTestingFramework extends TestingFramework {
+public class IDEALTestingFramework extends TestingFramework {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IDEalTestingFramework.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IDEALTestingFramework.class);
 
   private final TypeStateMachineWeightFunctions stateMachine;
 
-  public IDEalTestingFramework(
+  public IDEALTestingFramework(
       TypeStateMachineWeightFunctions stateMachine,
       Collection<String> includedClasses,
       Collection<String> excludedClasses) {

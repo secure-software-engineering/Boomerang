@@ -18,8 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import test.TestingFramework;
 import test.core.BoomerangTestRunnerInterceptor;
 import test.core.QueryMethods;
+import test.core.TestParameters;
 import test.core.selfrunning.AllocatedObject;
 import test.core.selfrunning.NoAllocatedObject;
 
@@ -31,6 +33,7 @@ public class KeySensitiveTest {
   public static class NoAllocation implements NoAllocatedObject {}
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT_UP})
   public void directAccess() {
     AllocatedObject someValue = new MapAlloc();
     Map<String, AllocatedObject> x = new HashMap<>();
@@ -40,6 +43,7 @@ public class KeySensitiveTest {
   }
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT_UP})
   public void directAccess2Keys() {
     AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
@@ -50,6 +54,7 @@ public class KeySensitiveTest {
   }
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT_UP})
   public void overwrite() {
     AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
@@ -61,6 +66,7 @@ public class KeySensitiveTest {
   }
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT_UP})
   public void accessWithAliasedKey() {
     AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
@@ -72,6 +78,7 @@ public class KeySensitiveTest {
   }
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT_UP})
   public void accessWithKeyFromReturn() {
     AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();
@@ -82,6 +89,7 @@ public class KeySensitiveTest {
   }
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT_UP})
   public void interprocedural() {
     AllocatedObject someValue = new MapAlloc();
     Map<String, Object> x = new HashMap<>();

@@ -35,26 +35,43 @@ public class TestingFramework {
   private static final String SOOT_UP = "sootup";
   private static final String OPAL = "opal";
 
-  protected final TestSetup testSetup;
-
+  private final TestSetup testSetup;
   private final Collection<String> includedClasses;
   private final Collection<String> excludedClasses;
+
+  public enum Framework {
+    SOOT,
+    SOOT_UP,
+    OPAL
+  }
+
+  private final Framework framework;
 
   public TestingFramework() {
     this(Collections.emptySet(), Collections.emptySet());
   }
 
   public TestingFramework(Collection<String> includedClasses, Collection<String> excludedClasses) {
-    this.testSetup = getTestSetup();
+    this.testSetup = createTestSetup();
     this.includedClasses = includedClasses;
     this.excludedClasses = excludedClasses;
+
+    if (testSetup instanceof SootTestSetup) {
+      this.framework = Framework.SOOT;
+    } else if (testSetup instanceof SootUpTestSetup) {
+      this.framework = Framework.SOOT_UP;
+    } else if (testSetup instanceof OpalTestSetup) {
+      this.framework = Framework.OPAL;
+    } else {
+      throw new RuntimeException("No valid framework setup: " + testSetup.getClass().getName());
+    }
   }
 
-  private TestSetup getTestSetup() {
+  private TestSetup createTestSetup() {
     String framework = System.getProperty("testSetup");
     if (framework == null) {
       // This can be changed when executing tests locally
-      return new OpalTestSetup();
+      return new SootUpTestSetup();
     }
 
     switch (framework.toLowerCase()) {
@@ -72,6 +89,10 @@ public class TestingFramework {
     }
   }
 
+  public Framework getFramework() {
+    return framework;
+  }
+
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {
     return getFrameworkScope(methodWrapper, DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
   }
@@ -80,10 +101,7 @@ public class TestingFramework {
       MethodWrapper methodWrapper, DataFlowScope dataFlowScope) {
     String classPath = buildClassPath();
     testSetup.initialize(
-        classPath,
-        methodWrapper,
-        List.copyOf(getIncludedPackages()),
-        List.copyOf(getExcludedPackages()));
+        classPath, methodWrapper, List.copyOf(includedClasses), List.copyOf(excludedClasses));
 
     return testSetup.createFrameworkScope(dataFlowScope);
   }
@@ -150,13 +168,5 @@ public class TestingFramework {
     if (testSetup != null) {
       testSetup.cleanUp();
     }
-  }
-
-  protected Collection<String> getIncludedPackages() {
-    return includedClasses;
-  }
-
-  protected Collection<String> getExcludedPackages() {
-    return excludedClasses;
   }
 }
