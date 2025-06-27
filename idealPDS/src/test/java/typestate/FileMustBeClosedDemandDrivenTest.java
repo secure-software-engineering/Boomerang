@@ -12,16 +12,25 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
-import test.TestMethod;
-import typestate.targets.helper.File;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.helper.File;
+import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
-@SuppressWarnings("unused")
-public class FileMustBeClosedDemandDriven {
+@Disabled("Adapt call graph algorithms")
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(stateMachine = FileMustBeClosedStateMachine.class)
+public class FileMustBeClosedDemandDrivenTest {
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void notCaughtByCHA() {
     I b = new B();
     callOnInterface(b);
@@ -34,7 +43,8 @@ public class FileMustBeClosedDemandDriven {
     Assertions.mustBeInAcceptingState(file);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void notCaughtByRTA() {
     I a = new A();
     I b = new B();

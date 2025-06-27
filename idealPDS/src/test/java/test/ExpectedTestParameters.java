@@ -12,23 +12,18 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets.helper;
+package test;
 
-public class File {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  public File open() {
-    return this;
-  }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ExpectedTestParameters {
 
-  public File close() {
-    return this;
-  }
+  int expectedSeedCount();
 
-  public int hashCode() {
-    return 9;
-  }
-
-  public void wrappedClose() {
-    close();
-  }
+  int expectedAssertionCount();
 }

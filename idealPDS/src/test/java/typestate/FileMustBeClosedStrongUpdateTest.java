@@ -12,21 +12,28 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
-import test.TestMethod;
-import typestate.targets.helper.File;
-import typestate.targets.helper.ObjectWithField;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.helper.File;
+import typestate.helper.ObjectWithField;
+import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
-@SuppressWarnings("unused")
-public class FileMustBeClosedStrongUpdate {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(stateMachine = FileMustBeClosedStateMachine.class)
+public class FileMustBeClosedStrongUpdateTest {
 
   private boolean staticallyUnknown() {
     return Math.random() > 0.5;
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 2, expectedAssertionCount = 3)
   public void noStrongUpdatePossible() {
     File b = null;
     File a = new File();
@@ -44,7 +51,8 @@ public class FileMustBeClosedStrongUpdate {
     Assertions.mustBeInAcceptingState(b);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void aliasSensitive() {
     ObjectWithField a = new ObjectWithField();
     ObjectWithField b = a;

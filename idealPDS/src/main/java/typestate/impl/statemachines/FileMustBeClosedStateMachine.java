@@ -67,7 +67,7 @@ public class FileMustBeClosedStateMachine extends TypeStateMachineWeightFunction
   @Override
   public Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge unit) {
     try {
-      return generateAtAllocationSiteOf(unit, Class.forName("typestate.targets.helper.File"));
+      return generateAtAllocationSiteOf(unit, Class.forName("typestate.helper.File"));
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }

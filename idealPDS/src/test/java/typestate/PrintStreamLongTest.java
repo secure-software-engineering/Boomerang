@@ -12,18 +12,25 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import test.TestMethod;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.PrintStreamStateMachine;
 
-@SuppressWarnings("unused")
-public class PrintStreamLong {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(stateMachine = PrintStreamStateMachine.class)
+public class PrintStreamLongTest {
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws FileNotFoundException {
     PrintStream inputStream = new PrintStream("");
     inputStream.close();
@@ -31,7 +38,8 @@ public class PrintStreamLong {
     Assertions.mustBeInErrorState(inputStream);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test() {
     try {
       FileOutputStream out = new FileOutputStream("foo.txt");

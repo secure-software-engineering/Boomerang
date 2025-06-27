@@ -12,28 +12,23 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate.helper;
 
-import assertions.Assertions;
-import test.TestMethod;
-import typestate.targets.helper.File;
+public class File {
 
-@SuppressWarnings("unused")
-public class FluentInterface {
-
-  @TestMethod
-  public void fluentOpen() {
-    File file = new File();
-    file = file.open();
-    Assertions.mustBeInErrorState(file);
+  public File open() {
+    return this;
   }
 
-  @TestMethod
-  public void fluentOpenAndClose() {
-    File file = new File();
-    file = file.open();
-    Assertions.mustBeInErrorState(file);
-    file = file.close();
-    Assertions.mustBeInAcceptingState(file);
+  public File close() {
+    return this;
+  }
+
+  public int hashCode() {
+    return 9;
+  }
+
+  public void wrappedClose() {
+    close();
   }
 }

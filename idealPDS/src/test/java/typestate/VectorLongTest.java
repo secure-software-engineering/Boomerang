@@ -12,27 +12,37 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.util.Vector;
-import test.TestMethod;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.VectorStateMachine;
 
-@SuppressWarnings("unused")
-public class VectorLong {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(
+    stateMachine = VectorStateMachine.class,
+    includedClasses = {java.util.Vector.class})
+public class VectorLongTest {
 
   private boolean staticallyUnknown() {
     return Math.random() > 0.5;
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() {
     Vector<Object> s = new Vector<>();
     s.lastElement();
     Assertions.mustBeInErrorState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() {
     Vector<Object> s = new Vector<>();
     s.add(new Object());
@@ -40,7 +50,8 @@ public class VectorLong {
     Assertions.mustBeInAcceptingState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3() {
     Vector<Object> v = new Vector<>();
     try {
@@ -52,7 +63,8 @@ public class VectorLong {
     Assertions.mayBeInErrorState(v);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void test4() {
     Vector<Object> v = new Vector<>();
     v.add(new Object());
@@ -70,7 +82,8 @@ public class VectorLong {
     Assertions.mayBeInErrorState(v);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 3)
   public void test6() {
     Vector<Object> v = new Vector<>();
     v.add(new Object());
@@ -83,7 +96,8 @@ public class VectorLong {
     Assertions.mayBeInErrorState(v);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test5() {
     Vector<Object> s = new Vector<>();
     s.add(new Object());
@@ -96,7 +110,8 @@ public class VectorLong {
 
   public static void foo() {}
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void staticAccessTest() {
     Vector<Object> x = new Vector<>();
     v = x;

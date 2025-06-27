@@ -12,18 +12,27 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import test.TestMethod;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.InputStreamStateMachine;
 
-@SuppressWarnings("unused")
-public class InputStreamLong {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(
+    stateMachine = InputStreamStateMachine.class,
+    includedClasses = {java.io.FileInputStream.class})
+public class InputStreamLongTest {
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws IOException {
     InputStream inputStream = new FileInputStream("");
     inputStream.close();
@@ -31,7 +40,8 @@ public class InputStreamLong {
     Assertions.mustBeInErrorState(inputStream);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 2, expectedAssertionCount = 1)
   public void test2() throws IOException {
     InputStream inputStream = new FileInputStream("");
     inputStream.close();
@@ -40,7 +50,8 @@ public class InputStreamLong {
     Assertions.mustBeInErrorState(inputStream);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3() throws IOException {
     InputStream inputStream = new FileInputStream("");
     inputStream.read();

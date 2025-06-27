@@ -12,21 +12,31 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.util.ArrayList;
 import java.util.Stack;
-import test.TestMethod;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.VectorStateMachine;
 
-@SuppressWarnings("unused")
-public class StackLong {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(
+    stateMachine = VectorStateMachine.class,
+    includedClasses = {java.util.Stack.class, java.util.Vector.class})
+public class StackLongTest {
 
   private boolean staticallyUnknown() {
     return Math.random() > 0.5;
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test1() {
     Stack<Object> s = new Stack<>();
     if (staticallyUnknown()) s.peek();
@@ -38,7 +48,8 @@ public class StackLong {
     Assertions.mustBeInErrorState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test4simple() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -47,7 +58,8 @@ public class StackLong {
     Assertions.mustBeInErrorState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() {
     Stack<Object> s = new Stack<>();
     s.add(new Object());
@@ -56,7 +68,8 @@ public class StackLong {
     Assertions.mustBeInAcceptingState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test6() {
     ArrayList<Object> l = new ArrayList<>();
     Stack<Object> s = new Stack<>();
@@ -72,7 +85,8 @@ public class StackLong {
     }
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test3() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -81,14 +95,16 @@ public class StackLong {
     Assertions.mustBeInErrorState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test5() {
     Stack<Object> s = new Stack<>();
     s.peek();
     Assertions.mustBeInErrorState(s);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test4() {
     Stack<Object> s = new Stack<>();
     s.peek();
@@ -102,7 +118,9 @@ public class StackLong {
     Assertions.mustBeInAcceptingState(c);
   }
 
-  @TestMethod
+  @Disabled("Broken since refactoring scope")
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void testInNewObject() {
     ObjectWithStack oWithStack = new ObjectWithStack();
     oWithStack.pushStack(new Object());

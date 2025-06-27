@@ -43,27 +43,28 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
-public class IDEalTestingFramework extends TestingFramework {
+public abstract class IDEalTestingFrameworkOld extends TestingFramework {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IDEalTestingFramework.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IDEalTestingFrameworkOld.class);
 
-  private final TypeStateMachineWeightFunctions stateMachine;
+  @Rule public TestName testName = new TestName();
 
-  public IDEalTestingFramework(
-      TypeStateMachineWeightFunctions stateMachine,
-      Collection<String> includedClasses,
-      Collection<String> excludedClasses) {
-    this.stateMachine = stateMachine;
+  private final StoreIDEALResultHandler<TransitionFunction> resultHandler;
+
+  protected IDEalTestingFrameworkOld() {
+    this.resultHandler = new StoreIDEALResultHandler<>();
   }
 
   public void analyze(
-      String targetClassName, String targetMethodName, int expectedSeeds, int expectedAssertions) {
+      String targetClassName, String targetMethodName, int expectedAssertions, int expectedSeeds) {
     LOGGER.info(
         "Running '{}' in class '{}' with {} assertions",
         targetMethodName,
@@ -88,8 +89,7 @@ public class IDEalTestingFramework extends TestingFramework {
     TestingResultReporter resultReporter = new TestingResultReporter(assertions);
 
     // Run IDEal
-    StoreIDEALResultHandler<TransitionFunction> resultHandler = new StoreIDEALResultHandler<>();
-    IDEALAnalysis<TransitionFunction> idealAnalysis = createAnalysis(frameworkScope, resultHandler);
+    IDEALAnalysis<TransitionFunction> idealAnalysis = createAnalysis(frameworkScope);
     idealAnalysis.run();
 
     // Update results
@@ -108,22 +108,21 @@ public class IDEalTestingFramework extends TestingFramework {
     assertResults(assertions);
   }
 
-  protected IDEALAnalysis<TransitionFunction> createAnalysis(
-      FrameworkScope frameworkScope, StoreIDEALResultHandler<TransitionFunction> resultHandler) {
+  protected IDEALAnalysis<TransitionFunction> createAnalysis(FrameworkScope frameworkScope) {
     return new IDEALAnalysis<>(
         new IDEALAnalysisDefinition<>() {
 
           @Override
           public Collection<WeightedForwardQuery<TransitionFunction>> generate(
               ControlFlowGraph.Edge stmt) {
-            return stateMachine.generateSeed(stmt);
+            return getStateMachine().generateSeed(stmt);
           }
 
           @Override
           public WeightFunctions<
                   ControlFlowGraph.Edge, Val, ControlFlowGraph.Edge, TransitionFunction>
               weightFunctions() {
-            return stateMachine;
+            return getStateMachine();
           }
 
           @Override
@@ -151,6 +150,8 @@ public class IDEalTestingFramework extends TestingFramework {
           }
         });
   }
+
+  protected abstract TypeStateMachineWeightFunctions getStateMachine();
 
   private Collection<Assertion> parseExpectedQueryResults(CallGraph callGraph, Method testMethod) {
     Collection<Assertion> results = new HashSet<>();

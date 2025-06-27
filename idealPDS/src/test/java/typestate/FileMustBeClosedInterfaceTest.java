@@ -12,32 +12,37 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
-import test.TestMethod;
-import typestate.targets.helper.File;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.helper.File;
+import typestate.impl.statemachines.FileMustBeClosedStateMachine;
 
-@SuppressWarnings("unused")
-public class FileMustBeClosedInterface {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(stateMachine = FileMustBeClosedStateMachine.class)
+public class FileMustBeClosedInterfaceTest {
 
   private boolean staticallyUnknown() {
     return Math.random() > 0.5;
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void mainTest() {
     File file = new File();
-    FileMustBeClosedInterface.Flow flow =
-        (staticallyUnknown()
-            ? new FileMustBeClosedInterface.ImplFlow1()
-            : new FileMustBeClosedInterface.ImplFlow2());
+    Flow flow = (staticallyUnknown() ? new ImplFlow1() : new ImplFlow2());
     flow.flow(file);
     Assertions.mayBeInErrorState(file);
     Assertions.mayBeInAcceptingState(file);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 4)
   public void otherTest() {
     File file = new File();
     if (staticallyUnknown()) {
@@ -51,14 +56,14 @@ public class FileMustBeClosedInterface {
     Assertions.mayBeInErrorState(file);
   }
 
-  public static class ImplFlow1 implements FileMustBeClosedInterface.Flow {
+  public static class ImplFlow1 implements Flow {
     @Override
     public void flow(File file) {
       file.open();
     }
   }
 
-  public static class ImplFlow2 implements FileMustBeClosedInterface.Flow {
+  public static class ImplFlow2 implements Flow {
 
     @Override
     public void flow(File file) {

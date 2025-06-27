@@ -12,17 +12,26 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import test.TestMethod;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.URLConnStateMachine;
 
-@SuppressWarnings("unused")
-public class URLConn {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(
+    stateMachine = URLConnStateMachine.class,
+    includedClasses = {java.net.URLConnection.class, java.net.HttpURLConnection.class})
+public class URLConnTest {
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test1() throws IOException {
     HttpURLConnection httpURLConnection =
         new HttpURLConnection(null) {
@@ -45,7 +54,8 @@ public class URLConn {
     Assertions.mustBeInErrorState(httpURLConnection);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() throws IOException {
     HttpURLConnection httpURLConnection =
         new HttpURLConnection(null) {

@@ -83,6 +83,7 @@
         <enforced-maven-version>3.6.1</enforced-maven-version>
         <!-- See https://www.eclipse.org/projects/handbook/#ip-copyright-headers -->
         <license.dir>${project.basedir}</license.dir>
+        <junit.version>5.13.1</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -162,6 +163,18 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.17</version>
+        </dependency>
+
+        <!-- JUnit API and engine -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

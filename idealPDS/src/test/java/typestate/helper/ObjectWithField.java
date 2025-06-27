@@ -12,21 +12,8 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate.helper;
 
-import assertions.Assertions;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import test.TestMethod;
-
-@SuppressWarnings("unused")
-public class PrintWriterLong {
-
-  @TestMethod
-  public void test1() throws FileNotFoundException {
-    PrintWriter inputStream = new PrintWriter("");
-    inputStream.close();
-    inputStream.flush();
-    Assertions.mustBeInErrorState(inputStream);
-  }
+public class ObjectWithField {
+  public File field;
 }

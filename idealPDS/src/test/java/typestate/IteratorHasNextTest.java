@@ -12,19 +12,26 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import test.TestMethod;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.HasNextStateMachine;
 
-@SuppressWarnings("unused")
-public class IteratorHasNext {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(stateMachine = HasNextStateMachine.class)
+public class IteratorHasNextTest {
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 2, expectedAssertionCount = 1)
   public void test1() {
     List<Object> list = new LinkedList<>();
     list.add(new Object());
@@ -35,7 +42,8 @@ public class IteratorHasNext {
     Assertions.mustBeInAcceptingState(list.iterator());
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() {
     MyLinkedList<Object> list = new MyLinkedList<>();
     list.add(new Object());
@@ -46,7 +54,8 @@ public class IteratorHasNext {
     Assertions.mustBeInErrorState(iterator);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3() {
     LinkedList<Object> list = new LinkedList<>();
     list.add(new Object());
@@ -62,7 +71,8 @@ public class IteratorHasNext {
     Assertions.mustBeInAcceptingState(it1);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test4() {
     List<Object> l1 = new ArrayList<>();
     List<Object> l2 = new ArrayList<>();
@@ -79,7 +89,8 @@ public class IteratorHasNext {
     Assertions.mayBeInErrorState(it1);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 2, expectedAssertionCount = 4)
   public void chartTest() {
     AxisCollection col = new AxisCollection();
     col.add(new Object());

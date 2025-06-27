@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package typestate.targets;
+package typestate;
 
 import assertions.Assertions;
 import java.io.FileInputStream;
@@ -22,12 +22,19 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import test.TestMethod;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.ExpectedTestParameters;
+import test.IDEalTestRunnerInterceptor;
+import test.TestConfig;
+import typestate.impl.statemachines.KeyStoreStateMachine;
 
-@SuppressWarnings("unused")
-public class KeyStoreLong {
+@ExtendWith(IDEalTestRunnerInterceptor.class)
+@TestConfig(stateMachine = KeyStoreStateMachine.class)
+public class KeyStoreLongTest {
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test1() throws GeneralSecurityException, IOException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
@@ -43,7 +50,8 @@ public class KeyStoreLong {
     Assertions.mustBeInAcceptingState(ks);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
   public void test4() throws GeneralSecurityException, IOException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
     KeyStore x = ks;
@@ -53,14 +61,16 @@ public class KeyStoreLong {
     Assertions.mustBeInAcceptingState(x);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test2() throws KeyStoreException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
     ks.aliases();
     Assertions.mustBeInErrorState(ks);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void test3()
       throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -78,15 +88,15 @@ public class KeyStoreLong {
     Assertions.mustBeInAcceptingState(ks);
   }
 
-  @TestMethod
+  @Test
+  @ExpectedTestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
   public void catchClause() {
     try {
       final KeyStore keyStore = KeyStore.getInstance("JKS");
       // ... Some code
       int size = keyStore.size(); // Hit !
       Assertions.mustBeInErrorState(keyStore);
-    } catch (KeyStoreException e) {
-      e.printStackTrace();
+    } catch (KeyStoreException ignored) {
     }
   }
 }
