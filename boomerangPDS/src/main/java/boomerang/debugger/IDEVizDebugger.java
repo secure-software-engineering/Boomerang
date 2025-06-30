@@ -47,8 +47,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.nodes.INode;
@@ -118,7 +118,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
         int labelYOffset = ONLY_CFG ? 0 : computeLabelYOffset(results.columnKeySet());
         JSONMethod jsonMethod = new JSONMethod(m);
         logger.debug("Creating control-flow graph for {}", m);
-        IDEVizDebugger<W>.JSONControlFlowGraph cfg = createControlFlowGraph(m, labelYOffset);
+        IDEVizDebugger.JSONControlFlowGraph cfg = createControlFlowGraph(m, labelYOffset);
 
         jsonMethod.put("cfg", cfg);
         if (!ONLY_CFG) {
@@ -128,18 +128,17 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
               createDataFlowGraph(query, results, rulesInMethod, cfg, m, labelYOffset);
           jsonMethod.put("dfg", dfg);
         }
-        data.add(jsonMethod);
+        data.put(jsonMethod);
       }
       queryJSON.put("methods", data);
-      eventualData.add(queryJSON);
+      eventualData.put(queryJSON);
     }
     logger.info("Computing visualization took: {}", watch.elapsed());
     try (FileWriter file = new FileWriter(ideVizFile)) {
       logger.info("Writing visualization to file {}", ideVizFile.getAbsolutePath());
-      file.write(eventualData.toJSONString());
+      eventualData.write(file);
       logger.info("Visualization available in file {}", ideVizFile.getAbsolutePath());
     } catch (IOException e) {
-      e.printStackTrace();
       logger.info("Exception in writing to visualization file {}", ideVizFile.getAbsolutePath());
     }
   }
@@ -178,7 +177,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
       label.put("factId", id(u));
       nodeObj.put("classes", "fact label method" + id(m));
       nodeObj.put("data", label);
-      data.add(nodeObj);
+      data.put(nodeObj);
     }
 
     Multimap<Node<Edge, Val>, RegExAccessPath> esgNodes = HashMultimap.create();
@@ -207,7 +206,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
       nodeObj.put("group", "nodes");
       nodeObj.put("data", additionalData);
 
-      data.add(nodeObj);
+      data.put(nodeObj);
 
       esgNodes.put(new Node<>(stmt, val.getVal()), val);
     }
@@ -230,7 +229,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
           nodeObj.put("data", dataEntry);
           nodeObj.put("classes", "esgEdge  method" + id(m));
           nodeObj.put("group", "edges");
-          data.add(nodeObj);
+          data.put(nodeObj);
         }
       }
     }
@@ -247,7 +246,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
   }
 
   private JSONControlFlowGraph createControlFlowGraph(Method m, int labelYOffset) {
-    IDEVizDebugger<W>.JSONControlFlowGraph cfg = new JSONControlFlowGraph();
+    IDEVizDebugger.JSONControlFlowGraph cfg = new JSONControlFlowGraph();
     int index = 0;
     int offset = 0;
     JSONArray data = new JSONArray();
@@ -275,7 +274,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
         JSONArray callees = new JSONArray();
         Set<Method> callers = new HashSet<>();
         icfg.addCallerListener(new JsonCallerListener(u, callers));
-        for (Method caller : callers) callees.add(new JSONMethod(caller));
+        for (Method caller : callers) callees.put(new JSONMethod(caller));
         label.put("callers", callees);
       }
       label.put("stmtId", id(u));
@@ -292,7 +291,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
               + (icfg.isCallStmt(u) ? " callSite " : " ")
               + " method"
               + id(m));
-      data.add(nodeObj);
+      data.put(nodeObj);
       offset = Math.max(offset, u.toString().length());
 
       this.cfg.addSuccsOfListener(
@@ -307,7 +306,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
               dataEntry.put("directed", "true");
               cfgEdgeObj.put("data", dataEntry);
               cfgEdgeObj.put("classes", "cfgEdge label method" + id(m));
-              data.add(cfgEdgeObj);
+              data.put(cfgEdgeObj);
             }
           });
     }
@@ -332,7 +331,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
     @Override
     public void onCalleeAdded(Statement unit, Method sootMethod) {
       if (sootMethod != null && sootMethod.toString() != null) {
-        callees.add(new JSONMethod(sootMethod));
+        callees.put(new JSONMethod(sootMethod));
       }
     }
 
@@ -353,7 +352,7 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
     public void onNoCalleeFound() {}
   }
 
-  private class JsonCallerListener implements CallerListener<Statement, Method> {
+  private static class JsonCallerListener implements CallerListener<Statement, Method> {
     Statement u;
     Set<Method> callers;
 
@@ -409,11 +408,11 @@ public class IDEVizDebugger<W extends Weight> extends Debugger<W> {
     }
   }
 
-  private class JSONControlFlowGraph extends JSONObject {
+  private static class JSONControlFlowGraph extends JSONObject {
     public List<Statement> stmtsList = Lists.newLinkedList();
   }
 
-  private class DataFlowGraph extends JSONObject {}
+  private static class DataFlowGraph extends JSONObject {}
 
   public Integer id(Object u) {
     if (objectToInteger.get(u) != null) return objectToInteger.get(u);
