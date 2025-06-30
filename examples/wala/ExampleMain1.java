@@ -63,7 +63,7 @@ public class ExampleMain1 {
       throws CallGraphBuilderCancelException, IOException, ClassHierarchyException {
     com.ibm.wala.ipa.callgraph.AnalysisScope walaScope =
         AnalysisScopeReader.instance.readJavaScope(
-            "testScope.txt",
+                "testScope.txt",
             (new FileProvider()).getFile("exclusion.txt"),
             ExampleMain1.class.getClassLoader());
     IClassHierarchy cha = ClassHierarchyFactory.make(walaScope);
