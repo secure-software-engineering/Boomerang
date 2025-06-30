@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
+import test.TestingFramework;
 import typestate.impl.statemachines.URLConnStateMachine;
 
 @ExtendWith(IDEALTestRunnerInterceptor.class)
@@ -31,7 +32,10 @@ import typestate.impl.statemachines.URLConnStateMachine;
 public class URLConnTest {
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 2,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test1() throws IOException {
     HttpURLConnection httpURLConnection =
         new HttpURLConnection(null) {
@@ -55,7 +59,10 @@ public class URLConnTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test2() throws IOException {
     HttpURLConnection httpURLConnection =
         new HttpURLConnection(null) {

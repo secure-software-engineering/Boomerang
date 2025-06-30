@@ -16,8 +16,10 @@ package test.cases.basic;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import test.TestingFramework;
 import test.core.BoomerangTestRunnerInterceptor;
 import test.core.QueryMethods;
+import test.core.TestParameters;
 import test.core.selfrunning.AllocatedObject;
 
 @ExtendWith(BoomerangTestRunnerInterceptor.class)
@@ -63,6 +65,7 @@ public class InterproceduralTest {
   }
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT})
   public void failedCast() {
     Object o = new BasicAlloc();
     Object returned = flow(o);

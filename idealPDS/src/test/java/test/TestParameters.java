@@ -26,4 +26,6 @@ public @interface TestParameters {
   int expectedSeedCount();
 
   int expectedAssertionCount();
+
+  TestingFramework.Framework[] skipFrameworks() default {};
 }

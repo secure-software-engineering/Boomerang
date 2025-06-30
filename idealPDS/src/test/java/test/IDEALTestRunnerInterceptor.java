@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -98,6 +99,12 @@ public class IDEALTestRunnerInterceptor
               + "' is not annotated with '"
               + TestConfig.class.getSimpleName()
               + "'");
+    }
+
+    for (TestingFramework.Framework framework : parameters.skipFrameworks()) {
+      Assumptions.assumeFalse(
+          framework == testingFramework.getFramework(),
+          "Test is configured to be skipped with " + framework);
     }
 
     testingFramework.analyze(

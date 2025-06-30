@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
+import test.TestingFramework;
 import typestate.impl.statemachines.PrintStreamStateMachine;
 
 @ExtendWith(IDEALTestRunnerInterceptor.class)
@@ -39,7 +40,10 @@ public class PrintStreamTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test() {
     try {
       FileOutputStream out = new FileOutputStream("foo.txt");

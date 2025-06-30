@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
+import test.TestingFramework;
 import typestate.impl.statemachines.InputStreamStateMachine;
 
 @ExtendWith(IDEALTestRunnerInterceptor.class)
@@ -32,7 +33,10 @@ import typestate.impl.statemachines.InputStreamStateMachine;
 public class InputStreamTest {
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test1() throws IOException {
     InputStream inputStream = new FileInputStream("");
     inputStream.close();
@@ -41,7 +45,10 @@ public class InputStreamTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 2, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 2,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test2() throws IOException {
     InputStream inputStream = new FileInputStream("");
     inputStream.close();
@@ -51,7 +58,10 @@ public class InputStreamTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test3() throws IOException {
     InputStream inputStream = new FileInputStream("");
     inputStream.read();

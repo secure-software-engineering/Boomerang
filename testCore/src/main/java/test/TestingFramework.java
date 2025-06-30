@@ -35,6 +35,9 @@ public class TestingFramework {
   private static final String SOOT_UP = "sootup";
   private static final String OPAL = "opal";
 
+  /** This variable may be changed to run the tests locally */
+  private static final String DEFAULT_FRAMEWORK = SOOT;
+
   private final TestSetup testSetup;
   private final Collection<String> includedClasses;
   private final Collection<String> excludedClasses;
@@ -68,11 +71,7 @@ public class TestingFramework {
   }
 
   private TestSetup createTestSetup() {
-    String framework = System.getProperty("testSetup");
-    if (framework == null) {
-      // This can be changed when executing tests locally
-      return new SootUpTestSetup();
-    }
+    String framework = System.getProperty("testSetup", DEFAULT_FRAMEWORK);
 
     switch (framework.toLowerCase()) {
       case SOOT:

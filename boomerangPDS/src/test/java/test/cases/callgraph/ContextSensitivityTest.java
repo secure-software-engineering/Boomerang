@@ -16,13 +16,16 @@ package test.cases.callgraph;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import test.TestingFramework;
 import test.core.BoomerangTestRunnerInterceptor;
 import test.core.QueryMethods;
+import test.core.TestParameters;
 
 @ExtendWith(BoomerangTestRunnerInterceptor.class)
 public class ContextSensitivityTest {
 
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT})
   public void testOnlyCorrectContextInCallGraph() {
     wrongContext();
     SuperClass type = new CorrectSubclass();

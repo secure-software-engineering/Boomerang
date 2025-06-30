@@ -67,7 +67,7 @@ public class BoomerangTestRunnerInterceptor
       for (TestingFramework.Framework framework : parameters.skipFramework()) {
         Assumptions.assumeFalse(
             framework == testingFramework.getFramework(),
-            "Test is configured to skip with " + framework);
+            "Test is configured to be skipped with " + framework);
       }
       testingFramework.analyze(testClassName, testMethodName, parameters.ignoreAllocSites());
     }
