@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.OneWeightFunctions;
@@ -136,14 +136,14 @@ public class BoomerangTestingFramework extends TestingFramework {
       PreAnalysis an = new PreAnalysis(frameworkScope, new IntegerAllocationSiteOf());
       expectedAllocationSites = an.computeSeeds();
       if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
-        Assert.fail("Did not find any allocation sites. Nothing is tested");
+        Assertions.fail("Did not find any allocation sites. Nothing is tested");
       }
     } else {
       PreAnalysis an =
           new PreAnalysis(frameworkScope, new AllocationSiteOf(AllocatedObject.class.getName()));
       expectedAllocationSites = an.computeSeeds();
       if (expectedAllocationSites.isEmpty() && !ignoreAllocSites) {
-        Assert.fail("Did not find any allocation sites. Nothing is tested");
+        Assertions.fail("Did not find any allocation sites. Nothing is tested");
       }
       an = new PreAnalysis(frameworkScope, new AllocationSiteOf(NoAllocatedObject.class.getName()));
       explicitlyUnexpectedAllocationSites =
@@ -162,10 +162,10 @@ public class BoomerangTestingFramework extends TestingFramework {
       }
       if (queryDetector.resultsMustNotBeEmpty) return;
       if (!unsoundErrors.isEmpty()) {
-        Assert.fail(Joiner.on("\n").join(unsoundErrors));
+        Assertions.fail(Joiner.on("\n").join(unsoundErrors));
       }
       if (!imprecisionErrors.isEmpty() && FAIL_ON_IMPRECISE) {
-        Assert.fail(Joiner.on("\n").join(imprecisionErrors));
+        Assertions.fail(Joiner.on("\n").join(imprecisionErrors));
       }
     }
   }
@@ -235,7 +235,7 @@ public class BoomerangTestingFramework extends TestingFramework {
       for (Node<ControlFlowGraph.Edge, Val> s : solvers.get(q).getReachedStates()) {
         if (s.stmt().getMethod().toString().contains("unreachable")
             && !q.toString().contains("dummyClass.main")) {
-          Assert.fail("Propagation within unreachable method found: " + q);
+          Assertions.fail("Propagation within unreachable method found: " + q);
         }
       }
     }
@@ -307,7 +307,7 @@ public class BoomerangTestingFramework extends TestingFramework {
 
           for (Node<ControlFlowGraph.Edge, Val> s : solver.getSolvers().get(q).getReachedStates()) {
             if (s.stmt().getMethod().toString().contains("unreachable")) {
-              Assert.fail("Propagation within unreachable method found.");
+              Assertions.fail("Propagation within unreachable method found.");
             }
           }
         }
@@ -361,7 +361,7 @@ public class BoomerangTestingFramework extends TestingFramework {
       imprecisionErrors.add(new Error(analysis + " Imprecise results for:" + answer));
 
     if (queryDetector.resultsMustNotBeEmpty && results.isEmpty()) {
-      Assert.fail("Expected some results, but Boomerang returned no allocation sites.");
+      Assertions.fail("Expected some results, but Boomerang returned no allocation sites.");
     }
 
     for (Node<ControlFlowGraph.Edge, Val> r : results) {
@@ -375,7 +375,7 @@ public class BoomerangTestingFramework extends TestingFramework {
     HashSet<AccessPath> expected = new LinkedHashSet<>(queryDetector.expectedAccessPaths);
     expected.removeAll(allAliases);
     if (!expected.isEmpty()) {
-      Assert.fail("Did not find all access path! " + expected);
+      Assertions.fail("Did not find all access path! " + expected);
     }
   }
 }

@@ -122,15 +122,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <!-- This dependency is here, so Maven and any IDE can compile Java and Scala code simultaneously -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <pluginManagement>
             <plugins>
