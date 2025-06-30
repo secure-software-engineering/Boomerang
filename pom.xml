@@ -258,7 +258,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
                 <configuration>
-                    <argLine>-Xmx8G -Xss128m</argLine>
+                    <argLine>-Xmx8g -Xms256m -Xss8m</argLine>
                     <systemPropertyVariables>
                         <property>
                             <name>testSetup</name>
