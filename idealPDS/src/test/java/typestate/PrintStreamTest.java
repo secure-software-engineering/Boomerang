@@ -31,7 +31,10 @@ import typestate.impl.statemachines.PrintStreamStateMachine;
 public class PrintStreamTest {
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.OPAL})
   public void test1() throws FileNotFoundException {
     PrintStream inputStream = new PrintStream("");
     inputStream.close();

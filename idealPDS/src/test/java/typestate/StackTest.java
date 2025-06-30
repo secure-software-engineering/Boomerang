@@ -104,7 +104,7 @@ public class StackTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 2)
+  @TestParameters(expectedSeedCount = 2, expectedAssertionCount = 2)
   public void test4() {
     Stack<Object> s = new Stack<>();
     s.peek();

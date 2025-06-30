@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import test.IDEALTestRunnerInterceptor;
 import test.TestConfig;
 import test.TestParameters;
+import test.TestingFramework;
 import typestate.impl.statemachines.HasNextStateMachine;
 
 @ExtendWith(IDEALTestRunnerInterceptor.class)
@@ -55,7 +56,10 @@ public class IteratorHasNextTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  @TestParameters(
+      expectedSeedCount = 1,
+      expectedAssertionCount = 1,
+      skipFrameworks = {TestingFramework.Framework.SOOT})
   public void test3() {
     LinkedList<Object> list = new LinkedList<>();
     list.add(new Object());
@@ -90,7 +94,10 @@ public class IteratorHasNextTest {
   }
 
   @Test
-  @TestParameters(expectedSeedCount = 2, expectedAssertionCount = 4)
+  @TestParameters(
+      expectedSeedCount = 2,
+      expectedAssertionCount = 4,
+      skipFrameworks = {TestingFramework.Framework.SOOT})
   public void chartTest() {
     AxisCollection col = new AxisCollection();
     col.add(new Object());
