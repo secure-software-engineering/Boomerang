@@ -36,7 +36,7 @@ public class TestingFramework {
   private static final String OPAL = "opal";
 
   /** This variable may be changed to run the tests locally */
-  private static final String DEFAULT_FRAMEWORK = SOOT;
+  private static final String DEFAULT_FRAMEWORK = SOOT_UP;
 
   private final TestSetup testSetup;
   private final Collection<String> includedClasses;

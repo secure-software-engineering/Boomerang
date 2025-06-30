@@ -259,13 +259,13 @@
                 <version>3.5.3</version>
                 <configuration>
                     <argLine>-Xmx8G -Xss128m</argLine>
-                    <systemProperties>
+                    <systemPropertyVariables>
                         <property>
                             <name>testSetup</name>
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${testSetup}</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -322,7 +322,8 @@
                                     <rules>
                                         <requireProperty>
                                             <property>testSetup</property>
-                                            <message>Running the tests requires the testSetup property. Use e.g. -DtestSetup=soot</message>
+                                            <regex>^(Soot|SootUp|Opal)$</regex>
+                                            <message>Running the tests requires the '-DtestSetup' flag. Possible values are {Soot, SootUp, Opal}</message>
                                         </requireProperty>
                                     </rules>
                                 </configuration>
