@@ -30,7 +30,7 @@ class OpalArrayRef(
 
   override def getIndexExpr: Val = new OpalVal(indexExpr, method)
 
-  override def getType: Type = OpalType.valueInformationToType(base.asVar.valueInformation, method.project)
+  override def getType: Type = new OpalType(OpalType.computationalTypeToFieldType(base.cTpe), method.project)
 
   override def asUnbalanced(stmt: ControlFlowGraph.Edge): Val = new OpalArrayRef(base, indexExpr, method, stmt)
 

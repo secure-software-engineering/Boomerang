@@ -25,8 +25,8 @@ import boomerang.scope.test.targets.HashCodeEqualsLocalTarget;
 import boomerang.scope.test.targets.ParameterLocalsTarget;
 import boomerang.scope.test.targets.ThisLocalTarget;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import soot.Scene;
 import soot.SootMethod;
 
@@ -48,16 +48,16 @@ public class SootScopeTest {
         InvokeExpr invokeExpr = stmt.getInvokeExpr();
         Val base = invokeExpr.getBase();
 
-        Assert.assertEquals(jimpleMethod.getThisLocal(), base);
-        Assert.assertEquals(base, jimpleMethod.getThisLocal());
-        Assert.assertTrue(jimpleMethod.isThisLocal(base));
+        Assertions.assertEquals(jimpleMethod.getThisLocal(), base);
+        Assertions.assertEquals(base, jimpleMethod.getThisLocal());
+        Assertions.assertTrue(jimpleMethod.isThisLocal(base));
 
         checked = true;
       }
     }
 
     if (!checked) {
-      Assert.fail("Did not check this local");
+      Assertions.fail("Did not check this local");
     }
   }
 
@@ -72,7 +72,7 @@ public class SootScopeTest {
     SootMethod noArgs = sootSetup.resolveMethod(noArgsSignature);
     Method noArgsMethod = JimpleMethod.of(noArgs, Scene.v());
 
-    Assert.assertTrue(noArgsMethod.getParameterLocals().isEmpty());
+    Assertions.assertTrue(noArgsMethod.getParameterLocals().isEmpty());
 
     // One parameter (primitive type)
     MethodSignature oneArgSignature =
@@ -80,8 +80,8 @@ public class SootScopeTest {
     SootMethod oneArg = sootSetup.resolveMethod(oneArgSignature);
     Method oneArgMethod = JimpleMethod.of(oneArg, Scene.v());
 
-    Assert.assertEquals(1, oneArgMethod.getParameterLocals().size());
-    Assert.assertEquals("int", oneArgMethod.getParameterLocal(0).getType().toString());
+    Assertions.assertEquals(1, oneArgMethod.getParameterLocals().size());
+    Assertions.assertEquals("int", oneArgMethod.getParameterLocal(0).getType().toString());
 
     // Two parameters (primitive type + RefType)
     MethodSignature twoArgSignature =
@@ -92,9 +92,10 @@ public class SootScopeTest {
     SootMethod twoArgs = sootSetup.resolveMethod(twoArgSignature);
     Method twoArgsMethod = JimpleMethod.of(twoArgs, Scene.v());
 
-    Assert.assertEquals(2, twoArgsMethod.getParameterLocals().size());
-    Assert.assertEquals("int", twoArgsMethod.getParameterLocal(0).getType().toString());
-    Assert.assertEquals(A.class.getName(), twoArgsMethod.getParameterLocal(1).getType().toString());
+    Assertions.assertEquals(2, twoArgsMethod.getParameterLocals().size());
+    Assertions.assertEquals("int", twoArgsMethod.getParameterLocal(0).getType().toString());
+    Assertions.assertEquals(
+        A.class.getName(), twoArgsMethod.getParameterLocal(1).getType().toString());
   }
 
   @Test
@@ -123,22 +124,22 @@ public class SootScopeTest {
         Val arg = invokeExpr.getArg(0);
 
         // equals in both directions
-        Assert.assertEquals(base, firstArg);
-        Assert.assertEquals(firstArg, base);
+        Assertions.assertEquals(base, firstArg);
+        Assertions.assertEquals(firstArg, base);
 
-        Assert.assertEquals(arg, secondArg);
-        Assert.assertEquals(secondArg, arg);
+        Assertions.assertEquals(arg, secondArg);
+        Assertions.assertEquals(secondArg, arg);
 
         // hash codes
-        Assert.assertEquals(base.hashCode(), firstArg.hashCode());
-        Assert.assertEquals(arg.hashCode(), secondArg.hashCode());
+        Assertions.assertEquals(base.hashCode(), firstArg.hashCode());
+        Assertions.assertEquals(arg.hashCode(), secondArg.hashCode());
 
         checked = true;
       }
     }
 
     if (!checked) {
-      Assert.fail("Did not check equals and hashCode methods for parameter locals");
+      Assertions.fail("Did not check equals and hashCode methods for parameter locals");
     }
   }
 }

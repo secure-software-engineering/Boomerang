@@ -14,20 +14,37 @@
  */
 package test.cases.synchronizd;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class BlockTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class BlockTest {
 
-  private final String target = BlockTarget.class.getName();
+  private Object field;
 
   @Test
   public void block() {
-    analyze(target, testName.getMethodName());
+    synchronized (field) {
+      AllocatedObject o = new SynchronizedAlloc();
+      QueryMethods.queryFor(o);
+    }
   }
 
   @Test
   public void block2() {
-    analyze(target, testName.getMethodName());
+    set();
+    synchronized (field) {
+      Object o = field;
+      QueryMethods.queryFor(o);
+    }
+  }
+
+  private void set() {
+    synchronized (field) {
+      field = new SynchronizedAlloc();
+    }
   }
 }

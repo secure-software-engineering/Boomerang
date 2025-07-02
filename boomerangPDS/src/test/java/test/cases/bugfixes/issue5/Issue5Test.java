@@ -29,12 +29,13 @@ import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.utils.MethodWrapper;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import test.TestingFramework;
 import wpds.impl.NoWeight;
 
@@ -49,12 +50,7 @@ public class Issue5Test {
   @Test
   public void excludeFoo() {
     TestingFramework testingFramework =
-        new TestingFramework() {
-          @Override
-          public List<String> getExcludedPackages() {
-            return List.of(Foo.class.getName());
-          }
-        };
+        new TestingFramework(Collections.emptyList(), List.of(Foo.class.getName()));
 
     MethodWrapper methodWrapper = new MethodWrapper(target, "foos", "java.util.List");
     FrameworkScope frameworkScope = testingFramework.getFrameworkScope(methodWrapper);
@@ -79,7 +75,7 @@ public class Issue5Test {
         new MethodWrapper(Foo.class.getName(), "baz"),
         new MethodWrapper(Foo.class.getName(), "bar"),
         new MethodWrapper(Foo.class.getName(), "<init>"),
-        new MethodWrapper("java.lang.Object", "<init>"));
+        new MethodWrapper(java.lang.Object.class.getName(), "<init>"));
   }
 
   private void assertResults(
@@ -97,7 +93,7 @@ public class Issue5Test {
             .findFirst();
 
     if (newFoo.isEmpty()) {
-      Assert.fail("Could not find instantiation of Foo");
+      Assertions.fail("Could not find instantiation of Foo");
     }
 
     // This will only show results if set_exclude above gets uncommented
@@ -114,7 +110,7 @@ public class Issue5Test {
       methodCalledOnFoo.add(calledMethod.toMethodWrapper());
     }
 
-    Assert.assertEquals(Set.of(expectedCalledMethodsOnFoo), methodCalledOnFoo);
+    Assertions.assertEquals(Set.of(expectedCalledMethodsOnFoo), methodCalledOnFoo);
   }
 
   private static Collection<Statement> getMethodsInvokedFromInstanceInStatement(
@@ -125,7 +121,7 @@ public class Issue5Test {
         queryStatement.getMethod().getControlFlowGraph().getSuccsOf(queryStatement).stream()
             .findFirst();
     if (successorStmt.isEmpty()) {
-      Assert.fail("Could not find successor for " + queryStatement);
+      Assertions.fail("Could not find successor for " + queryStatement);
     }
 
     ForwardQuery fwq = new ForwardQuery(new Edge(queryStatement, successorStmt.get()), var);

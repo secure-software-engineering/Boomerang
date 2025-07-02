@@ -14,15 +14,30 @@
  */
 package test.cases.typing;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class TypeConfusionTest extends AbstractBoomerangTest {
-
-  private final String target = TypeConfusionTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class TypeConfusionTest {
 
   @Test
   public void invokesInterface() {
-    analyze(target, testName.getMethodName());
+    B b = new B();
+    A a1 = new A();
+    Object o = b;
+    A a = null;
+    if (Math.random() > 0.5) {
+      a = a1;
+    } else {
+      a = (A) o;
+    }
+    QueryMethods.queryFor(a);
   }
+
+  private static class A implements AllocatedObject {}
+
+  private static class B {}
 }

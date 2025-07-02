@@ -17,13 +17,12 @@ package boomerang.scope.opal
 import boomerang.scope.DataFlowScope
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
-import boomerang.scope.test.targets.BranchingTarget
 import boomerang.scope.test.targets.InvokeExprTarget
 import boomerang.scope.test.targets.SingleTarget
 import com.typesafe.config.ConfigValueFactory
 import java.util
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.cg.InitialEntryPointsKey
 import org.opalj.tac.cg.CallGraph
@@ -100,14 +99,14 @@ class OpalInvokeExprTest {
       if (stmt.containsInvokeExpr()) {
         val invokeExpr = stmt.getInvokeExpr
 
-        Assert.assertTrue(invokeExpr.isStaticInvokeExpr)
-        Assert.assertEquals(2, invokeExpr.getArgs.size())
+        Assertions.assertTrue(invokeExpr.isStaticInvokeExpr)
+        Assertions.assertEquals(2, invokeExpr.getArgs.size())
 
         checked = true
       }
     })
 
-    Assert.assertTrue(checked)
+    Assertions.assertTrue(checked)
   }
 
 }

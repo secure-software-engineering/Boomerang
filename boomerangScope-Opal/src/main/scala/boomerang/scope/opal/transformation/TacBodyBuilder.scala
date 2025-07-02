@@ -16,7 +16,6 @@ package boomerang.scope.opal.transformation
 
 import boomerang.scope.opal.transformation.stack.OperandStackBuilder
 import boomerang.scope.opal.transformation.transformer._
-import org.opalj.ai.domain.l0.PrimitiveTACAIDomain
 import org.opalj.br.Method
 import org.opalj.br.analyses.Project
 import org.opalj.br.cfg.CFGFactory
@@ -36,12 +35,7 @@ object TacBodyBuilder {
     val tacNaive = TACNaive(method, project.classHierarchy)
     val stackHandler = OperandStackBuilder(method, tacNaive)
 
-    // TODO
-    //  We are only interested in the type information, so there may be
-    //  a more suitable domain
-    val domain = new PrimitiveTACAIDomain(project.classHierarchy, method)
-    val localTransformedTac =
-      LocalTransformer(project, method, tacNaive, stackHandler, domain)
+    val localTransformedTac = LocalTransformer(method, tacNaive, stackHandler)
     assert(
       tacNaive.stmts.length == localTransformedTac.length,
       "Wrong transformation"
@@ -77,7 +71,7 @@ object TacBodyBuilder {
       StmtGraph(propagatedTac, tacCfg, tacNaive.pcToIndex, exceptionHandlers)
 
     stmtGraph = NopTransformer(stmtGraph)
-    stmtGraph = NullifyFieldsTransformer(project, method, stmtGraph)
+    stmtGraph = NullifyFieldsTransformer(method, stmtGraph)
     stmtGraph = NopEliminator(stmtGraph)
 
     new BoomerangTACode(stmtGraph)

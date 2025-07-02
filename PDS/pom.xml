@@ -23,5 +23,4 @@
     <properties>
         <license.dir>${project.parent.basedir}</license.dir>
     </properties>
-
 </project>

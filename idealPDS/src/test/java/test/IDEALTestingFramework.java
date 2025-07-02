@@ -41,30 +41,29 @@ import ideal.StoreIDEALResultHandler;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
 import typestate.TransitionFunction;
 import typestate.finiteautomata.TypeStateMachineWeightFunctions;
 
-public abstract class IDEALTestingFramework extends TestingFramework {
+public class IDEALTestingFramework extends TestingFramework {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IDEALTestingFramework.class);
 
-  @Rule public TestName testName = new TestName();
+  private final TypeStateMachineWeightFunctions stateMachine;
 
-  private final StoreIDEALResultHandler<TransitionFunction> resultHandler;
+  public IDEALTestingFramework(
+      TypeStateMachineWeightFunctions stateMachine,
+      Collection<String> includedClasses,
+      Collection<String> excludedClasses) {
+    super(includedClasses, excludedClasses);
 
-  protected IDEALTestingFramework() {
-    this.resultHandler = new StoreIDEALResultHandler<>();
+    this.stateMachine = stateMachine;
   }
 
   public void analyze(
-      String targetClassName, String targetMethodName, int expectedAssertions, int expectedSeeds) {
+      String targetClassName, String targetMethodName, int expectedSeeds, int expectedAssertions) {
     LOGGER.info(
         "Running '{}' in class '{}' with {} assertions",
         targetMethodName,
@@ -80,7 +79,7 @@ public abstract class IDEALTestingFramework extends TestingFramework {
     Collection<Assertion> assertions =
         parseExpectedQueryResults(frameworkScope.getCallGraph(), testMethod);
     if (assertions.size() != expectedAssertions) {
-      Assert.fail(
+      org.junit.jupiter.api.Assertions.fail(
           "Unexpected number of assertions in target program. Expected "
               + expectedAssertions
               + ", got "
@@ -89,14 +88,15 @@ public abstract class IDEALTestingFramework extends TestingFramework {
     TestingResultReporter resultReporter = new TestingResultReporter(assertions);
 
     // Run IDEal
-    IDEALAnalysis<TransitionFunction> idealAnalysis = createAnalysis(frameworkScope);
+    StoreIDEALResultHandler<TransitionFunction> resultHandler = new StoreIDEALResultHandler<>();
+    IDEALAnalysis<TransitionFunction> idealAnalysis = createAnalysis(frameworkScope, resultHandler);
     idealAnalysis.run();
 
     // Update results
     Collection<WeightedForwardQuery<TransitionFunction>> seeds =
         resultHandler.getResults().keySet();
     if (seeds.size() != expectedSeeds) {
-      Assert.fail(
+      org.junit.jupiter.api.Assertions.fail(
           "Unexpected number of seeds. Expected " + expectedSeeds + ", got " + seeds.size());
     }
 
@@ -108,21 +108,22 @@ public abstract class IDEALTestingFramework extends TestingFramework {
     assertResults(assertions);
   }
 
-  protected IDEALAnalysis<TransitionFunction> createAnalysis(FrameworkScope frameworkScope) {
+  protected IDEALAnalysis<TransitionFunction> createAnalysis(
+      FrameworkScope frameworkScope, StoreIDEALResultHandler<TransitionFunction> resultHandler) {
     return new IDEALAnalysis<>(
         new IDEALAnalysisDefinition<>() {
 
           @Override
           public Collection<WeightedForwardQuery<TransitionFunction>> generate(
               ControlFlowGraph.Edge stmt) {
-            return getStateMachine().generateSeed(stmt);
+            return stateMachine.generateSeed(stmt);
           }
 
           @Override
           public WeightFunctions<
                   ControlFlowGraph.Edge, Val, ControlFlowGraph.Edge, TransitionFunction>
               weightFunctions() {
-            return getStateMachine();
+            return stateMachine;
           }
 
           @Override
@@ -150,8 +151,6 @@ public abstract class IDEALTestingFramework extends TestingFramework {
           }
         });
   }
-
-  protected abstract TypeStateMachineWeightFunctions getStateMachine();
 
   private Collection<Assertion> parseExpectedQueryResults(CallGraph callGraph, Method testMethod) {
     Collection<Assertion> results = new HashSet<>();
@@ -212,10 +211,5 @@ public abstract class IDEALTestingFramework extends TestingFramework {
         queries.add(new MayBeInErrorState(stmt, seed));
       }
     }
-  }
-
-  @After
-  public void cleanUp() {
-    super.cleanUp();
   }
 }

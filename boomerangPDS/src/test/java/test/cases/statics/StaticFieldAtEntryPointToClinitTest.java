@@ -14,33 +14,41 @@
  */
 package test.cases.statics;
 
-import boomerang.options.BoomerangOptions;
-import boomerang.solver.Strategies;
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-@Ignore(
+@Disabled(
     "After discovering the allocation site, the forward flow does not reach the query statement")
-public class StaticFieldAtEntryPointToClinitTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class StaticFieldAtEntryPointToClinitTest {
 
-  private final String target = StaticFieldAtEntryPointToClinitTarget.class.getName();
-
-  @Override
-  protected BoomerangOptions createBoomerangOptions() {
+  /*protected BoomerangOptions createBoomerangOptions() {
     return BoomerangOptions.builder()
         .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
         .enableTrackStaticFieldAtEntryPointToClinit(true)
         .build();
+  }*/
+
+  public static class ClassWithStaticField {
+    private static final StaticsAlloc alloc = new StaticsAlloc();
   }
 
   @Test
   public void staticFieldAtEntryPointTest() {
-    analyze(target, testName.getMethodName());
+    StaticsAlloc loadedAlloc = ClassWithStaticField.alloc;
+    QueryMethods.queryFor(loadedAlloc);
+  }
+
+  public static void loadStaticField() {
+    StaticsAlloc loadedAlloc = ClassWithStaticField.alloc;
+    QueryMethods.queryFor(loadedAlloc);
   }
 
   @Test
   public void staticFieldAtEntryPointWithLoadTest() {
-    analyze(target, testName.getMethodName());
+    loadStaticField();
   }
 }

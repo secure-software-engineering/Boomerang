@@ -14,22 +14,58 @@
  */
 package test.cases.exceptions;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-@Ignore
-public class ExceptionTest extends AbstractBoomerangTest {
-
-  private final String target = ExceptionTarget.class.getName();
+@Disabled(
+    "Cannot be tested because exceptions are instantiated implicitly (i.e. no 'new Exception()'")
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ExceptionTest {
 
   @Test
   public void compileTimeExceptionFlow() {
-    analyze(target, testName.getMethodName());
+    try {
+      throwException();
+    } catch (MyException e) {
+      ExceptionAlloc object = e.field;
+      QueryMethods.queryFor(e);
+    }
   }
 
   @Test
   public void runtimeExceptionFlow() {
-    analyze(target, testName.getMethodName());
+    try {
+      throwRuntimeException();
+    } catch (MyRuntimeException e) {
+      ExceptionAlloc object = e.field;
+      QueryMethods.queryFor(e);
+    }
+  }
+
+  private void throwRuntimeException() {
+    new MyRuntimeException(new ExceptionAlloc());
+  }
+
+  private static class MyRuntimeException extends RuntimeException {
+    ExceptionAlloc field;
+
+    public MyRuntimeException(ExceptionAlloc alloc) {
+      field = alloc;
+    }
+  }
+
+  private void throwException() throws MyException {
+    throw new MyException(new ExceptionAlloc());
+  }
+
+  private static class MyException extends Exception {
+    ExceptionAlloc field;
+
+    public MyException(ExceptionAlloc alloc) {
+      field = alloc;
+    }
   }
 }

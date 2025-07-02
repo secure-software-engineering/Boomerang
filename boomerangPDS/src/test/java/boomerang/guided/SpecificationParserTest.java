@@ -14,8 +14,8 @@
  */
 package boomerang.guided;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SpecificationParserTest {
 
@@ -23,13 +23,13 @@ public class SpecificationParserTest {
   public void specificationParserTest1() {
     Specification specification =
         Specification.create("<GO{F}java.lang.String: void <init>(ON{F}java.lang.String)>");
-    Assert.assertEquals(specification.getMethodAndQueries().size(), 1);
+    Assertions.assertEquals(specification.getMethodAndQueries().size(), 1);
   }
 
   @Test
   public void specificationParserTest2() {
     Specification specification =
         Specification.create("<ON{B}java.lang.String: void <init>(GO{B}java.lang.String)>)");
-    Assert.assertEquals(specification.getMethodAndQueries().size(), 1);
+    Assertions.assertEquals(specification.getMethodAndQueries().size(), 1);
   }
 }

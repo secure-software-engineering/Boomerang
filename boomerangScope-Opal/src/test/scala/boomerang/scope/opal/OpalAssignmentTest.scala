@@ -17,8 +17,8 @@ package boomerang.scope.opal
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.AssignmentTarget
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class OpalAssignmentTest {
 
@@ -44,15 +44,15 @@ class OpalAssignmentTest {
           arrayAllocationCount += 1
 
           val leftOp = stmt.getLeftOp
-          Assert.assertTrue(leftOp.isLocal)
+          Assertions.assertTrue(leftOp.isLocal)
 
-          Assert.assertTrue(rightOp.getArrayAllocationSize.isIntConstant)
-          Assert.assertEquals(2, rightOp.getArrayAllocationSize.getIntValue)
+          Assertions.assertTrue(rightOp.getArrayAllocationSize.isIntConstant)
+          Assertions.assertEquals(2, rightOp.getArrayAllocationSize.getIntValue)
         }
       }
     })
 
-    Assert.assertEquals(1, arrayAllocationCount)
+    Assertions.assertEquals(1, arrayAllocationCount)
   }
 
   @Test
@@ -75,18 +75,18 @@ class OpalAssignmentTest {
 
         if (rightOp.isArrayAllocationVal) {
           val leftOp = stmt.getLeftOp
-          Assert.assertTrue(leftOp.isLocal)
+          Assertions.assertTrue(leftOp.isLocal)
 
           val arraySize = rightOp.getArrayAllocationSize
-          Assert.assertTrue(arraySize.isIntConstant)
-          Assert.assertEquals(2, arraySize.getIntValue)
+          Assertions.assertTrue(arraySize.isIntConstant)
+          Assertions.assertEquals(2, arraySize.getIntValue)
 
           checked = true
         }
       }
     })
 
-    Assert.assertTrue(checked)
+    Assertions.assertTrue(checked)
   }
 
   @Test
@@ -108,32 +108,32 @@ class OpalAssignmentTest {
         val leftOp = stmt.getLeftOp
         val rightOp = stmt.getRightOp
 
-        Assert.assertTrue(leftOp.isLocal)
+        Assertions.assertTrue(leftOp.isLocal)
 
         if (rightOp.isIntConstant) {
           constantCount += 1
 
-          Assert.assertEquals(10, rightOp.getIntValue)
-          Assert.assertTrue(rightOp.getType.toString.equals("int"))
+          Assertions.assertEquals(10, rightOp.getIntValue)
+          Assertions.assertTrue(rightOp.getType.toString.equals("int"))
         }
 
         if (rightOp.isLongConstant) {
           constantCount += 1
 
-          Assert.assertEquals(1000, rightOp.getLongValue)
-          Assert.assertTrue(rightOp.getType.toString.equals("long"))
+          Assertions.assertEquals(1000, rightOp.getLongValue)
+          Assertions.assertTrue(rightOp.getType.toString.equals("long"))
         }
 
         if (rightOp.isStringConstant) {
           constantCount += 1
 
-          Assert.assertTrue(rightOp.getStringValue.equals("test"))
-          Assert.assertTrue(rightOp.getType.toString.equals("java.lang.String"))
+          Assertions.assertTrue(rightOp.getStringValue.equals("test"))
+          Assertions.assertTrue(rightOp.getType.toString.equals("java.lang.String"))
         }
       }
     })
 
-    Assert.assertEquals(3, constantCount)
+    Assertions.assertEquals(3, constantCount)
   }
 
   @Test
@@ -151,10 +151,7 @@ class OpalAssignmentTest {
 
     opalMethod.getStatements.forEach(stmt => {
       if (stmt.isFieldStore) {
-        Assert.assertTrue(stmt.isAssignStmt)
-
-        val leftOp = stmt.getLeftOp
-        val rightOp = stmt.getRightOp
+        Assertions.assertTrue(stmt.isAssignStmt)
       }
     })
   }

@@ -14,17 +14,29 @@
  */
 package test.cases.sets;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import java.util.HashSet;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class HashSetsLongTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class HashSetsLongTest {
 
-  private final String target = HashSetsLongTarget.class.getName();
-
-  @Ignore
+  @Disabled
   @Test
   public void addAndRetrieve() {
-    analyze(target, testName.getMethodName());
+    HashSet<Object> set = new HashSet<>();
+    AllocatedObject alias = new AllocatedObject() {};
+    AllocatedObject alias3 = new AllocatedObject() {};
+    set.add(alias);
+    set.add(alias3);
+    Object alias2 = null;
+    for (Object o : set) alias2 = o;
+    Object ir = alias2;
+    Object query2 = ir;
+    QueryMethods.queryFor(query2);
   }
 }

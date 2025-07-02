@@ -83,98 +83,44 @@
         <enforced-maven-version>3.6.1</enforced-maven-version>
         <!-- See https://www.eclipse.org/projects/handbook/#ip-copyright-headers -->
         <license.dir>${project.basedir}</license.dir>
+
+        <soot.version>4.6.0</soot.version>
+        <sootup.version>2.0.0</sootup.version>
+        <opal.version>5.0.0</opal.version>
+        <junit.version>5.13.1</junit.version>
+        <guava.version>33.4.8-jre</guava.version>
+        <jspecify.version>1.0.0</jspecify.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Logger API and provider -->
             <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>pathexpression</artifactId>
-                <version>1.0.7</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>2.0.17</version>
             </dependency>
             <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>WPDS</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>2.0.17</version>
             </dependency>
+
+            <!-- JUnit API and engine -->
             <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>PDS</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>synchronizedPDS</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>boomerangPDS</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>boomerangScope</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>boomerangScope-Soot</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>boomerangScope-SootUp</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>boomerangScope-Opal</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>boomerangScope-WALA</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.fraunhofer.iem</groupId>
-                <artifactId>testCore</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.17</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.17</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.4.8-jre</version>
-        </dependency>
-        <!-- This dependency is here, so Maven and any IDE can compile Java and Scala code simultaneously -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <pluginManagement>
@@ -230,10 +176,12 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.8.1</version>
                     <configuration>
-                        <ignoredDependencies>
-                            <ignoredDependency>org.slf4j:slf4j-api</ignoredDependency>
-                            <ignoredDependency>org.slf4j:slf4j-simple</ignoredDependency>
-                        </ignoredDependencies>
+                        <ignoredUnusedDeclaredDependencies>
+                            <!-- The logger api requires a concrete provider that is not explicitly used by this project: https://www.slf4j.org/manual.html -->
+                            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-simple</ignoredUnusedDeclaredDependency>
+                            <!-- The JUnit api requires a concrete engine that is not explicitly used by this project -->
+                            <ignoredUnusedDeclaredDependency>org.junit.jupiter:junit-jupiter-engine</ignoredUnusedDeclaredDependency>
+                        </ignoredUnusedDeclaredDependencies>
                     </configuration>
                 </plugin>
             </plugins>
@@ -310,14 +258,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
                 <configuration>
-                    <argLine>-Xmx8G -Xss128m</argLine>
-                    <systemProperties>
+                    <argLine>-Xmx8g -Xms256m -Xss8m</argLine>
+                    <systemPropertyVariables>
                         <property>
                             <name>testSetup</name>
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${testSetup}</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -374,7 +322,8 @@
                                     <rules>
                                         <requireProperty>
                                             <property>testSetup</property>
-                                            <message>Running the tests requires the testSetup property. Use e.g. -DtestSetup=soot</message>
+                                            <regex>^(Soot|SootUp|Opal)$</regex>
+                                            <message>Running the tests requires the '-DtestSetup' flag. Possible values are {Soot, SootUp, Opal}</message>
                                         </requireProperty>
                                     </rules>
                                 </configuration>

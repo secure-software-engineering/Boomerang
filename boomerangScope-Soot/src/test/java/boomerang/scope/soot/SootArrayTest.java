@@ -21,8 +21,8 @@ import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleMethod;
 import boomerang.scope.test.MethodSignature;
 import boomerang.scope.test.targets.ArrayTarget;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import soot.Scene;
 import soot.SootMethod;
 
@@ -43,15 +43,15 @@ public class SootArrayTest {
         arrayStoreCount++;
 
         IArrayRef arrayBase = stmt.getArrayBase();
-        Assert.assertFalse(arrayBase.getBase().isArrayRef());
-        Assert.assertTrue(arrayBase.getBase().isLocal());
-        Assert.assertEquals(0, arrayBase.getIndex());
+        Assertions.assertFalse(arrayBase.getBase().isArrayRef());
+        Assertions.assertTrue(arrayBase.getBase().isLocal());
+        Assertions.assertEquals(0, arrayBase.getIndex());
 
         Val leftOp = stmt.getLeftOp();
-        Assert.assertTrue(leftOp.isArrayRef());
+        Assertions.assertTrue(leftOp.isArrayRef());
       }
     }
 
-    Assert.assertEquals(1, arrayStoreCount);
+    Assertions.assertEquals(1, arrayStoreCount);
   }
 }

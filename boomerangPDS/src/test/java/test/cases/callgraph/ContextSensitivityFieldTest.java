@@ -14,18 +14,60 @@
  */
 package test.cases.callgraph;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class ContextSensitivityFieldTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ContextSensitivityFieldTest {
 
-  private final String target = ContextSensitivityFieldTarget.class.getName();
-
-  // Method WrongSubclass.foo(Object o) is incorrectly marked as reachable.
-  @Ignore
+  @Disabled("Method WrongSubclass.foo(Object o) is incorrectly marked as reachable.")
   @Test
   public void testOnlyCorrectContextInCallGraph() {
-    analyze(target, testName.getMethodName());
+    wrongContext();
+    SuperClass type = new CorrectSubclass();
+    Object alloc = method(type);
+    QueryMethods.queryFor(alloc);
+  }
+
+  public void wrongContext() {
+    SuperClass type = new WrongSubclass();
+    method(type);
+  }
+
+  public Object method(SuperClass type) {
+    CallGraphAlloc alloc = new CallGraphAlloc();
+    type.foo(alloc);
+    return type.getO();
+  }
+
+  public static class SuperClass {
+    Object o;
+
+    public void foo(Object o) {
+      this.o = o;
+    }
+
+    public Object getO() {
+      return o;
+    }
+  }
+
+  static class CorrectSubclass extends SuperClass {
+
+    public void foo(Object o) {
+      super.foo(o);
+    }
+  }
+
+  static class WrongSubclass extends SuperClass {
+
+    public void foo(Object o) {
+      unreachable(o);
+    }
+
+    public void unreachable(Object o) {}
   }
 }

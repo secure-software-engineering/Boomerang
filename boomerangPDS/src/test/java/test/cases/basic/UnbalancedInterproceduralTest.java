@@ -14,20 +14,33 @@
  */
 package test.cases.basic;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class UnbalancedInterproceduralTest extends AbstractBoomerangTest {
-
-  private final String target = UnbalancedInterproceduralTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class UnbalancedInterproceduralTest {
 
   @Test
   public void unbalancedCreation() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias1 = create();
+    BasicAlloc query = alias1;
+    QueryMethods.queryFor(query);
   }
 
   @Test
   public void doubleUnbalancedCreation() {
-    analyze(target, testName.getMethodName());
+    BasicAlloc alias1 = wrappedCreate();
+    BasicAlloc query = alias1;
+    QueryMethods.queryFor(query);
+  }
+
+  private BasicAlloc wrappedCreate() {
+    return create();
+  }
+
+  private BasicAlloc create() {
+    return new BasicAlloc();
   }
 }

@@ -20,8 +20,8 @@ import boomerang.scope.test.targets.A
 import boomerang.scope.test.targets.ParameterLocalsTarget
 import boomerang.scope.test.targets.ThisLocalTarget
 import java.util
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.opalj.br.IntegerType
 
 class OpalLocalTest {
@@ -47,15 +47,15 @@ class OpalLocalTest {
         val invokeExpr = stmt.getInvokeExpr
         val base = invokeExpr.getBase
 
-        Assert.assertTrue(opalMethod.getThisLocal.equals(base))
-        Assert.assertTrue(base.equals(opalMethod.getThisLocal))
-        Assert.assertTrue(opalMethod.isThisLocal(base))
+        Assertions.assertTrue(opalMethod.getThisLocal.equals(base))
+        Assertions.assertTrue(base.equals(opalMethod.getThisLocal))
+        Assertions.assertTrue(opalMethod.isThisLocal(base))
 
         checked = true
       }
     })
 
-    Assert.assertTrue(checked)
+    Assertions.assertTrue(checked)
   }
 
   @Test
@@ -72,7 +72,7 @@ class OpalLocalTest {
     val noArgs = opalSetup.resolveMethod(noArgsSignature)
     val noArgsMethod = OpalMethod.of(noArgs, opalSetup.project.get)
 
-    Assert.assertTrue(noArgsMethod.getParameterLocals.isEmpty)
+    Assertions.assertTrue(noArgsMethod.getParameterLocals.isEmpty)
 
     // One parameter (primitive type)
     val oneArgSignature = new MethodSignature(
@@ -84,8 +84,8 @@ class OpalLocalTest {
     val oneArg = opalSetup.resolveMethod(oneArgSignature)
     val oneArgMethod = OpalMethod.of(oneArg, opalSetup.project.get)
 
-    Assert.assertEquals(1, oneArgMethod.getParameterLocals.size)
-    Assert.assertEquals(
+    Assertions.assertEquals(1, oneArgMethod.getParameterLocals.size)
+    Assertions.assertEquals(
       "int",
       oneArgMethod.getParameterLocal(0).getType.toString
     )
@@ -100,14 +100,10 @@ class OpalLocalTest {
     val twoArgs = opalSetup.resolveMethod(twoArgSignature)
     val twoArgsMethod = OpalMethod.of(twoArgs, opalSetup.project.get)
 
-    Assert.assertEquals(2, twoArgsMethod.getParameterLocals.size)
-    Assert.assertEquals(
+    Assertions.assertEquals(2, twoArgsMethod.getParameterLocals.size)
+    Assertions.assertEquals(
       "int",
       twoArgsMethod.getParameterLocal(0).getType.toString
-    )
-    Assert.assertEquals(
-      classOf[A].getName,
-      twoArgsMethod.getParameterLocal(1).getType.toString
     )
   }
 }

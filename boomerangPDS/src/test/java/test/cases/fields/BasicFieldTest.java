@@ -14,27 +14,70 @@
  */
 package test.cases.fields;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class BasicFieldTest extends AbstractBoomerangTest {
-
-  private final String target = BasicFieldTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class BasicFieldTest {
 
   @Test
   public void basicFieldReadAndWriteTest() {
-    analyze(target, testName.getMethodName());
+    ClassWithField c = new ClassWithField();
+    FieldAlloc alloc = new FieldAlloc();
+
+    c.field = alloc;
+    FieldAlloc query = c.field;
+
+    QueryMethods.queryFor(query);
   }
 
   @Test
   public void basicFieldGetAndSetTest() {
-    analyze(target, testName.getMethodName());
+    ClassWithField c = new ClassWithField();
+    FieldAlloc alloc = new FieldAlloc();
+
+    c.setField(alloc);
+    FieldAlloc query = c.getField();
+
+    QueryMethods.queryFor(query);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void nestedFieldReadAndWriteTest() {
-    analyze(target, testName.getMethodName());
+    ClassWithNestedFields c = new ClassWithNestedFields();
+    FieldAlloc alloc = new FieldAlloc();
+
+    c.c.field = alloc;
+    FieldAlloc query = c.c.field;
+
+    QueryMethods.queryFor(query);
+  }
+
+  private static class ClassWithField {
+    FieldAlloc field;
+
+    public FieldAlloc getField() {
+      return field;
+    }
+
+    public void setField(FieldAlloc alloc) {
+      this.field = alloc;
+    }
+  }
+
+  private static class ClassWithNestedFields {
+    ClassWithField c;
+
+    public ClassWithField getC() {
+      return c;
+    }
+
+    public void setC(ClassWithField c) {
+      this.c = c;
+    }
   }
 }

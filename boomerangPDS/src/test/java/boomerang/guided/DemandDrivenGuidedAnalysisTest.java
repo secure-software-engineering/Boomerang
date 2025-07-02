@@ -54,8 +54,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import test.TestingFramework;
 import wpds.impl.NoWeight;
 
@@ -448,14 +448,14 @@ public class DemandDrivenGuidedAnalysisTest {
                             .equals("boomerang.guided.targets.Query"))
             .findFirst();
     if (newFileStatement.isEmpty()) {
-      Assert.fail("No new file statement found in method " + method.getName());
+      Assertions.fail("No new file statement found in method " + method.getName());
     }
     Val arg = newFileStatement.get().getInvokeExpr().getArg(0);
 
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(newFileStatement.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for statement " + newFileStatement);
+      Assertions.fail("No predecessor found for statement " + newFileStatement);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), newFileStatement.get());
@@ -484,7 +484,7 @@ public class DemandDrivenGuidedAnalysisTest {
                             .equals("java.io.File"))
             .findFirst();
     if (newFileStatement.isEmpty()) {
-      Assert.fail("No new file statement found in method " + method.getName());
+      Assertions.fail("No new file statement found in method " + method.getName());
     }
 
     Val arg = newFileStatement.get().getInvokeExpr().getArg(0);
@@ -492,7 +492,7 @@ public class DemandDrivenGuidedAnalysisTest {
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(newFileStatement.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for statement " + newFileStatement);
+      Assertions.fail("No predecessor found for statement " + newFileStatement);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), newFileStatement.get());
@@ -506,14 +506,14 @@ public class DemandDrivenGuidedAnalysisTest {
             .filter(x -> x.getInvokeExpr().getDeclaredMethod().getName().equals("toString"))
             .findFirst();
     if (toStringCall.isEmpty()) {
-      Assert.fail("No call to toString() found in method " + method.getName());
+      Assertions.fail("No call to toString() found in method " + method.getName());
     }
 
     Val arg = toStringCall.get().getInvokeExpr().getBase();
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(toStringCall.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for statement " + toStringCall);
+      Assertions.fail("No predecessor found for statement " + toStringCall);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), toStringCall.get());
@@ -581,7 +581,7 @@ public class DemandDrivenGuidedAnalysisTest {
             .map(x -> (x.isIntConstant() ? x.getIntValue() : x.getStringValue()))
             .collect(Collectors.toSet());
 
-    Assert.assertEquals(Set.of(expectedValues), collect);
+    Assertions.assertEquals(Set.of(expectedValues), collect);
   }
 
   private IAllocationSite allocationSite() {

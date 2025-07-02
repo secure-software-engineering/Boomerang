@@ -14,8 +14,6 @@
  */
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static tests.TestHelper.ACC;
 import static tests.TestHelper.a;
 import static tests.TestHelper.accepts;
@@ -25,21 +23,22 @@ import static tests.TestHelper.push;
 import static tests.TestHelper.t;
 
 import java.util.Collection;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import tests.TestHelper.Abstraction;
 import tests.TestHelper.StackSymbol;
 import wpds.impl.PAutomaton;
 import wpds.impl.PushdownSystem;
 import wpds.impl.Transition;
 
-@Ignore
+@Disabled
 public class PDSPrestarTests {
 
   private PushdownSystem<StackSymbol, Abstraction> pds;
 
-  @Before
+  @BeforeEach
   public void init() {
     pds = new PushdownSystem<StackSymbol, Abstraction>() {};
   }
@@ -50,9 +49,9 @@ public class PDSPrestarTests {
     pds.addRule(normal(1, "2", 1, "3"));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "3");
     pds.prestar(fa);
-    assertEquals(fa.getTransitions().size(), 3);
-    assertEquals(fa.getStates().size(), 2);
-    assertTrue(fa.getStates().contains(a(1)));
+    Assertions.assertEquals(fa.getTransitions().size(), 3);
+    Assertions.assertEquals(fa.getStates().size(), 2);
+    Assertions.assertTrue(fa.getStates().contains(a(1)));
   }
 
   @Test
@@ -61,10 +60,10 @@ public class PDSPrestarTests {
     pds.addRule(normal(2, "b", 2, "c"));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(2, "c");
     pds.prestar(fa);
-    assertEquals(fa.getTransitions().size(), 3);
-    assertEquals(fa.getStates().size(), 3);
-    assertTrue(fa.getStates().contains(a(1)));
-    assertTrue(fa.getStates().contains(a(2)));
+    Assertions.assertEquals(fa.getTransitions().size(), 3);
+    Assertions.assertEquals(fa.getStates().size(), 3);
+    Assertions.assertTrue(fa.getStates().contains(a(1)));
+    Assertions.assertTrue(fa.getStates().contains(a(2)));
   }
 
   @Test
@@ -75,8 +74,8 @@ public class PDSPrestarTests {
     pds.addRule(normal(1, "d", 1, "e"));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "e");
     pds.prestar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "c", 1)));
-    assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "c", 1)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
   }
 
   @Test
@@ -91,10 +90,10 @@ public class PDSPrestarTests {
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "k");
     pds.prestar(fa);
     System.out.println(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "k", ACC)));
     fa = accepts(1, "k");
     pds.prestar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
   }
 
   @Test
@@ -109,8 +108,8 @@ public class PDSPrestarTests {
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "k");
     pds.prestar(fa);
     System.out.println(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "c", ACC)));
-    assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "c", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
   }
 
   @Test
@@ -121,7 +120,7 @@ public class PDSPrestarTests {
     pds.addRule(normal(1, "e", 1, "k"));
     PAutomaton<StackSymbol, Abstraction> fa = accepts(1, "k");
     pds.prestar(fa);
-    assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
+    Assertions.assertTrue(fa.getTransitions().contains(t(1, "a", ACC)));
   }
 
   // Example taken from http://research.cs.wisc.edu/wpis/papers/fsttcs07.invited.pdf
@@ -147,6 +146,6 @@ public class PDSPrestarTests {
     transitions.remove(t(1, "n6", ACC));
     transitions.remove(t(1, "n7", 1));
     transitions.remove(t(1, "n8", 1));
-    assertTrue(transitions.isEmpty());
+    Assertions.assertTrue(transitions.isEmpty());
   }
 }

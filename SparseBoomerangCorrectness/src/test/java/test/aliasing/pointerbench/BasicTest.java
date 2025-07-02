@@ -5,7 +5,6 @@ import target.aliasing.PointerBench.basic.*;
 import test.aliasing.AliasingTestSetUp;
 
 public class BasicTest extends AliasingTestSetUp {
-
   @Test
   public void branching1() {
     String queryLHS = "a_q1";

@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import test.setup.OpalTestSetup;
 import test.setup.SootTestSetup;
 import test.setup.SootUpTestSetup;
@@ -35,18 +35,43 @@ public class TestingFramework {
   private static final String SOOT_UP = "sootup";
   private static final String OPAL = "opal";
 
-  private final TestSetup testSetup;
+  /** This variable may be changed to run the tests locally */
+  private static final String DEFAULT_FRAMEWORK = SOOT_UP;
 
-  public TestingFramework() {
-    this.testSetup = getTestSetup();
+  private final TestSetup testSetup;
+  private final Collection<String> includedClasses;
+  private final Collection<String> excludedClasses;
+
+  public enum Framework {
+    SOOT,
+    SOOT_UP,
+    OPAL
   }
 
-  private TestSetup getTestSetup() {
-    String framework = System.getProperty("testSetup");
-    if (framework == null) {
-      // This can be changed when executing tests locally
-      return new OpalTestSetup();
+  private final Framework framework;
+
+  public TestingFramework() {
+    this(Collections.emptySet(), Collections.emptySet());
+  }
+
+  public TestingFramework(Collection<String> includedClasses, Collection<String> excludedClasses) {
+    this.testSetup = createTestSetup();
+    this.includedClasses = includedClasses;
+    this.excludedClasses = excludedClasses;
+
+    if (testSetup instanceof SootTestSetup) {
+      this.framework = Framework.SOOT;
+    } else if (testSetup instanceof SootUpTestSetup) {
+      this.framework = Framework.SOOT_UP;
+    } else if (testSetup instanceof OpalTestSetup) {
+      this.framework = Framework.OPAL;
+    } else {
+      throw new RuntimeException("No valid framework setup: " + testSetup.getClass().getName());
     }
+  }
+
+  private TestSetup createTestSetup() {
+    String framework = System.getProperty("testSetup", DEFAULT_FRAMEWORK);
 
     switch (framework.toLowerCase()) {
       case SOOT:
@@ -63,6 +88,10 @@ public class TestingFramework {
     }
   }
 
+  public Framework getFramework() {
+    return framework;
+  }
+
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {
     return getFrameworkScope(methodWrapper, DataFlowScope.EXCLUDE_PHANTOM_CLASSES);
   }
@@ -70,7 +99,8 @@ public class TestingFramework {
   public FrameworkScope getFrameworkScope(
       MethodWrapper methodWrapper, DataFlowScope dataFlowScope) {
     String classPath = buildClassPath();
-    testSetup.initialize(classPath, methodWrapper, getIncludedPackages(), getExcludedPackages());
+    testSetup.initialize(
+        classPath, methodWrapper, List.copyOf(includedClasses), List.copyOf(excludedClasses));
 
     return testSetup.createFrameworkScope(dataFlowScope);
   }
@@ -107,7 +137,7 @@ public class TestingFramework {
     }
 
     if (!unsound.isEmpty()) {
-      Assert.fail(
+      Assertions.fail(
           "Unsound results:\n- "
               + unsound.stream()
                   .map(Assertion::getAssertedMessage)
@@ -115,7 +145,7 @@ public class TestingFramework {
     }
 
     if (!imprecise.isEmpty() && failOnImprecise) {
-      Assert.fail(
+      Assertions.fail(
           "Imprecise results:\n- "
               + imprecise.stream()
                   .map(Assertion::getAssertedMessage)
@@ -137,13 +167,5 @@ public class TestingFramework {
     if (testSetup != null) {
       testSetup.cleanUp();
     }
-  }
-
-  protected List<String> getIncludedPackages() {
-    return Collections.emptyList();
-  }
-
-  protected List<String> getExcludedPackages() {
-    return Collections.emptyList();
   }
 }

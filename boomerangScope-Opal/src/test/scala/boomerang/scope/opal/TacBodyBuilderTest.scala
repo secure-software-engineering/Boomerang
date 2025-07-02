@@ -21,7 +21,7 @@ import java.nio.file.Files
 import java.nio.file.FileSystems
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.opalj.br.Method
 import org.opalj.br.analyses.Project
 import org.opalj.log.DevNullLogger

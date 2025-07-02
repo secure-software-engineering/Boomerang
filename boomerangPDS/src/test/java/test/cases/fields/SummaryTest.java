@@ -14,20 +14,44 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class SummaryTest extends AbstractBoomerangTest {
-
-  private final String target = SummaryTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class SummaryTest {
 
   @Test
   public void branchedSummaryReuse() {
-    analyze(target, testName.getMethodName());
+    A x = new A();
+    B query = null;
+    if (Math.random() > 0.5) {
+      x.f = new B();
+      query = load(x);
+    } else {
+      x.f = new B();
+      query = load(x);
+    }
+    QueryMethods.queryFor(query);
   }
 
   @Test
   public void simpleNoReuse() {
-    analyze(target, testName.getMethodName());
+    A x = new A();
+    x.f = new B();
+    B query = load(x);
+    QueryMethods.queryFor(query);
   }
+
+  private B load(A x) {
+    return x.f;
+  }
+
+  private class A {
+    B f;
+  }
+
+  private class B implements AllocatedObject {}
 }

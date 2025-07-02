@@ -14,17 +14,51 @@
  */
 package test.cases.callgraph;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.TestingFramework;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.TestParameters;
 
-public class ContextSensitivityTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ContextSensitivityTest {
 
-  private final String target = ContextSensitivityTarget.class.getName();
-
-  @Ignore
   @Test
+  @TestParameters(skipFramework = {TestingFramework.Framework.SOOT})
   public void testOnlyCorrectContextInCallGraph() {
-    analyze(target, testName.getMethodName());
+    wrongContext();
+    SuperClass type = new CorrectSubclass();
+    Object alloc = method(type);
+    QueryMethods.queryFor(alloc);
+  }
+
+  public void wrongContext() {
+    SuperClass type = new WrongSubclass();
+    method(type);
+  }
+
+  public Object method(SuperClass type) {
+    CallGraphAlloc alloc = new CallGraphAlloc();
+    type.foo(alloc);
+    return alloc;
+  }
+
+  public class SuperClass {
+
+    public void foo(Object o) {
+      QueryMethods.unreachable(o);
+    }
+  }
+
+  class CorrectSubclass extends SuperClass {
+    public void foo(Object o) {}
+  }
+
+  class WrongSubclass extends SuperClass {
+
+    public void foo(Object o) {
+      QueryMethods.unreachable(o);
+    }
   }
 }

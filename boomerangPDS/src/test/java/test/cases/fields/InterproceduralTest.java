@@ -14,15 +14,37 @@
  */
 package test.cases.fields;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class InterproceduralTest extends AbstractBoomerangTest {
-
-  private final String target = InterproceduralTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class InterproceduralTest {
 
   @Test
   public void test3() {
-    analyze(target, testName.getMethodName());
+    A a = new A();
+    B b = new B();
+    b.c = new C();
+    alias(a, b);
+    B h = a.b;
+    C query = h.c;
+    QueryMethods.queryFor(query);
   }
+
+  private void alias(A a, B b) {
+    a.b = b;
+  }
+
+  public static class A {
+    B b;
+  }
+
+  public static class B {
+    C c;
+  }
+
+  public static class C implements AllocatedObject {}
 }

@@ -34,8 +34,8 @@ class AllocationSiteOf implements ValueOfInterestInUnit {
     Statement stmt = cfgEdge.getStart();
     if (stmt.isAssignStmt()) {
       if (stmt.getLeftOp().isLocal() && stmt.getRightOp().isNewExpr()) {
-        Type expr = stmt.getRightOp().getNewExprType();
-        if (expr.isSubtypeOf(type)) {
+        Type exprType = stmt.getRightOp().getNewExprType();
+        if (isTypeOrSubType(exprType.toString(), type)) {
           Val local = stmt.getLeftOp();
           ForwardQuery forwardQuery =
               new ForwardQuery(cfgEdge, new AllocVal(local, stmt, stmt.getRightOp()));
@@ -44,5 +44,13 @@ class AllocationSiteOf implements ValueOfInterestInUnit {
       }
     }
     return Optional.empty();
+  }
+
+  private boolean isTypeOrSubType(String subType, String superType) {
+    try {
+      return Class.forName(superType).isAssignableFrom(Class.forName(subType));
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
   }
 }

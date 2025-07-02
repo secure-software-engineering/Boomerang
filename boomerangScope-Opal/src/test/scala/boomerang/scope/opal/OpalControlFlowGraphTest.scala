@@ -17,8 +17,8 @@ package boomerang.scope.opal
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ControlFlowGraphTarget
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.opalj.br.IntegerType
 
 class OpalControlFlowGraphTest {
@@ -39,13 +39,12 @@ class OpalControlFlowGraphTest {
     val opalMethod = OpalMethod.of(method, opalSetup.project.get)
 
     val cfg = opalMethod.getControlFlowGraph
-    Assert.assertTrue(cfg.getStatements.size() > 0)
-    Assert.assertEquals(1, cfg.getStartPoints.size())
-    Assert.assertEquals(2, cfg.getEndPoints.size())
+    Assertions.assertTrue(cfg.getStatements.size() > 0)
+    Assertions.assertEquals(1, cfg.getStartPoints.size())
+    Assertions.assertEquals(2, cfg.getEndPoints.size())
 
     cfg.getEndPoints.forEach(stmt => {
-      Assert.assertTrue(stmt.isReturnStmt)
+      Assertions.assertTrue(stmt.isReturnStmt)
     })
   }
-
 }

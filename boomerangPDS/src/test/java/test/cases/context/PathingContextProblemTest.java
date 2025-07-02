@@ -14,20 +14,63 @@
  */
 package test.cases.context;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
 
-public class PathingContextProblemTest extends AbstractBoomerangTest {
-
-  private final String target = PathingContextProblemTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class PathingContextProblemTest {
 
   @Test
   public void start() {
-    analyze(target, testName.getMethodName());
+    Inner i = new Inner();
+    i.test1();
+    i.test2();
+  }
+
+  public static class Inner {
+
+    public void callee(Object a, Object b) {
+      QueryMethods.queryFor(a);
+    }
+
+    public void test1() {
+      Object a1 = new ContextAlloc();
+      Object b1 = a1;
+      callee(a1, b1);
+    }
+
+    public void test2() {
+      Object a2 = new ContextAlloc();
+      Object b2 = new Object();
+      callee(a2, b2);
+    }
   }
 
   @Test
   public void start2() {
-    analyze(target, testName.getMethodName());
+    Inner2 i = new Inner2();
+    i.test1();
+    i.test2();
+  }
+
+  public static class Inner2 {
+
+    public void callee(Object a, Object b) {
+      QueryMethods.queryFor(b);
+    }
+
+    public void test1() {
+      Object a1 = new ContextAlloc();
+      Object b1 = a1;
+      callee(a1, b1);
+    }
+
+    public void test2() {
+      Object a2 = new Object();
+      Object b2 = new ContextAlloc();
+      callee(a2, b2);
+    }
   }
 }

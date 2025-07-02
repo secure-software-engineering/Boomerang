@@ -14,15 +14,27 @@
  */
 package test.cases.realworld;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.TestParameters;
 
-public class ScalabilityOfBackwardAnalysisTest extends AbstractBoomerangTest {
-
-  private final String target = ScalabilityOfBackwardAnalysisTarget.class.getName();
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class ScalabilityOfBackwardAnalysisTest {
 
   @Test
-  public void simpleButDifficult() {
-    analyze(target, testName.getMethodName(), true);
+  @TestParameters(ignoreAllocSites = true)
+  public void simpleButDifficult() throws IOException {
+    // This test case scales in Whole Program PTS Analysis when we do NOT track subtypes of
+    // Exceptions.
+    // The backward analysis runs into scalability problem, when we enable unbalanced flows.
+    InputStream inputStream = new FileInputStream("");
+    inputStream.close();
+    inputStream.read();
+    QueryMethods.queryFor(inputStream);
   }
 }
