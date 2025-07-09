@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import sootup.core.graph.MutableStmtGraph;
+import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.ClassConstant;
@@ -40,6 +41,8 @@ import sootup.core.transform.BodyInterceptor;
 import sootup.core.types.ClassType;
 import sootup.core.types.ReferenceType;
 import sootup.core.views.View;
+
+import javax.annotation.Nonnull;
 
 public class BoomerangPreInterceptor implements BodyInterceptor {
 
@@ -120,7 +123,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
             && rightOp instanceof Constant
             && !(rightOp instanceof ClassConstant)) {
           String label = LABEL + replaceCounter++;
-          Local local = Jimple.newLocal(label, rightOp.getType());
+          Local local = new ReplacedLocal(label, leftOp, rightOp);
           JAssignStmt newAssignStmt = Jimple.newAssignStmt(local, rightOp, stmt.getPositionInfo());
 
           body.addLocal(local);
@@ -145,7 +148,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
         if (InvokeExprOpt.isPresent()) {
           if (filterTransformableInvokeExprs(stmt)) {
-            transformInInvokeExprs(body, stmt, InvokeExprOpt);
+            transformInInvokeExprs(body, stmt, InvokeExprOpt.get());
           }
         }
       }
@@ -178,9 +181,8 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   private void transformInInvokeExprs(
-      Body.BodyBuilder body, Stmt stmt, Optional<AbstractInvokeExpr> InvokeExprOpt) {
+      Body.BodyBuilder body, Stmt stmt, AbstractInvokeExpr invokeExpr) {
     List<Immediate> newArgs = new ArrayList<>();
-    AbstractInvokeExpr invokeExpr = InvokeExprOpt.get();
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Immediate arg = invokeExpr.getArg(i);
 
@@ -304,11 +306,12 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
                 NullConstant.getInstance(),
                 StmtPositionInfo.getNoStmtPositionInfo());
 
-        Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(bodyBuilder);
+        MutableStmtGraph stmtGraph = bodyBuilder.getStmtGraph();
+        Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(stmtGraph);
         if (firstNonIdentityStmt.isPresent()) {
-          bodyBuilder.getStmtGraph().insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
+          stmtGraph.insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
         } else {
-          bodyBuilder.getStmtGraph().addNode(nullifiedFieldStmt);
+          stmtGraph.addNode(nullifiedFieldStmt);
         }
       }
     }
@@ -332,15 +335,33 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
     return definedFields;
   }
 
-  private Optional<Stmt> findFirstNonIdentityStmt(Body.BodyBuilder bodyBuilder) {
-    for (Stmt stmt : bodyBuilder.getStmts()) {
-      if (stmt instanceof JIdentityStmt) {
-        continue;
+  private Optional<Stmt> findFirstNonIdentityStmt(StmtGraph<?> stmtGraph) {
+      for (Stmt stmt : stmtGraph) {
+          if (stmt instanceof JIdentityStmt) {
+              continue;
+          }
+          return Optional.of(stmt);
       }
-
-      return Optional.of(stmt);
-    }
-
     return Optional.empty();
   }
+
+  /**
+   *    More expressive Local Replacement implementation with reference to the not replaced code Stmt
+   * */
+  private static class ReplacedLocal extends Local {
+
+    final Value lvalue;
+
+    public ReplacedLocal(String label, Value lvalue, Value rvalue) {
+      super(label, rvalue.getType());
+      this.lvalue = lvalue;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+      return super.getName() + "_" + lvalue;
+    }
+  }
+
 }
