@@ -279,7 +279,8 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         sootClass.get().getFields().stream()
             .map(SootClassMember::getSignature)
             .collect(Collectors.toSet());
-    Collection<FieldSignature> definedFields = getDefinedFields(bodyBuilder);
+    MutableStmtGraph graph = bodyBuilder.getStmtGraph();
+    Collection<FieldSignature> definedFields = getDefinedFields(graph);
 
     for (FieldSignature fieldSignature : allFields) {
       if (definedFields.contains(fieldSignature)) {
@@ -298,29 +299,31 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
       // TODO Consider only Ref types or all types?
       if (field.get().getType() instanceof ReferenceType) {
+        // FIXME: don't build a body just for the this local!
+        Local thisLocal = bodyBuilder.build().getThisLocal();
         JInstanceFieldRef nullifiedFieldRef =
-            Jimple.newInstanceFieldRef(bodyBuilder.build().getThisLocal(), fieldSignature);
+            Jimple.newInstanceFieldRef(thisLocal, fieldSignature);
+
         JAssignStmt nullifiedFieldStmt =
             Jimple.newAssignStmt(
                 nullifiedFieldRef,
                 NullConstant.getInstance(),
                 StmtPositionInfo.getNoStmtPositionInfo());
 
-        MutableStmtGraph stmtGraph = bodyBuilder.getStmtGraph();
-        Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(stmtGraph);
+        Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(graph);
         if (firstNonIdentityStmt.isPresent()) {
-          stmtGraph.insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
+          graph.insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
         } else {
-          stmtGraph.addNode(nullifiedFieldStmt);
+          graph.addNode(nullifiedFieldStmt);
         }
       }
     }
   }
 
-  private Collection<FieldSignature> getDefinedFields(Body.BodyBuilder bodyBuilder) {
+  private Collection<FieldSignature> getDefinedFields(StmtGraph<?> stmtGraph) {
     Collection<FieldSignature> definedFields = new LinkedHashSet<>();
 
-    for (Stmt stmt : bodyBuilder.getStmts()) {
+    for (Stmt stmt : stmtGraph) {
       if (stmt instanceof JAssignStmt) {
         LValue leftOp = ((JAssignStmt) stmt).getLeftOp();
 
