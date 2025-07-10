@@ -299,8 +299,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
       // TODO Consider only Ref types or all types?
       if (field.get().getType() instanceof ReferenceType) {
-        // FIXME: don't build a body just for the this local!
-        Local thisLocal = bodyBuilder.build().getThisLocal();
+        Local thisLocal = Jimple.newLocal("this", classType);
         JInstanceFieldRef nullifiedFieldRef =
             Jimple.newInstanceFieldRef(thisLocal, fieldSignature);
 
