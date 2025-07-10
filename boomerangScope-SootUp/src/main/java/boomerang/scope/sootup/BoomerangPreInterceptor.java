@@ -16,6 +16,8 @@ package boomerang.scope.sootup;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jspecify.annotations.NonNull;
 import sootup.core.graph.MutableStmtGraph;
 import sootup.core.graph.StmtGraph;
@@ -73,7 +75,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
     }
   }
 
-  private void addNopStatementsToMethod(Body.BodyBuilder body) {
+  private void addNopStatementsToMethod(Body.@NonNull BodyBuilder body) {
     // Initial nop statement
     JNopStmt initialNop = Jimple.newNopStmt(StmtPositionInfo.getNoStmtPositionInfo());
     MutableStmtGraph stmtGraph = body.getStmtGraph();
@@ -105,9 +107,9 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   private void transformConstantsAtFieldWrites(Body.BodyBuilder body) {
-    Collection<Stmt> stmtsWithConstants = getStatementsWithConstants(body);
-    for (Stmt stmt : stmtsWithConstants) {
-      if (stmt instanceof JAssignStmt) {
+      MutableStmtGraph stmtGraph = body.getStmtGraph();
+      getStatementsWithConstants(body).forEach( stmt -> {
+        if (stmt instanceof JAssignStmt) {
         /* Transform simple assignments to two assignment steps:
          * - value = 10;
          * becomes
@@ -122,20 +124,19 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         if (isFieldRef(leftOp)
             && rightOp instanceof Constant
             && !(rightOp instanceof ClassConstant)) {
+
           String label = LABEL + replaceCounter++;
           Local local = new ReplacedLocal(label, leftOp, rightOp);
           JAssignStmt newAssignStmt = Jimple.newAssignStmt(local, rightOp, stmt.getPositionInfo());
 
           body.addLocal(local);
-          body.getStmtGraph().insertBefore(stmt, newAssignStmt);
+          stmtGraph.insertBefore(stmt, newAssignStmt);
 
           JAssignStmt updatedAssignStmt =
               Jimple.newAssignStmt(leftOp, local, stmt.getPositionInfo());
-          body.getStmtGraph().replaceNode(stmt, updatedAssignStmt);
+          stmtGraph.replaceNode(stmt, updatedAssignStmt);
         }
-      }
-
-      if (stmt.isInvokableStmt()) {
+      }else if (stmt.isInvokableStmt()) {
         /* Extract constant arguments to new assignments
          * - method(10)
          * becomes
@@ -151,9 +152,8 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
             transformInInvokeExprs(body, stmt, InvokeExprOpt.get());
           }
         }
-      }
 
-      if (stmt instanceof JReturnStmt) {
+      } else if (stmt instanceof JReturnStmt) {
         /* Transform return stmtsWithConstants into two stmtsWithConstants
          * - return 10
          * becomes
@@ -168,12 +168,13 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
             Jimple.newAssignStmt(local, returnStmt.getOp(), returnStmt.getPositionInfo());
 
         body.addLocal(local);
-        body.getStmtGraph().insertBefore(stmt, assignStmt);
+        stmtGraph.insertBefore(stmt, assignStmt);
 
         JReturnStmt newReturnStmt = Jimple.newReturnStmt(local, returnStmt.getPositionInfo());
-        body.getStmtGraph().replaceNode(stmt, newReturnStmt);
+        stmtGraph.replaceNode(stmt, newReturnStmt);
       }
-    }
+    });
+
   }
 
   protected boolean filterTransformableInvokeExprs(@NonNull Stmt stmt) {
@@ -220,21 +221,20 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
     }
   }
 
-  private Collection<Stmt> getStatementsWithConstants(Body.BodyBuilder body) {
-    Collection<Stmt> result = new HashSet<>();
+  private Stream<Stmt> getStatementsWithConstants(Body.BodyBuilder body) {
 
     // Assign statements: If the right side is a constant
     // Consider arguments of invoke expressions
     // Check for constant return values
-    body.getStmts()
-        .forEach(
+    return body.getStmts().stream()
+        .filter(
             stmt -> {
               if (stmt instanceof JAssignStmt) {
                 JAssignStmt assignStmt = (JAssignStmt) stmt;
 
                 if (isFieldRef(assignStmt.getLeftOp())
                     && assignStmt.getRightOp() instanceof Constant) {
-                  result.add(stmt);
+                  return true;
                 }
               }
               if (stmt.isInvokableStmt()) {
@@ -244,7 +244,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
                   if (invokeExpr.isPresent()) {
                     for (Value arg : invokeExpr.get().getArgs()) {
                       if (arg instanceof Constant) {
-                        result.add(stmt);
+                        return true;
                       }
                     }
                   }
@@ -253,12 +253,11 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
               if (stmt instanceof JReturnStmt) {
                 JReturnStmt returnStmt = (JReturnStmt) stmt;
                 if (returnStmt.getOp() instanceof Constant) {
-                  result.add(stmt);
+                  return true;
                 }
               }
+              return false;
             });
-
-    return result;
   }
 
   private boolean isFieldRef(Value value) {
@@ -267,7 +266,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         || value instanceof JArrayRef;
   }
 
-  private void addNullifiedFields(Body.BodyBuilder bodyBuilder, View view) {
+  private void addNullifiedFields(Body.@NonNull BodyBuilder bodyBuilder, @NonNull View view) {
     ClassType classType = bodyBuilder.getMethodSignature().getDeclClassType();
     Optional<? extends SootClass> sootClass = view.getClass(classType);
 
@@ -293,15 +292,15 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         continue;
       }
 
-      if (field.get().isStatic() || field.get().isFinal()) {
+      SootField sootField = field.get();
+      if (sootField.isStatic() || sootField.isFinal()) {
         continue;
       }
 
       // TODO Consider only Ref types or all types?
       if (field.get().getType() instanceof ReferenceType) {
-        Local thisLocal = Jimple.newLocal("this", classType);
-        JInstanceFieldRef nullifiedFieldRef =
-            Jimple.newInstanceFieldRef(thisLocal, fieldSignature);
+        Local thisLocal = bodyBuilder.getLocals().stream().filter( l -> l.getName().equals("this")).findAny().orElseThrow();
+        JInstanceFieldRef nullifiedFieldRef = Jimple.newInstanceFieldRef(thisLocal, fieldSignature);
 
         JAssignStmt nullifiedFieldStmt =
             Jimple.newAssignStmt(
