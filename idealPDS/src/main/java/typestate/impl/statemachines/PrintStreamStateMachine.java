@@ -1,12 +1,15 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package typestate.impl.statemachines;
@@ -50,16 +53,28 @@ public class PrintStreamStateMachine extends TypeStateMachineWeightFunctions {
   public PrintStreamStateMachine() {
     addTransition(
         new MatcherTransition(
-            States.CLOSED, CLOSE_METHODS, Parameter.This, States.CLOSED, Type.OnCall));
+            States.CLOSED,
+            CLOSE_METHODS,
+            Parameter.This,
+            States.CLOSED,
+            Type.OnCallOrOnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.CLOSED, READ_METHODS, Parameter.This, States.ERROR, Type.OnCall));
+            States.CLOSED,
+            READ_METHODS,
+            Parameter.This,
+            States.ERROR,
+            Type.OnCallOrOnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, READ_METHODS, Parameter.This, States.ERROR, Type.OnCall));
+            States.ERROR, READ_METHODS, Parameter.This, States.ERROR, Type.OnCallOrOnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, CLOSE_METHODS, Parameter.This, States.ERROR, Type.OnCall));
+            States.ERROR,
+            CLOSE_METHODS,
+            Parameter.This,
+            States.ERROR,
+            Type.OnCallOrOnCallToReturn));
   }
 
   //

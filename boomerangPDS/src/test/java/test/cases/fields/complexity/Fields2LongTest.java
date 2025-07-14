@@ -1,25 +1,58 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package test.cases.fields.complexity;
 
-import org.junit.Test;
-import test.core.AbstractBoomerangTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import test.core.BoomerangTestRunnerInterceptor;
+import test.core.QueryMethods;
+import test.core.selfrunning.AllocatedObject;
 
-public class Fields2LongTest extends AbstractBoomerangTest {
+@ExtendWith(BoomerangTestRunnerInterceptor.class)
+public class Fields2LongTest {
 
-  private final String target = Fields2LongTarget.class.getName();
+  private boolean staticallyUnknown() {
+    return Math.random() > 0.5;
+  }
 
   @Test
   public void test() {
-    analyze(target, testName.getMethodName());
+    TreeNode x = new TreeNode();
+    TreeNode p = null;
+    while (staticallyUnknown()) {
+      if (staticallyUnknown()) {
+        x.a = p;
+      }
+      if (staticallyUnknown()) {
+        x.b = p;
+      }
+      p = x;
+    }
+    TreeNode t = null;
+    if (staticallyUnknown()) {
+      t = x.a;
+    }
+    if (staticallyUnknown()) {
+      t = x.b;
+    }
+    TreeNode h = t;
+    QueryMethods.queryFor(h);
+  }
+
+  public static class TreeNode implements AllocatedObject {
+    TreeNode a = new TreeNode();
+    TreeNode b = new TreeNode();
   }
 }

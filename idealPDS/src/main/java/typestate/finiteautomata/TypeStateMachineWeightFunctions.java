@@ -1,12 +1,15 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package typestate.finiteautomata;
@@ -19,16 +22,18 @@ import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.Node;
 import typestate.TransitionFunction;
+import typestate.TransitionFunctionImpl;
+import typestate.TransitionFunctionOne;
 import typestate.finiteautomata.MatcherTransition.Parameter;
 import typestate.finiteautomata.MatcherTransition.Type;
 
@@ -44,7 +49,7 @@ public abstract class TypeStateMachineWeightFunctions
 
   @Override
   public TransitionFunction getOne() {
-    return TransitionFunction.one();
+    return TransitionFunctionOne.one();
   }
 
   public TransitionFunction pop(Node<Edge, Val> curr) {
@@ -76,11 +81,11 @@ public abstract class TypeStateMachineWeightFunctions
 
   public TransitionFunction callToReturn(
       Node<Edge, Val> curr, Node<Edge, Val> succ, InvokeExpr invokeExpr) {
-    Set<Transition> res = Sets.newHashSet();
+    Set<Transition> res = new LinkedHashSet<>();
     if (invokeExpr.isInstanceInvokeExpr()) {
       if (invokeExpr.getBase().equals(succ.fact())) {
         for (MatcherTransition trans : transition) {
-          if (trans.matches(invokeExpr.getMethod())
+          if (trans.matches(invokeExpr.getDeclaredMethod())
               && (trans.getType().equals(Type.OnCallToReturn)
                   || trans.getType().equals(Type.OnCallOrOnCallToReturn))) {
             res.add(trans);
@@ -91,9 +96,7 @@ public abstract class TypeStateMachineWeightFunctions
     if (!res.isEmpty()) {
       LOGGER.trace("Typestate transition at {} to {}, [{}]", succ.stmt(), res, Type.OnCallToReturn);
     }
-    return (res.isEmpty()
-        ? getOne()
-        : new TransitionFunction(res, Collections.singleton(succ.stmt())));
+    return (res.isEmpty() ? getOne() : new TransitionFunctionImpl(res, succ.stmt().getStart()));
   }
 
   private TransitionFunction getMatchingTransitions(
@@ -103,26 +106,26 @@ public abstract class TypeStateMachineWeightFunctions
       Collection<MatcherTransition> filteredTrans,
       Type type) {
     Statement transitionStmt = transitionEdge.getStart();
-    Set<ITransition> res = new HashSet<>();
+    Set<Transition> res = new HashSet<>();
     if (filteredTrans.isEmpty() || !transitionStmt.containsInvokeExpr()) return getOne();
     for (MatcherTransition trans : filteredTrans) {
-      if (trans.matches(transitionStmt.getInvokeExpr().getMethod())) {
+      if (trans.matches(transitionStmt.getInvokeExpr().getDeclaredMethod())) {
         LOGGER.trace(
             "Found potential transition at {}, now checking if parameter match", transitionStmt);
         Parameter param = trans.getParam();
         if (param.equals(Parameter.This) && edge.getMethod().isThisLocal(node))
-          res.add(new Transition(trans.from(), trans.to()));
+          res.add(new TransitionImpl(trans.from(), trans.to()));
         if (param.equals(Parameter.Param1) && edge.getMethod().getParameterLocal(0).equals(node))
-          res.add(new Transition(trans.from(), trans.to()));
+          res.add(new TransitionImpl(trans.from(), trans.to()));
         if (param.equals(Parameter.Param2) && edge.getMethod().getParameterLocal(1).equals(node))
-          res.add(new Transition(trans.from(), trans.to()));
+          res.add(new TransitionImpl(trans.from(), trans.to()));
       }
     }
 
     if (res.isEmpty()) return getOne();
 
     LOGGER.debug("Typestate transition at {} to {}, [{}]", transitionStmt, res, type);
-    return new TransitionFunction(res, Collections.singleton(transitionEdge));
+    return new TransitionFunctionImpl(res, transitionStmt);
   }
 
   /*
@@ -143,21 +146,23 @@ public abstract class TypeStateMachineWeightFunctions
     if (s.isAssignStmt()) {
       return Collections.singleton(
           new WeightedForwardQuery<>(
-              edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition()));
+              edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition(edge)));
     }
     return Collections.emptySet();
   }
 
   protected Collection<WeightedForwardQuery<TransitionFunction>> generateAtAllocationSiteOf(
-      Edge edge, Class allocationSuperType) {
+      Edge edge, Class<?> allocationSuperType) {
     Statement s = edge.getStart();
     if (s.isAssignStmt()) {
       if (s.getRightOp().isNewExpr()) {
         boomerang.scope.Type newExprType = s.getRightOp().getNewExprType();
         if (newExprType.isSubtypeOf(allocationSuperType.getName())) {
+          TransitionFunction function =
+              new TransitionFunctionImpl(new TransitionImpl(initialState(), initialState()), s);
           return Collections.singleton(
               new WeightedForwardQuery<>(
-                  edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), initialTransition()));
+                  edge, new AllocVal(s.getLeftOp(), s, s.getRightOp()), function));
         }
       }
     }
@@ -170,11 +175,15 @@ public abstract class TypeStateMachineWeightFunctions
     if (unit.containsInvokeExpr()) {
       if (unit.getInvokeExpr().isInstanceInvokeExpr()) {
         Val base = unit.getInvokeExpr().getBase();
-        if (unit.getInvokeExpr().getMethod().getSignature().matches(declaredMethod)) {
+        // TODO
+        //  Soot, SootUp and Opal use different signatures. Hence, we should move away from
+        //  using basic pattern matching to identify correct methods
+        String sig = " " + unit.getInvokeExpr().getDeclaredMethod().getName();
+        if (sig.matches(declaredMethod)) {
           if (base.getType().isSubtypeOf(declaredType)) {
             return Collections.singleton(
                 new WeightedForwardQuery<>(
-                    edge, new AllocVal(base, unit, base), initialTransition()));
+                    edge, new AllocVal(base, unit, base), initialTransition(edge)));
           }
         }
       }
@@ -189,9 +198,9 @@ public abstract class TypeStateMachineWeightFunctions
 
   public abstract Collection<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge stmt);
 
-  public TransitionFunction initialTransition() {
-    return new TransitionFunction(
-        new Transition(initialState(), initialState()), Collections.emptySet());
+  public TransitionFunction initialTransition(Edge edge) {
+    return new TransitionFunctionImpl(
+        new TransitionImpl(initialState(), initialState()), edge.getStart());
   }
 
   protected abstract State initialState();

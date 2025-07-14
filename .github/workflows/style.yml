@@ -1,0 +1,22 @@
+name: Spotless Style Check
+description: Check the formatting. Use "mvn spotless:apply" to format the code.
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  check-formatting:
+    runs-on: ubuntu-latest
+    name: Check style
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          java-package: jdk
+          java-version: 11
+          
+      - name: Run spotless checks
+        run: mvn spotless:check

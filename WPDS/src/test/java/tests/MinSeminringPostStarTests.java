@@ -1,24 +1,27 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package tests;
 
-import static org.junit.Assert.assertEquals;
 import static tests.TestHelper.ACC;
 import static tests.TestHelper.a;
 import static tests.TestHelper.s;
 import static tests.TestHelper.t;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import tests.TestHelper.Abstraction;
 import tests.TestHelper.StackSymbol;
 import wpds.impl.NormalRule;
@@ -30,7 +33,7 @@ import wpds.impl.WeightedPushdownSystem;
 public class MinSeminringPostStarTests {
   private WeightedPushdownSystem<StackSymbol, Abstraction, MinSemiring> pds;
 
-  @Before
+  @BeforeEach
   public void init() {
     pds = new WeightedPushdownSystem<StackSymbol, Abstraction, MinSemiring>();
   }
@@ -41,9 +44,9 @@ public class MinSeminringPostStarTests {
     pds.addRule(wnormal(2, "b", 3, "c", w(1)));
     WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(fa.getTransitions().size(), 3);
-    assertEquals(fa.getStates().size(), 4);
-    assertEquals(w(2), fa.getWeightFor(t(3, "c", ACC)));
+    Assertions.assertEquals(fa.getTransitions().size(), 3);
+    Assertions.assertEquals(fa.getStates().size(), 4);
+    Assertions.assertEquals(w(2), fa.getWeightFor(t(3, "c", ACC)));
   }
 
   @Test
@@ -54,9 +57,9 @@ public class MinSeminringPostStarTests {
     pds.addRule(wnormal(1, "d", 1, "c", w(1)));
     WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(w(2), fa.getWeightFor(t(1, "c", ACC)));
-    assertEquals(w(1), fa.getWeightFor(t(1, "b", ACC)));
-    assertEquals(w(1), fa.getWeightFor(t(1, "d", ACC)));
+    Assertions.assertEquals(w(2), fa.getWeightFor(t(1, "c", ACC)));
+    Assertions.assertEquals(w(1), fa.getWeightFor(t(1, "b", ACC)));
+    Assertions.assertEquals(w(1), fa.getWeightFor(t(1, "d", ACC)));
   }
 
   @Test
@@ -67,8 +70,8 @@ public class MinSeminringPostStarTests {
     pds.addRule(wpop(1, "e", 1, w(1)));
     WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(w(1), fa.getWeightFor(t(1, "b", ACC)));
-    assertEquals(w(4), fa.getWeightFor(t(1, "d", ACC)));
+    Assertions.assertEquals(w(1), fa.getWeightFor(t(1, "b", ACC)));
+    Assertions.assertEquals(w(4), fa.getWeightFor(t(1, "d", ACC)));
     // assertEquals(w(2), fa.getWeightFor(t(1, "e", a(1, "c"))));
   }
 
@@ -82,8 +85,8 @@ public class MinSeminringPostStarTests {
     WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> fa = waccepts(1, "a", w(0));
 
     pds.poststar(fa);
-    assertEquals(w(5), fa.getWeightFor(t(5, "d", ACC)));
-    assertEquals(w(15), fa.getWeightFor(t(2, "f", ACC)));
+    Assertions.assertEquals(w(5), fa.getWeightFor(t(5, "d", ACC)));
+    Assertions.assertEquals(w(15), fa.getWeightFor(t(2, "f", ACC)));
   }
 
   @Test
@@ -97,17 +100,17 @@ public class MinSeminringPostStarTests {
     pds.addRule(wnormal(1, "g", 1, "h", w(1)));
     WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> fa = waccepts(1, "a", w(0));
     pds.poststar(fa);
-    assertEquals(w(9), fa.getWeightFor(t(1, "h", ACC)));
+    Assertions.assertEquals(w(9), fa.getWeightFor(t(1, "h", ACC)));
   }
 
   private static MinSemiring w(int i) {
-    return new MinSemiring(i);
+    return new MinSemiringImpl(i);
   }
 
   static WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> waccepts(
       int a, String c, MinSemiring weight) {
     WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring> aut =
-        new WeightedPAutomaton<StackSymbol, Abstraction, MinSemiring>() {
+        new WeightedPAutomaton<>() {
 
           @Override
           public Abstraction createState(Abstraction d, StackSymbol loc) {
@@ -121,7 +124,7 @@ public class MinSeminringPostStarTests {
 
           @Override
           public MinSemiring getOne() {
-            return MinSemiring.one();
+            return MinSemiringOne.one();
           }
 
           @Override
@@ -137,7 +140,7 @@ public class MinSeminringPostStarTests {
 
   static NormalRule<StackSymbol, Abstraction, MinSemiring> wnormal(
       int a, String n, int b, String m, MinSemiring w) {
-    return new NormalRule<StackSymbol, Abstraction, MinSemiring>(a(a), s(n), a(b), s(m), w);
+    return new NormalRule<>(a(a), s(n), a(b), s(m), w);
   }
 
   static PushRule<StackSymbol, Abstraction, MinSemiring> wpush(
@@ -147,6 +150,6 @@ public class MinSeminringPostStarTests {
 
   static PopRule<StackSymbol, Abstraction, MinSemiring> wpop(
       int a, String n, int b, MinSemiring w) {
-    return new PopRule<StackSymbol, Abstraction, MinSemiring>(a(a), s(n), a(b), w);
+    return new PopRule<>(a(a), s(n), a(b), w);
   }
 }

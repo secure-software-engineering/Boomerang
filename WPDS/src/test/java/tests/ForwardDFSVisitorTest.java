@@ -1,12 +1,15 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package tests;
@@ -20,24 +23,24 @@ import static tests.TestHelper.s;
 import static tests.TestHelper.t;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import tests.TestHelper.Abstraction;
 import tests.TestHelper.StackSymbol;
+import wpds.impl.NoWeight;
 import wpds.impl.PAutomaton;
 import wpds.impl.PushdownSystem;
 import wpds.impl.SummaryNestedWeightedPAutomatons;
 import wpds.impl.Transition;
-import wpds.impl.Weight.NoWeight;
 import wpds.interfaces.ReachabilityListener;
 
 public class ForwardDFSVisitorTest {
   PAutomaton<StackSymbol, Abstraction> fa =
-      new PAutomaton<StackSymbol, Abstraction>() {
+      new PAutomaton<>() {
         @Override
         public Abstraction createState(Abstraction d, StackSymbol loc) {
           return new Abstraction(d, loc);
@@ -53,7 +56,7 @@ public class ForwardDFSVisitorTest {
           return d.s != null;
         }
       };
-  final Set<Transition<StackSymbol, Abstraction>> reachables = Sets.newHashSet();
+  final Set<Transition<StackSymbol, Abstraction>> reachables = new LinkedHashSet<>();
 
   @Test
   public void delayedAdd() {
@@ -66,17 +69,17 @@ public class ForwardDFSVisitorTest {
           }
         });
     fa.addTransition(t(0, "n1", 1));
-    Assert.assertFalse(reachables.isEmpty());
-    Assert.assertTrue(reachableMinusTrans().isEmpty());
+    Assertions.assertFalse(reachables.isEmpty());
+    Assertions.assertTrue(reachableMinusTrans().isEmpty());
     fa.addTransition(t(1, "n1", 2));
-    Assert.assertTrue(reachableMinusTrans().isEmpty());
+    Assertions.assertTrue(reachableMinusTrans().isEmpty());
   }
 
   @Test
   public void delayedAddListener() {
     fa.addTransition(t(0, "n1", 1));
     fa.addTransition(t(1, "n1", 2));
-    Assert.assertFalse(fa.getTransitions().isEmpty());
+    Assertions.assertFalse(fa.getTransitions().isEmpty());
     fa.registerDFSListener(
         a(0),
         new ReachabilityListener<StackSymbol, Abstraction>() {
@@ -85,36 +88,36 @@ public class ForwardDFSVisitorTest {
             reachables.add(t);
           }
         });
-    Assert.assertFalse(reachables.isEmpty());
-    Assert.assertTrue(reachableMinusTrans().isEmpty());
+    Assertions.assertFalse(reachables.isEmpty());
+    Assertions.assertTrue(reachableMinusTrans().isEmpty());
 
     fa.addTransition(t(4, "n1", 5));
-    Assert.assertTrue(fa.getTransitions().size() > reachables.size());
+    Assertions.assertTrue(fa.getTransitions().size() > reachables.size());
 
     fa.addTransition(t(2, "n1", 5));
-    Assert.assertTrue(fa.getTransitions().size() > reachables.size());
-    Assert.assertFalse(reachableMinusTrans().isEmpty());
+    Assertions.assertTrue(fa.getTransitions().size() > reachables.size());
+    Assertions.assertFalse(reachableMinusTrans().isEmpty());
 
     fa.addTransition(t(2, "n1", 4));
 
-    Assert.assertEquals(fa.getTransitions().size(), reachables.size());
-    Assert.assertTrue(reachableMinusTrans().isEmpty());
+    Assertions.assertEquals(fa.getTransitions().size(), reachables.size());
+    Assertions.assertTrue(reachableMinusTrans().isEmpty());
 
     fa.addTransition(t(3, "n1", 8));
     fa.addTransition(t(8, "n1", 9));
     fa.addTransition(t(3, "n1", 7));
     fa.addTransition(t(3, "n1", 6));
     fa.addTransition(t(6, "n1", 3));
-    Assert.assertTrue(fa.getTransitions().size() > reachables.size());
-    Assert.assertFalse(reachableMinusTrans().isEmpty());
+    Assertions.assertTrue(fa.getTransitions().size() > reachables.size());
+    Assertions.assertFalse(reachableMinusTrans().isEmpty());
 
     fa.addTransition(t(1, "n1", 3));
-    Assert.assertTrue(reachableMinusTrans().isEmpty());
+    Assertions.assertTrue(reachableMinusTrans().isEmpty());
   }
 
   private PushdownSystem<StackSymbol, Abstraction> pds;
 
-  @Before
+  @BeforeEach
   public void init() {
     pds = new PushdownSystem<StackSymbol, Abstraction>() {};
   }
@@ -193,9 +196,9 @@ public class ForwardDFSVisitorTest {
   private void assertSetEquals(
       Set<Transition<StackSymbol, Abstraction>> s1, Set<Transition<StackSymbol, Abstraction>> s2) {
     if (s1.equals(s2)) return;
-    Set<Transition<StackSymbol, Abstraction>> s1MinusS2 = Sets.newHashSet(s1);
+    Set<Transition<StackSymbol, Abstraction>> s1MinusS2 = new LinkedHashSet<>(s1);
     s1MinusS2.removeAll(s2);
-    Set<Transition<StackSymbol, Abstraction>> s2MinusS1 = Sets.newHashSet(s2);
+    Set<Transition<StackSymbol, Abstraction>> s2MinusS1 = new LinkedHashSet<>(s2);
     s2MinusS1.removeAll(s1);
     throw new AssertionError(
         "The sets are not equal: \n S1\\S2 = \n"
@@ -206,7 +209,7 @@ public class ForwardDFSVisitorTest {
 
   private Set<Transition<StackSymbol, Abstraction>> reachableFrom(
       PAutomaton<StackSymbol, Abstraction> aut, Abstraction a) {
-    final Set<Transition<StackSymbol, Abstraction>> reachable = Sets.newHashSet();
+    final Set<Transition<StackSymbol, Abstraction>> reachable = new LinkedHashSet<>();
     aut.registerDFSListener(
         a,
         new ReachabilityListener<StackSymbol, Abstraction>() {
@@ -219,7 +222,7 @@ public class ForwardDFSVisitorTest {
   }
 
   private Set<Transition<StackSymbol, Abstraction>> reachableMinusTrans() {
-    HashSet<Transition<StackSymbol, Abstraction>> res = Sets.newHashSet(fa.getTransitions());
+    HashSet<Transition<StackSymbol, Abstraction>> res = new LinkedHashSet<>(fa.getTransitions());
     res.removeAll(reachables);
     return res;
   }

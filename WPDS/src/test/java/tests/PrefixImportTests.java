@@ -1,9 +1,22 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package tests;
 
-import static org.junit.Assert.assertTrue;
-
 import de.fraunhofer.iem.Location;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import wpds.impl.PAutomaton;
 import wpds.impl.PrefixImport;
 import wpds.impl.Transition;
@@ -12,7 +25,7 @@ import wpds.interfaces.State;
 public class PrefixImportTests {
 
   PAutomaton<StringLoc, StringState> autA =
-      new PAutomaton<StringLoc, StringState>() {
+      new PAutomaton<>() {
         @Override
         public StringState createState(StringState d, StringLoc loc) {
           return new StringState(d + "_" + loc) {
@@ -35,7 +48,7 @@ public class PrefixImportTests {
       };
 
   PAutomaton<StringLoc, StringState> autB =
-      new PAutomaton<StringLoc, StringState>() {
+      new PAutomaton<>() {
         @Override
         public StringState createState(StringState d, StringLoc loc) {
           return new StringState(d + "_" + loc) {
@@ -67,8 +80,8 @@ public class PrefixImportTests {
     autB.addTransition(t("B2", "i", "INITB"));
 
     new PrefixImport<>(autA, autB, t("A1", "f", "INITA"));
-    assertTrue(autB.getTransitions().contains(t("A3", "g", "B2")));
-    assertTrue(autB.getTransitions().contains(t("A4", "h", "A3")));
+    Assertions.assertTrue(autB.getTransitions().contains(t("A3", "g", "B2")));
+    Assertions.assertTrue(autB.getTransitions().contains(t("A4", "h", "A3")));
   }
 
   @Test
@@ -82,8 +95,8 @@ public class PrefixImportTests {
     autB.addTransition(t("B2", "i", "INITB"));
 
     new PrefixImport<>(autA, autB, t("A1", "f", "A2"));
-    assertTrue(autB.getTransitions().contains(t("A3", "g", "INITB")));
-    assertTrue(autB.getTransitions().contains(t("A4", "k", "A3")));
+    Assertions.assertTrue(autB.getTransitions().contains(t("A3", "g", "INITB")));
+    Assertions.assertTrue(autB.getTransitions().contains(t("A4", "k", "A3")));
   }
 
   private Transition<StringLoc, StringState> t(String start, String label, String target) {

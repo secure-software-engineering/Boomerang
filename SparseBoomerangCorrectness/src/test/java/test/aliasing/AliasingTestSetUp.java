@@ -3,7 +3,7 @@ package test.aliasing;
 import static org.junit.Assert.assertTrue;
 
 import aliasing.SparseAliasManager;
-import boomerang.scene.jimple.BoomerangPretransformer;
+import boomerang.scope.jimple.BoomerangPretransformer;
 import boomerang.util.AccessPath;
 import com.google.common.base.Predicate;
 import java.io.File;

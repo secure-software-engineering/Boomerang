@@ -1,3 +1,17 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.guided;
 
 import boomerang.BackwardQuery;
@@ -20,14 +34,14 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
+import boomerang.utils.MethodWrapper;
 import com.google.common.collect.Table;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 public class CustomFlowFunctionTest {
 
@@ -50,14 +64,14 @@ public class CustomFlowFunctionTest {
 
     System.out.println("Solving query: " + query);
     BackwardBoomerangResults<NoWeight> backwardQueryResults = solver.solve(query);
-    for (BackwardBoomerangSolver bw : solver.getBackwardSolvers().values()) {
-      Assert.assertTrue(bw.getCallAutomaton().getTransitions().size() < 3);
+    for (BackwardBoomerangSolver<?> bw : solver.getBackwardSolvers().values()) {
+      Assertions.assertTrue(bw.getCallAutomaton().getTransitions().size() < 3);
     }
     System.out.println(backwardQueryResults.getAllocationSites());
 
     // For the query no allocation site is found, as between queryFor and the allocation site there
     // exists a System.exit call.
-    Assert.assertTrue(backwardQueryResults.isEmpty());
+    Assertions.assertTrue(backwardQueryResults.isEmpty());
   }
 
   /*
@@ -91,7 +105,7 @@ public class CustomFlowFunctionTest {
 
     // For the query no allocation site is found, as between queryFor and the allocation site there
     // exists a System.exit call.
-    Assert.assertTrue(backwardQueryResults.isEmpty());
+    Assertions.assertTrue(backwardQueryResults.isEmpty());
   }
 
   @Test
@@ -121,8 +135,12 @@ public class CustomFlowFunctionTest {
             .anyMatch(
                 statement ->
                     statement.containsInvokeExpr()
-                        && statement.getInvokeExpr().getMethod().getName().equals("queryFor"));
-    Assert.assertFalse(t);
+                        && statement
+                            .getInvokeExpr()
+                            .getDeclaredMethod()
+                            .getName()
+                            .equals("queryFor"));
+    Assertions.assertFalse(t);
   }
 
   public static BackwardQuery selectQueryForStatement(Method method) {
@@ -131,19 +149,20 @@ public class CustomFlowFunctionTest {
             .filter(Statement::containsInvokeExpr)
             .filter(
                 x -> {
-                  System.out.println("methodname: " + x.getInvokeExpr().getMethod().getName());
-                  return x.getInvokeExpr().getMethod().getName().equals("queryFor");
+                  System.out.println(
+                      "methodname: " + x.getInvokeExpr().getDeclaredMethod().getName());
+                  return x.getInvokeExpr().getDeclaredMethod().getName().equals("queryFor");
                 })
             .findFirst();
     if (queryStatement.isEmpty()) {
-      Assert.fail("No query statement found in method " + method.getName());
+      Assertions.fail("No query statement found in method " + method.getName());
     }
     Val arg = queryStatement.get().getInvokeExpr().getArg(0);
 
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(queryStatement.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for " + queryStatement);
+      Assertions.fail("No predecessor found for " + queryStatement);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), queryStatement.get());
@@ -157,7 +176,7 @@ public class CustomFlowFunctionTest {
             .filter(x -> x.isAssignStmt() && !x.getLeftOp().getType().isRefType())
             .findFirst();
     if (intAssignStmt.isEmpty()) {
-      Assert.fail("No assignment found in method " + method.getName());
+      Assertions.fail("No assignment found in method " + method.getName());
     }
 
     AllocVal arg =
@@ -167,7 +186,7 @@ public class CustomFlowFunctionTest {
     Optional<Statement> succs =
         method.getControlFlowGraph().getSuccsOf(intAssignStmt.get()).stream().findFirst();
     if (succs.isEmpty()) {
-      Assert.fail("No successor found for " + intAssignStmt);
+      Assertions.fail("No successor found for " + intAssignStmt);
     }
 
     Edge cfgEdge = new Edge(intAssignStmt.get(), succs.get());

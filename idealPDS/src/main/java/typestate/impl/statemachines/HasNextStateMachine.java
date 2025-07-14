@@ -1,12 +1,15 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package typestate.impl.statemachines;
@@ -54,22 +57,23 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
 
   public HasNextStateMachine() {
     addTransition(
-        new MatcherTransition(States.INIT, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCall));
+        new MatcherTransition(
+            States.INIT, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCall));
+            States.ERROR, NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.HASNEXT, NEXT_METHOD, Parameter.This, States.INIT, Type.OnCall));
+            States.HASNEXT, NEXT_METHOD, Parameter.This, States.INIT, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.INIT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCall));
+            States.INIT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.HASNEXT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCall));
+            States.HASNEXT, HAS_NEXT_METHOD, Parameter.This, States.HASNEXT, Type.OnCallToReturn));
     addTransition(
         new MatcherTransition(
-            States.ERROR, HAS_NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCall));
+            States.ERROR, HAS_NEXT_METHOD, Parameter.This, States.ERROR, Type.OnCallToReturn));
   }
 
   public Set<WeightedForwardQuery<TransitionFunction>> generateSeed(Edge edge) {
@@ -77,12 +81,12 @@ public class HasNextStateMachine extends TypeStateMachineWeightFunctions {
     if (unit.containsInvokeExpr() && unit.isAssignStmt()) {
       InvokeExpr invokeExpr = unit.getInvokeExpr();
       if (invokeExpr.isInstanceInvokeExpr()) {
-        if (invokeExpr.getMethod().getName().contains("iterator")) {
+        if (invokeExpr.getDeclaredMethod().getName().contains("iterator")) {
           return Collections.singleton(
               new WeightedForwardQuery<>(
                   edge,
                   new AllocVal(unit.getLeftOp(), unit, unit.getLeftOp()),
-                  initialTransition()));
+                  initialTransition(edge)));
         }
       }
     }

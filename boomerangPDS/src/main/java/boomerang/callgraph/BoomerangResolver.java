@@ -1,3 +1,17 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.callgraph;
 
 import boomerang.BackwardQuery;
@@ -23,9 +37,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +68,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
 
   private final CallGraph precomputedCallGraph;
   private final WeightedBoomerang<? extends Weight> solver;
-  private final Set<Statement> queriedInvokeExprAndAllocationSitesFound = Sets.newHashSet();
-  private final Set<Statement> queriedInvokeExpr = Sets.newHashSet();
+  private final Set<Statement> queriedInvokeExprAndAllocationSitesFound = new LinkedHashSet<>();
+  private final Set<Statement> queriedInvokeExpr = new LinkedHashSet<>();
 
   public BoomerangResolver(FrameworkScope frameworkScope) {
     this.solver = new Boomerang(frameworkScope);
@@ -104,7 +118,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
   @Override
   public Method resolveSpecialInvoke(InvokeExpr ie) {
     Collection<Method> methodFromClassOrFromSuperclass =
-        getMethodFromClassOrFromSuperclass(ie.getMethod(), ie.getMethod().getDeclaringClass());
+        getMethodFromClassOrFromSuperclass(
+            ie.getDeclaredMethod(), ie.getDeclaredMethod().getDeclaringClass());
     if (methodFromClassOrFromSuperclass.size() > 1) {
       throw new RuntimeException(
           "Illegal state, a special call should exactly resolve to one target");
@@ -115,7 +130,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
   @Override
   public Method resolveStaticInvoke(InvokeExpr ie) {
     Collection<Method> methodFromClassOrFromSuperclass =
-        getMethodFromClassOrFromSuperclass(ie.getMethod(), ie.getMethod().getDeclaringClass());
+        getMethodFromClassOrFromSuperclass(
+            ie.getDeclaredMethod(), ie.getDeclaredMethod().getDeclaringClass());
     if (methodFromClassOrFromSuperclass.size() > 1) {
       throw new RuntimeException(
           "Illegal state, a static call should exactly resolve to one target");
@@ -158,7 +174,7 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
 
   private Collection<Method> getMethodFromClassOrFromSuperclass(
       DeclaredMethod method, WrappedClass sootClass) {
-    Set<Method> res = Sets.newHashSet();
+    Set<Method> res = new LinkedHashSet<>();
     WrappedClass originalClass = sootClass;
     while (sootClass != null) {
       for (Method candidate : sootClass.getMethods()) {
@@ -232,7 +248,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
                       if (type.isRefType()) {
                         for (Method calleeMethod :
                             getMethodFromClassOrFromSuperclass(
-                                invokeExpr.getInvokeExpr().getMethod(), type.getWrappedClass())) {
+                                invokeExpr.getInvokeExpr().getDeclaredMethod(),
+                                type.getWrappedClass())) {
                           results.add(calleeMethod);
                         }
                       } else if (type.isArrayType()) {
@@ -240,7 +257,8 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
                         if (base.isRefType()) {
                           for (Method calleeMethod :
                               getMethodFromClassOrFromSuperclass(
-                                  invokeExpr.getInvokeExpr().getMethod(), base.getWrappedClass())) {
+                                  invokeExpr.getInvokeExpr().getDeclaredMethod(),
+                                  base.getWrappedClass())) {
                             results.add(calleeMethod);
                           }
                         }

@@ -1,3 +1,17 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.core;
 
 import boomerang.ForwardQuery;
@@ -20,8 +34,8 @@ class AllocationSiteOf implements ValueOfInterestInUnit {
     Statement stmt = cfgEdge.getStart();
     if (stmt.isAssignStmt()) {
       if (stmt.getLeftOp().isLocal() && stmt.getRightOp().isNewExpr()) {
-        Type expr = stmt.getRightOp().getNewExprType();
-        if (expr.isSubtypeOf(type)) {
+        Type exprType = stmt.getRightOp().getNewExprType();
+        if (isTypeOrSubType(exprType.toString(), type)) {
           Val local = stmt.getLeftOp();
           ForwardQuery forwardQuery =
               new ForwardQuery(cfgEdge, new AllocVal(local, stmt, stmt.getRightOp()));
@@ -30,5 +44,13 @@ class AllocationSiteOf implements ValueOfInterestInUnit {
       }
     }
     return Optional.empty();
+  }
+
+  private boolean isTypeOrSubType(String subType, String superType) {
+    try {
+      return Class.forName(superType).isAssignableFrom(Class.forName(subType));
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
   }
 }

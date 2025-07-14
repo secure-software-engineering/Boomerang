@@ -9,3 +9,5 @@ bin/
 surefire-reports/
 shippable/
 *.prefs
+*.xml
+**/target

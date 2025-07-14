@@ -1,25 +1,95 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test;
 
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
+import boomerang.utils.MethodWrapper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import test.setup.MethodWrapper;
+import org.junit.jupiter.api.Assertions;
+import test.setup.OpalTestSetup;
 import test.setup.SootTestSetup;
+import test.setup.SootUpTestSetup;
 import test.setup.TestSetup;
 
 public class TestingFramework {
 
+  private static final String SOOT = "soot";
+  private static final String SOOT_UP = "sootup";
+  private static final String OPAL = "opal";
+
+  /** This variable may be changed to run the tests locally */
+  private static final String DEFAULT_FRAMEWORK = SOOT_UP;
+
   private final TestSetup testSetup;
+  private final Collection<String> includedClasses;
+  private final Collection<String> excludedClasses;
+
+  public enum Framework {
+    SOOT,
+    SOOT_UP,
+    OPAL
+  }
+
+  private final Framework framework;
 
   public TestingFramework() {
-    // TODO Parameterize
-    this.testSetup = new SootTestSetup();
+    this(Collections.emptySet(), Collections.emptySet());
+  }
+
+  public TestingFramework(Collection<String> includedClasses, Collection<String> excludedClasses) {
+    this.testSetup = createTestSetup();
+    this.includedClasses = includedClasses;
+    this.excludedClasses = excludedClasses;
+
+    if (testSetup instanceof SootTestSetup) {
+      this.framework = Framework.SOOT;
+    } else if (testSetup instanceof SootUpTestSetup) {
+      this.framework = Framework.SOOT_UP;
+    } else if (testSetup instanceof OpalTestSetup) {
+      this.framework = Framework.OPAL;
+    } else {
+      throw new RuntimeException("No valid framework setup: " + testSetup.getClass().getName());
+    }
+  }
+
+  private TestSetup createTestSetup() {
+    String framework = System.getProperty("testSetup", DEFAULT_FRAMEWORK);
+
+    switch (framework.toLowerCase()) {
+      case SOOT:
+        return new SootTestSetup();
+      case SOOT_UP:
+        return new SootUpTestSetup();
+      case OPAL:
+        return new OpalTestSetup();
+      default:
+        throw new IllegalArgumentException(
+            "Cannot create test setup for framework "
+                + framework
+                + ". Available options are {Soot, SootUp, Opal}");
+    }
+  }
+
+  public Framework getFramework() {
+    return framework;
   }
 
   public FrameworkScope getFrameworkScope(MethodWrapper methodWrapper) {
@@ -29,7 +99,8 @@ public class TestingFramework {
   public FrameworkScope getFrameworkScope(
       MethodWrapper methodWrapper, DataFlowScope dataFlowScope) {
     String classPath = buildClassPath();
-    testSetup.initialize(classPath, methodWrapper, getIncludedPackages(), getExcludedPackages());
+    testSetup.initialize(
+        classPath, methodWrapper, List.copyOf(includedClasses), List.copyOf(excludedClasses));
 
     return testSetup.createFrameworkScope(dataFlowScope);
   }
@@ -66,7 +137,7 @@ public class TestingFramework {
     }
 
     if (!unsound.isEmpty()) {
-      Assert.fail(
+      Assertions.fail(
           "Unsound results:\n- "
               + unsound.stream()
                   .map(Assertion::getAssertedMessage)
@@ -74,7 +145,7 @@ public class TestingFramework {
     }
 
     if (!imprecise.isEmpty() && failOnImprecise) {
-      Assert.fail(
+      Assertions.fail(
           "Imprecise results:\n- "
               + imprecise.stream()
                   .map(Assertion::getAssertedMessage)
@@ -92,11 +163,9 @@ public class TestingFramework {
     return userDir + "/target/test-classes";
   }
 
-  protected List<String> getIncludedPackages() {
-    return Collections.emptyList();
-  }
-
-  protected List<String> getExcludedPackages() {
-    return Collections.emptyList();
+  public void cleanUp() {
+    if (testSetup != null) {
+      testSetup.cleanUp();
+    }
   }
 }

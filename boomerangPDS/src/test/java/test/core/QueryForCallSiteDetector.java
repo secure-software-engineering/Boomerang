@@ -1,11 +1,25 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.core;
 
 import boomerang.BackwardQuery;
 import boomerang.Query;
 import boomerang.scope.AccessPathParser;
 import boomerang.scope.AnalysisScope;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
 import boomerang.util.AccessPath;
@@ -15,15 +29,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-class QueryForCallSiteDetector extends AnalysisScope {
+public class QueryForCallSiteDetector extends AnalysisScope {
 
   boolean resultsMustNotBeEmpty = false;
   boolean accessPathQuery = false;
   boolean integerQueries;
   Set<AccessPath> expectedAccessPaths = new HashSet<>();
 
-  QueryForCallSiteDetector(CallGraph cg) {
-    super(cg);
+  public QueryForCallSiteDetector(FrameworkScope frameworkScope) {
+    super(frameworkScope);
   }
 
   private void getAllExpectedAccessPath(Edge u) {
@@ -46,7 +60,8 @@ class QueryForCallSiteDetector extends AnalysisScope {
     public Optional<? extends Query> test(Edge stmt) {
       if (!(stmt.getTarget().containsInvokeExpr())) return Optional.empty();
       InvokeExpr invokeExpr = stmt.getTarget().getInvokeExpr();
-      if (!invokeExpr.getMethod().getName().matches(methodNameMatcher)) return Optional.empty();
+      if (!invokeExpr.getDeclaredMethod().getName().matches(methodNameMatcher))
+        return Optional.empty();
       Val param = invokeExpr.getArg(0);
       if (!param.isLocal()) return Optional.empty();
       BackwardQuery newBackwardQuery = BackwardQuery.make(stmt, param);

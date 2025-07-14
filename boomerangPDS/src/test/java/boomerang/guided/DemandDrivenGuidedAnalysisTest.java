@@ -1,8 +1,21 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.guided;
 
 import boomerang.BackwardQuery;
 import boomerang.ForwardQuery;
-import boomerang.Query;
 import boomerang.QueryGraph;
 import boomerang.guided.targets.ArrayContainerTarget;
 import boomerang.guided.targets.BasicTarget;
@@ -34,18 +47,17 @@ import boomerang.scope.FrameworkScope;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import com.google.common.collect.Sets;
+import boomerang.utils.MethodWrapper;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import test.TestingFramework;
-import test.setup.MethodWrapper;
-import wpds.impl.Weight.NoWeight;
+import wpds.impl.NoWeight;
 
 public class DemandDrivenGuidedAnalysisTest {
 
@@ -428,22 +440,22 @@ public class DemandDrivenGuidedAnalysisTest {
             .filter(Statement::containsInvokeExpr)
             .filter(
                 x ->
-                    x.getInvokeExpr().getMethod().getName().equals("queryFor")
+                    x.getInvokeExpr().getDeclaredMethod().getName().equals("queryFor")
                         && x.getInvokeExpr()
-                            .getMethod()
+                            .getDeclaredMethod()
                             .getDeclaringClass()
                             .getFullyQualifiedName()
                             .equals("boomerang.guided.targets.Query"))
             .findFirst();
     if (newFileStatement.isEmpty()) {
-      Assert.fail("No new file statement found in method " + method.getName());
+      Assertions.fail("No new file statement found in method " + method.getName());
     }
     Val arg = newFileStatement.get().getInvokeExpr().getArg(0);
 
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(newFileStatement.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for statement " + newFileStatement);
+      Assertions.fail("No predecessor found for statement " + newFileStatement);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), newFileStatement.get());
@@ -464,15 +476,15 @@ public class DemandDrivenGuidedAnalysisTest {
             .filter(Statement::containsInvokeExpr)
             .filter(
                 x ->
-                    x.getInvokeExpr().getMethod().getName().equals("<init>")
+                    x.getInvokeExpr().getDeclaredMethod().getName().equals("<init>")
                         && x.getInvokeExpr()
-                            .getMethod()
+                            .getDeclaredMethod()
                             .getDeclaringClass()
                             .getFullyQualifiedName()
                             .equals("java.io.File"))
             .findFirst();
     if (newFileStatement.isEmpty()) {
-      Assert.fail("No new file statement found in method " + method.getName());
+      Assertions.fail("No new file statement found in method " + method.getName());
     }
 
     Val arg = newFileStatement.get().getInvokeExpr().getArg(0);
@@ -480,7 +492,7 @@ public class DemandDrivenGuidedAnalysisTest {
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(newFileStatement.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for statement " + newFileStatement);
+      Assertions.fail("No predecessor found for statement " + newFileStatement);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), newFileStatement.get());
@@ -491,17 +503,17 @@ public class DemandDrivenGuidedAnalysisTest {
     Optional<Statement> toStringCall =
         method.getStatements().stream()
             .filter(Statement::containsInvokeExpr)
-            .filter(x -> x.getInvokeExpr().getMethod().getName().equals("toString"))
+            .filter(x -> x.getInvokeExpr().getDeclaredMethod().getName().equals("toString"))
             .findFirst();
     if (toStringCall.isEmpty()) {
-      Assert.fail("No call to toString() found in method " + method.getName());
+      Assertions.fail("No call to toString() found in method " + method.getName());
     }
 
     Val arg = toStringCall.get().getInvokeExpr().getBase();
     Optional<Statement> predecessor =
         method.getControlFlowGraph().getPredsOf(toStringCall.get()).stream().findFirst();
     if (predecessor.isEmpty()) {
-      Assert.fail("No predecessor found for statement " + toStringCall);
+      Assertions.fail("No predecessor found for statement " + toStringCall);
     }
 
     Edge cfgEdge = new Edge(predecessor.get(), toStringCall.get());
@@ -555,20 +567,21 @@ public class DemandDrivenGuidedAnalysisTest {
 
     // Filter out query graph's node to only return the queries of interest (ForwardQueries &
     // String/Int Allocation sites).
-    Stream<Query> res =
+    Stream<ForwardQuery> res =
         queryGraph.getNodes().stream()
             .filter(
                 x ->
                     x instanceof ForwardQuery
-                        && isStringOrIntAllocation(x.asNode().stmt().getStart()));
+                        && isStringOrIntAllocation(x.asNode().stmt().getStart()))
+            .map(ForwardQuery.class::cast);
 
     Set<? extends Serializable> collect =
-        res.map(t -> ((AllocVal) t.var()).getAllocVal())
+        res.map(t -> t.getAllocVal().getAllocVal())
             .filter(x -> x.isStringConstant() || x.isIntConstant())
             .map(x -> (x.isIntConstant() ? x.getIntValue() : x.getStringValue()))
             .collect(Collectors.toSet());
 
-    Assert.assertEquals(Sets.newHashSet(expectedValues), collect);
+    Assertions.assertEquals(Set.of(expectedValues), collect);
   }
 
   private IAllocationSite allocationSite() {

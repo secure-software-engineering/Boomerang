@@ -4,8 +4,8 @@ import boomerang.BackwardQuery;
 import boomerang.Boomerang;
 import boomerang.DefaultBoomerangOptions;
 import boomerang.results.BackwardBoomerangResults;
-import boomerang.scene.*;
-import boomerang.scene.jimple.*;
+import boomerang.scope.*;
+import boomerang.scope.jimple.*;
 import boomerang.sparse.SparsificationStrategy;
 import boomerang.util.AccessPath;
 import com.google.common.base.Stopwatch;
@@ -134,7 +134,7 @@ public class SparseAliasManager {
                               dataFlowScope,
                               new BoomerangOptions(
                                   INSTANCE.sparsificationStrategy, INSTANCE.ignoreAfterQuery));
-                      BackwardBoomerangResults<Weight.NoWeight> results =
+                      BackwardBoomerangResults<NoWeight> results =
                           boomerangSolver.solve(query);
                       aliases = results.getAllAliases();
                       boolean debug = false;

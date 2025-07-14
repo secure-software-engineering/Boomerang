@@ -1,12 +1,15 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package ideal;
@@ -27,8 +30,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -61,7 +64,7 @@ public class IDEALSeedSolver<W extends Weight> {
   private final WeightedBoomerang<W> phase2Solver;
   private final Stopwatch analysisStopwatch = Stopwatch.createUnstarted();
   private final Multimap<Node<Edge, Val>, Edge> affectedStrongUpdateStmt = HashMultimap.create();
-  private final Set<Node<Edge, Val>> weakUpdates = Sets.newHashSet();
+  private final Set<Node<Edge, Val>> weakUpdates = new LinkedHashSet<>();
   private int killedRules;
 
   private final class AddIndirectFlowAtCallSite implements WPAUpdateListener<Edge, INode<Val>, W> {
@@ -247,7 +250,7 @@ public class IDEALSeedSolver<W extends Weight> {
                 strongUpdateNode,
                 targetFact -> {
                   if (!e.getKey().asNode().equals(seed.asNode())) {
-                    if (!e.getKey().asNode().fact().isNull()) {
+                    if (!e.getKey().getAllocVal().getAllocVal().isNull()) {
                       setWeakUpdate(strongUpdateNode);
                     }
                   }
@@ -281,7 +284,7 @@ public class IDEALSeedSolver<W extends Weight> {
   public ForwardBoomerangResults<W> run() {
     LOGGER.debug("Starting Phase 1 of IDEal");
     ForwardBoomerangResults<W> resultPhase1 = runPhase(this.phase1Solver, Phases.ObjectFlow);
-    if (resultPhase1.isTimedout()) {
+    if (resultPhase1.isTimedOut()) {
       if (analysisStopwatch.isRunning()) {
         analysisStopwatch.stop();
       }
@@ -289,7 +292,7 @@ public class IDEALSeedSolver<W extends Weight> {
     }
     LOGGER.debug("Starting Phase 2 of IDEal");
     ForwardBoomerangResults<W> resultPhase2 = runPhase(this.phase2Solver, Phases.ValueFlow);
-    if (resultPhase2.isTimedout()) {
+    if (resultPhase2.isTimedOut()) {
       if (analysisStopwatch.isRunning()) {
         analysisStopwatch.stop();
       }

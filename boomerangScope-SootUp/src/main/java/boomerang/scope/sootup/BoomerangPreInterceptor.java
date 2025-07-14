@@ -1,28 +1,51 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package boomerang.scope.sootup;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import sootup.core.graph.MutableStmtGraph;
 import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.ClassConstant;
 import sootup.core.jimple.common.constant.Constant;
+import sootup.core.jimple.common.constant.NullConstant;
 import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
+import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
 import sootup.core.jimple.common.expr.JStaticInvokeExpr;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.model.Body;
+import sootup.core.model.SootClass;
+import sootup.core.model.SootClassMember;
+import sootup.core.model.SootField;
+import sootup.core.signatures.FieldSignature;
 import sootup.core.transform.BodyInterceptor;
+import sootup.core.types.ClassType;
+import sootup.core.types.ReferenceType;
 import sootup.core.views.View;
 
 public class BoomerangPreInterceptor implements BodyInterceptor {
 
   private final boolean TRANSFORM_CONSTANTS_SETTINGS;
 
+  private static final String CONSTRUCTOR = "<init>";
   private static final String LABEL = "varReplacer";
   private int replaceCounter = 0;
 
@@ -35,8 +58,12 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   @Override
-  public void interceptBody(@Nonnull Body.BodyBuilder bodyBuilder, @Nonnull View view) {
+  public void interceptBody(Body.@NonNull BodyBuilder bodyBuilder, @NonNull View view) {
     addNopStatementsToMethod(bodyBuilder);
+
+    if (bodyBuilder.getMethodSignature().getName().equals(CONSTRUCTOR)) {
+      addNullifiedFields(bodyBuilder, view);
+    }
 
     if (TRANSFORM_CONSTANTS_SETTINGS) {
       transformConstantsAtFieldWrites(bodyBuilder);
@@ -117,46 +144,8 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         Optional<AbstractInvokeExpr> InvokeExprOpt = invStmt.getInvokeExpr();
 
         if (InvokeExprOpt.isPresent()) {
-          // TODO: ms: dont use in production?!
-          if (!stmt.toString().contains("test.assertions.Assertions:")
-              && !stmt.toString().contains("intQueryFor")) {
-
-            List<Immediate> newArgs = new ArrayList<>();
-            AbstractInvokeExpr invokeExpr = InvokeExprOpt.get();
-            for (int i = 0; i < invokeExpr.getArgCount(); i++) {
-              Immediate arg = invokeExpr.getArg(i);
-
-              if (arg instanceof Constant && !(arg instanceof ClassConstant)) {
-                String label = LABEL + replaceCounter++;
-                Local paramLocal = Jimple.newLocal(label, arg.getType());
-                JAssignStmt newAssignStmt =
-                    Jimple.newAssignStmt(paramLocal, arg, stmt.getPositionInfo());
-
-                body.addLocal(paramLocal);
-                body.getStmtGraph().insertBefore(stmt, newAssignStmt);
-                newArgs.add(paramLocal);
-              } else {
-                newArgs.add(arg);
-              }
-            }
-
-            // Update the invoke expression with new arguments
-            AbstractInvokeExpr newInvokeExpr;
-            if (invokeExpr instanceof JStaticInvokeExpr) {
-              newInvokeExpr = ((JStaticInvokeExpr) invokeExpr).withArgs(newArgs);
-            } else if (invokeExpr instanceof AbstractInstanceInvokeExpr) {
-              newInvokeExpr = ((AbstractInstanceInvokeExpr) invokeExpr).withArgs(newArgs);
-            } else {
-              throw new IllegalStateException("unknown InvokeExpr.");
-            }
-
-            if (stmt instanceof JInvokeStmt) {
-              JInvokeStmt newStmt = ((JInvokeStmt) stmt).withInvokeExpr(newInvokeExpr);
-              body.getStmtGraph().replaceNode(stmt, newStmt);
-            } else if (stmt instanceof JAssignStmt) {
-              JAssignStmt newStmt = ((JAssignStmt) stmt).withRValue(newInvokeExpr);
-              body.getStmtGraph().replaceNode(stmt, newStmt);
-            }
+          if (filterTransformableInvokeExprs(stmt)) {
+            transformInInvokeExprs(body, stmt, InvokeExprOpt);
           }
         }
       }
@@ -181,6 +170,51 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         JReturnStmt newReturnStmt = Jimple.newReturnStmt(local, returnStmt.getPositionInfo());
         body.getStmtGraph().replaceNode(stmt, newReturnStmt);
       }
+    }
+  }
+
+  protected boolean filterTransformableInvokeExprs(@NonNull Stmt stmt) {
+    return true;
+  }
+
+  private void transformInInvokeExprs(
+      Body.BodyBuilder body, Stmt stmt, Optional<AbstractInvokeExpr> InvokeExprOpt) {
+    List<Immediate> newArgs = new ArrayList<>();
+    AbstractInvokeExpr invokeExpr = InvokeExprOpt.get();
+    for (int i = 0; i < invokeExpr.getArgCount(); i++) {
+      Immediate arg = invokeExpr.getArg(i);
+
+      if (arg instanceof Constant && !(arg instanceof ClassConstant)) {
+        String label = LABEL + replaceCounter++;
+        Local paramLocal = Jimple.newLocal(label, arg.getType());
+        JAssignStmt newAssignStmt = Jimple.newAssignStmt(paramLocal, arg, stmt.getPositionInfo());
+
+        body.addLocal(paramLocal);
+        body.getStmtGraph().insertBefore(stmt, newAssignStmt);
+        newArgs.add(paramLocal);
+      } else {
+        newArgs.add(arg);
+      }
+    }
+
+    // Update the invoke expression with new arguments
+    AbstractInvokeExpr newInvokeExpr;
+    if (invokeExpr instanceof JStaticInvokeExpr) {
+      newInvokeExpr = ((JStaticInvokeExpr) invokeExpr).withArgs(newArgs);
+    } else if (invokeExpr instanceof AbstractInstanceInvokeExpr) {
+      newInvokeExpr = ((AbstractInstanceInvokeExpr) invokeExpr).withArgs(newArgs);
+    } else if (invokeExpr instanceof JDynamicInvokeExpr) {
+      newInvokeExpr = ((JDynamicInvokeExpr) invokeExpr).withMethodArgs(newArgs);
+    } else {
+      throw new IllegalStateException("unknown InvokeExpr.");
+    }
+
+    if (stmt instanceof JInvokeStmt) {
+      JInvokeStmt newStmt = ((JInvokeStmt) stmt).withInvokeExpr(newInvokeExpr);
+      body.getStmtGraph().replaceNode(stmt, newStmt);
+    } else if (stmt instanceof JAssignStmt) {
+      JAssignStmt newStmt = ((JAssignStmt) stmt).withRValue(newInvokeExpr);
+      body.getStmtGraph().replaceNode(stmt, newStmt);
     }
   }
 
@@ -229,5 +263,84 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
     return value instanceof JInstanceFieldRef
         || value instanceof JStaticFieldRef
         || value instanceof JArrayRef;
+  }
+
+  private void addNullifiedFields(Body.BodyBuilder bodyBuilder, View view) {
+    ClassType classType = bodyBuilder.getMethodSignature().getDeclClassType();
+    Optional<? extends SootClass> sootClass = view.getClass(classType);
+
+    if (sootClass.isEmpty()) {
+      return;
+    }
+
+    Collection<FieldSignature> allFields =
+        sootClass.get().getFields().stream()
+            .map(SootClassMember::getSignature)
+            .collect(Collectors.toSet());
+    Collection<FieldSignature> definedFields = getDefinedFields(bodyBuilder);
+
+    for (FieldSignature fieldSignature : allFields) {
+      if (definedFields.contains(fieldSignature)) {
+        continue;
+      }
+
+      Optional<? extends SootField> field =
+          sootClass.get().getField(fieldSignature.getSubSignature());
+      if (field.isEmpty()) {
+        continue;
+      }
+
+      if (field.get().isStatic() || field.get().isFinal()) {
+        continue;
+      }
+
+      // TODO Consider only Ref types or all types?
+      if (field.get().getType() instanceof ReferenceType) {
+        JInstanceFieldRef nullifiedFieldRef =
+            Jimple.newInstanceFieldRef(bodyBuilder.build().getThisLocal(), fieldSignature);
+        JAssignStmt nullifiedFieldStmt =
+            Jimple.newAssignStmt(
+                nullifiedFieldRef,
+                NullConstant.getInstance(),
+                StmtPositionInfo.getNoStmtPositionInfo());
+
+        Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(bodyBuilder);
+        if (firstNonIdentityStmt.isPresent()) {
+          bodyBuilder.getStmtGraph().insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
+        } else {
+          bodyBuilder.getStmtGraph().addNode(nullifiedFieldStmt);
+        }
+      }
+    }
+  }
+
+  private Collection<FieldSignature> getDefinedFields(Body.BodyBuilder bodyBuilder) {
+    Collection<FieldSignature> definedFields = new LinkedHashSet<>();
+
+    for (Stmt stmt : bodyBuilder.getStmts()) {
+      if (stmt instanceof JAssignStmt) {
+        LValue leftOp = ((JAssignStmt) stmt).getLeftOp();
+
+        if (leftOp instanceof JInstanceFieldRef) {
+          JInstanceFieldRef fieldRef = (JInstanceFieldRef) leftOp;
+
+          definedFields.add(fieldRef.getFieldSignature());
+        }
+      }
+    }
+
+    return definedFields;
+  }
+
+  private Optional<Stmt> findFirstNonIdentityStmt(Body.BodyBuilder bodyBuilder) {
+    for (Stmt stmt : bodyBuilder.getStmts()) {
+      if (stmt instanceof JIdentityStmt) {
+        continue;
+      }
+
+      return Optional.of(stmt);
+    }
+
+    return Optional.empty();
   }
 }

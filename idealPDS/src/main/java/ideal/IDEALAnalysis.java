@@ -1,12 +1,15 @@
 /**
- * ***************************************************************************** Copyright (c) 2018
- * Fraunhofer IEM, Paderborn, Germany. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0 which is available at
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- *
- * <p>SPDX-License-Identifier: EPL-2.0
- *
- * <p>Contributors: Johannes Spaeth - initial API and implementation
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
 package ideal;
@@ -43,7 +46,7 @@ public class IDEALAnalysis<W extends Weight> {
   public IDEALAnalysis(final IDEALAnalysisDefinition<W> analysisDefinition) {
     this.analysisDefinition = analysisDefinition;
     this.seedFactory =
-        new AnalysisScope(analysisDefinition.callGraph()) {
+        new AnalysisScope(analysisDefinition.getFrameworkFactory()) {
 
           @Override
           protected Collection<WeightedForwardQuery<W>> generate(Edge stmt) {
