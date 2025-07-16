@@ -33,14 +33,10 @@ public interface ControlFlowGraph {
   class Edge extends Pair<Statement, Statement> implements Location {
     public Edge(Statement start, Statement target) {
       super(start, target);
-      if (!start.equals(Statement.epsilon()) && !start.getMethod().equals(target.getMethod())) {
+      if (!start.equals(EpsilonStatement.getInstance())
+          && !start.getMethod().equals(target.getMethod())) {
         throw new RuntimeException("Illegal Control Flow Graph Edge constructed");
       }
-    }
-
-    @Override
-    public String toString() {
-      return getStart() + " -> " + getTarget();
     }
 
     public Statement getStart() {
@@ -53,6 +49,15 @@ public interface ControlFlowGraph {
 
     public Method getMethod() {
       return getStart().getMethod();
+    }
+
+    public static Edge epsilon() {
+      return new Edge(EpsilonStatement.getInstance(), EpsilonStatement.getInstance());
+    }
+
+    @Override
+    public String toString() {
+      return getStart() + " -> " + getTarget();
     }
 
     @Override

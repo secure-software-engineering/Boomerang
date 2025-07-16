@@ -18,8 +18,8 @@ import boomerang.BackwardQuery;
 import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.Util;
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
@@ -173,7 +173,8 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
     for (Entry<Transition<Edge, INode<Val>>, W> e :
         callAut.getTransitionsToFinalWeights().entrySet()) {
       Transition<Edge, INode<Val>> t = e.getKey();
-      if (t.getLabel().equals(Statement.epsilon())) continue;
+
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
       if (t.getLabel().getStart().uses(t.getStart().fact()))

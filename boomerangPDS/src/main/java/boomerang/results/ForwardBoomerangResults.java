@@ -405,10 +405,11 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     for (Entry<Transition<ControlFlowGraph.Edge, INode<Val>>, W> e :
         callAut.getTransitionsToFinalWeights().entrySet()) {
       Transition<ControlFlowGraph.Edge, INode<Val>> t = e.getKey();
-      if (t.getLabel()
-          .equals(new ControlFlowGraph.Edge(Statement.epsilon(), Statement.epsilon()))) {
+
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) {
         continue;
       }
+
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) {
         continue;

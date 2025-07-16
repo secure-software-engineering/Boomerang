@@ -36,6 +36,7 @@ import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DataFlowScope;
+import boomerang.scope.EpsilonStatement;
 import boomerang.scope.Field;
 import boomerang.scope.Field.ArrayField;
 import boomerang.scope.FrameworkScope;
@@ -1362,7 +1363,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         fieldAut.getTransitionsToFinalWeights().entrySet()) {
       Transition<ControlFlowGraph.Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) continue;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getStart().getMethod().equals(t.getStart().fact().m())) continue;
       results.put(t.getLabel(), t.getStart().fact(), w);
@@ -1391,7 +1392,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         callAut.getTransitionsToFinalWeights().entrySet()) {
       Transition<ControlFlowGraph.Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
-      if (t.getLabel().getStart().equals(Statement.epsilon())) continue;
+      if (t.getLabel().getStart().equals(EpsilonStatement.getInstance())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getStart().getMethod().equals(t.getStart().fact().m())) continue;
       results.put(t.getLabel(), t.getStart().fact(), w);

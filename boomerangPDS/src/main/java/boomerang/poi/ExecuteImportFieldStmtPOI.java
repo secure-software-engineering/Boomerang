@@ -14,6 +14,7 @@
  */
 package boomerang.poi;
 
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Statement;
@@ -192,7 +193,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
     public void onWeightAdded(
         Transition<Edge, INode<Val>> t, W w, WeightedPAutomaton<Edge, INode<Val>, W> aut) {
       if (!flowSolver.getCallAutomaton().isUnbalancedState(t.getTarget())) return;
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) {
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) {
         return;
       }
       Edge edge = t.getLabel();

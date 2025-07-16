@@ -148,7 +148,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     @Override
     public void onWeightAdded(
         Transition<Edge, INode<Val>> t, W w, WeightedPAutomaton<Edge, INode<Val>, W> aut) {
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) return;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) return;
       if (icfg.isExitStmt(
           (AbstractBoomerangSolver.this instanceof ForwardBoomerangSolver
               ? t.getLabel().getTarget()
@@ -239,7 +239,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
         callAut.getTransitionsToFinalWeights().entrySet()) {
       Transition<Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) continue;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
       results.put(t.getLabel(), t.getStart().fact(), w);
@@ -256,7 +256,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
       Transition<Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
 
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) continue;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
 
@@ -468,7 +468,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
   @Override
   public ControlFlowGraph.Edge epsilonStmt() {
-    return new Edge(Statement.epsilon(), Statement.epsilon());
+    return ControlFlowGraph.Edge.epsilon();
   }
 
   @Override
