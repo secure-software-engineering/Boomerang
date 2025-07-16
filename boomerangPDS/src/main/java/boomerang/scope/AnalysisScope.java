@@ -73,7 +73,7 @@ public abstract class AnalysisScope {
           }
         }
 
-        for (Statement succ : stmt.getMethod().getControlFlowGraph().getSuccsOf(stmt)) {
+        for (Statement succ : stmt.getSuccessors()) {
           seeds.addAll(generate(new ControlFlowGraph.Edge(stmt, succ)));
         }
       }

@@ -22,17 +22,10 @@ import java.util.Objects;
 public abstract class Statement implements Location {
 
   private static Statement epsilon;
-  private final String rep;
   protected final Method method;
 
   protected Statement(Method method) {
-    this.rep = null;
     this.method = method;
-  }
-
-  private Statement(String rep) {
-    this.rep = rep;
-    this.method = null;
   }
 
   public static Statement epsilon() {
@@ -45,12 +38,12 @@ public abstract class Statement implements Location {
   private static class EpsStatement extends Statement implements Empty {
 
     public EpsStatement() {
-      super("Eps_s");
+      super(null);
     }
 
     @Override
     public Method getMethod() {
-      return null;
+      throw new RuntimeException("Epsilon statement has no method");
     }
 
     @Override
@@ -242,10 +235,15 @@ public abstract class Statement implements Location {
     public boolean equals(Object obj) {
       return obj == this;
     }
+
+    @Override
+    public String toString() {
+      return "Eps_s";
+    }
   }
 
   public Method getMethod() {
-    return this.method;
+    return method;
   }
 
   public abstract boolean containsInvokeExpr();
@@ -312,6 +310,22 @@ public abstract class Statement implements Location {
       return getLeftOp().equals(value);
     }
     return false;
+  }
+
+  public Collection<Statement> getPredecessors() {
+    if (method == null) {
+      throw new RuntimeException("Statement has no correct method");
+    }
+
+    return method.getControlFlowGraph().getPredsOf(this);
+  }
+
+  public Collection<Statement> getSuccessors() {
+    if (method == null) {
+      throw new RuntimeException("Statement has no correct method");
+    }
+
+    return method.getControlFlowGraph().getSuccsOf(this);
   }
 
   public abstract boolean isAssignStmt();
@@ -387,16 +401,11 @@ public abstract class Statement implements Location {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Statement statement = (Statement) o;
-    return Objects.equals(rep, statement.rep) && Objects.equals(method, statement.method);
+    return Objects.equals(method, statement.method);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(rep, method);
-  }
-
-  @Override
-  public String toString() {
-    return rep;
+    return Objects.hash(method);
   }
 }
