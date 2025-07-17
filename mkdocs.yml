@@ -7,12 +7,12 @@ nav:
   - Home: index.md
   - Getting Started:
       - Installation: installation.md
-      - First Steps: getting-started.md
-      - Example Analyses: examples.md
+  - Boomerang:
+      - Options: options.md
 
 theme:
   name: material
-  logo: ./img/SparseBoomerangLogo.png
+  logo: ./img/BoomerangLogo.png
 #  favicon: ./img/icon.png
   palette:
     primary: blue
