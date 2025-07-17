@@ -139,7 +139,7 @@ public class IDEALSeedSolver<W extends Weight> {
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (!t.getLabel().equals(EmptyField.getInstance())) {
+      if (!t.getLabel().equals(EmptyField.getEmptyField())) {
         return;
       }
 

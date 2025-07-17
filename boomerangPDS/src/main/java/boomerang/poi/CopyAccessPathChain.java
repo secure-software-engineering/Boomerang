@@ -85,7 +85,7 @@ public class CopyAccessPathChain<W extends Weight> {
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(EmptyField.getInstance())) {
+      if (t.getLabel().equals(EmptyField.getEmptyField())) {
         if (forwardSolver.getFieldAutomaton().isUnbalancedState(t.getTarget())) {
           if (t.getStart().equals(CopyAccessPathChain.this.killedTransitionTarget)) {
             // Do a simple backwardSolve(...)...
@@ -96,7 +96,11 @@ public class CopyAccessPathChain<W extends Weight> {
             INode<Val> callTarget =
                 backwardSolver.generateCallState(new SingleNode<>(query.var()), query.cfgEdge());
             backwardSolver.solve(
-                query.asNode(), EmptyField.getInstance(), fieldTarget, query.cfgEdge(), callTarget);
+                query.asNode(),
+                EmptyField.getEmptyField(),
+                fieldTarget,
+                query.cfgEdge(),
+                callTarget);
             return;
           }
           // addReachable(stateInBwSolver);

@@ -723,7 +723,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> weightedPAutomaton) {
-      if (!t.getLabel().equals(EmptyField.getInstance()) && !(t.getLabel() instanceof ArrayField))
+      if (!t.getLabel().equals(EmptyField.getEmptyField()) && !(t.getLabel() instanceof ArrayField))
         return;
       Optional<AllocVal> allocNode = isAllocationNode(node.stmt(), node.fact());
       if (allocNode.isPresent()) {
@@ -781,7 +781,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(EmptyField.getInstance())) {
+      if (t.getLabel().equals(EmptyField.getEmptyField())) {
         ForwardQueryArray forwardQuery = new ForwardQueryArray(node.stmt(), val, arrayAccessIndex);
         forwardSolve(forwardQuery);
         queryGraph.addEdge(key, node, forwardQuery);
@@ -1129,7 +1129,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
       rootQuery = callTarget;
     }
     solver.solve(
-        query.asNode(), EmptyField.getInstance(), fieldTarget, query.cfgEdge(), callTarget);
+        query.asNode(), EmptyField.getEmptyField(), fieldTarget, query.cfgEdge(), callTarget);
   }
 
   private AbstractBoomerangSolver<W> forwardSolve(ForwardQuery query) {
@@ -1159,7 +1159,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
             new Transition<>(genState1, ArrayField.getInstance(arrayQuery.getIndex2()), genState2));
         insertTransition(
             solver.getFieldAutomaton(),
-            new Transition<>(genState2, EmptyField.getInstance(), fieldTarget));
+            new Transition<>(genState2, EmptyField.getEmptyField(), fieldTarget));
       } else {
         ForwardQueryArray arrayQuery = ((ForwardQueryArray) query);
         Node<ControlFlowGraph.Edge, Val> node =
@@ -1172,7 +1172,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
             new Transition<>(sourceVal, ArrayField.getInstance(arrayQuery.getIndex()), genState));
         insertTransition(
             solver.getFieldAutomaton(),
-            new Transition<>(genState, EmptyField.getInstance(), fieldTarget));
+            new Transition<>(genState, EmptyField.getEmptyField(), fieldTarget));
       }
     }
     Val var;
@@ -1188,7 +1188,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
           query);
     } else {
       var = query.getAllocVal().getDelegate();
-      field = EmptyField.getInstance();
+      field = EmptyField.getEmptyField();
     }
     if (query instanceof WeightedForwardQuery) {
       WeightedForwardQuery<W> q = (WeightedForwardQuery<W>) query;

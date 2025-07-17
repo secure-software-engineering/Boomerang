@@ -20,7 +20,6 @@ import boomerang.scope.Field;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.scope.fields.EmptyField;
-import boomerang.scope.fields.EpsilonField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ControlFlowEdgeBasedCallTransitionListener;
 import boomerang.solver.ControlFlowEdgeBasedFieldTransitionListener;
@@ -271,7 +270,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (active) return;
       if (!(aliasedVariableAtStmt instanceof GeneratedState)) {
         Val alias = aliasedVariableAtStmt.fact().fact();
-        if (alias.equals(poi.baseVar) && t.getLabel().equals(EmptyField.getInstance())) {
+        if (alias.equals(poi.baseVar) && t.getLabel().equals(EmptyField.getEmptyField())) {
           flowsTo();
         }
       }
@@ -416,7 +415,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
 
     @Override
     public void onAddedTransition(Transition<Field, INode<Node<Edge, Val>>> t) {
-      if (t.getLabel().equals(EpsilonField.getInstance())) {
+      if (t.getLabel().equals(EmptyField.getEpsilonField())) {
         return;
       }
       if (!(t.getStart() instanceof GeneratedState)) {
@@ -467,7 +466,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
 
     @Override
     public void onAddedTransition(Transition<Field, INode<Node<Edge, Val>>> innerT) {
-      if (innerT.getLabel().equals(EpsilonField.getInstance())) {
+      if (innerT.getLabel().equals(EmptyField.getEpsilonField())) {
         return;
       }
       if (!(innerT.getStart() instanceof GeneratedState)
@@ -507,10 +506,10 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   protected void importFieldTransitionsStartingAt(
       Transition<Field, INode<Node<Edge, Val>>> t, int importDepth) {
     if (MAX_IMPORT_DEPTH > 0 && importDepth > MAX_IMPORT_DEPTH) return;
-    if (t.getLabel().equals(EpsilonField.getInstance())) {
+    if (t.getLabel().equals(EmptyField.getEpsilonField())) {
       return;
     }
-    if (t.getLabel().equals(EmptyField.getInstance())) {
+    if (t.getLabel().equals(EmptyField.getEmptyField())) {
       if (isLogEnabled()) {
         LOGGER.trace("Activating with {}", t.getStart());
       }
@@ -583,7 +582,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(EpsilonField.getInstance())) return;
+      if (t.getLabel().equals(EmptyField.getEpsilonField())) return;
       importFieldTransitionsStartingAt(t, importDepth);
     }
 

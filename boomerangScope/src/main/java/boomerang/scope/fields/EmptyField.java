@@ -18,16 +18,15 @@ import de.fraunhofer.iem.Empty;
 
 public class EmptyField extends PredefinedField implements Empty {
 
-  private static EmptyField instance;
-
-  private EmptyField() {
-    super("{}");
+  private EmptyField(String name) {
+    super(name);
   }
 
-  public static EmptyField getInstance() {
-    if (instance == null) {
-      instance = new EmptyField();
-    }
-    return instance;
+  public static EmptyField getEmptyField() {
+    return new EmptyField("{}");
+  }
+
+  public static EmptyField getEpsilonField() {
+    return new EmptyField("eps_f");
   }
 }

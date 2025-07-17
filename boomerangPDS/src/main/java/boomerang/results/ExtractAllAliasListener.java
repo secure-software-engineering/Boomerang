@@ -18,7 +18,6 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Val;
 import boomerang.scope.fields.EmptyField;
-import boomerang.scope.fields.EpsilonField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.util.AccessPath;
 import com.google.common.collect.Lists;
@@ -67,7 +66,7 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
                     if (t.getStart().fact().stmt().equals(stmt)
                         && !(t.getStart() instanceof GeneratedState)
                         && t.getStart().fact().fact().equals(base)) {
-                      if (t.getLabel().equals(EmptyField.getInstance())) {
+                      if (t.getLabel().equals(EmptyField.getEmptyField())) {
                         if (t.getTarget().equals(allocNode)) {
                           results.add(new AccessPath(base));
                         }
@@ -113,10 +112,10 @@ public class ExtractAllAliasListener<W extends Weight> implements SyncPDSUpdateL
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(EpsilonField.getInstance())) return;
+      if (t.getLabel().equals(EmptyField.getEpsilonField())) return;
       Collection<Transition<Field, INode<Node<Edge, Val>>>> copiedFields =
           (fields instanceof Set ? new LinkedHashSet<>(fields) : Lists.newArrayList(fields));
-      if (!t.getLabel().equals(EmptyField.getInstance())) {
+      if (!t.getLabel().equals(EmptyField.getEmptyField())) {
         if (copiedFields.contains(t)) {
           copiedFields = new LinkedHashSet<>(fields);
         }
