@@ -36,6 +36,11 @@
         <!-- Boomerang -->
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>PDS</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.fraunhofer.iem</groupId>
             <artifactId>boomerangScope</artifactId>
             <version>${project.version}</version>
         </dependency>

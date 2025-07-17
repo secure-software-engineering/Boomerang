@@ -12,18 +12,15 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope;
+package boomerang.scope.fields;
 
-import de.fraunhofer.iem.Location;
+public class StringBasedField extends PredefinedField {
 
-public interface Field extends Location {
+  private StringBasedField(String string) {
+    super(string);
+  }
 
-  String getName();
-
-  boolean isInnerClassField();
-
-  @Override
-  default boolean accepts(Location other) {
-    return this.equals(other);
+  public static StringBasedField getInstance(String string) {
+    return new StringBasedField(string);
   }
 }

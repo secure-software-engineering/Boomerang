@@ -15,6 +15,7 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope._
+import boomerang.scope.fields.ArrayField
 import boomerang.scope.opal.transformation.TacLocal
 import java.util
 import java.util.Objects
@@ -66,8 +67,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extend
       return new OpalField(
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
-        fieldStore.name,
-        opalMethod.project
+        fieldStore.name
       )
     }
 
@@ -77,13 +77,12 @@ class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extend
       return new OpalField(
         fieldStore.declaringClass,
         fieldStore.declaredFieldType,
-        fieldStore.name,
-        opalMethod.project
+        fieldStore.name
       )
     }
 
     if (isArrayStore) {
-      return Field.array(getArrayBase.getIndex)
+      return ArrayField.getInstance(getArrayBase.getIndex)
     }
 
     throw new RuntimeException("Statement is not a field store operation")
@@ -115,8 +114,7 @@ class OpalStatement(val delegate: Stmt[TacLocal], opalMethod: OpalMethod) extend
       return new OpalField(
         fieldLoad.declaringClass,
         fieldLoad.declaredFieldType,
-        fieldLoad.name,
-        opalMethod.project
+        fieldLoad.name
       )
     }
 

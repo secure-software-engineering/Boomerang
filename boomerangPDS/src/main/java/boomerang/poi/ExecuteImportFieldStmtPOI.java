@@ -14,10 +14,13 @@
  */
 package boomerang.poi;
 
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.fields.EmptyField;
+import boomerang.scope.fields.EpsilonField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ControlFlowEdgeBasedCallTransitionListener;
 import boomerang.solver.ControlFlowEdgeBasedFieldTransitionListener;
@@ -192,7 +195,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
     public void onWeightAdded(
         Transition<Edge, INode<Val>> t, W w, WeightedPAutomaton<Edge, INode<Val>, W> aut) {
       if (!flowSolver.getCallAutomaton().isUnbalancedState(t.getTarget())) return;
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) {
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) {
         return;
       }
       Edge edge = t.getLabel();
@@ -268,7 +271,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
       if (active) return;
       if (!(aliasedVariableAtStmt instanceof GeneratedState)) {
         Val alias = aliasedVariableAtStmt.fact().fact();
-        if (alias.equals(poi.baseVar) && t.getLabel().equals(Field.empty())) {
+        if (alias.equals(poi.baseVar) && t.getLabel().equals(EmptyField.getInstance())) {
           flowsTo();
         }
       }
@@ -413,7 +416,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
 
     @Override
     public void onAddedTransition(Transition<Field, INode<Node<Edge, Val>>> t) {
-      if (t.getLabel().equals(Field.epsilon())) {
+      if (t.getLabel().equals(EpsilonField.getInstance())) {
         return;
       }
       if (!(t.getStart() instanceof GeneratedState)) {
@@ -464,7 +467,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
 
     @Override
     public void onAddedTransition(Transition<Field, INode<Node<Edge, Val>>> innerT) {
-      if (innerT.getLabel().equals(Field.epsilon())) {
+      if (innerT.getLabel().equals(EpsilonField.getInstance())) {
         return;
       }
       if (!(innerT.getStart() instanceof GeneratedState)
@@ -504,10 +507,10 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
   protected void importFieldTransitionsStartingAt(
       Transition<Field, INode<Node<Edge, Val>>> t, int importDepth) {
     if (MAX_IMPORT_DEPTH > 0 && importDepth > MAX_IMPORT_DEPTH) return;
-    if (t.getLabel().equals(Field.epsilon())) {
+    if (t.getLabel().equals(EpsilonField.getInstance())) {
       return;
     }
-    if (t.getLabel().equals(Field.empty())) {
+    if (t.getLabel().equals(EmptyField.getInstance())) {
       if (isLogEnabled()) {
         LOGGER.trace("Activating with {}", t.getStart());
       }
@@ -580,7 +583,7 @@ public abstract class ExecuteImportFieldStmtPOI<W extends Weight> {
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(Field.epsilon())) return;
+      if (t.getLabel().equals(EpsilonField.getInstance())) return;
       importFieldTransitionsStartingAt(t, importDepth);
     }
 

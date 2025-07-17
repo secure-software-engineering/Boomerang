@@ -19,6 +19,7 @@ import boomerang.ForwardQuery;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Val;
+import boomerang.scope.fields.EmptyField;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.Transition;
@@ -52,7 +53,8 @@ public abstract class ExtractAllocationSiteStateListener<W extends Weight>
       Transition<Field, INode<Node<Edge, Val>>> t,
       W w,
       WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-    if (t.getStart().fact().equals(bwQuery.asNode()) && t.getLabel().equals(Field.empty())) {
+    if (t.getStart().fact().equals(bwQuery.asNode())
+        && t.getLabel().equals(EmptyField.getInstance())) {
       allocationSiteFound(query, bwQuery);
     }
   }

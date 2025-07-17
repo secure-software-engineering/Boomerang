@@ -15,6 +15,7 @@
 package boomerang.results;
 
 import boomerang.ForwardQuery;
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
@@ -223,10 +224,10 @@ public class AbstractBoomerangResults<W extends Weight> {
     public Context(Node<Edge, Val> node, ForwardQuery forwardQuery) {
       this.node = node;
       this.openingContext =
-          new PAutomaton<Edge, INode<Val>>() {
+          new PAutomaton<>() {
 
             @Override
-            public INode<Val> createState(INode<Val> d, Edge loc) {
+            public INode<Val> createState(INode<Val> d, ControlFlowGraph.Edge loc) {
               throw new RuntimeException("Not implemented");
             }
 
@@ -236,12 +237,12 @@ public class AbstractBoomerangResults<W extends Weight> {
             }
 
             @Override
-            public Edge epsilon() {
-              return new Edge(Statement.epsilon(), Statement.epsilon());
+            public ControlFlowGraph.Edge epsilon() {
+              return ControlFlowGraph.Edge.epsilon();
             }
           };
       this.closingContext =
-          new PAutomaton<Edge, INode<Val>>() {
+          new PAutomaton<>() {
 
             @Override
             public INode<Val> createState(INode<Val> d, Edge loc) {
@@ -254,8 +255,8 @@ public class AbstractBoomerangResults<W extends Weight> {
             }
 
             @Override
-            public Edge epsilon() {
-              return new Edge(Statement.epsilon(), Statement.epsilon());
+            public ControlFlowGraph.Edge epsilon() {
+              return ControlFlowGraph.Edge.epsilon();
             }
           };
     }

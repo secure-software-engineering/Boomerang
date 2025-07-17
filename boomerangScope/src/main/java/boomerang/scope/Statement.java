@@ -14,238 +14,20 @@
  */
 package boomerang.scope;
 
-import de.fraunhofer.iem.Empty;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Objects;
 
 public abstract class Statement implements Location {
 
-  private static Statement epsilon;
-  private final String rep;
   protected final Method method;
 
   protected Statement(Method method) {
-    this.rep = null;
     this.method = method;
   }
 
-  private Statement(String rep) {
-    this.rep = rep;
-    this.method = null;
-  }
-
-  public static Statement epsilon() {
-    if (epsilon == null) {
-      epsilon = new EpsStatement();
-    }
-    return epsilon;
-  }
-
-  private static class EpsStatement extends Statement implements Empty {
-
-    public EpsStatement() {
-      super("Eps_s");
-    }
-
-    @Override
-    public Method getMethod() {
-      return null;
-    }
-
-    @Override
-    public boolean containsInvokeExpr() {
-      return false;
-    }
-
-    @Override
-    public Field getWrittenField() {
-      throw new RuntimeException("Epsilon statement is not a field write statement");
-    }
-
-    @Override
-    public boolean isFieldWriteWithBase(Val base) {
-      return false;
-    }
-
-    @Override
-    public Field getLoadedField() {
-      throw new RuntimeException("Epsilon statement is not a field load statement");
-    }
-
-    @Override
-    public boolean isFieldLoadWithBase(Val base) {
-      return false;
-    }
-
-    @Override
-    public boolean isParameter(Val value) {
-      return false;
-    }
-
-    @Override
-    public boolean assignsValue(Val value) {
-      return false;
-    }
-
-    @Override
-    public boolean isReturnOperator(Val val) {
-      return false;
-    }
-
-    @Override
-    public boolean uses(Val value) {
-      return false;
-    }
-
-    @Override
-    public boolean isAssignStmt() {
-      return false;
-    }
-
-    @Override
-    public Val getLeftOp() {
-      throw new RuntimeException("Epsilon statement is not an assign statement");
-    }
-
-    @Override
-    public Val getRightOp() {
-      throw new RuntimeException("Epsilon statement is not an assign statement");
-    }
-
-    @Override
-    public boolean isInstanceOfStatement(Val fact) {
-      return false;
-    }
-
-    @Override
-    public boolean isCast() {
-      return false;
-    }
-
-    @Override
-    public InvokeExpr getInvokeExpr() {
-      throw new RuntimeException("Epsilon statement has no invoke expression");
-    }
-
-    @Override
-    public boolean isReturnStmt() {
-      return false;
-    }
-
-    @Override
-    public boolean isThrowStmt() {
-      return false;
-    }
-
-    @Override
-    public boolean isIfStmt() {
-      return false;
-    }
-
-    @Override
-    public IfStatement getIfStmt() {
-      throw new RuntimeException("Epsilon statement is not an if statement");
-    }
-
-    @Override
-    public Val getReturnOp() {
-      throw new RuntimeException("Epsilon statement is not a return statement");
-    }
-
-    @Override
-    public boolean isFieldStore() {
-      return false;
-    }
-
-    @Override
-    public boolean isArrayStore() {
-      return false;
-    }
-
-    @Override
-    public boolean isArrayLoad() {
-      return false;
-    }
-
-    @Override
-    public boolean isFieldLoad() {
-      return false;
-    }
-
-    @Override
-    public boolean isIdentityStmt() {
-      return false;
-    }
-
-    @Override
-    public boolean killAtIfStmt(Val fact, Statement successor) {
-      return false;
-    }
-
-    @Override
-    public IInstanceFieldRef getFieldStore() {
-      throw new RuntimeException("Epsilon statement is not a field store statement");
-    }
-
-    @Override
-    public IInstanceFieldRef getFieldLoad() {
-      throw new RuntimeException("Epsilon statement is not a field load statement");
-    }
-
-    @Override
-    public boolean isStaticFieldLoad() {
-      return false;
-    }
-
-    @Override
-    public boolean isStaticFieldStore() {
-      return false;
-    }
-
-    @Override
-    public IStaticFieldRef getStaticField() {
-      throw new RuntimeException("Epsilon statement has no static field");
-    }
-
-    @Override
-    public boolean isPhiStatement() {
-      return false;
-    }
-
-    @Override
-    public Collection<Val> getPhiVals() {
-      throw new RuntimeException("Epsilon statement is not a phi statement");
-    }
-
-    @Override
-    public IArrayRef getArrayBase() {
-      throw new RuntimeException("Epsilon statement has no array base");
-    }
-
-    @Override
-    public int getLineNumber() {
-      return -1;
-    }
-
-    @Override
-    public boolean isCatchStmt() {
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return System.identityHashCode(this);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return obj == this;
-    }
-  }
-
   public Method getMethod() {
-    return this.method;
+    return method;
   }
 
   public abstract boolean containsInvokeExpr();
@@ -312,6 +94,22 @@ public abstract class Statement implements Location {
       return getLeftOp().equals(value);
     }
     return false;
+  }
+
+  public Collection<Statement> getPredecessors() {
+    if (method == null) {
+      throw new RuntimeException("Statement has no correct method");
+    }
+
+    return method.getControlFlowGraph().getPredsOf(this);
+  }
+
+  public Collection<Statement> getSuccessors() {
+    if (method == null) {
+      throw new RuntimeException("Statement has no correct method");
+    }
+
+    return method.getControlFlowGraph().getSuccsOf(this);
   }
 
   public abstract boolean isAssignStmt();
@@ -387,16 +185,11 @@ public abstract class Statement implements Location {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Statement statement = (Statement) o;
-    return Objects.equals(rep, statement.rep) && Objects.equals(method, statement.method);
+    return Objects.equals(method, statement.method);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(rep, method);
-  }
-
-  @Override
-  public String toString() {
-    return rep;
+    return Objects.hash(method);
   }
 }

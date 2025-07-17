@@ -117,9 +117,7 @@ public class Issue5Test {
       FrameworkScope scopeFactory, Statement queryStatement) {
     AllocVal var =
         new AllocVal(queryStatement.getLeftOp(), queryStatement, queryStatement.getRightOp());
-    Optional<Statement> successorStmt =
-        queryStatement.getMethod().getControlFlowGraph().getSuccsOf(queryStatement).stream()
-            .findFirst();
+    Optional<Statement> successorStmt = queryStatement.getSuccessors().stream().findFirst();
     if (successorStmt.isEmpty()) {
       Assertions.fail("Could not find successor for " + queryStatement);
     }

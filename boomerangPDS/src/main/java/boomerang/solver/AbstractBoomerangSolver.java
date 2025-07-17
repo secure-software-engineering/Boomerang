@@ -29,6 +29,10 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.scope.fields.EmptyField;
+import boomerang.scope.fields.EpsilonField;
+import boomerang.scope.fields.ExclusionWildcardField;
+import boomerang.scope.fields.WildcardField;
 import boomerang.util.RegExAccessPath;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
@@ -135,7 +139,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
       if (t.getStart() instanceof GeneratedState) {
         continue;
       }
-      if (t.getStart().fact().equals(node) && t.getLabel().equals(Field.empty())) {
+      if (t.getStart().fact().equals(node) && t.getLabel().equals(EmptyField.getInstance())) {
         return true;
       }
     }
@@ -148,7 +152,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     @Override
     public void onWeightAdded(
         Transition<Edge, INode<Val>> t, W w, WeightedPAutomaton<Edge, INode<Val>, W> aut) {
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) return;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) return;
       if (icfg.isExitStmt(
           (AbstractBoomerangSolver.this instanceof ForwardBoomerangSolver
               ? t.getLabel().getTarget()
@@ -239,7 +243,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
         callAut.getTransitionsToFinalWeights().entrySet()) {
       Transition<Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) continue;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
       results.put(t.getLabel(), t.getStart().fact(), w);
@@ -256,7 +260,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
       Transition<Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
 
-      if (t.getLabel().equals(new Edge(Statement.epsilon(), Statement.epsilon()))) continue;
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
       if (t.getStart().fact().isLocal()
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
 
@@ -458,27 +462,27 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
   @Override
   public Field epsilonField() {
-    return Field.epsilon();
+    return EpsilonField.getInstance();
   }
 
   @Override
   public Field emptyField() {
-    return Field.empty();
+    return EmptyField.getInstance();
   }
 
   @Override
   public ControlFlowGraph.Edge epsilonStmt() {
-    return new Edge(Statement.epsilon(), Statement.epsilon());
+    return ControlFlowGraph.Edge.epsilon();
   }
 
   @Override
   public Field fieldWildCard() {
-    return Field.wildcard();
+    return WildcardField.getInstance();
   }
 
   @Override
   public Field exclusionFieldWildCard(Field exclusion) {
-    return Field.exclusionWildcard(exclusion);
+    return ExclusionWildcardField.getInstance(exclusion);
   }
 
   public WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> getFieldAutomaton() {
@@ -504,11 +508,11 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   @Override
   protected boolean preventFieldTransitionAdd(
       Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t, W weight) {
-    if (t.getStart().equals(t.getTarget()) && t.getLabel().equals(Field.empty())) {
+    if (t.getStart().equals(t.getTarget()) && t.getLabel().equals(EmptyField.getInstance())) {
       LOGGER.warn("Prevented illegal edge addition of {}", t);
       return true;
     }
-    if (!t.getLabel().equals(Field.empty()) || !options.typeCheck()) {
+    if (!t.getLabel().equals(EmptyField.getInstance()) || !options.typeCheck()) {
       return false;
     }
     if (t.getTarget() instanceof GeneratedState || t.getStart() instanceof GeneratedState) {

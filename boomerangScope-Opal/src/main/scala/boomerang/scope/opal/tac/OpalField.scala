@@ -15,29 +15,22 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope.Field
-import boomerang.scope.Type
 import java.util.Objects
 import org.opalj.br.FieldType
 import org.opalj.br.ObjectType
-import org.opalj.br.analyses.Project
 
 class OpalField(
     declaringClass: ObjectType,
     val fieldType: FieldType,
-    val name: String,
-    project: Project[_]
+    val name: String
 ) extends Field {
-
-  override def isPredefinedField: Boolean = false
-
-  override def isInnerClassField: Boolean = declaringClass.fqn.contains("$")
-
-  override def getType: Type = new OpalType(fieldType, project)
 
   override def getName: String = name
 
+  override def isInnerClassField: Boolean = declaringClass.fqn.contains("$")
+
   // Important: Do not include the declaring class because subclasses may access the field, too
-  override def hashCode: Int = Objects.hash(super.hashCode(), fieldType, name)
+  override def hashCode: Int = Objects.hash(fieldType, name)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalField =>

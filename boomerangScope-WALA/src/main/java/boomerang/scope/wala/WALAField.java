@@ -15,10 +15,9 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.Field;
-import boomerang.scope.Type;
 import com.ibm.wala.types.FieldReference;
 
-public class WALAField extends Field {
+public class WALAField implements Field {
 
   private final FieldReference fieldRef;
 
@@ -29,7 +28,7 @@ public class WALAField extends Field {
   @Override
   public int hashCode() {
     final int prime = 31;
-    int result = super.hashCode();
+    int result = 1;
     result = prime * result + ((fieldRef == null) ? 0 : fieldRef.hashCode());
     return result;
   }
@@ -37,7 +36,6 @@ public class WALAField extends Field {
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
-    if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     WALAField other = (WALAField) obj;
     if (fieldRef == null) {
@@ -51,17 +49,12 @@ public class WALAField extends Field {
   }
 
   @Override
-  public boolean isPredefinedField() {
-    return false;
+  public String getName() {
+    return fieldRef.getName().toString();
   }
 
   @Override
   public boolean isInnerClassField() {
-    throw new RuntimeException("Not yet implemented");
-  }
-
-  @Override
-  public Type getType() {
     throw new RuntimeException("Not yet implemented");
   }
 }

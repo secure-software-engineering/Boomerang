@@ -39,7 +39,6 @@ class OpalFieldTest {
         fieldLoadCount += 1
 
         val field = stmt.getLoadedField
-        Assertions.assertFalse(field.isPredefinedField)
         Assertions.assertFalse(field.isInnerClassField)
       }
     })
@@ -63,7 +62,6 @@ class OpalFieldTest {
         fieldStoreCount += 1
 
         val fieldStore = stmt.getFieldStore
-        Assertions.assertFalse(fieldStore.getField.isPredefinedField)
         Assertions.assertFalse(fieldStore.getField.isInnerClassField)
       }
     })
@@ -90,7 +88,6 @@ class OpalFieldTest {
         staticFieldLoadCount += 1
 
         val staticField = stmt.getStaticField.asStaticFieldVal()
-        Assertions.assertFalse(staticField.getField.isPredefinedField)
         Assertions.assertFalse(staticField.getField.isInnerClassField)
 
         val typeName = staticField.getType.toString
@@ -122,7 +119,6 @@ class OpalFieldTest {
         staticFieldStoreCount += 1
 
         val staticField = stmt.getStaticField
-        Assertions.assertFalse(staticField.getField.isPredefinedField)
         Assertions.assertFalse(staticField.getField.isInnerClassField)
 
         val typeName = staticField.asStaticFieldVal().getType.toString
@@ -154,11 +150,10 @@ class OpalFieldTest {
         fieldLoadCount += 1
 
         val field = stmt.getLoadedField
-        Assertions.assertFalse(field.isPredefinedField)
         Assertions.assertTrue(field.isInnerClassField)
 
         val fieldLoad = stmt.getFieldLoad
-        Assertions.assertFalse(fieldLoad.getField.isPredefinedField)
+        Assertions.assertTrue(fieldLoad.getField.isInnerClassField)
       }
     })
 
@@ -184,7 +179,7 @@ class OpalFieldTest {
         fieldStoreCount += 1
 
         val fieldStore = stmt.getFieldStore
-        Assertions.assertFalse(fieldStore.getField.isPredefinedField)
+        Assertions.assertTrue(fieldStore.getField.isInnerClassField)
       }
     })
 

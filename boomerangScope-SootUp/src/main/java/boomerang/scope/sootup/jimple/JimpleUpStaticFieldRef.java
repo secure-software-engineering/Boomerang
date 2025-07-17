@@ -49,7 +49,7 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
   @Override
   public Field getField() {
-    return new JimpleUpField(delegate.getFieldSignature(), method.getView());
+    return new JimpleUpField(delegate.getFieldSignature());
   }
 
   @Override

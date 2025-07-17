@@ -35,7 +35,7 @@ class OpalStaticFieldRef(
 
   override def getDeclaringClass: WrappedClass = new OpalWrappedClass(declaringClass, method.project)
 
-  override def getField: Field = new OpalField(declaringClass, fieldType, name, method.project)
+  override def getField: Field = new OpalField(declaringClass, fieldType, name)
 
   override def getType: Type = new OpalType(fieldType, method.project)
 
