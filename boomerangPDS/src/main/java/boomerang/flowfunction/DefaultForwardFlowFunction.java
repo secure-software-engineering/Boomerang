@@ -24,6 +24,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
+import boomerang.scope.fields.ArrayField;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
@@ -163,7 +164,8 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
         IArrayRef arrayBase = nextStmt.getArrayBase();
         if (arrayBase.getBase().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(nextEdge, leftOp, Field.array(arrayBase.getIndex()));
+              new NodeWithLocation<>(
+                  nextEdge, leftOp, ArrayField.getInstance(arrayBase.getIndex()));
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       } else if (rightOp.isCast()) {

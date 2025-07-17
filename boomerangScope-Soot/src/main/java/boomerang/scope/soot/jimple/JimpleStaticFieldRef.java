@@ -52,7 +52,7 @@ public class JimpleStaticFieldRef extends StaticFieldVal {
 
   @Override
   public Field getField() {
-    return new JimpleField(delegate.getFieldRef(), method.getScene());
+    return new JimpleField(delegate.getFieldRef());
   }
 
   @Override

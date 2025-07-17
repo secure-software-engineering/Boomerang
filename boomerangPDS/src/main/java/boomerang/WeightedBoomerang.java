@@ -38,7 +38,6 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.EpsilonStatement;
 import boomerang.scope.Field;
-import boomerang.scope.Field.ArrayField;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.IArrayRef;
 import boomerang.scope.IInstanceFieldRef;
@@ -46,6 +45,9 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
+import boomerang.scope.fields.ArrayField;
+import boomerang.scope.fields.EmptyField;
+import boomerang.scope.fields.StringBasedField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ControlFlowEdgeBasedFieldTransitionListener;
@@ -278,7 +280,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
                           new PushNode<>(
                               new Edge(pred, stmt),
                               stmt.getInvokeExpr().getBase(),
-                              Field.string(key),
+                              StringBasedField.getInstance(key),
                               PDSSystem.FIELDS));
                     }
                   }
@@ -307,7 +309,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
                           new NodeWithLocation<>(
                               new Edge(pred, stmt),
                               stmt.getInvokeExpr().getArg(1),
-                              Field.string(key));
+                              StringBasedField.getInstance(key));
                       backwardSolverIns.propagate(node, new PopNode<>(succNode, PDSSystem.FIELDS));
                     }
                   }
@@ -338,7 +340,9 @@ public abstract class WeightedBoomerang<W extends Weight> {
                         String key = v.getAllocVal().getStringValue();
                         NodeWithLocation<Edge, Val, Field> succNode =
                             new NodeWithLocation<>(
-                                new Edge(stmt, succ), stmt.getLeftOp(), Field.string(key));
+                                new Edge(stmt, succ),
+                                stmt.getLeftOp(),
+                                StringBasedField.getInstance(key));
                         solver.propagate(node, new PopNode<>(succNode, PDSSystem.FIELDS));
                       }
                     }
@@ -366,7 +370,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
                             new PushNode<>(
                                 new Edge(stmt, succ),
                                 stmt.getInvokeExpr().getBase(),
-                                Field.string(key),
+                                StringBasedField.getInstance(key),
                                 PDSSystem.FIELDS));
                       }
                     }
@@ -627,7 +631,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
     IArrayRef base = s.getStart().getArrayBase();
     return fieldWrites.getOrCreate(
         new FieldWritePOI(
-            s, base.getBase(), Field.array(base.getIndex()), s.getStart().getRightOp()));
+            s, base.getBase(), ArrayField.getInstance(base.getIndex()), s.getStart().getRightOp()));
   }
 
   protected FieldWritePOI createFieldStore(Edge cfgEdge) {
@@ -719,7 +723,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
         Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> weightedPAutomaton) {
-      if (!t.getLabel().equals(Field.empty()) && !(t.getLabel() instanceof ArrayField)) return;
+      if (!t.getLabel().equals(EmptyField.getInstance()) && !(t.getLabel() instanceof ArrayField))
+        return;
       Optional<AllocVal> allocNode = isAllocationNode(node.stmt(), node.fact());
       if (allocNode.isPresent()) {
         AllocVal val = allocNode.get();
@@ -776,7 +781,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(Field.empty())) {
+      if (t.getLabel().equals(EmptyField.getInstance())) {
         ForwardQueryArray forwardQuery = new ForwardQueryArray(node.stmt(), val, arrayAccessIndex);
         forwardSolve(forwardQuery);
         queryGraph.addEdge(key, node, forwardQuery);
@@ -1123,7 +1128,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
     if (rootQuery == null) {
       rootQuery = callTarget;
     }
-    solver.solve(query.asNode(), Field.empty(), fieldTarget, query.cfgEdge(), callTarget);
+    solver.solve(
+        query.asNode(), EmptyField.getInstance(), fieldTarget, query.cfgEdge(), callTarget);
   }
 
   private AbstractBoomerangSolver<W> forwardSolve(ForwardQuery query) {
@@ -1142,29 +1148,31 @@ public abstract class WeightedBoomerang<W extends Weight> {
             new Node<>(query.cfgEdge(), query.getAllocVal().getDelegate());
         SingleNode<Node<ControlFlowGraph.Edge, Val>> sourveVal = new SingleNode<>(node);
         INode<Node<ControlFlowGraph.Edge, Val>> genState1 =
-            solver.generateFieldState(sourveVal, Field.array(arrayQuery.getIndex1()));
+            solver.generateFieldState(sourveVal, ArrayField.getInstance(arrayQuery.getIndex1()));
         insertTransition(
             solver.getFieldAutomaton(),
-            new Transition<>(sourveVal, Field.array(arrayQuery.getIndex1()), genState1));
+            new Transition<>(sourveVal, ArrayField.getInstance(arrayQuery.getIndex1()), genState1));
         INode<Node<ControlFlowGraph.Edge, Val>> genState2 =
-            solver.generateFieldState(sourveVal, Field.array(arrayQuery.getIndex2()));
+            solver.generateFieldState(sourveVal, ArrayField.getInstance(arrayQuery.getIndex2()));
         insertTransition(
             solver.getFieldAutomaton(),
-            new Transition<>(genState1, Field.array(arrayQuery.getIndex2()), genState2));
+            new Transition<>(genState1, ArrayField.getInstance(arrayQuery.getIndex2()), genState2));
         insertTransition(
-            solver.getFieldAutomaton(), new Transition<>(genState2, Field.empty(), fieldTarget));
+            solver.getFieldAutomaton(),
+            new Transition<>(genState2, EmptyField.getInstance(), fieldTarget));
       } else {
         ForwardQueryArray arrayQuery = ((ForwardQueryArray) query);
         Node<ControlFlowGraph.Edge, Val> node =
             new Node<>(query.cfgEdge(), query.getAllocVal().getDelegate());
         SingleNode<Node<ControlFlowGraph.Edge, Val>> sourceVal = new SingleNode<>(node);
         INode<Node<ControlFlowGraph.Edge, Val>> genState =
-            solver.generateFieldState(sourceVal, Field.array(arrayQuery.getIndex()));
+            solver.generateFieldState(sourceVal, ArrayField.getInstance(arrayQuery.getIndex()));
         insertTransition(
             solver.getFieldAutomaton(),
-            new Transition<>(sourceVal, Field.array(arrayQuery.getIndex()), genState));
+            new Transition<>(sourceVal, ArrayField.getInstance(arrayQuery.getIndex()), genState));
         insertTransition(
-            solver.getFieldAutomaton(), new Transition<>(genState, Field.empty(), fieldTarget));
+            solver.getFieldAutomaton(),
+            new Transition<>(genState, EmptyField.getInstance(), fieldTarget));
       }
     }
     Val var;
@@ -1180,7 +1188,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
           query);
     } else {
       var = query.getAllocVal().getDelegate();
-      field = Field.empty();
+      field = EmptyField.getInstance();
     }
     if (query instanceof WeightedForwardQuery) {
       WeightedForwardQuery<W> q = (WeightedForwardQuery<W>) query;

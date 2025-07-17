@@ -32,7 +32,7 @@ class OpalInstanceFieldRef(
 
   override def getBase: Val = new OpalVal(objRef, method)
 
-  override def getField: Field = new OpalField(declaringClass, fieldType, fieldName, method.project)
+  override def getField: Field = new OpalField(declaringClass, fieldType, fieldName)
 
   override def getType: Type = new OpalType(fieldType, method.project)
 

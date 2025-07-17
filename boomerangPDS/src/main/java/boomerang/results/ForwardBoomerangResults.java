@@ -29,6 +29,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.scope.ValCollection;
+import boomerang.scope.fields.EmptyField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
@@ -314,7 +315,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         .getFieldAutomaton()
         .registerListener(
             (t, w, aut) -> {
-              if (!t.getLabel().equals(Field.empty()) || t.getStart() instanceof GeneratedState) {
+              if (!t.getLabel().equals(EmptyField.getInstance())
+                  || t.getStart() instanceof GeneratedState) {
                 return;
               }
               Node<ControlFlowGraph.Edge, Val> node = t.getStart().fact();
@@ -355,7 +357,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     Set<Node<ControlFlowGraph.Edge, Val>> res = new LinkedHashSet<>();
     for (Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t :
         queryToSolvers.get(query).getFieldAutomaton().getTransitions()) {
-      if (!t.getLabel().equals(Field.empty()) || t.getStart() instanceof GeneratedState) {
+      if (!t.getLabel().equals(EmptyField.getInstance())
+          || t.getStart() instanceof GeneratedState) {
         continue;
       }
       Node<ControlFlowGraph.Edge, Val> nullPointerNode = t.getStart().fact();
@@ -435,7 +438,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
         if (!t.getStart().fact().stmt().equals(ifStmt)) {
           continue;
         }
-        if (!t.getLabel().equals(Field.empty()) || t.getStart() instanceof GeneratedState) {
+        if (!t.getLabel().equals(EmptyField.getInstance())
+            || t.getStart() instanceof GeneratedState) {
           continue;
         }
 

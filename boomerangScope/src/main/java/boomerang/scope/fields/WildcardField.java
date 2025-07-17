@@ -12,18 +12,22 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope;
+package boomerang.scope.fields;
 
-import de.fraunhofer.iem.Location;
+import de.fraunhofer.iem.wildcard.Wildcard;
 
-public abstract class Field implements Location {
+public class WildcardField extends PredefinedField implements Wildcard {
 
-  public abstract String getName();
+  private static WildcardField instance;
 
-  public abstract boolean isInnerClassField();
+  private WildcardField() {
+    super("*");
+  }
 
-  @Override
-  public boolean accepts(Location other) {
-    return this.equals(other);
+  public static WildcardField getInstance() {
+    if (instance == null) {
+      instance = new WildcardField();
+    }
+    return instance;
   }
 }

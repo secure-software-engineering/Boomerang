@@ -12,18 +12,22 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope;
+package boomerang.scope.fields;
 
-import de.fraunhofer.iem.Location;
+import de.fraunhofer.iem.Empty;
 
-public abstract class Field implements Location {
+public class EmptyField extends PredefinedField implements Empty {
 
-  public abstract String getName();
+  private static EmptyField instance;
 
-  public abstract boolean isInnerClassField();
+  private EmptyField() {
+    super("{}");
+  }
 
-  @Override
-  public boolean accepts(Location other) {
-    return this.equals(other);
+  public static EmptyField getInstance() {
+    if (instance == null) {
+      instance = new EmptyField();
+    }
+    return instance;
   }
 }

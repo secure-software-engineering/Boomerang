@@ -29,6 +29,7 @@ import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Val;
+import boomerang.scope.fields.EmptyField;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.util.AccessPath;
 import boomerang.util.DefaultValueMap;
@@ -218,7 +219,7 @@ public class BoomerangTestingFramework extends TestingFramework {
                       NoWeight w,
                       WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, NoWeight>
                           weightedPAutomaton) {
-                    if (t.getLabel().equals(Field.empty())
+                    if (t.getLabel().equals(EmptyField.getInstance())
                         && t.getTarget().fact().equals(q.asNode())) {
                       results.add(q.asNode());
                     }

@@ -15,19 +15,15 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.Field;
-import boomerang.scope.Type;
 import java.util.Objects;
 import sootup.core.signatures.FieldSignature;
-import sootup.java.core.views.JavaView;
 
 public class JimpleUpField extends Field {
 
   private final FieldSignature delegate;
-  private final JavaView view;
 
-  public JimpleUpField(FieldSignature delegate, JavaView view) {
+  public JimpleUpField(FieldSignature delegate) {
     this.delegate = delegate;
-    this.view = view;
   }
 
   public FieldSignature getDelegate() {
@@ -35,23 +31,13 @@ public class JimpleUpField extends Field {
   }
 
   @Override
-  public boolean isPredefinedField() {
-    return false;
+  public String getName() {
+    return delegate.getName();
   }
 
   @Override
   public boolean isInnerClassField() {
     return delegate.getName().contains("$");
-  }
-
-  @Override
-  public Type getType() {
-    return new JimpleUpType(delegate.getType(), view);
-  }
-
-  @Override
-  public String getName() {
-    return delegate.getName();
   }
 
   @Override

@@ -15,7 +15,6 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.Field;
-import boomerang.scope.Type;
 import com.ibm.wala.types.FieldReference;
 
 public class WALAField extends Field {
@@ -51,17 +50,12 @@ public class WALAField extends Field {
   }
 
   @Override
-  public boolean isPredefinedField() {
-    return false;
+  public String getName() {
+    return fieldRef.getName().toString();
   }
 
   @Override
   public boolean isInnerClassField() {
-    throw new RuntimeException("Not yet implemented");
-  }
-
-  @Override
-  public Type getType() {
     throw new RuntimeException("Not yet implemented");
   }
 }

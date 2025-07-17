@@ -12,53 +12,48 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope.soot.jimple;
+package boomerang.scope.fields;
 
 import boomerang.scope.Field;
 import java.util.Objects;
-import soot.SootFieldRef;
 
-public class JimpleField extends Field {
+/**
+ * Super class for all predefined fields that are used in Boomerang. Fields that extend this class
+ * are not expected to be used outside of Boomerang
+ */
+public class PredefinedField extends Field {
 
-  private final SootFieldRef delegate;
+  private final String name;
 
-  public JimpleField(SootFieldRef delegate) {
-    this.delegate = delegate;
-  }
-
-  public SootFieldRef getDelegate() {
-    return this.delegate;
+  protected PredefinedField(String name) {
+    this.name = name;
   }
 
   @Override
   public String getName() {
-    return delegate.name();
+    return name;
   }
 
   @Override
   public boolean isInnerClassField() {
-    return this.delegate.name().contains("$");
+    return false;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    JimpleField that = (JimpleField) o;
-    // Important: Do not include the declaring class because subclasses may access the field, too
-    return Objects.equals(delegate.type(), that.delegate.type())
-        && Objects.equals(delegate.name(), that.delegate.name());
+    PredefinedField that = (PredefinedField) o;
+    return Objects.equals(name, that.name);
   }
 
   @Override
   public int hashCode() {
-    // Important: Do not include the declaring class because subclasses may access the field, too
-    return Objects.hash(super.hashCode(), delegate.type(), delegate.name());
+    return Objects.hash(name);
   }
 
   @Override
   public String toString() {
-    return delegate.name();
+    return name;
   }
 }

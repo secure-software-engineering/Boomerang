@@ -31,6 +31,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
+import boomerang.scope.fields.ArrayField;
 import com.google.common.collect.Multimap;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
@@ -157,7 +158,8 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(Field.array(nextStmt.getTarget().getArrayBase().getIndex()))) {
+      if (t.getLabel()
+          .equals(ArrayField.getInstance(nextStmt.getTarget().getArrayBase().getIndex()))) {
         LOGGER.trace("Overwriting field {} at {}", t.getLabel(), nextStmt);
         overwriteFieldAtStatement(nextStmt, t);
       }
