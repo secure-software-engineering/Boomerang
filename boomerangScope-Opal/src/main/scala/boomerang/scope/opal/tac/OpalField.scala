@@ -30,7 +30,7 @@ class OpalField(
   override def isInnerClassField: Boolean = declaringClass.fqn.contains("$")
 
   // Important: Do not include the declaring class because subclasses may access the field, too
-  override def hashCode: Int = Objects.hash(super.hashCode(), fieldType, name)
+  override def hashCode: Int = Objects.hash(fieldType, name)
 
   override def equals(other: Any): Boolean = other match {
     case that: OpalField =>

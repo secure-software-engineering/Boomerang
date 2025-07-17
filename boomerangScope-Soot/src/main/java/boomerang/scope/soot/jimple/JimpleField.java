@@ -18,7 +18,7 @@ import boomerang.scope.Field;
 import java.util.Objects;
 import soot.SootFieldRef;
 
-public class JimpleField extends Field {
+public class JimpleField implements Field {
 
   private final SootFieldRef delegate;
 
@@ -44,7 +44,6 @@ public class JimpleField extends Field {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleField that = (JimpleField) o;
     // Important: Do not include the declaring class because subclasses may access the field, too
     return Objects.equals(delegate.type(), that.delegate.type())
@@ -54,7 +53,7 @@ public class JimpleField extends Field {
   @Override
   public int hashCode() {
     // Important: Do not include the declaring class because subclasses may access the field, too
-    return Objects.hash(super.hashCode(), delegate.type(), delegate.name());
+    return Objects.hash(delegate.type(), delegate.name());
   }
 
   @Override

@@ -18,7 +18,7 @@ import boomerang.scope.Field;
 import java.util.Objects;
 import sootup.core.signatures.FieldSignature;
 
-public class JimpleUpField extends Field {
+public class JimpleUpField implements Field {
 
   private final FieldSignature delegate;
 
@@ -44,7 +44,6 @@ public class JimpleUpField extends Field {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleUpField that = (JimpleUpField) o;
     // Important: Do not include the declaring class because subclasses may access the field, too
     return Objects.equals(delegate.getType(), that.delegate.getType())
@@ -54,7 +53,7 @@ public class JimpleUpField extends Field {
   @Override
   public int hashCode() {
     // Important: Do not include the declaring class because subclasses may access the field, too
-    return Objects.hash(super.hashCode(), delegate.getType(), delegate.getName());
+    return Objects.hash(delegate.getType(), delegate.getName());
   }
 
   @Override

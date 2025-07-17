@@ -16,14 +16,14 @@ package boomerang.scope;
 
 import de.fraunhofer.iem.Location;
 
-public abstract class Field implements Location {
+public interface Field extends Location {
 
-  public abstract String getName();
+  String getName();
 
-  public abstract boolean isInnerClassField();
+  boolean isInnerClassField();
 
   @Override
-  public boolean accepts(Location other) {
+  default boolean accepts(Location other) {
     return this.equals(other);
   }
 }

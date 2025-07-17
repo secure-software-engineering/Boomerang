@@ -21,7 +21,7 @@ import java.util.Objects;
  * Super class for all predefined fields that are used in Boomerang. Fields that extend this class
  * are not expected to be used outside of Boomerang
  */
-public class PredefinedField extends Field {
+public class PredefinedField implements Field {
 
   private final String name;
 
