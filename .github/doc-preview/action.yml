@@ -1,0 +1,49 @@
+name: Documentation Preview
+description: Create and deploy a preview of the documentation
+
+inputs:
+  token:
+    description: 'GitHub token for authentication'
+    required: true
+  preview-name:
+    description: 'The name of the preview'
+    required: true
+  enable-comment:
+    description: 'If true a comment with a link to the preview is added to the PR (default: true)'
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install mike mkdocs-material mkdocs-tooltips git+https://github.com/RedisLabs/mkdocs-include.git git+https://github.com/swissiety/LspLexer4Pygments.git
+
+    - name: Configure git user
+      shell: bash
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+
+    - name: Deploy the Preview
+      shell: bash
+      run: mike deploy --push --update-aliases -t "Preview for ${{ inputs.preview-name }}" ${{ inputs.preview-name }}
+
+    - name: Comment Link to Preview
+      if: inputs.enable-comment == 'true' && github.event.action != 'closed'
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        recreate: true
+        message: |
+          Detected changes in documentation files: [Documentation Preview](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/)
+
+    - name: Delete the Preview
+      if: github.event.action == 'closed'
+      shell: bash
+      run: mike delete --push ${{ preview-name }}

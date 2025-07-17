@@ -1,0 +1,42 @@
+name: PR Documentation Preview
+
+permissions:
+  pages: write
+  deployments: write
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    types:
+      - opened
+      - closed
+      - synchronize
+      - reopened
+    paths:
+      - mkdocs.yml
+      - docs/**
+      - .github/workflows/doc_preview.yml
+
+concurrency:
+  group: gh-pages
+
+jobs:
+  deploy-preview:
+    name: Preview documentation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Documentation Preview
+        uses: ./.github/doc-preview
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          preview-name: pr-${{ github.event.pull_request.number }}
