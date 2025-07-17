@@ -1,0 +1,1 @@
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"Welcome to Boomerang Documentation","text":""},{"location":"installation/","title":"Installation Instructions","text":""},{"location":"options/","title":"Boomerang Options","text":""}]}
