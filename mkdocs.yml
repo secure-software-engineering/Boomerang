@@ -9,6 +9,7 @@ nav:
       - Installation: installation.md
   - Boomerang:
       - Options: options.md
+      - Allocation Sites: allocation_sites.md
 
 theme:
   name: material
