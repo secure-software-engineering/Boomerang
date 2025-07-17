@@ -46,4 +46,4 @@ runs:
     - name: Delete the Preview
       if: github.event.action == 'closed'
       shell: bash
-      run: mike delete --push ${{ preview-name }}
+      run: mike delete --push ${{ inputs.preview-name }}

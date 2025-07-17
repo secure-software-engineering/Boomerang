@@ -1,10 +1,4 @@
-name: PR Documentation Preview
-
-permissions:
-  pages: write
-  deployments: write
-  contents: write
-  pull-requests: write
+name: Documentation Preview
 
 on:
   pull_request:
