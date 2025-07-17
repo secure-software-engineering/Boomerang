@@ -16,17 +16,17 @@ package boomerang.scope.fields;
 
 import de.fraunhofer.iem.Empty;
 
-public class EmptyField extends PredefinedField implements Empty {
+public class EpsilonField extends PredefinedField implements Empty {
 
-  private static EmptyField instance;
+  private static EpsilonField instance;
 
-  private EmptyField() {
-    super("{}");
+  private EpsilonField() {
+    super("eps_f");
   }
 
-  public static EmptyField getInstance() {
+  public static EpsilonField getInstance() {
     if (instance == null) {
-      instance = new EmptyField();
+      instance = new EpsilonField();
     }
     return instance;
   }

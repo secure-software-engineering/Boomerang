@@ -219,7 +219,7 @@ public class BoomerangTestingFramework extends TestingFramework {
                       NoWeight w,
                       WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, NoWeight>
                           weightedPAutomaton) {
-                    if (t.getLabel().equals(EmptyField.getEmptyField())
+                    if (t.getLabel().equals(EmptyField.getInstance())
                         && t.getTarget().fact().equals(q.asNode())) {
                       results.add(q.asNode());
                     }

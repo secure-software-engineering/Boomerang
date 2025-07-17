@@ -30,6 +30,7 @@ import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.fields.EmptyField;
+import boomerang.scope.fields.EpsilonField;
 import boomerang.scope.fields.ExclusionWildcardField;
 import boomerang.scope.fields.WildcardField;
 import boomerang.util.RegExAccessPath;
@@ -138,7 +139,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
       if (t.getStart() instanceof GeneratedState) {
         continue;
       }
-      if (t.getStart().fact().equals(node) && t.getLabel().equals(EmptyField.getEmptyField())) {
+      if (t.getStart().fact().equals(node) && t.getLabel().equals(EmptyField.getInstance())) {
         return true;
       }
     }
@@ -461,12 +462,12 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
   @Override
   public Field epsilonField() {
-    return EmptyField.getEpsilonField();
+    return EpsilonField.getInstance();
   }
 
   @Override
   public Field emptyField() {
-    return EmptyField.getEmptyField();
+    return EmptyField.getInstance();
   }
 
   @Override
@@ -507,11 +508,11 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   @Override
   protected boolean preventFieldTransitionAdd(
       Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t, W weight) {
-    if (t.getStart().equals(t.getTarget()) && t.getLabel().equals(EmptyField.getEmptyField())) {
+    if (t.getStart().equals(t.getTarget()) && t.getLabel().equals(EmptyField.getInstance())) {
       LOGGER.warn("Prevented illegal edge addition of {}", t);
       return true;
     }
-    if (!t.getLabel().equals(EmptyField.getEmptyField()) || !options.typeCheck()) {
+    if (!t.getLabel().equals(EmptyField.getInstance()) || !options.typeCheck()) {
       return false;
     }
     if (t.getTarget() instanceof GeneratedState || t.getStart() instanceof GeneratedState) {

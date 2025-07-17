@@ -54,7 +54,7 @@ public abstract class ExtractAllocationSiteStateListener<W extends Weight>
       W w,
       WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
     if (t.getStart().fact().equals(bwQuery.asNode())
-        && t.getLabel().equals(EmptyField.getEmptyField())) {
+        && t.getLabel().equals(EmptyField.getInstance())) {
       allocationSiteFound(query, bwQuery);
     }
   }
