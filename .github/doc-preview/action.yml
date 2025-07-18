@@ -40,7 +40,7 @@ runs:
 
     - name: Deploy the Preview
       shell: bash
-      run: mike deploy --branch ${{ inputs.gh-pages-branch }} --push --update-aliases -t ${{ inputs.preview-title }} ${{ inputs.preview-name }}
+      run: mike deploy --branch ${{ inputs.gh-pages-branch }} --push --update-aliases -t "${{ inputs.preview-title }}" ${{ inputs.preview-name }}
 
     - name: Comment Link to Preview
       if: inputs.enable-comment == 'true' && github.event.action != 'closed'
