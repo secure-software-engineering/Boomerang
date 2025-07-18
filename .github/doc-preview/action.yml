@@ -8,6 +8,13 @@ inputs:
   preview-name:
     description: 'The name of the preview'
     required: true
+  preview-title:
+    description: 'The title of the preview'
+    required: true
+  gh-pages-branch:
+    description: 'The branch name where the gh pages are deployed to (default: gh-pages)'
+    required: false
+    default: 'gh-pages'
   enable-comment:
     description: 'If true a comment with a link to the preview is added to the PR (default: true)'
     required: false
@@ -33,7 +40,7 @@ runs:
 
     - name: Deploy the Preview
       shell: bash
-      run: mike deploy --push --update-aliases -t "Preview for ${{ inputs.preview-name }}" ${{ inputs.preview-name }}
+      run: mike deploy --branch ${{ inputs.gh-pages-branch }} --push --update-aliases -t ${{ inputs.preview-title }} ${{ inputs.preview-name }}
 
     - name: Comment Link to Preview
       if: inputs.enable-comment == 'true' && github.event.action != 'closed'

@@ -34,3 +34,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           preview-name: pr-${{ github.event.pull_request.number }}
+          preview-title: Preview for pr-${{ github.event.pull_request.number }}
