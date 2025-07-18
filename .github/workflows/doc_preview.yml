@@ -30,8 +30,8 @@ jobs:
           fetch-depth: 0
 
       - name: Create Documentation Preview
-        uses: secure-software-engineering/actions/pages/doc-preview@feature/doc-preview
+        uses: secure-software-engineering/actions/pages/doc-preview@develop
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           preview-name: pr-${{ github.event.pull_request.number }}
-          preview-title: Preview for pr-${{ github.event.pull_request.number }}
+          preview-title: Preview for PR-${{ github.event.pull_request.number }}
