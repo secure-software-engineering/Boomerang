@@ -5,11 +5,15 @@ edit_uri: edit/develop/docs/
 
 nav:
   - Home: index.md
-  - Getting Started:
-      - Installation: installation.md
+  - General:
+      - Installation: general/installation.md
+      - Boomerang Scopes: general/boomerang_scopes.md
+      - Framework Scopes: general/framework_scopes.md
   - Boomerang:
-      - Options: options.md
-      - Allocation Sites: allocation_sites.md
+      - Boomerang Setup: boomerang/boomerang_setup.md
+      - Options: boomerang/options.md
+      - Allocation Sites: boomerang/allocation_sites.md
+      - Examples: boomerang/examples.md
 
 theme:
   name: material
