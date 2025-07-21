@@ -471,6 +471,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Allocation Sites
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -482,6 +495,52 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#allocation-site-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Allocation Site Interface
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simple-allocation-site" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Allocation Site
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allocation-site-with-dataflowscope" class="md-nav__link">
+    <span class="md-ellipsis">
+      Allocation Site with DataFlowScope
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -538,6 +597,41 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#allocation-site-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Allocation Site Interface
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simple-allocation-site" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Allocation Site
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allocation-site-with-dataflowscope" class="md-nav__link">
+    <span class="md-ellipsis">
+      Allocation Site with DataFlowScope
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -556,6 +650,236 @@
 
 
 <h1 id="defining-allocation-sites">Defining Allocation Sites</h1>
+<p>Boomerang provides an interface that allows the definition of individual allocation sites. An allocation site is a value that should be considered as a points-to object.</p>
+<h2 id="allocation-site-interface">Allocation Site Interface</h2>
+<p>To define an individual allocation site, we have to implement the <code>IAllocationSite</code> interface and override its method <code>getAllocationSite(...)</code> that returns an optional <code>AllocVal</code>. 
+An <code>AllocVal</code> represents an allocation site and acts as a wrapper for the allocation site statement and value.
+If the optional is present, the <code>AllocVal</code> is added to the resulting allocation sites.</p>
+<p>When performing a backward analysis, Boomerang calls this method on each statement on each data-flow path. 
+It provides three parameters to the method <code>getAllocationSite</code>:
+- Method: The current method
+- Statement: The current statement that may contain an allocation site
+- Val: The current propagated data-flow fact</p>
+<p>These parameters necessitate two checks that should be part of each allocation site implementation:
+1) Check whether the statement is an assignment
+2) Check whether the left operand of the assignment is equal to the propagated data-flow fact</p>
+<p>The first point is relevant because an allocation site is defined as an assignment.
+The second aspect is relevant to avoid returning statements that are not relevant to the points-to analysis.
+Boomerang propagates only data-flow facts that are relevant to or alias with the query variable.
+Therefore, one can exclude irrelevant assignments with the second check.</p>
+<p>To this end, a self-defined allocation site should have at least the following code:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ExtendedAllocationSite</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IAllocationSite</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">AllocVal</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getAllocationSite</span><span class="p">(</span><span class="n">Method</span><span class="w"> </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">Val</span><span class="w"> </span><span class="n">fact</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Check for assignments        </span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">statement</span><span class="p">.</span><span class="na">isAssignStmt</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">Val</span><span class="w"> </span><span class="n">leftOp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getLeftOp</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Val</span><span class="w"> </span><span class="n">rightOp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getRightOp</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// Check for correct data-flow fact</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">leftOp</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">fact</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// rightOp is a potential allocation site</span>
+<span class="w">        </span><span class="p">...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>Last, to use our self-defined allocation site, we need to add it to the options:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">BoomerangOptions</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">                    </span><span class="n">BoomerangOptions</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<span class="w">                            </span><span class="p">.</span><span class="na">withAllocationSite</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ExtendedAllocationSite</span><span class="p">())</span>
+<span class="w">                            </span><span class="p">...</span>
+<span class="w">                            </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="simple-allocation-site">Simple Allocation Site</h2>
+<p>To show how an implementation of the <code>IAllocationSite</code> interface may look like, we consider the following simple example:</p>
+<p>Assume our program requires <em>constants</em> and <em>new expressions</em> as allocation sites. 
+Then, the interface implementation may look like this:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SimpleAllocationSite</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IAllocationSite</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">AllocVal</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getAllocationSite</span><span class="p">(</span><span class="n">Method</span><span class="w"> </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">Val</span><span class="w"> </span><span class="n">fact</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Check for assignments        </span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">statement</span><span class="p">.</span><span class="na">isAssignStmt</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">Val</span><span class="w"> </span><span class="n">leftOp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getLeftOp</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Val</span><span class="w"> </span><span class="n">rightOp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getRightOp</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// Check for correct data-flow fact</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">leftOp</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">fact</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// Constant allocation sites: var = &lt;constant&gt;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rightOp</span><span class="p">.</span><span class="na">isConstant</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">AllocVal</span><span class="w"> </span><span class="n">allocVal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AllocVal</span><span class="p">(</span><span class="n">leftOp</span><span class="p">,</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">rightOp</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">allocVal</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// New expressions: var = new java.lang.Object</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rightOp</span><span class="p">.</span><span class="na">isNewExpr</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">AllocVal</span><span class="w"> </span><span class="n">allocVal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AllocVal</span><span class="p">(</span><span class="n">leftOp</span><span class="p">,</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">rightOp</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">allocVal</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="allocation-site-with-dataflowscope">Allocation Site with DataFlowScope</h2>
+<p>In many cases, we are interested in finding an allocation site to analyze it.
+However, a common scenario where Boomerang cannot find an allocation site occurs when a data-flow path ends because we have a function call that is not part of the application.
+For example, using the <code>SimpleAllocationSite</code> from the previous section, Boomerang would not find an allocation site in the following program:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;property&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Most precise allocation site</span>
+<span class="p">...</span>
+<span class="n">queryFor</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w">                                </span>
+</code></pre></div></td></tr></table></div>
+<p>Boomerang does not compute an allocation site because <code>System.getProperty("property")</code> is not a <em>constant</em> or a <em>new expression</em>.
+Additionally, we may be interested in analyzing only our own application, that is, we do not load the JDK class <code>java.lang.System</code> and exclude it in the <code>DataFlowScope</code>.
+In this case, Boomerang returns an empty results set because the data-flow path ends at the call <code>System.getProperty("property")</code>.</p>
+<p>To cover these scenarios, we can include the <code>DataFlowScope</code> in the allocation site implementation.
+For example, we can extend the <a href="https://github.com/secure-software-engineering/Boomerang/blob/develop/boomerangPDS/src/main/java/boomerang/options/DefaultAllocationSite.java">DefaultAllocationSite</a> as follows:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ExtendedDataFlowScope</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DefaultAllocationSite</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">DataFlowScope</span><span class="w"> </span><span class="n">dataFlowScope</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">ExtendedDataFlowScope</span><span class="p">(</span><span class="n">DataFlowScope</span><span class="w"> </span><span class="n">dataFlowScope</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">dataFlowScope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataFlowScope</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Override</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">AllocVal</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getAllocationSite</span><span class="p">(</span><span class="n">Method</span><span class="w"> </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">Val</span><span class="w"> </span><span class="n">fact</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Check for assignments        </span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">statement</span><span class="p">.</span><span class="na">isAssignStmt</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">Val</span><span class="w"> </span><span class="n">leftOp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getLeftOp</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Val</span><span class="w"> </span><span class="n">rightOp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getRightOp</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// Check for correct data-flow fact</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">leftOp</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">fact</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">empty</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// Check for function calls that would end the data-flow path</span>
+<span class="w">        </span><span class="c1">// If the function call is not excluded, Boomerang can continue with the analysis</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">statement</span><span class="p">.</span><span class="na">containsInvokeExpr</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">InvokeExpr</span><span class="w"> </span><span class="n">invokeExpr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">statement</span><span class="p">.</span><span class="na">getInvokeExpr</span><span class="p">();</span>
+<span class="w">            </span><span class="n">DeclaredMethod</span><span class="w"> </span><span class="n">declaredMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">invokeExpr</span><span class="p">.</span><span class="na">getDeclaredMethod</span><span class="p">();</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dataFlowScope</span><span class="p">.</span><span class="na">isExcluded</span><span class="p">(</span><span class="n">declaredMethod</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// rightOp is the invoke expression</span>
+<span class="w">                </span><span class="n">AllocVal</span><span class="w"> </span><span class="n">allocVal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AllocVal</span><span class="p">(</span><span class="n">leftOp</span><span class="p">,</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">rightOp</span><span class="p">);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">Optional</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">allocVal</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// If the statement does not contain a function call, we continue with the default behavior</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kd">super</span><span class="p">.</span><span class="na">getAllocationSite</span><span class="p">(</span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">statement</span><span class="p">,</span><span class="w"> </span><span class="n">fact</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>With this implementation, we cover function calls that would end the analysis, and we can conclude that the allocation site cannot be computed precisely.
+For example, having <code>System.getProperty("property")</code> as allocation site indicates that the query variable points to some object that depends on some system variables at runtime.</p>
 
 
 
