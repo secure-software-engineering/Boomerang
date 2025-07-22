@@ -61,18 +61,6 @@ class OpalVal(
     throw new RuntimeException("Value is not an array allocation expression")
   }
 
-  override def isNull: Boolean = delegate.isNullExpr
-
-  override def isStringConstant: Boolean = delegate.isStringConst
-
-  override def getStringValue: String = {
-    if (isStringConstant) {
-      return delegate.asStringConst.value
-    }
-
-    throw new RuntimeException("Value is not a String constant")
-  }
-
   override def isCast: Boolean = delegate.astID == PrimitiveTypecastExpr.ASTID
 
   override def getCastOp: Val = {
@@ -105,6 +93,15 @@ class OpalVal(
     throw new RuntimeException("Value is not a length expression")
   }
 
+  override def withNewMethod(callee: Method): Val = throw new RuntimeException("Only allowed for static fields")
+
+  override def withSecondVal(secondVal: Val) =
+    new OpalDoubleVal(delegate, method, secondVal)
+
+  override def getArrayBase: IArrayRef = throw new RuntimeException(
+    "Value is not an array ref"
+  )
+
   override def isIntConstant: Boolean = delegate.isIntConst
 
   override def isClassConstant: Boolean = delegate.isClassConst
@@ -116,11 +113,6 @@ class OpalVal(
 
     throw new RuntimeException("Value is not a class constant")
   }
-
-  override def withNewMethod(callee: Method): Val = throw new RuntimeException("Only allowed for static fields")
-
-  override def withSecondVal(secondVal: Val) =
-    new OpalDoubleVal(delegate, method, secondVal)
 
   override def isLongConstant: Boolean = delegate.isLongConst
 
@@ -140,9 +132,37 @@ class OpalVal(
     throw new RuntimeException("Value is not a long constant")
   }
 
-  override def getArrayBase: IArrayRef = throw new RuntimeException(
-    "Value is not an array ref"
-  )
+  override def isFloatConstant: Boolean = delegate.isFloatConst
+
+  override def getFloatValue: Float = {
+    if (isFloatConstant) {
+      return delegate.asFloatConst.value
+    }
+
+    throw new RuntimeException("Val is not a float constant")
+  }
+
+  override def isDoubleConstant: Boolean = delegate.isDoubleConst
+
+  override def getDoubleValue: Double = {
+    if (isDoubleConstant) {
+      return delegate.asDoubleConst.value
+    }
+
+    throw new RuntimeException("Val is not a double constant")
+  }
+
+  override def isNull: Boolean = delegate.isNullExpr
+
+  override def isStringConstant: Boolean = delegate.isStringConst
+
+  override def getStringValue: String = {
+    if (isStringConstant) {
+      return delegate.asStringConst.value
+    }
+
+    throw new RuntimeException("Value is not a String constant")
+  }
 
   override def getVariableName: String = {
     delegate match {

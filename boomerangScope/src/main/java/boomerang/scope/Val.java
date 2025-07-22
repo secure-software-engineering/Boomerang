@@ -61,12 +61,6 @@ public abstract class Val {
   // TODO Change to list to include all dimensions (not just the first one)
   public abstract Val getArrayAllocationSize();
 
-  public abstract boolean isNull();
-
-  public abstract boolean isStringConstant();
-
-  public abstract String getStringValue();
-
   public abstract boolean isCast();
 
   public abstract Val getCastOp();
@@ -81,28 +75,6 @@ public abstract class Val {
 
   public abstract Val getLengthOp();
 
-  public abstract boolean isIntConstant();
-
-  public abstract boolean isClassConstant();
-
-  public abstract Type getClassConstantType();
-
-  public abstract Val withNewMethod(Method callee);
-
-  public Val withSecondVal(Val secondVal) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
-
-  public abstract boolean isLongConstant();
-
-  public boolean isConstant() {
-    return isClassConstant() || isIntConstant() || isStringConstant() || isLongConstant();
-  }
-
-  public abstract int getIntValue();
-
-  public abstract long getLongValue();
-
   public abstract IArrayRef getArrayBase();
 
   public boolean isThisLocal() {
@@ -115,6 +87,47 @@ public abstract class Val {
 
   public boolean isParameterLocal(int i) {
     return i < m().getParameterLocals().size() && m().getParameterLocal(i).equals(this);
+  }
+
+  public abstract boolean isIntConstant();
+
+  public abstract int getIntValue();
+
+  public abstract boolean isLongConstant();
+
+  public abstract long getLongValue();
+
+  public abstract boolean isFloatConstant();
+
+  public abstract float getFloatValue();
+
+  public abstract boolean isDoubleConstant();
+
+  public abstract double getDoubleValue();
+
+  public abstract boolean isNull();
+
+  public abstract boolean isStringConstant();
+
+  public abstract String getStringValue();
+
+  public abstract boolean isClassConstant();
+
+  public abstract Type getClassConstantType();
+
+  public abstract Val withNewMethod(Method callee);
+
+  public Val withSecondVal(Val secondVal) {
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
+  public boolean isConstant() {
+    return isIntConstant()
+        || isLongConstant()
+        || isFloatConstant()
+        || isDoubleConstant()
+        || isStringConstant()
+        || isClassConstant();
   }
 
   public abstract String getVariableName();

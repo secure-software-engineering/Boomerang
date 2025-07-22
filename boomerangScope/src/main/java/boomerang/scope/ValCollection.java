@@ -117,21 +117,6 @@ public final class ValCollection {
     }
 
     @Override
-    public boolean isNull() {
-      return false;
-    }
-
-    @Override
-    public boolean isStringConstant() {
-      return false;
-    }
-
-    @Override
-    public String getStringValue() {
-      throw new RuntimeException("Predefined val is not a String constant");
-    }
-
-    @Override
     public boolean isCast() {
       return false;
     }
@@ -167,8 +152,68 @@ public final class ValCollection {
     }
 
     @Override
+    public Val withNewMethod(Method callee) {
+      throw new RuntimeException("Not supported");
+    }
+
+    @Override
+    public IArrayRef getArrayBase() {
+      throw new RuntimeException("Predefined val is not an array ref");
+    }
+
+    @Override
     public boolean isIntConstant() {
       return false;
+    }
+
+    @Override
+    public int getIntValue() {
+      throw new RuntimeException("Predefined val is not an int constant");
+    }
+
+    @Override
+    public boolean isLongConstant() {
+      return false;
+    }
+
+    @Override
+    public long getLongValue() {
+      throw new RuntimeException("Predefined val is not a long constant");
+    }
+
+    @Override
+    public boolean isFloatConstant() {
+      return false;
+    }
+
+    @Override
+    public float getFloatValue() {
+      throw new RuntimeException("Predefined val is not a float constant");
+    }
+
+    @Override
+    public boolean isDoubleConstant() {
+      return false;
+    }
+
+    @Override
+    public double getDoubleValue() {
+      throw new RuntimeException("Predefined val is not a double constant");
+    }
+
+    @Override
+    public boolean isNull() {
+      return false;
+    }
+
+    @Override
+    public boolean isStringConstant() {
+      return false;
+    }
+
+    @Override
+    public String getStringValue() {
+      throw new RuntimeException("Predefined val is not a String constant");
     }
 
     @Override
@@ -179,31 +224,6 @@ public final class ValCollection {
     @Override
     public Type getClassConstantType() {
       throw new RuntimeException("Predefined val is not a class constant");
-    }
-
-    @Override
-    public Val withNewMethod(Method callee) {
-      throw new RuntimeException("Not supported");
-    }
-
-    @Override
-    public boolean isLongConstant() {
-      return false;
-    }
-
-    @Override
-    public int getIntValue() {
-      throw new RuntimeException("Predefined val is not an int constant");
-    }
-
-    @Override
-    public long getLongValue() {
-      throw new RuntimeException("Predefined val is not a long constant");
-    }
-
-    @Override
-    public IArrayRef getArrayBase() {
-      throw new RuntimeException("Predefined val is not an array ref");
     }
 
     @Override

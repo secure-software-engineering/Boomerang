@@ -284,6 +284,26 @@ public class WALAVal extends Val {
   }
 
   @Override
+  public boolean isFloatConstant() {
+    return false;
+  }
+
+  @Override
+  public float getFloatValue() {
+    return 0;
+  }
+
+  @Override
+  public boolean isDoubleConstant() {
+    return false;
+  }
+
+  @Override
+  public double getDoubleValue() {
+    return 0;
+  }
+
+  @Override
   public IArrayRef getArrayBase() {
     // TODO Auto-generated method stub
     return null;
