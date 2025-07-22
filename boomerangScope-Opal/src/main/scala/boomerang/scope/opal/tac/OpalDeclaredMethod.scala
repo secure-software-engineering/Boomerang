@@ -28,10 +28,9 @@ import org.opalj.tac.Call
 import scala.jdk.CollectionConverters._
 
 class OpalDeclaredMethod(
-    val invokeExpr: InvokeExpr,
     val delegate: Call[TacLocal],
     method: OpalMethod
-) extends DeclaredMethod(invokeExpr) {
+) extends DeclaredMethod {
 
   override def getSubSignature: String =
     MethodSignature(delegate.name, delegate.descriptor).toJava

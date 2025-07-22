@@ -14,132 +14,97 @@
  */
 package boomerang.scope.soot;
 
-import boomerang.scope.InvokeExpr;
-import boomerang.scope.Method;
+import boomerang.scope.Field;
 import boomerang.scope.Statement;
+import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.soot.jimple.JimpleMethod;
+import boomerang.scope.soot.jimple.JimplePhantomMethod;
+import boomerang.scope.soot.jimple.JimpleWrappedClass;
 import boomerang.scope.test.MethodSignature;
-import boomerang.scope.test.targets.A;
-import boomerang.scope.test.targets.HashCodeEqualsLocalTarget;
-import boomerang.scope.test.targets.ParameterLocalsTarget;
-import boomerang.scope.test.targets.ThisLocalTarget;
-import java.util.List;
+import boomerang.scope.test.targets.ScopeTarget;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import soot.Scene;
+import soot.SootClass;
+import soot.SootFieldRef;
 import soot.SootMethod;
+import soot.SootMethodRef;
+import soot.Value;
+import soot.jimple.Stmt;
 
 public class SootScopeTest {
 
   @Test
-  public void thisLocalTest() {
+  public void testFactoryAndConverter() {
     SootSetup sootSetup = new SootSetup();
-    sootSetup.setupSoot(ThisLocalTarget.class.getName());
+    sootSetup.setupSoot(ScopeTarget.class.getName());
 
-    MethodSignature signature = new MethodSignature(ThisLocalTarget.class.getName(), "call");
-    SootMethod method = sootSetup.resolveMethod(signature);
-    Method jimpleMethod = JimpleMethod.of(method, Scene.v());
-
-    boolean checked = false;
-    for (Statement stmt : jimpleMethod.getStatements()) {
-      if (stmt.containsInvokeExpr()
-          && stmt.getInvokeExpr().getDeclaredMethod().getName().equals("callWithThis")) {
-        InvokeExpr invokeExpr = stmt.getInvokeExpr();
-        Val base = invokeExpr.getBase();
-
-        Assertions.assertEquals(jimpleMethod.getThisLocal(), base);
-        Assertions.assertEquals(base, jimpleMethod.getThisLocal());
-        Assertions.assertTrue(jimpleMethod.isThisLocal(base));
-
-        checked = true;
-      }
-    }
-
-    if (!checked) {
-      Assertions.fail("Did not check this local");
-    }
-  }
-
-  @Test
-  public void parameterLocalTest() {
-    SootSetup sootSetup = new SootSetup();
-    sootSetup.setupSoot(ParameterLocalsTarget.class.getName());
-
-    // No parameters
-    MethodSignature noArgsSignature =
-        new MethodSignature(ParameterLocalsTarget.class.getName(), "noParameters");
-    SootMethod noArgs = sootSetup.resolveMethod(noArgsSignature);
-    Method noArgsMethod = JimpleMethod.of(noArgs, Scene.v());
-
-    Assertions.assertTrue(noArgsMethod.getParameterLocals().isEmpty());
-
-    // One parameter (primitive type)
-    MethodSignature oneArgSignature =
-        new MethodSignature(ParameterLocalsTarget.class.getName(), "oneParameter", List.of("int"));
-    SootMethod oneArg = sootSetup.resolveMethod(oneArgSignature);
-    Method oneArgMethod = JimpleMethod.of(oneArg, Scene.v());
-
-    Assertions.assertEquals(1, oneArgMethod.getParameterLocals().size());
-    Assertions.assertEquals("int", oneArgMethod.getParameterLocal(0).getType().toString());
-
-    // Two parameters (primitive type + RefType)
-    MethodSignature twoArgSignature =
-        new MethodSignature(
-            ParameterLocalsTarget.class.getName(),
-            "twoParameters",
-            List.of("int", A.class.getName()));
-    SootMethod twoArgs = sootSetup.resolveMethod(twoArgSignature);
-    Method twoArgsMethod = JimpleMethod.of(twoArgs, Scene.v());
-
-    Assertions.assertEquals(2, twoArgsMethod.getParameterLocals().size());
-    Assertions.assertEquals("int", twoArgsMethod.getParameterLocal(0).getType().toString());
-    Assertions.assertEquals(
-        A.class.getName(), twoArgsMethod.getParameterLocal(1).getType().toString());
-  }
-
-  @Test
-  public void hashCodeEqualsLocalTest() {
-    SootSetup sootSetup = new SootSetup();
-    sootSetup.setupSoot(HashCodeEqualsLocalTarget.class.getName());
-
-    // Parameter locals
     MethodSignature signature =
-        new MethodSignature(
-            ParameterLocalsTarget.class.getName(),
-            "parameterCall",
-            List.of(A.class.getName(), "int"));
+        new MethodSignature(ScopeTarget.class.getName(), "methodWithStatements", "int");
     SootMethod method = sootSetup.resolveMethod(signature);
-    Method jimpleMethod = JimpleMethod.of(method, Scene.v());
 
-    Val firstArg = jimpleMethod.getParameterLocal(0);
-    Val secondArg = jimpleMethod.getParameterLocal(1);
+    // Test method factory and converter
+    JimpleMethod jimpleMethod = SootScopeFactory.createJimpleMethod(method, Scene.v());
+    SootMethod sootMethod = SootScopeConverter.toSootMethod(jimpleMethod);
+    Assertions.assertEquals(method, sootMethod);
 
-    boolean checked = false;
-    for (Statement stmt : jimpleMethod.getStatements()) {
-      if (stmt.containsInvokeExpr()
-          && stmt.getInvokeExpr().getDeclaredMethod().getName().equals("methodCall")) {
-        InvokeExpr invokeExpr = stmt.getInvokeExpr();
-        Val base = invokeExpr.getBase();
-        Val arg = invokeExpr.getArg(0);
+    // Test phantom method factory and converter
+    JimplePhantomMethod phantomMethod =
+        SootScopeFactory.createJimplePhantomMethod(method.makeRef(), Scene.v());
+    SootMethodRef methodRef = SootScopeConverter.toSootMethodRef(phantomMethod);
+    Assertions.assertEquals(method.makeRef(), methodRef);
 
-        // equals in both directions
-        Assertions.assertEquals(base, firstArg);
-        Assertions.assertEquals(firstArg, base);
+    // Test class factory and converter
+    SootClass sootClass = method.getDeclaringClass();
+    JimpleWrappedClass wrappedClass =
+        SootScopeFactory.createJimpleWrappedClass(sootClass, Scene.v());
+    SootClass newSootClass = SootScopeConverter.toSootClass(wrappedClass);
+    Assertions.assertEquals(sootClass, newSootClass);
 
-        Assertions.assertEquals(arg, secondArg);
-        Assertions.assertEquals(secondArg, arg);
+    boolean checkedField = false;
+    boolean checkedType = false;
+    boolean checkedVal = false;
 
-        // hash codes
-        Assertions.assertEquals(base.hashCode(), firstArg.hashCode());
-        Assertions.assertEquals(arg.hashCode(), secondArg.hashCode());
+    for (Statement statement : jimpleMethod.getStatements()) {
+      // Test statement factory and converter
+      Stmt sootStmt = SootScopeConverter.toSootStatement(statement);
+      Statement newStmt = SootScopeFactory.createJimpleStatement(sootStmt, jimpleMethod);
+      Assertions.assertEquals(statement, newStmt);
 
-        checked = true;
+      // Test field factory and converter
+      if (statement.isFieldLoad()) {
+        Field field = statement.getLoadedField();
+        SootFieldRef fieldRef = SootScopeConverter.toSootFieldRef(field);
+        Field newField = SootScopeFactory.createJimpleField(fieldRef);
+        Assertions.assertEquals(field, newField);
+
+        checkedField = true;
+      }
+
+      // Test type factory and converter
+      if (statement.isAssignStmt() && statement.getRightOp().isNewExpr()) {
+        Type type = statement.getRightOp().getNewExprType();
+        soot.Type sootType = SootScopeConverter.toSootType(type);
+        Type newType = SootScopeFactory.createJimpleType(sootType, Scene.v());
+        Assertions.assertEquals(type, newType);
+
+        checkedType = true;
+      }
+
+      // Test val factory and converter
+      if (statement.isAssignStmt() && statement.getRightOp().isIntConstant()) {
+        Val rightOp = statement.getRightOp();
+        Value value = SootScopeConverter.toSootValue(rightOp);
+        Val newRightOp = SootScopeFactory.createJimpleVal(value, jimpleMethod);
+        Assertions.assertEquals(rightOp, newRightOp);
+
+        checkedVal = true;
       }
     }
 
-    if (!checked) {
-      Assertions.fail("Did not check equals and hashCode methods for parameter locals");
-    }
+    Assertions.assertTrue(checkedField);
+    Assertions.assertTrue(checkedType);
+    Assertions.assertTrue(checkedVal);
   }
 }

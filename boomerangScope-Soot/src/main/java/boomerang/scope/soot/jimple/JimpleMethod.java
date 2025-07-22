@@ -60,12 +60,12 @@ public class JimpleMethod extends DefinedMethod {
     return INTERNAL_POOL.intern(new JimpleMethod(method, scene));
   }
 
-  public Scene getScene() {
-    return scene;
-  }
-
   public SootMethod getDelegate() {
     return delegate;
+  }
+
+  public Scene getScene() {
+    return scene;
   }
 
   @Override

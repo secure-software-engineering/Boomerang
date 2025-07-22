@@ -24,15 +24,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import sootup.core.signatures.MethodSignature;
 
-public class JimpleUpDeclaredMethod extends DeclaredMethod {
+public class JimpleUpDeclaredMethod implements DeclaredMethod {
 
   private final MethodSignature delegate;
   private final JimpleUpMethod method;
 
-  public JimpleUpDeclaredMethod(
-      JimpleUpInvokeExpr invokeExpr, MethodSignature delegate, JimpleUpMethod method) {
-    super(invokeExpr);
-
+  public JimpleUpDeclaredMethod(MethodSignature delegate, JimpleUpMethod method) {
     this.delegate = delegate;
     this.method = method;
   }
