@@ -49,9 +49,6 @@ public class ExtendedAllocationSite implements IAllocationSite {
 }
 ```
 
-
-
-
 Last, to use our self-defined allocation site, we need to add it to the options:
 
 ```java
@@ -102,6 +99,8 @@ public class SimpleAllocationSite implements IAllocationSite {
     }
 }
 ```
+
+Using this allocation site implementation, Boomerang returns values that are either *new expressions* (e.g. `new java.lang.Object`) or *constants* (e.g. int, String etc.).
 
 ## Allocation Site with DataFlowScope
 

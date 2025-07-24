@@ -7,7 +7,7 @@ nav:
   - Home: index.md
   - General:
       - Installation: general/installation.md
-      - Boomerang Scopes: general/boomerang_scopes.md
+      - Boomerang Scopes: general/boomerang_scope.md
       - Framework Scopes: general/framework_scopes.md
   - Boomerang:
       - Boomerang Setup: boomerang/boomerang_setup.md

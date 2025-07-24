@@ -8,7 +8,7 @@ In the following sections, we give an overview of relevant constructs and API ca
 
 Boomerang uses *backward queries* to compute relevant points-to information. A **BackwardQuery** consists of a statement `s` and a variable `v`. `s` is the starting statement where the backwards analysis starts and `v` is the data-flow fact to solve for.
 
-Backward queries can be easily constructed. However, due to Boomerang's scope implementation, we need to specify the corresponding control-flow graph edge with the starting statement `s` as target (see the [Boomerang Scopes](./../general/boomerang_scopes.md)). With that, we can construct a backward query as follows:
+Backward queries can be easily constructed. However, due to Boomerang's scope implementation, we need to specify the corresponding control-flow graph edge with the starting statement `s` as target (see the [Boomerang Scopes](./../general/boomerang_scope.md)). With that, we can construct a backward query as follows:
 
 ```java
 public void createBackwardQuery(ControlFlowGraph.Edge, edge, Val fact) {
@@ -78,7 +78,7 @@ public void extractAllocationSites(BackwardBoomerangResults<NoWeight> results) {
 
 ## Extracting Aliases
 
-Beside the allocation sites, we can use the results to compute the aliases for the query variable. An alias is represented by an `AccessPath` that holds the base variable and the field chain. For example, an alias `x.f.g` is represented by an `AccessPath` with the base `x` and the field chain `[f, g]. We can compute the access paths as follows:
+Beside the allocation sites, we can use the results to compute the aliases for the query variable. An alias is represented by an `AccessPath` that holds the base variable and the field chain. For example, an alias `x.f.g` is represented by an `AccessPath` with the base `x` and the field chain `[f, g]`. We can compute the access paths as follows:
 
 ```java
 public void extractAliases(BackwardBoomerangResults<NoWeight> results) {
