@@ -318,7 +318,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../general/boomerang_scopes/" class="md-nav__link">
+      <a href="../../general/boomerang_scope/" class="md-nav__link">
         
   
   
@@ -672,7 +672,7 @@
 <p>In the following sections, we give an overview of relevant constructs and API calls. We highly recommend to take a look at the <a href="../examples/">Examples</a> to see the best way to combine these constructs.</p>
 <h2 id="backward-queries">Backward Queries</h2>
 <p>Boomerang uses <em>backward queries</em> to compute relevant points-to information. A <strong>BackwardQuery</strong> consists of a statement <code>s</code> and a variable <code>v</code>. <code>s</code> is the starting statement where the backwards analysis starts and <code>v</code> is the data-flow fact to solve for.</p>
-<p>Backward queries can be easily constructed. However, due to Boomerang's scope implementation, we need to specify the corresponding control-flow graph edge with the starting statement <code>s</code> as target (see the <a href="../../general/boomerang_scopes/">Boomerang Scopes</a>). With that, we can construct a backward query as follows:</p>
+<p>Backward queries can be easily constructed. However, due to Boomerang's scope implementation, we need to specify the corresponding control-flow graph edge with the starting statement <code>s</code> as target (see the <a href="../../general/boomerang_scope/">Boomerang Scopes</a>). With that, we can construct a backward query as follows:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">createBackwardQuery</span><span class="p">(</span><span class="n">ControlFlowGraph</span><span class="p">.</span><span class="na">Edge</span><span class="p">,</span><span class="w"> </span><span class="n">edge</span><span class="p">,</span><span class="w"> </span><span class="n">Val</span><span class="w"> </span><span class="n">fact</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -761,7 +761,7 @@
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="extracting-aliases">Extracting Aliases</h2>
-<p>Beside the allocation sites, we can use the results to compute the aliases for the query variable. An alias is represented by an <code>AccessPath</code> that holds the base variable and the field chain. For example, an alias <code>x.f.g</code> is represented by an <code>AccessPath</code> with the base <code>x</code> and the field chain `[f, g]. We can compute the access paths as follows:</p>
+<p>Beside the allocation sites, we can use the results to compute the aliases for the query variable. An alias is represented by an <code>AccessPath</code> that holds the base variable and the field chain. For example, an alias <code>x.f.g</code> is represented by an <code>AccessPath</code> with the base <code>x</code> and the field chain <code>[f, g]</code>. We can compute the access paths as follows:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>

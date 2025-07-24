@@ -318,7 +318,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../general/boomerang_scopes/" class="md-nav__link">
+      <a href="../../general/boomerang_scope/" class="md-nav__link">
         
   
   
@@ -785,6 +785,7 @@ Then, the interface implementation may look like this:</p>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
+<p>Using this allocation site implementation, Boomerang returns values that are either <em>new expressions</em> (e.g. <code>new java.lang.Object</code>) or <em>constants</em> (e.g. int, String etc.).</p>
 <h2 id="allocation-site-with-dataflowscope">Allocation Site with DataFlowScope</h2>
 <p>In many cases, we are interested in finding an allocation site to analyze it.
 However, a common scenario where Boomerang cannot find an allocation site occurs when a data-flow path ends because we have a function call that is not part of the application.
