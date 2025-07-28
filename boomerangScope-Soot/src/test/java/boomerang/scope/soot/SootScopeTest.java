@@ -45,21 +45,21 @@ public class SootScopeTest {
     SootMethod method = sootSetup.resolveMethod(signature);
 
     // Test method factory and converter
-    JimpleMethod jimpleMethod = SootScopeFactory.createJimpleMethod(method, Scene.v());
-    SootMethod sootMethod = SootScopeConverter.toSootMethod(jimpleMethod);
+    JimpleMethod jimpleMethod = SootScopeConverter.createJimpleMethod(method, Scene.v());
+    SootMethod sootMethod = SootScopeConverter.extractSootMethod(jimpleMethod);
     Assertions.assertEquals(method, sootMethod);
 
     // Test phantom method factory and converter
     JimplePhantomMethod phantomMethod =
-        SootScopeFactory.createJimplePhantomMethod(method.makeRef(), Scene.v());
-    SootMethodRef methodRef = SootScopeConverter.toSootMethodRef(phantomMethod);
+        SootScopeConverter.createJimplePhantomMethod(method.makeRef(), Scene.v());
+    SootMethodRef methodRef = SootScopeConverter.extractSootMethodRef(phantomMethod);
     Assertions.assertEquals(method.makeRef(), methodRef);
 
     // Test class factory and converter
     SootClass sootClass = method.getDeclaringClass();
     JimpleWrappedClass wrappedClass =
-        SootScopeFactory.createJimpleWrappedClass(sootClass, Scene.v());
-    SootClass newSootClass = SootScopeConverter.toSootClass(wrappedClass);
+        SootScopeConverter.createJimpleWrappedClass(sootClass, Scene.v());
+    SootClass newSootClass = SootScopeConverter.extractSootClass(wrappedClass);
     Assertions.assertEquals(sootClass, newSootClass);
 
     boolean checkedField = false;
@@ -68,15 +68,15 @@ public class SootScopeTest {
 
     for (Statement statement : jimpleMethod.getStatements()) {
       // Test statement factory and converter
-      Stmt sootStmt = SootScopeConverter.toSootStatement(statement);
-      Statement newStmt = SootScopeFactory.createJimpleStatement(sootStmt, jimpleMethod);
+      Stmt sootStmt = SootScopeConverter.extractSootStatement(statement);
+      Statement newStmt = SootScopeConverter.createJimpleStatement(sootStmt, jimpleMethod);
       Assertions.assertEquals(statement, newStmt);
 
       // Test field factory and converter
       if (statement.isFieldLoad()) {
         Field field = statement.getLoadedField();
-        SootFieldRef fieldRef = SootScopeConverter.toSootFieldRef(field);
-        Field newField = SootScopeFactory.createJimpleField(fieldRef);
+        SootFieldRef fieldRef = SootScopeConverter.extractSootFieldRef(field);
+        Field newField = SootScopeConverter.createJimpleField(fieldRef);
         Assertions.assertEquals(field, newField);
 
         checkedField = true;
@@ -85,8 +85,8 @@ public class SootScopeTest {
       // Test type factory and converter
       if (statement.isAssignStmt() && statement.getRightOp().isNewExpr()) {
         Type type = statement.getRightOp().getNewExprType();
-        soot.Type sootType = SootScopeConverter.toSootType(type);
-        Type newType = SootScopeFactory.createJimpleType(sootType, Scene.v());
+        soot.Type sootType = SootScopeConverter.extractSootType(type);
+        Type newType = SootScopeConverter.createJimpleType(sootType, Scene.v());
         Assertions.assertEquals(type, newType);
 
         checkedType = true;
@@ -95,8 +95,8 @@ public class SootScopeTest {
       // Test val factory and converter
       if (statement.isAssignStmt() && statement.getRightOp().isIntConstant()) {
         Val rightOp = statement.getRightOp();
-        Value value = SootScopeConverter.toSootValue(rightOp);
-        Val newRightOp = SootScopeFactory.createJimpleVal(value, jimpleMethod);
+        Value value = SootScopeConverter.extractSootValue(rightOp);
+        Val newRightOp = SootScopeConverter.createJimpleVal(value, jimpleMethod);
         Assertions.assertEquals(rightOp, newRightOp);
 
         checkedVal = true;

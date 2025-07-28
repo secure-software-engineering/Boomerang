@@ -33,25 +33,25 @@ class OpalScopeTest {
     val project = opalSetup.project.get
 
     // Test method factory and converter
-    val opalMethod = OpalScopeFactory.createOpalMethod(method, project)
-    val newOpalMethod = OpalScopeConverter.toOpalMethod(opalMethod)
+    val opalMethod = OpalScopeConverter.createOpalMethod(method, project)
+    val newOpalMethod = OpalScopeConverter.extractOpalMethod(opalMethod)
     Assertions.assertEquals(method, newOpalMethod)
 
     // Test phantom method factory and converter
-    val phantomMethod = OpalScopeFactory.createOpalPhantomMethod(
+    val phantomMethod = OpalScopeConverter.createOpalPhantomMethod(
       method.classFile.thisType,
       method.name,
       method.descriptor,
       method.isStatic,
       project
     )
-    val newPhantomMethod = OpalScopeConverter.toOpalPhantomMethod(phantomMethod)
+    val newPhantomMethod = OpalScopeConverter.extractOpalPhantomMethod(phantomMethod)
     Assertions.assertEquals(phantomMethod, newPhantomMethod)
 
     // Test class factory and converter
     val classType = method.classFile.thisType
-    val wrappedClass = OpalScopeFactory.createOpalWrappedClass(classType, project)
-    val newClassType = OpalScopeConverter.toOpalClass(wrappedClass)
+    val wrappedClass = OpalScopeConverter.createOpalWrappedClass(classType, project)
+    val newClassType = OpalScopeConverter.extractOpalClass(wrappedClass)
     Assertions.assertEquals(classType, newClassType)
 
     var checkedField = false
@@ -60,20 +60,20 @@ class OpalScopeTest {
 
     opalMethod.getStatements.asScala.foreach(statement => {
       // Test statement factory and converter
-      val opalStmt = OpalScopeConverter.toOpalStatement(statement)
-      val newStmt = OpalScopeFactory.createOpalStatement(opalStmt, opalMethod)
+      val opalStmt = OpalScopeConverter.extractOpalStatement(statement)
+      val newStmt = OpalScopeConverter.createOpalStatement(opalStmt, opalMethod)
       Assertions.assertEquals(statement, newStmt)
 
       // Test statement factory and converter unsafe
-      val opalStmtUnsafe = OpalScopeConverter.toOpalStatement(statement)
-      val newStmtUnsafe = OpalScopeFactory.createOpalStatementUnsafe(opalStmtUnsafe, opalMethod)
+      val opalStmtUnsafe = OpalScopeConverter.extractOpalStatement(statement)
+      val newStmtUnsafe = OpalScopeConverter.createOpalStatementUnsafe(opalStmtUnsafe, opalMethod)
       Assertions.assertEquals(statement, newStmtUnsafe)
 
       // Test field factory and converter
       if (statement.isFieldLoad) {
         val field = statement.getLoadedField
-        val fieldRef = OpalScopeConverter.toOpalField(field)
-        val newField = OpalScopeFactory.createOpalField(fieldRef.declaringClass, fieldRef.fieldType, fieldRef.name)
+        val fieldRef = OpalScopeConverter.extractOpalField(field)
+        val newField = OpalScopeConverter.createOpalField(fieldRef.declaringClass, fieldRef.fieldType, fieldRef.name)
         Assertions.assertEquals(field, newField)
 
         checkedField = true
@@ -82,8 +82,8 @@ class OpalScopeTest {
       // Test type factory and converter
       if (statement.isAssignStmt && statement.getRightOp.isNewExpr) {
         val t = statement.getRightOp.getNewExprType
-        val opalType = OpalScopeConverter.toOpalType(t)
-        val newType = OpalScopeFactory.createOpalType(opalType, project)
+        val opalType = OpalScopeConverter.extractOpalType(t)
+        val newType = OpalScopeConverter.createOpalType(opalType, project)
         Assertions.assertEquals(t, newType)
 
         checkedType = true
@@ -92,12 +92,12 @@ class OpalScopeTest {
       // Test val factory and converter
       if (statement.isAssignStmt && statement.getRightOp.isIntConstant) {
         val rightOp = statement.getRightOp
-        val value = OpalScopeConverter.toOpalExpr(rightOp)
-        val newRightOp = OpalScopeFactory.createOpalVal(value, opalMethod)
+        val value = OpalScopeConverter.extractOpalExpr(rightOp)
+        val newRightOp = OpalScopeConverter.createOpalVal(value, opalMethod)
         Assertions.assertEquals(rightOp, newRightOp)
 
-        val valueUnsafe = OpalScopeConverter.toOpalExpr(rightOp)
-        val newRightOpUnsafe = OpalScopeFactory.createOpalValUnsafe(valueUnsafe, opalMethod)
+        val valueUnsafe = OpalScopeConverter.extractOpalExpr(rightOp)
+        val newRightOpUnsafe = OpalScopeConverter.createOpalValUnsafe(valueUnsafe, opalMethod)
         Assertions.assertEquals(rightOp, newRightOpUnsafe)
 
         checkedVal = true
