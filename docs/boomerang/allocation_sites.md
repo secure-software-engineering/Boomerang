@@ -11,13 +11,15 @@ If the optional is present, the `AllocVal` is added to the resulting allocation 
 
 When performing a backward analysis, Boomerang calls this method on each statement on each data-flow path. 
 It provides three parameters to the method `getAllocationSite`:
+
 - Method: The current method
 - Statement: The current statement that may contain an allocation site
 - Val: The current propagated data-flow fact
 
 These parameters necessitate two checks that should be part of each allocation site implementation:
-1) Check whether the statement is an assignment
-2) Check whether the left operand of the assignment is equal to the propagated data-flow fact
+
+- Check whether the statement is an assignment
+- Check whether the left operand of the assignment is equal to the propagated data-flow fact
 
 The first point is relevant because an allocation site is defined as an assignment.
 The second aspect is relevant to avoid returning statements that are not relevant to the points-to analysis.

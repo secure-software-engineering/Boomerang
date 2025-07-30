@@ -1,14 +1,20 @@
 # Boomerang Setup
 
-Boomerang's purpose is the computation of points-to information for a variable on-demand. Starting at a specific statement, it traverses the program and its data-flow paths backwards until it finds an allocation site for the desired variable. While doing that, it computes relevant alias information.
+Boomerang's purpose is the computation of points-to information for a variable on-demand.
+Starting at a specific statement, it traverses the program and its data-flow paths backwards until it finds an allocation site for the desired variable. 
+While doing that, it computes relevant alias information.
 
-In the following sections, we give an overview of relevant constructs and API calls. We highly recommend to take a look at the [Examples](./../boomerang/examples.md) to see the best way to combine these constructs.
+In the following sections, we give an overview of relevant constructs and API calls. 
+We highly recommend to take a look at the [Examples](./../boomerang/examples.md) to see the best way to combine these constructs.
 
 ## Backward Queries
 
-Boomerang uses *backward queries* to compute relevant points-to information. A **BackwardQuery** consists of a statement `s` and a variable `v`. `s` is the starting statement where the backwards analysis starts and `v` is the data-flow fact to solve for.
+Boomerang uses *backward queries* to compute relevant points-to information. 
+A **BackwardQuery** consists of a statement `s` and a variable `v`. `s` is the starting statement where the backwards analysis starts and `v` is the data-flow fact to solve for.
 
-Backward queries can be easily constructed. However, due to Boomerang's scope implementation, we need to specify the corresponding control-flow graph edge with the starting statement `s` as target (see the [Boomerang Scopes](./../general/boomerang_scope.md)). With that, we can construct a backward query as follows:
+Backward queries can be easily constructed. 
+However, due to Boomerang's scope implementation, we need to specify the corresponding control-flow graph edge with the starting statement `s` as target (see the [Boomerang Scopes](./../general/boomerang_scope.md)). 
+With that, we can construct a backward query as follows:
 
 ```java
 public void createBackwardQuery(ControlFlowGraph.Edge, edge, Val fact) {
@@ -18,7 +24,7 @@ public void createBackwardQuery(ControlFlowGraph.Edge, edge, Val fact) {
 
 ## Running Boomerang
 
-Boomerang requires a [FrameworkScope](./../general/framework_scopes.md) and a set [options](./../boomerang/options.md). With that, we can solve a backward query as follows:
+Boomerang requires a [FrameworkScope](./../general/framework_scopes.md) and a set [Options](./../boomerang/options.md). With that, we can solve a backward query as follows:
 
 ```java
 public void solveQuery(
@@ -32,24 +38,25 @@ public void solveQuery(
 
 The call to `solve` solves the query and returns a wrapper for the results.
 
-// TODO Use a box
+!!! Important: 
+    A `Boomerang` instance can be used to solve exactly one query. 
+    If you want to solve multiple queries with the same instance, you have to set [allowMultipleQueries]() in the options to `true` and you have to call `unregisterAllListeners()` after each call to `solve`. 
+    This may look like this:
 
-!!! Important: A `Boomerang` instance can be used to solve exactly one query. If you want to solve multiple queries with the same instance, you have to set [allowMultipleQueries]() in the options to `true` and you have to call `unregisterAllListeners()` after each call to `solve`. This may look like this:
-
-```java
-public void solveQueries(
-        Collection<BackwardQuery> queries,
-        FrameworkScope scope,
-        BoomerangOptions options) {
-    Boomerang solver = new Boomerang(scope, options);
+    ```java
+    public void solveQueries(
+            Collection<BackwardQuery> queries,
+            FrameworkScope scope,
+            BoomerangOptions options) {
+        Boomerang solver = new Boomerang(scope, options);
     
-    for (BackwardQuery query : queries) {
-        BackwardBoomerangResults<NoWeight> results = solver.solve(query);
-        // <Process or store the results>
-        solver.unregisterAllListeners();
+        for (BackwardQuery query : queries) {
+            BackwardBoomerangResults<NoWeight> results = solver.solve(query);
+            // <Process or store the results>
+            solver.unregisterAllListeners();
+        }
     }
-}
-```
+    ```
 
 ## Extracting Allocation Sites
 
