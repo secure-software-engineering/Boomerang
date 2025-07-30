@@ -24,6 +24,7 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
+import boomerang.scope.fields.ArrayField;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.Strategies;
 import com.google.common.collect.Multimap;
@@ -173,7 +174,8 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
         IArrayRef arrayBase = nextStmt.getArrayBase();
         if (arrayBase.getBase().equals(fact)) {
           NodeWithLocation<Edge, Val, Field> succNode =
-              new NodeWithLocation<>(nextEdge, rightOp, Field.array(arrayBase.getIndex()));
+              new NodeWithLocation<>(
+                  nextEdge, rightOp, ArrayField.getInstance(arrayBase.getIndex()));
           out.add(new PopNode<>(succNode, PDSSystem.FIELDS));
         }
       }

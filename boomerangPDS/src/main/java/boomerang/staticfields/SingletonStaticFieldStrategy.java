@@ -45,8 +45,7 @@ public class SingletonStaticFieldStrategy implements StaticFieldHandlingStrategy
       Edge storeStmt, Val storedVal, StaticFieldVal staticVal, Set<State> out) {
     for (Statement matchingStore : fieldLoadStatements.get(staticVal.getField())) {
       if (matchingStore.isAssignStmt()) {
-        for (Statement succ :
-            matchingStore.getMethod().getControlFlowGraph().getSuccsOf(matchingStore)) {
+        for (Statement succ : matchingStore.getSuccessors()) {
           solver.processNormal(
               new Node<>(storeStmt, storedVal),
               new Node<>(new Edge(matchingStore, succ), matchingStore.getLeftOp()));

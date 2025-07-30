@@ -79,7 +79,7 @@ public class StaticCFG implements ObservableControlFlowGraph {
   */
 
   private void propagateDefault(SuccessorListener l) {
-    for (Statement s : l.getCurr().getMethod().getControlFlowGraph().getSuccsOf(l.getCurr())) {
+    for (Statement s : l.getCurr().getSuccessors()) {
       sparsificationStrategy.getCounter().countForwardPropagation();
       l.getSuccessor(s);
     }

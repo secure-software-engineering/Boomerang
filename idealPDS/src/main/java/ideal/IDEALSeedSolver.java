@@ -24,6 +24,7 @@ import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.fields.EmptyField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Stopwatch;
@@ -138,7 +139,7 @@ public class IDEALSeedSolver<W extends Weight> {
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (!t.getLabel().equals(Field.empty())) {
+      if (!t.getLabel().equals(EmptyField.getInstance())) {
         return;
       }
 

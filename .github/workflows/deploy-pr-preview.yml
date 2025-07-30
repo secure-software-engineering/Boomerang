@@ -1,0 +1,28 @@
+name: PR Documentation Preview
+
+permissions:
+  pages: write
+  deployments: write
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    types:
+      - opened
+      - closed
+      - synchronize
+      - reopened
+    paths:
+      - 'mkdocs.yml'
+      - 'docs/**'
+      - '.github/workflows/deploy-pr-preview.yml'
+
+concurrency: pages
+
+jobs:
+  deploy-preview:
+    uses: secure-software-engineering/actions/pages/pr-review-action.yml@develop
+    with:
+      enable_comment: true
+      title_prefix: "Boomerang PR Preview: "

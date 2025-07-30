@@ -15,11 +15,12 @@
 package boomerang.poi;
 
 import boomerang.BackwardQuery;
+import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
-import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.scope.ValCollection;
+import boomerang.scope.fields.EmptyField;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.base.Objects;
@@ -84,7 +85,7 @@ public class CopyAccessPathChain<W extends Weight> {
         Transition<Field, INode<Node<Edge, Val>>> t,
         W w,
         WeightedPAutomaton<Field, INode<Node<Edge, Val>>, W> weightedPAutomaton) {
-      if (t.getLabel().equals(Field.empty())) {
+      if (t.getLabel().equals(EmptyField.getInstance())) {
         if (forwardSolver.getFieldAutomaton().isUnbalancedState(t.getTarget())) {
           if (t.getStart().equals(CopyAccessPathChain.this.killedTransitionTarget)) {
             // Do a simple backwardSolve(...)...
@@ -95,7 +96,7 @@ public class CopyAccessPathChain<W extends Weight> {
             INode<Val> callTarget =
                 backwardSolver.generateCallState(new SingleNode<>(query.var()), query.cfgEdge());
             backwardSolver.solve(
-                query.asNode(), Field.empty(), fieldTarget, query.cfgEdge(), callTarget);
+                query.asNode(), EmptyField.getInstance(), fieldTarget, query.cfgEdge(), callTarget);
             return;
           }
           // addReachable(stateInBwSolver);
@@ -104,9 +105,7 @@ public class CopyAccessPathChain<W extends Weight> {
       }
       INode<Node<Edge, Val>> targetState =
           backwardSolver.generateFieldState(
-              new SingleNode<>(
-                  new Node<>(
-                      new Edge(Statement.epsilon(), Statement.epsilon()), ValCollection.zero())),
+              new SingleNode<>(new Node<>(ControlFlowGraph.Edge.epsilon(), ValCollection.zero())),
               t.getLabel());
       Transition<Field, INode<Node<Edge, Val>>> insert =
           new Transition<>(stateInBwSolver, t.getLabel(), targetState);

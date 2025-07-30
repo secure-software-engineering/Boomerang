@@ -22,6 +22,7 @@ import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.fields.ArrayField;
 import com.google.common.base.Joiner;
 import java.util.Collection;
 import java.util.Objects;
@@ -74,15 +75,15 @@ public class JimpleUpStatement extends Statement {
     JAssignStmt assignStmt = (JAssignStmt) delegate;
     if (assignStmt.getLeftOp() instanceof JStaticFieldRef) {
       JStaticFieldRef staticFieldRef = (JStaticFieldRef) assignStmt.getLeftOp();
-      return new JimpleUpField(staticFieldRef.getFieldSignature(), method.getView());
+      return new JimpleUpField(staticFieldRef.getFieldSignature());
     }
 
     if (assignStmt.getLeftOp() instanceof JArrayRef) {
-      return Field.array(getArrayBase().getIndex());
+      return ArrayField.getInstance(getArrayBase().getIndex());
     }
 
     JInstanceFieldRef ifr = (JInstanceFieldRef) assignStmt.getLeftOp();
-    return new JimpleUpField(ifr.getFieldSignature(), method.getView());
+    return new JimpleUpField(ifr.getFieldSignature());
   }
 
   @Override
@@ -105,7 +106,7 @@ public class JimpleUpStatement extends Statement {
     JAssignStmt as = (JAssignStmt) delegate;
     JInstanceFieldRef ifr = (JInstanceFieldRef) as.getRightOp();
 
-    return new JimpleUpField(ifr.getFieldSignature(), method.getView());
+    return new JimpleUpField(ifr.getFieldSignature());
   }
 
   @Override

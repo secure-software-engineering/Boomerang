@@ -22,6 +22,7 @@ import boomerang.scope.IfStatement;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.fields.ArrayField;
 import com.google.common.base.Joiner;
 import java.util.Collection;
 import java.util.Objects;
@@ -68,14 +69,14 @@ public class JimpleStatement extends Statement {
     AssignStmt as = (AssignStmt) delegate;
     if (as.getLeftOp() instanceof StaticFieldRef) {
       StaticFieldRef staticFieldRef = (StaticFieldRef) as.getLeftOp();
-      return new JimpleField(staticFieldRef.getFieldRef(), method.getScene());
+      return new JimpleField(staticFieldRef.getFieldRef());
     }
 
     if (as.getLeftOp() instanceof ArrayRef) {
-      return Field.array(getArrayBase().getIndex());
+      return ArrayField.getInstance(getArrayBase().getIndex());
     }
     InstanceFieldRef ifr = (InstanceFieldRef) as.getLeftOp();
-    return new JimpleField(ifr.getFieldRef(), method.getScene());
+    return new JimpleField(ifr.getFieldRef());
   }
 
   @Override
@@ -101,7 +102,7 @@ public class JimpleStatement extends Statement {
       AssignStmt as = (AssignStmt) delegate;
       InstanceFieldRef ifr = (InstanceFieldRef) as.getRightOp();
 
-      return new JimpleField(ifr.getFieldRef(), method.getScene());
+      return new JimpleField(ifr.getFieldRef());
     }
 
     throw new RuntimeException("Statement is not a field load statement");
