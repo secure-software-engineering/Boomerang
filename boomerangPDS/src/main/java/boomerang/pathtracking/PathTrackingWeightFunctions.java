@@ -12,11 +12,11 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
+import boomerang.pathtracking.PathConditionWeight.ConditionDomain;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Val;
-import boomerang.weights.PathConditionWeight.ConditionDomain;
 import sync.pds.solver.WeightFunctions;
 import sync.pds.solver.nodes.Node;
 

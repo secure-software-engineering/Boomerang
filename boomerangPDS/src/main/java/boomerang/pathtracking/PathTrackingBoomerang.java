@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
 import boomerang.ForwardQuery;
 import boomerang.WeightedBoomerang;
@@ -25,6 +25,10 @@ import org.jspecify.annotations.NonNull;
 import sync.pds.solver.OneWeightFunctions;
 import sync.pds.solver.WeightFunctions;
 
+/**
+ * TODO This needs a complete revisit. Currently, it is not clear what this class is doing and
+ * whether it works with the refactored scopes in 3.0.0+
+ */
 public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPathWeight> {
 
   private OneWeightFunctions<Edge, Val, Field, DataFlowPathWeight> fieldWeights;

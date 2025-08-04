@@ -12,25 +12,21 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
-import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import java.util.Map;
-import java.util.Set;
-import org.jspecify.annotations.NonNull;
-import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
-public interface DataFlowPathWeight extends Weight {
-  @NonNull PathTrackingWeight getPath();
+public interface PathConditionWeight extends Weight {
+  Map<Statement, ConditionDomain> getConditions();
 
-  @NonNull PathConditionWeight getCondition();
+  Map<Val, ConditionDomain> getEvaluationMap();
 
-  @NonNull Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
-
-  @NonNull Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions();
-
-  @NonNull Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap();
+  public enum ConditionDomain {
+    TRUE,
+    FALSE,
+    TOP
+  }
 }

@@ -990,10 +990,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         this.queryToSolvers,
         getStats(),
         analysisWatch,
-        visitedMethods,
-        options.trackDataFlowPath(),
-        options.prunePathConditions(),
-        options.trackImplicitFlows());
+        visitedMethods);
   }
 
   public BackwardBoomerangResults<W> solve(BackwardQuery query) {
@@ -1103,10 +1100,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         this.queryToSolvers,
         getStats(),
         analysisWatch,
-        visitedMethods,
-        options.trackDataFlowPath(),
-        options.prunePathConditions(),
-        options.trackImplicitFlows());
+        visitedMethods);
   }
 
   public void debugOutput() {
