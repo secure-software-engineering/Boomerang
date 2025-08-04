@@ -46,12 +46,12 @@ public class JimplePhantomMethod extends PhantomMethod {
     return INTERNAL_POOL.intern(new JimplePhantomMethod(delegate, scene));
   }
 
-  public Scene getScene() {
-    return scene;
-  }
-
   public SootMethodRef getDelegate() {
     return delegate;
+  }
+
+  public Scene getScene() {
+    return scene;
   }
 
   @Override

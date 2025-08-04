@@ -37,6 +37,10 @@ public class JimpleInvokeExpr implements InvokeExpr {
     this.method = method;
   }
 
+  public soot.jimple.InvokeExpr getDelegate() {
+    return delegate;
+  }
+
   @Override
   public Val getArg(int index) {
     if (delegate.getArg(index) == null) {
@@ -69,7 +73,7 @@ public class JimpleInvokeExpr implements InvokeExpr {
 
   @Override
   public DeclaredMethod getDeclaredMethod() {
-    return new JimpleDeclaredMethod(this, delegate.getMethodRef(), method);
+    return new JimpleDeclaredMethod(delegate.getMethodRef(), method);
   }
 
   @Override

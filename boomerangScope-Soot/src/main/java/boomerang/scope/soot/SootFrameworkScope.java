@@ -14,13 +14,13 @@
  */
 package boomerang.scope.soot;
 
-import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
 import soot.Scene;
 import soot.SootMethod;
+import soot.jimple.toolkits.callgraph.CallGraph;
 
 public class SootFrameworkScope implements FrameworkScope {
 
@@ -30,7 +30,7 @@ public class SootFrameworkScope implements FrameworkScope {
 
   public SootFrameworkScope(
       @NonNull Scene scene,
-      soot.jimple.toolkits.callgraph.@NonNull CallGraph callGraph,
+      @NonNull CallGraph callGraph,
       @NonNull Collection<SootMethod> entryPoints,
       @NonNull DataFlowScope dataFlowScope) {
     this.scene = scene;
@@ -40,7 +40,7 @@ public class SootFrameworkScope implements FrameworkScope {
   }
 
   @Override
-  public CallGraph getCallGraph() {
+  public SootCallGraph getCallGraph() {
     return sootCallGraph;
   }
 

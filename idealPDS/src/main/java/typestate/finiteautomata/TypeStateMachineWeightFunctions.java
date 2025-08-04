@@ -19,6 +19,7 @@ import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Statement;
+import boomerang.scope.Type;
 import boomerang.scope.Val;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
@@ -35,7 +36,6 @@ import typestate.TransitionFunction;
 import typestate.TransitionFunctionImpl;
 import typestate.TransitionFunctionOne;
 import typestate.finiteautomata.MatcherTransition.Parameter;
-import typestate.finiteautomata.MatcherTransition.Type;
 
 public abstract class TypeStateMachineWeightFunctions
     implements WeightFunctions<Edge, Val, Edge, TransitionFunction> {
@@ -65,9 +65,9 @@ public abstract class TypeStateMachineWeightFunctions
         Collections2.filter(
             transition,
             input ->
-                input.getType().equals(Type.OnCall)
-                    || input.getType().equals(Type.OnCallOrOnCallToReturn)),
-        Type.OnCall);
+                input.getType().equals(MatcherTransition.Type.OnCall)
+                    || input.getType().equals(MatcherTransition.Type.OnCallOrOnCallToReturn)),
+        MatcherTransition.Type.OnCall);
   }
 
   @Override
@@ -86,15 +86,19 @@ public abstract class TypeStateMachineWeightFunctions
       if (invokeExpr.getBase().equals(succ.fact())) {
         for (MatcherTransition trans : transition) {
           if (trans.matches(invokeExpr.getDeclaredMethod())
-              && (trans.getType().equals(Type.OnCallToReturn)
-                  || trans.getType().equals(Type.OnCallOrOnCallToReturn))) {
+              && (trans.getType().equals(MatcherTransition.Type.OnCallToReturn)
+                  || trans.getType().equals(MatcherTransition.Type.OnCallOrOnCallToReturn))) {
             res.add(trans);
           }
         }
       }
     }
     if (!res.isEmpty()) {
-      LOGGER.trace("Typestate transition at {} to {}, [{}]", succ.stmt(), res, Type.OnCallToReturn);
+      LOGGER.trace(
+          "Typestate transition at {} to {}, [{}]",
+          succ.stmt(),
+          res,
+          MatcherTransition.Type.OnCallToReturn);
     }
     return (res.isEmpty() ? getOne() : new TransitionFunctionImpl(res, succ.stmt().getStart()));
   }
@@ -104,7 +108,7 @@ public abstract class TypeStateMachineWeightFunctions
       Val node,
       Edge transitionEdge,
       Collection<MatcherTransition> filteredTrans,
-      Type type) {
+      MatcherTransition.Type type) {
     Statement transitionStmt = transitionEdge.getStart();
     Set<Transition> res = new HashSet<>();
     if (filteredTrans.isEmpty() || !transitionStmt.containsInvokeExpr()) return getOne();
@@ -156,7 +160,7 @@ public abstract class TypeStateMachineWeightFunctions
     Statement s = edge.getStart();
     if (s.isAssignStmt()) {
       if (s.getRightOp().isNewExpr()) {
-        boomerang.scope.Type newExprType = s.getRightOp().getNewExprType();
+        Type newExprType = s.getRightOp().getNewExprType();
         if (newExprType.isSubtypeOf(allocationSuperType.getName())) {
           TransitionFunction function =
               new TransitionFunctionImpl(new TransitionImpl(initialState(), initialState()), s);

@@ -15,7 +15,6 @@
 package boomerang.scope.soot.jimple;
 
 import boomerang.scope.DeclaredMethod;
-import boomerang.scope.InvokeExpr;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.utils.MethodWrapper;
@@ -25,13 +24,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import soot.SootMethodRef;
 
-public class JimpleDeclaredMethod extends DeclaredMethod {
+public class JimpleDeclaredMethod implements DeclaredMethod {
 
   private final SootMethodRef delegate;
   private final JimpleMethod method;
 
-  public JimpleDeclaredMethod(InvokeExpr inv, SootMethodRef delegate, JimpleMethod method) {
-    super(inv);
+  public JimpleDeclaredMethod(SootMethodRef delegate, JimpleMethod method) {
     this.delegate = delegate;
     this.method = method;
   }

@@ -38,6 +38,10 @@ public class JimpleUpInvokeExpr implements InvokeExpr {
     this.method = method;
   }
 
+  public AbstractInvokeExpr getDelegate() {
+    return delegate;
+  }
+
   @Override
   public Val getArg(int index) {
     if (delegate.getArg(index) == null) {
@@ -73,7 +77,7 @@ public class JimpleUpInvokeExpr implements InvokeExpr {
 
   @Override
   public DeclaredMethod getDeclaredMethod() {
-    return new JimpleUpDeclaredMethod(this, delegate.getMethodSignature(), method);
+    return new JimpleUpDeclaredMethod(delegate.getMethodSignature(), method);
   }
 
   @Override
