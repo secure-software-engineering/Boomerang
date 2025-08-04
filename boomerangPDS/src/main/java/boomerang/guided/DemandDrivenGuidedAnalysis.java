@@ -45,8 +45,8 @@ public class DemandDrivenGuidedAnalysis {
 
   public DemandDrivenGuidedAnalysis(
       IDemandDrivenGuidedManager specification,
-      BoomerangOptions options,
-      FrameworkScope frameworkScope) {
+      FrameworkScope frameworkScope,
+      BoomerangOptions options) {
     this.spec = specification;
     if (!options.allowMultipleQueries()) {
       throw new RuntimeException(

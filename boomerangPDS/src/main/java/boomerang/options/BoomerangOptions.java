@@ -17,14 +17,12 @@ package boomerang.options;
 import boomerang.callgraph.BoomerangResolver;
 import boomerang.callgraph.ICallerCalleeResolutionStrategy;
 import boomerang.flowfunction.DefaultBackwardFlowFunction;
-import boomerang.flowfunction.DefaultBackwardFlowFunctionOptions;
 import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.flowfunction.DefaultForwardFlowFunctionOptions;
 import boomerang.flowfunction.IBackwardFlowFunction;
+import boomerang.flowfunction.IFlowFunctionOptions;
 import boomerang.flowfunction.IForwardFlowFunction;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
-import boomerang.solver.Strategies;
 import sparse.SparsificationStrategy;
 
 /**
@@ -35,7 +33,6 @@ import sparse.SparsificationStrategy;
  * <pre>{@code
  * BoomerangOptions options =
  *                     BoomerangOptions.builder()
- *                            .withAllocationSite(new DefaultAllocationSite())
  *                            .withAnalysisTimeout(10000)
  *                            .build();
  *
@@ -80,19 +77,19 @@ public class BoomerangOptions {
   }
 
   public IForwardFlowFunction getForwardFlowFunction() {
-    return builder.forwardFlowFunctions;
+    return builder.forwardFlowFunction;
   }
 
   public IBackwardFlowFunction getBackwardFlowFunction() {
     return builder.backwardFlowFunction;
   }
 
-  public Strategies.StaticFieldStrategy getStaticFieldStrategy() {
-    return builder.staticFieldStrategy;
+  public IFlowFunctionOptions getForwardFlowFunctionOptions() {
+    return builder.forwardFlowFunction.getFlowFunctionOptions();
   }
 
-  public Strategies.ArrayStrategy getArrayStrategy() {
-    return builder.arrayStrategy;
+  public IFlowFunctionOptions getBackwardFlowFunctionOptions() {
+    return builder.backwardFlowFunction.getFlowFunctionOptions();
   }
 
   public ICallerCalleeResolutionStrategy.Factory getResolutionStrategy() {
@@ -166,10 +163,8 @@ public class BoomerangOptions {
   public static class OptionsBuilder {
 
     private IAllocationSite allocationSite;
-    private IForwardFlowFunction forwardFlowFunctions;
+    private IForwardFlowFunction forwardFlowFunction;
     private IBackwardFlowFunction backwardFlowFunction;
-    private Strategies.StaticFieldStrategy staticFieldStrategy;
-    private Strategies.ArrayStrategy arrayStrategy;
     private ICallerCalleeResolutionStrategy.Factory resolutionStrategy;
     private SparsificationStrategy<? extends Method, ? extends Statement> sparsificationStrategy;
 
@@ -192,10 +187,9 @@ public class BoomerangOptions {
 
     protected OptionsBuilder() {
       this.allocationSite = new DefaultAllocationSite();
-      this.forwardFlowFunctions = null;
-      this.backwardFlowFunction = null;
-      this.staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON;
-      this.arrayStrategy = Strategies.ArrayStrategy.INDEX_SENSITIVE;
+      this.forwardFlowFunction = new DefaultForwardFlowFunction();
+      this.backwardFlowFunction = new DefaultBackwardFlowFunction();
+
       this.resolutionStrategy = BoomerangResolver.FACTORY;
       this.sparsificationStrategy = SparsificationStrategy.NONE;
 
@@ -218,25 +212,6 @@ public class BoomerangOptions {
     }
 
     public BoomerangOptions build() {
-      if (this.forwardFlowFunctions == null) {
-        DefaultForwardFlowFunctionOptions options =
-            DefaultForwardFlowFunctionOptions.builder()
-                .withStaticFieldStrategy(staticFieldStrategy)
-                .withArrayStrategy(arrayStrategy)
-                .build();
-        this.forwardFlowFunctions = new DefaultForwardFlowFunction(options);
-      }
-
-      if (this.backwardFlowFunction == null) {
-        DefaultBackwardFlowFunctionOptions options =
-            DefaultBackwardFlowFunctionOptions.builder()
-                .withAllocationSite(allocationSite)
-                .withStaticFieldStrategy(staticFieldStrategy)
-                .withArrayStrategy(arrayStrategy)
-                .build();
-        this.backwardFlowFunction = new DefaultBackwardFlowFunction(options);
-      }
-
       return new BoomerangOptions(this);
     }
 
@@ -246,36 +221,12 @@ public class BoomerangOptions {
     }
 
     public OptionsBuilder withForwardFlowFunction(IForwardFlowFunction forwardFlowFunction) {
-      this.forwardFlowFunctions = forwardFlowFunction;
+      this.forwardFlowFunction = forwardFlowFunction;
       return this;
     }
 
     public OptionsBuilder withBackwardFlowFunction(IBackwardFlowFunction backwardFlowFunction) {
       this.backwardFlowFunction = backwardFlowFunction;
-      return this;
-    }
-
-    /**
-     * Sets the strategy {@link Strategies.StaticFieldStrategy} to define how to deal with static
-     * fields.
-     *
-     * @param staticFieldStrategy the array strategy (default: SINGLETON)
-     * @return the builder
-     */
-    public OptionsBuilder withStaticFieldStrategy(
-        Strategies.StaticFieldStrategy staticFieldStrategy) {
-      this.staticFieldStrategy = staticFieldStrategy;
-      return this;
-    }
-
-    /**
-     * Sets the strategy {@link Strategies.ArrayStrategy} to define how to deal with arrays.
-     *
-     * @param arrayStrategy the array strategy (default: INDEX_SENSITIVE)
-     * @return the builder
-     */
-    public OptionsBuilder withArrayStrategy(Strategies.ArrayStrategy arrayStrategy) {
-      this.arrayStrategy = arrayStrategy;
       return this;
     }
 

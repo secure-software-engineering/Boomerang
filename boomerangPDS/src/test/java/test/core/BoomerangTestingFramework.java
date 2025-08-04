@@ -210,8 +210,7 @@ public class BoomerangTestingFramework extends TestingFramework {
             .get(q)
             .getFieldAutomaton()
             .registerListener(
-                new WPAStateListener<Field, INode<Node<ControlFlowGraph.Edge, Val>>, NoWeight>(
-                    new SingleNode<>(queryForCallSite.asNode())) {
+                new WPAStateListener<>(new SingleNode<>(queryForCallSite.asNode())) {
 
                   @Override
                   public void onOutTransitionAdded(

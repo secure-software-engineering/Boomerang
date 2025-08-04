@@ -17,8 +17,7 @@ package boomerang.guided;
 import boomerang.BackwardQuery;
 import boomerang.Boomerang;
 import boomerang.ForwardQuery;
-import boomerang.flowfunction.DefaultBackwardFlowFunctionOptions;
-import boomerang.flowfunction.DefaultForwardFlowFunctionOptions;
+import boomerang.flowfunction.FlowFunctionOptions;
 import boomerang.guided.flowfunction.CustomBackwardFlowFunction;
 import boomerang.guided.flowfunction.CustomForwardFlowFunction;
 import boomerang.guided.targets.CustomFlowFunctionIntTarget;
@@ -194,12 +193,12 @@ public class CustomFlowFunctionTest {
   }
 
   private static BoomerangOptions customOptions() {
+    FlowFunctionOptions options =
+        FlowFunctionOptions.builder().withAllocationSite(new IntAndStringAllocationSite()).build();
     return BoomerangOptions.builder()
         .withAllocationSite(new IntAndStringAllocationSite())
-        .withForwardFlowFunction(
-            new CustomForwardFlowFunction(DefaultForwardFlowFunctionOptions.DEFAULT()))
-        .withBackwardFlowFunction(
-            new CustomBackwardFlowFunction(DefaultBackwardFlowFunctionOptions.DEFAULT()))
+        .withForwardFlowFunction(new CustomForwardFlowFunction(options))
+        .withBackwardFlowFunction(new CustomBackwardFlowFunction(options))
         .build();
   }
 }

@@ -43,11 +43,20 @@ import wpds.interfaces.State;
 
 public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
-  private final DefaultForwardFlowFunctionOptions options;
+  private final FlowFunctionOptions options;
   private Strategies strategies;
 
-  public DefaultForwardFlowFunction(DefaultForwardFlowFunctionOptions options) {
+  public DefaultForwardFlowFunction() {
+    this(FlowFunctionOptions.DEFAULT());
+  }
+
+  public DefaultForwardFlowFunction(FlowFunctionOptions options) {
     this.options = options;
+  }
+
+  @Override
+  public FlowFunctionOptions getFlowFunctionOptions() {
+    return options;
   }
 
   @Override
@@ -236,8 +245,8 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
       Multimap<Field, Statement> fieldStoreStatements) {
     this.strategies =
         new Strategies(
-            options.getStaticFieldStrategy(),
-            options.getArrayStrategy(),
+            options.staticFieldStrategy(),
+            options.arrayStrategy(),
             solver,
             fieldLoadStatements,
             fieldStoreStatements);

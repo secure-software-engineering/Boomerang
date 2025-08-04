@@ -43,11 +43,20 @@ import wpds.interfaces.State;
 
 public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
-  private final DefaultBackwardFlowFunctionOptions options;
+  private final FlowFunctionOptions options;
   private Strategies strategies;
 
-  public DefaultBackwardFlowFunction(DefaultBackwardFlowFunctionOptions options) {
+  public DefaultBackwardFlowFunction() {
+    this(FlowFunctionOptions.DEFAULT());
+  }
+
+  public DefaultBackwardFlowFunction(FlowFunctionOptions options) {
     this.options = options;
+  }
+
+  @Override
+  public FlowFunctionOptions getFlowFunctionOptions() {
+    return options;
   }
 
   @Override

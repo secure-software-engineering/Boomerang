@@ -22,6 +22,9 @@ import assertions.MustBeInErrorState;
 import assertions.ShouldNotBeAnalyzed;
 import boomerang.WeightedForwardQuery;
 import boomerang.debugger.Debugger;
+import boomerang.flowfunction.DefaultBackwardFlowFunction;
+import boomerang.flowfunction.DefaultForwardFlowFunction;
+import boomerang.flowfunction.FlowFunctionOptions;
 import boomerang.options.BoomerangOptions;
 import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph;
@@ -138,8 +141,14 @@ public class IDEALTestingFramework extends TestingFramework {
 
           @Override
           public BoomerangOptions boomerangOptions() {
+            FlowFunctionOptions options =
+                FlowFunctionOptions.builder()
+                    .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
+                    .build();
+
             return BoomerangOptions.builder()
-                .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
+                .withForwardFlowFunction(new DefaultForwardFlowFunction(options))
+                .withBackwardFlowFunction(new DefaultBackwardFlowFunction(options))
                 .withAnalysisTimeout(-1)
                 .enableAllowMultipleQueries(true)
                 .build();

@@ -435,6 +435,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
   private final CallGraph callGraph;
   private INode<Val> rootQuery;
 
+  public WeightedBoomerang(FrameworkScope frameworkScope) {
+    this(frameworkScope, BoomerangOptions.DEFAULT());
+  }
+
   public WeightedBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
     this.frameworkScope = frameworkScope;
     this.options = options;
@@ -459,10 +463,6 @@ public abstract class WeightedBoomerang<W extends Weight> {
       icfg = new ObservableStaticICFG(callGraph);
     }
     this.queryGraph = new QueryGraph<>(this);
-  }
-
-  public WeightedBoomerang(FrameworkScope frameworkScope) {
-    this(frameworkScope, BoomerangOptions.DEFAULT());
   }
 
   protected void addVisitedMethod(Method method) {
@@ -552,7 +552,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
         node -> {
           if (node.stmt().getStart().isFieldStore()) {
             forwardHandleFieldWrite(node, createFieldStore(node.stmt()), sourceQuery);
-          } else if (options.getArrayStrategy() != Strategies.ArrayStrategy.DISABLED
+          } else if (options.getForwardFlowFunctionOptions().arrayStrategy()
+                  != Strategies.ArrayStrategy.DISABLED
               && node.stmt().getStart().isArrayStore()) {
             forwardHandleFieldWrite(node, createArrayFieldStore(node.stmt()), sourceQuery);
           }
@@ -1135,7 +1136,8 @@ public abstract class WeightedBoomerang<W extends Weight> {
     Statement stmt = cfgEdge.getStart();
     if (!(stmt.isFieldStore())
         && query instanceof ForwardQueryArray
-        && options.getArrayStrategy() != Strategies.ArrayStrategy.DISABLED) {
+        && options.getForwardFlowFunctionOptions().arrayStrategy()
+            != Strategies.ArrayStrategy.DISABLED) {
       if (query instanceof ForwardQueryMultiDimensionalArray) {
         ForwardQueryMultiDimensionalArray arrayQuery = ((ForwardQueryMultiDimensionalArray) query);
         Node<ControlFlowGraph.Edge, Val> node =

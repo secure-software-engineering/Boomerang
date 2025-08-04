@@ -27,6 +27,8 @@ import wpds.interfaces.State;
 
 public interface IForwardFlowFunction {
 
+  IFlowFunctionOptions getFlowFunctionOptions();
+
   /**
    * Called by the forward analysis, when the forward solver reaches the returnStmt (any last
    * statement of callee method) of callee method with data-flow fact returnedVal.

@@ -17,7 +17,6 @@ package test.options;
 import boomerang.callgraph.BoomerangResolver;
 import boomerang.options.BoomerangOptions;
 import boomerang.pathtracking.PathTrackingBoomerangOptions;
-import boomerang.solver.Strategies;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sparse.SparsificationStrategy;
@@ -26,18 +25,6 @@ public class BoomerangOptionsTest {
 
   @Test
   public void settingOptionsTest() {
-    BoomerangOptions staticFieldStrategy =
-        BoomerangOptions.builder()
-            .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
-            .build();
-    Assertions.assertEquals(
-        staticFieldStrategy.getStaticFieldStrategy(),
-        Strategies.StaticFieldStrategy.FLOW_SENSITIVE);
-
-    BoomerangOptions arrayStrategy =
-        BoomerangOptions.builder().withArrayStrategy(Strategies.ArrayStrategy.DISABLED).build();
-    Assertions.assertEquals(arrayStrategy.getArrayStrategy(), Strategies.ArrayStrategy.DISABLED);
-
     BoomerangOptions resolutionStrategy =
         BoomerangOptions.builder().withResolutionStrategy(BoomerangResolver.FACTORY).build();
     Assertions.assertEquals(resolutionStrategy.getResolutionStrategy(), BoomerangResolver.FACTORY);

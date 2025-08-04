@@ -16,7 +16,7 @@ package boomerang.guided.flowfunction;
 
 import boomerang.ForwardQuery;
 import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.flowfunction.DefaultForwardFlowFunctionOptions;
+import boomerang.flowfunction.FlowFunctionOptions;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.Method;
@@ -29,7 +29,7 @@ import wpds.interfaces.State;
 
 public class CustomForwardFlowFunction extends DefaultForwardFlowFunction {
 
-  public CustomForwardFlowFunction(DefaultForwardFlowFunctionOptions options) {
+  public CustomForwardFlowFunction(FlowFunctionOptions options) {
     super(options);
   }
 

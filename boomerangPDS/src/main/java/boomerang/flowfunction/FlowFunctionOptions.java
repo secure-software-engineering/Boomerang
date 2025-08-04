@@ -18,12 +18,20 @@ import boomerang.options.DefaultAllocationSite;
 import boomerang.options.IAllocationSite;
 import boomerang.solver.Strategies;
 
-public class DefaultBackwardFlowFunctionOptions {
+public class FlowFunctionOptions implements IFlowFunctionOptions {
 
-  private final BackwardFlowFunctionBuilder builder;
+  private final FlowFunctionOptionsBuilder builder;
 
-  public DefaultBackwardFlowFunctionOptions(BackwardFlowFunctionBuilder builder) {
+  protected FlowFunctionOptions(FlowFunctionOptionsBuilder builder) {
     this.builder = builder;
+  }
+
+  public static FlowFunctionOptionsBuilder builder() {
+    return new FlowFunctionOptionsBuilder();
+  }
+
+  public static FlowFunctionOptions DEFAULT() {
+    return new FlowFunctionOptionsBuilder().build();
   }
 
   public IAllocationSite allocationSite() {
@@ -46,59 +54,74 @@ public class DefaultBackwardFlowFunctionOptions {
     return builder.includeInnerClassFields;
   }
 
-  public static BackwardFlowFunctionBuilder builder() {
-    return new BackwardFlowFunctionBuilder();
+  public boolean throwFlows() {
+    return builder.throwFlows;
   }
 
-  public static DefaultBackwardFlowFunctionOptions DEFAULT() {
-    return new BackwardFlowFunctionBuilder().build();
+  public boolean trackReturnOfInstanceOf() {
+    return builder.trackReturnOfInstanceOf;
   }
 
-  public static class BackwardFlowFunctionBuilder {
+  public static class FlowFunctionOptionsBuilder {
 
     private IAllocationSite allocationSite;
     private Strategies.StaticFieldStrategy staticFieldStrategy;
     private Strategies.ArrayStrategy arrayStrategy;
     private boolean trackFields;
     private boolean includeInnerClassFields;
+    private boolean throwFlows;
+    private boolean trackReturnOfInstanceOf;
 
-    private BackwardFlowFunctionBuilder() {
+    protected FlowFunctionOptionsBuilder() {
       this.allocationSite = new DefaultAllocationSite();
       this.staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON;
-      this.arrayStrategy = Strategies.ArrayStrategy.INDEX_INSENSITIVE;
+      this.arrayStrategy = Strategies.ArrayStrategy.INDEX_SENSITIVE;
       this.trackFields = true;
       this.includeInnerClassFields = true;
+      this.throwFlows = false;
+      this.trackReturnOfInstanceOf = false;
     }
 
-    public BackwardFlowFunctionBuilder withAllocationSite(IAllocationSite allocationSite) {
+    public FlowFunctionOptions build() {
+      return new FlowFunctionOptions(this);
+    }
+
+    public FlowFunctionOptionsBuilder withAllocationSite(IAllocationSite allocationSite) {
       this.allocationSite = allocationSite;
       return this;
     }
 
-    public BackwardFlowFunctionBuilder withStaticFieldStrategy(
+    public FlowFunctionOptionsBuilder withStaticFieldStrategy(
         Strategies.StaticFieldStrategy staticFieldStrategy) {
       this.staticFieldStrategy = staticFieldStrategy;
       return this;
     }
 
-    public BackwardFlowFunctionBuilder withArrayStrategy(Strategies.ArrayStrategy arrayStrategy) {
+    public FlowFunctionOptionsBuilder withArrayStrategy(Strategies.ArrayStrategy arrayStrategy) {
       this.arrayStrategy = arrayStrategy;
       return this;
     }
 
-    public BackwardFlowFunctionBuilder enableTrackFields(boolean trackFields) {
+    public FlowFunctionOptionsBuilder enableTrackFields(boolean trackFields) {
       this.trackFields = trackFields;
       return this;
     }
 
-    public BackwardFlowFunctionBuilder enableIncludeInnerClassFields(
+    public FlowFunctionOptionsBuilder enableIncludeInnerClassFields(
         boolean includeInnerClassFields) {
       this.includeInnerClassFields = includeInnerClassFields;
       return this;
     }
 
-    public DefaultBackwardFlowFunctionOptions build() {
-      return new DefaultBackwardFlowFunctionOptions(this);
+    public FlowFunctionOptionsBuilder enableThrowFlows(boolean throwFlows) {
+      this.throwFlows = throwFlows;
+      return this;
+    }
+
+    public FlowFunctionOptionsBuilder enableTrackReturnOfInstanceOf(
+        boolean trackReturnOfInstanceOf) {
+      this.trackReturnOfInstanceOf = trackReturnOfInstanceOf;
+      return this;
     }
   }
 }

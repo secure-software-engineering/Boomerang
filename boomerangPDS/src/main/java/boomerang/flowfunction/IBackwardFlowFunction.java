@@ -26,6 +26,8 @@ import wpds.interfaces.State;
 
 public interface IBackwardFlowFunction {
 
+  IFlowFunctionOptions getFlowFunctionOptions();
+
   /**
    * Called by the backward analysis, when the backward solver reaches the returnStmt (first
    * statement of callee method) of callee method with data-flow fact returnedVal.
