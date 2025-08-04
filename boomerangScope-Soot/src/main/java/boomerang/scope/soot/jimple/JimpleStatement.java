@@ -55,7 +55,7 @@ public class JimpleStatement extends Statement {
     this.method = method;
   }
 
-  public static Statement create(Stmt delegate, JimpleMethod method) {
+  public static JimpleStatement create(Stmt delegate, JimpleMethod method) {
     return new JimpleStatement(delegate, method);
   }
 

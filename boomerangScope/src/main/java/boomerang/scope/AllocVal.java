@@ -92,21 +92,6 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public boolean isNull() {
-    return allocationVal.isNull();
-  }
-
-  @Override
-  public boolean isStringConstant() {
-    return delegate.isStringConstant();
-  }
-
-  @Override
-  public String getStringValue() {
-    return delegate.getStringValue();
-  }
-
-  @Override
   public boolean isCast() {
     return delegate.isCast();
   }
@@ -142,21 +127,6 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public boolean isIntConstant() {
-    return delegate.isIntConstant();
-  }
-
-  @Override
-  public boolean isClassConstant() {
-    return delegate.isClassConstant();
-  }
-
-  @Override
-  public Type getClassConstantType() {
-    return delegate.getClassConstantType();
-  }
-
-  @Override
   public Val withNewMethod(Method callee) {
     return delegate.withNewMethod(callee);
   }
@@ -167,23 +137,73 @@ public class AllocVal extends Val {
   }
 
   @Override
-  public boolean isLongConstant() {
-    return false;
+  public IArrayRef getArrayBase() {
+    return delegate.getArrayBase();
+  }
+
+  @Override
+  public boolean isIntConstant() {
+    return allocationVal.isIntConstant();
   }
 
   @Override
   public int getIntValue() {
-    return delegate.getIntValue();
+    return allocationVal.getIntValue();
+  }
+
+  @Override
+  public boolean isLongConstant() {
+    return allocationVal.isLongConstant();
   }
 
   @Override
   public long getLongValue() {
-    return delegate.getLongValue();
+    return allocationVal.getLongValue();
   }
 
   @Override
-  public IArrayRef getArrayBase() {
-    return delegate.getArrayBase();
+  public boolean isFloatConstant() {
+    return allocationVal.isLongConstant();
+  }
+
+  @Override
+  public float getFloatValue() {
+    return allocationVal.getFloatValue();
+  }
+
+  @Override
+  public boolean isDoubleConstant() {
+    return allocationVal.isDoubleConstant();
+  }
+
+  @Override
+  public double getDoubleValue() {
+    return allocationVal.getDoubleValue();
+  }
+
+  @Override
+  public boolean isNull() {
+    return allocationVal.isNull();
+  }
+
+  @Override
+  public boolean isStringConstant() {
+    return allocationVal.isStringConstant();
+  }
+
+  @Override
+  public String getStringValue() {
+    return allocationVal.getStringValue();
+  }
+
+  @Override
+  public boolean isClassConstant() {
+    return allocationVal.isClassConstant();
+  }
+
+  @Override
+  public Type getClassConstantType() {
+    return allocationVal.getClassConstantType();
   }
 
   @Override

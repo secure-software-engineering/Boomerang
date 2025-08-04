@@ -62,21 +62,6 @@ public abstract class StaticFieldVal extends Val implements IStaticFieldRef {
   }
 
   @Override
-  public boolean isNull() {
-    return false;
-  }
-
-  @Override
-  public boolean isStringConstant() {
-    return false;
-  }
-
-  @Override
-  public String getStringValue() {
-    throw new RuntimeException("Static field val is not a String constant");
-  }
-
-  @Override
   public boolean isCast() {
     return false;
   }
@@ -112,8 +97,63 @@ public abstract class StaticFieldVal extends Val implements IStaticFieldRef {
   }
 
   @Override
+  public IArrayRef getArrayBase() {
+    throw new RuntimeException("Static field val has no array base");
+  }
+
+  @Override
   public boolean isIntConstant() {
     return false;
+  }
+
+  @Override
+  public int getIntValue() {
+    throw new RuntimeException("Static field is not an int constant");
+  }
+
+  @Override
+  public boolean isLongConstant() {
+    return false;
+  }
+
+  @Override
+  public long getLongValue() {
+    throw new RuntimeException("Static field is not a long constant");
+  }
+
+  @Override
+  public boolean isFloatConstant() {
+    return false;
+  }
+
+  @Override
+  public float getFloatValue() {
+    throw new RuntimeException("Static field is not a long constant");
+  }
+
+  @Override
+  public boolean isDoubleConstant() {
+    return false;
+  }
+
+  @Override
+  public double getDoubleValue() {
+    throw new RuntimeException("Static field is not a long constant");
+  }
+
+  @Override
+  public boolean isNull() {
+    return false;
+  }
+
+  @Override
+  public boolean isStringConstant() {
+    return false;
+  }
+
+  @Override
+  public String getStringValue() {
+    throw new RuntimeException("Static field is not a long constant");
   }
 
   @Override
@@ -123,26 +163,6 @@ public abstract class StaticFieldVal extends Val implements IStaticFieldRef {
 
   @Override
   public Type getClassConstantType() {
-    throw new RuntimeException("Static field val is not a class constant");
-  }
-
-  @Override
-  public boolean isLongConstant() {
-    return false;
-  }
-
-  @Override
-  public int getIntValue() {
-    throw new RuntimeException("Static field val is not an int constant");
-  }
-
-  @Override
-  public long getLongValue() {
-    throw new RuntimeException("Static field val is not a long constant");
-  }
-
-  @Override
-  public IArrayRef getArrayBase() {
-    throw new RuntimeException("Static field val has no array base");
+    throw new RuntimeException("Static field is not a long constant");
   }
 }

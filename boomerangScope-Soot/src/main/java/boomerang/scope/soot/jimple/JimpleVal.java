@@ -25,6 +25,8 @@ import soot.Value;
 import soot.jimple.ArrayRef;
 import soot.jimple.CastExpr;
 import soot.jimple.ClassConstant;
+import soot.jimple.DoubleConstant;
+import soot.jimple.FloatConstant;
 import soot.jimple.InstanceOfExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.LengthExpr;
@@ -50,6 +52,10 @@ public class JimpleVal extends Val {
     if (delegate == null) throw new RuntimeException("Value must not be null!");
     this.delegate = delegate;
     this.method = method;
+  }
+
+  public Value getDelegate() {
+    return delegate;
   }
 
   @Override
@@ -106,25 +112,6 @@ public class JimpleVal extends Val {
     }
 
     throw new RuntimeException("Val is not an array allocation val");
-  }
-
-  @Override
-  public boolean isNull() {
-    return delegate instanceof NullConstant;
-  }
-
-  @Override
-  public boolean isStringConstant() {
-    return delegate instanceof StringConstant;
-  }
-
-  @Override
-  public String getStringValue() {
-    if (isStringConstant()) {
-      return ((StringConstant) delegate).value;
-    }
-
-    throw new RuntimeException("Val is not a String constant");
   }
 
   @Override
@@ -189,6 +176,16 @@ public class JimpleVal extends Val {
   }
 
   @Override
+  public Val withNewMethod(Method callee) {
+    throw new RuntimeException("Only allowed for static fields");
+  }
+
+  @Override
+  public Val withSecondVal(Val leftOp) {
+    return new JimpleDoubleVal(delegate, method, leftOp);
+  }
+
+  @Override
   public boolean isIntConstant() {
     return delegate instanceof IntConstant;
   }
@@ -217,6 +214,53 @@ public class JimpleVal extends Val {
   }
 
   @Override
+  public boolean isFloatConstant() {
+    return delegate instanceof FloatConstant;
+  }
+
+  @Override
+  public float getFloatValue() {
+    if (isFloatConstant()) {
+      return ((FloatConstant) delegate).value;
+    }
+
+    throw new RuntimeException("Val is not a float constant");
+  }
+
+  @Override
+  public boolean isDoubleConstant() {
+    return delegate instanceof DoubleConstant;
+  }
+
+  @Override
+  public double getDoubleValue() {
+    if (isDoubleConstant()) {
+      return ((DoubleConstant) delegate).value;
+    }
+
+    throw new RuntimeException("Val is not a double constant");
+  }
+
+  @Override
+  public boolean isNull() {
+    return delegate instanceof NullConstant;
+  }
+
+  @Override
+  public boolean isStringConstant() {
+    return delegate instanceof StringConstant;
+  }
+
+  @Override
+  public String getStringValue() {
+    if (isStringConstant()) {
+      return ((StringConstant) delegate).value;
+    }
+
+    throw new RuntimeException("Val is not a String constant");
+  }
+
+  @Override
   public boolean isClassConstant() {
     return delegate instanceof ClassConstant;
   }
@@ -233,22 +277,8 @@ public class JimpleVal extends Val {
   }
 
   @Override
-  public Val withNewMethod(Method callee) {
-    throw new RuntimeException("Only allowed for static fields");
-  }
-
-  @Override
-  public Val withSecondVal(Val leftOp) {
-    return new JimpleDoubleVal(delegate, method, leftOp);
-  }
-
-  @Override
   public String getVariableName() {
     return delegate.toString();
-  }
-
-  public Value getDelegate() {
-    return delegate;
   }
 
   @Override

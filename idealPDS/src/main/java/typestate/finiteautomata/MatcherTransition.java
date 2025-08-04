@@ -66,8 +66,7 @@ public class MatcherTransition extends TransitionImpl {
   public boolean matches(@NonNull DeclaredMethod declaredMethod) {
     boolean matches = methodMatcher.matcher(declaredMethod.getSubSignature()).matches();
     if (matches) {
-      LOGGER.debug(
-          "Found matching transition at call site {} for {}", declaredMethod.getInvokeExpr(), this);
+      LOGGER.debug("Found matching transition at call site {} for {}", declaredMethod, this);
     }
     return negate != matches;
   }
