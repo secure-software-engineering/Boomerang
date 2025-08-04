@@ -16,7 +16,6 @@ package boomerang.pathtracking;
 
 import boomerang.ForwardQuery;
 import boomerang.WeightedBoomerang;
-import boomerang.options.BoomerangOptions;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.FrameworkScope;
@@ -33,13 +32,19 @@ public abstract class PathTrackingBoomerang extends WeightedBoomerang<DataFlowPa
 
   private OneWeightFunctions<Edge, Val, Field, DataFlowPathWeight> fieldWeights;
   private PathTrackingWeightFunctions callWeights;
+  private final PathTrackingBoomerangOptions options;
 
   public PathTrackingBoomerang(@NonNull FrameworkScope frameworkScope) {
-    super(frameworkScope);
+    super(frameworkScope, PathTrackingBoomerangOptions.DEFAULT());
+
+    this.options = PathTrackingBoomerangOptions.DEFAULT();
   }
 
-  public PathTrackingBoomerang(@NonNull FrameworkScope frameworkScope, BoomerangOptions options) {
+  public PathTrackingBoomerang(
+      @NonNull FrameworkScope frameworkScope, PathTrackingBoomerangOptions options) {
     super(frameworkScope, options);
+
+    this.options = options;
   }
 
   @Override

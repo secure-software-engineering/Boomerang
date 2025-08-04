@@ -16,6 +16,7 @@ package test.options;
 
 import boomerang.callgraph.BoomerangResolver;
 import boomerang.options.BoomerangOptions;
+import boomerang.pathtracking.PathTrackingBoomerangOptions;
 import boomerang.solver.Strategies;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -77,10 +78,6 @@ public class BoomerangOptionsTest {
     BoomerangOptions fieldSummaries = BoomerangOptions.builder().enableFieldSummaries(true).build();
     Assertions.assertTrue(fieldSummaries.fieldSummaries());
 
-    BoomerangOptions trackImplicitFlows =
-        BoomerangOptions.builder().enableTrackImplicitFlows(true).build();
-    Assertions.assertTrue(trackImplicitFlows.trackImplicitFlows());
-
     BoomerangOptions killNullAtCast = BoomerangOptions.builder().enableKillNullAtCast(true).build();
     Assertions.assertTrue(killNullAtCast.killNullAtCast());
 
@@ -91,18 +88,6 @@ public class BoomerangOptionsTest {
 
     BoomerangOptions handleMaps = BoomerangOptions.builder().enableHandleMaps(false).build();
     Assertions.assertFalse(handleMaps.handleMaps());
-
-    BoomerangOptions trackPathConditions =
-        BoomerangOptions.builder().enableTrackPathConditions(true).build();
-    Assertions.assertTrue(trackPathConditions.trackPathConditions());
-
-    BoomerangOptions prunePathConditions =
-        BoomerangOptions.builder().enablePrunePathConditions(true).build();
-    Assertions.assertTrue(prunePathConditions.prunePathConditions());
-
-    BoomerangOptions trackDataFlowPath =
-        BoomerangOptions.builder().enableTrackDataFlowPath(false).build();
-    Assertions.assertFalse(trackDataFlowPath.trackDataFlowPath());
 
     BoomerangOptions allowMultipleQueries =
         BoomerangOptions.builder().enableAllowMultipleQueries(true).build();
@@ -119,12 +104,14 @@ public class BoomerangOptionsTest {
   }
 
   @Test
-  public void checkValidTest() {
+  public void checkValidPathTrackingOptionsTest() {
     Assertions.assertThrows(
         RuntimeException.class,
         () -> {
-          BoomerangOptions options =
-              BoomerangOptions.builder()
+          PathTrackingBoomerangOptions options =
+              PathTrackingBoomerangOptions.builder()
+                  .enableTrackPathConditions(false)
+                  .enableTrackImplicitFlows(true)
                   .enablePrunePathConditions(true)
                   .enableTrackDataFlowPath(false)
                   .build();

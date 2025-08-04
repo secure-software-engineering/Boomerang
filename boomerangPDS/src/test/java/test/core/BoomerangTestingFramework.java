@@ -322,7 +322,7 @@ public class BoomerangTestingFramework extends TestingFramework {
 
   protected BoomerangOptions createBoomerangOptions() {
     if (queryDetector.integerQueries) {
-      return BoomerangOptions.WITH_ALLOCATION_SITE(new IntAndStringAllocationSite());
+      return BoomerangOptions.withAllocationSite(new IntAndStringAllocationSite());
     }
 
     return BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();

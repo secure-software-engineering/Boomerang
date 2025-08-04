@@ -65,7 +65,7 @@ public class BoomerangOptions {
    * @param allocationSite the {@link IAllocationSite} to be used
    * @return the options with the specified {@link IAllocationSite} and all other default options
    */
-  public static BoomerangOptions WITH_ALLOCATION_SITE(IAllocationSite allocationSite) {
+  public static BoomerangOptions withAllocationSite(IAllocationSite allocationSite) {
     return new OptionsBuilder().withAllocationSite(allocationSite).build();
   }
 
@@ -73,12 +73,7 @@ public class BoomerangOptions {
     return new OptionsBuilder();
   }
 
-  public void checkValid() {
-    if (!trackPathConditions() && prunePathConditions()) {
-      throw new RuntimeException(
-          "InvalidCombinations of options, path conditions must be enabled when pruning path conditions");
-    }
-  }
+  public void checkValid() {}
 
   public IAllocationSite allocationSite() {
     return builder.allocationSite;
@@ -144,10 +139,6 @@ public class BoomerangOptions {
     return builder.fieldSummaries;
   }
 
-  public boolean trackImplicitFlows() {
-    return builder.trackImplicitFlows;
-  }
-
   public boolean killNullAtCast() {
     return builder.killNullAtCast;
   }
@@ -158,18 +149,6 @@ public class BoomerangOptions {
 
   public boolean handleMaps() {
     return builder.handleMaps;
-  }
-
-  public boolean trackPathConditions() {
-    return builder.trackPathConditions;
-  }
-
-  public boolean prunePathConditions() {
-    return builder.prunePathConditions;
-  }
-
-  public boolean trackDataFlowPath() {
-    return builder.trackDataFlowPath;
   }
 
   public boolean allowMultipleQueries() {
@@ -204,13 +183,9 @@ public class BoomerangOptions {
     private boolean onTheFlyControlFlow;
     private boolean callSummaries;
     private boolean fieldSummaries;
-    private boolean trackImplicitFlows;
     private boolean killNullAtCast;
     private boolean trackStaticFieldAtEntryPointToClinit;
     private boolean handleMaps;
-    private boolean trackPathConditions;
-    private boolean prunePathConditions;
-    private boolean trackDataFlowPath;
     private boolean allowMultipleQueries;
     private boolean handleSpecialInvokeAsNormalPropagation;
     private boolean ignoreSparsificationAfterQuery;
@@ -234,13 +209,9 @@ public class BoomerangOptions {
       this.onTheFlyControlFlow = false;
       this.callSummaries = false;
       this.fieldSummaries = false;
-      this.trackImplicitFlows = false;
       this.killNullAtCast = false;
       this.trackStaticFieldAtEntryPointToClinit = false;
       this.handleMaps = true;
-      this.trackPathConditions = false;
-      this.prunePathConditions = false;
-      this.trackDataFlowPath = true;
       this.allowMultipleQueries = false;
       this.handleSpecialInvokeAsNormalPropagation = false;
       this.ignoreSparsificationAfterQuery = true;
@@ -372,11 +343,6 @@ public class BoomerangOptions {
       return this;
     }
 
-    public OptionsBuilder enableTrackImplicitFlows(boolean trackImplicitFlows) {
-      this.trackImplicitFlows = trackImplicitFlows;
-      return this;
-    }
-
     /**
      * Assume we have the following code:
      *
@@ -409,21 +375,6 @@ public class BoomerangOptions {
 
     public OptionsBuilder enableHandleMaps(boolean handleMaps) {
       this.handleMaps = handleMaps;
-      return this;
-    }
-
-    public OptionsBuilder enableTrackPathConditions(boolean trackPathConditions) {
-      this.trackPathConditions = trackPathConditions;
-      return this;
-    }
-
-    public OptionsBuilder enablePrunePathConditions(boolean prunePathConditions) {
-      this.prunePathConditions = prunePathConditions;
-      return this;
-    }
-
-    public OptionsBuilder enableTrackDataFlowPath(boolean trackDataFlowPath) {
-      this.trackDataFlowPath = trackDataFlowPath;
       return this;
     }
 
