@@ -52,8 +52,7 @@ class OpalMethodInvokeExpr(
     )
   }
 
-  override def getDeclaredMethod: DeclaredMethod =
-    new OpalDeclaredMethod(this, delegate, method)
+  override def getDeclaredMethod: DeclaredMethod = new OpalDeclaredMethod(delegate, method)
 
   override def isSpecialInvokeExpr: Boolean =
     delegate.astID == NonVirtualMethodCall.ASTID
@@ -103,8 +102,7 @@ class OpalFunctionInvokeExpr(
     )
   }
 
-  override def getDeclaredMethod: DeclaredMethod =
-    new OpalDeclaredMethod(this, delegate, method)
+  override def getDeclaredMethod: DeclaredMethod = new OpalDeclaredMethod(delegate, method)
 
   override def isSpecialInvokeExpr: Boolean =
     delegate.astID == NonVirtualFunctionCall.ASTID

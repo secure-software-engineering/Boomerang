@@ -23,6 +23,8 @@ import java.util.Objects;
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.ClassConstant;
+import sootup.core.jimple.common.constant.DoubleConstant;
+import sootup.core.jimple.common.constant.FloatConstant;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.constant.LongConstant;
 import sootup.core.jimple.common.constant.NullConstant;
@@ -118,25 +120,6 @@ public class JimpleUpVal extends Val {
   }
 
   @Override
-  public boolean isNull() {
-    return delegate instanceof NullConstant;
-  }
-
-  @Override
-  public boolean isStringConstant() {
-    return delegate instanceof StringConstant;
-  }
-
-  @Override
-  public String getStringValue() {
-    if (isStringConstant()) {
-      return ((StringConstant) delegate).getValue();
-    }
-
-    throw new RuntimeException("Val is not a String constant");
-  }
-
-  @Override
   public boolean isCast() {
     return delegate instanceof JCastExpr;
   }
@@ -217,6 +200,17 @@ public class JimpleUpVal extends Val {
   }
 
   @Override
+  public IArrayRef getArrayBase() {
+    if (isArrayRef()) {
+      JArrayRef arrayRef = (JArrayRef) delegate;
+
+      return new JimpleUpArrayRef(arrayRef, method);
+    }
+
+    throw new RuntimeException("Val is not an array ref");
+  }
+
+  @Override
   public boolean isLongConstant() {
     return delegate instanceof LongConstant;
   }
@@ -242,14 +236,52 @@ public class JimpleUpVal extends Val {
   }
 
   @Override
-  public IArrayRef getArrayBase() {
-    if (isArrayRef()) {
-      JArrayRef arrayRef = (JArrayRef) delegate;
+  public boolean isFloatConstant() {
+    return delegate instanceof FloatConstant;
+  }
 
-      return new JimpleUpArrayRef(arrayRef, method);
+  @Override
+  public float getFloatValue() {
+    if (isFloatConstant()) {
+      FloatConstant floatConstant = (FloatConstant) delegate;
+      return floatConstant.getValue();
     }
 
-    throw new RuntimeException("Val is not an array ref");
+    throw new RuntimeException("Val is not a float constant");
+  }
+
+  @Override
+  public boolean isDoubleConstant() {
+    return delegate instanceof DoubleConstant;
+  }
+
+  @Override
+  public double getDoubleValue() {
+    if (isDoubleConstant()) {
+      DoubleConstant doubleConstant = (DoubleConstant) delegate;
+      return doubleConstant.getValue();
+    }
+
+    throw new RuntimeException("Val is not a double constant");
+  }
+
+  @Override
+  public boolean isNull() {
+    return delegate instanceof NullConstant;
+  }
+
+  @Override
+  public boolean isStringConstant() {
+    return delegate instanceof StringConstant;
+  }
+
+  @Override
+  public String getStringValue() {
+    if (isStringConstant()) {
+      return ((StringConstant) delegate).getValue();
+    }
+
+    throw new RuntimeException("Val is not a String constant");
   }
 
   @Override

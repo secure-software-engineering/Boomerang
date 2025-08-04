@@ -12,28 +12,25 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope;
+package boomerang.scope.test.targets;
 
-import boomerang.utils.MethodWrapper;
-import java.util.List;
+public class ScopeTarget {
 
-public interface DeclaredMethod {
+  public static void main(String[] args) {
+    int i = methodWithStatements();
+    System.out.println(i);
+  }
 
-  String getSubSignature();
+  public static int methodWithStatements() {
+    A a = new A();
+    // Invoke expression
+    a.methodCall(10);
 
-  String getName();
+    FieldClass fieldClass = new FieldClass();
+    // Field store + assignment
+    fieldClass.i = 10;
 
-  boolean isConstructor();
-
-  String getSignature();
-
-  WrappedClass getDeclaringClass();
-
-  List<Type> getParameterTypes();
-
-  Type getParameterType(int index);
-
-  Type getReturnType();
-
-  MethodWrapper toMethodWrapper();
+    // Field load + return
+    return fieldClass.i;
+  }
 }

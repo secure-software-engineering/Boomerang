@@ -15,19 +15,18 @@
 package boomerang.scope.wala;
 
 import boomerang.scope.DeclaredMethod;
-import boomerang.scope.InvokeExpr;
 import boomerang.scope.Type;
 import boomerang.scope.WrappedClass;
 import boomerang.utils.MethodWrapper;
 import com.ibm.wala.types.MethodReference;
 import java.util.List;
 
-public class WALADeclaredMethod extends DeclaredMethod {
+public class WALADeclaredMethod implements DeclaredMethod {
 
   private final MethodReference delegate;
 
-  public WALADeclaredMethod(InvokeExpr inv, MethodReference ref) {
-    super(inv);
+  public WALADeclaredMethod(MethodReference ref) {
+    super();
     this.delegate = ref;
   }
 

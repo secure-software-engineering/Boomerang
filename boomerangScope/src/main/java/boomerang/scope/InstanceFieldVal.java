@@ -60,21 +60,6 @@ public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef 
   }
 
   @Override
-  public boolean isNull() {
-    return false;
-  }
-
-  @Override
-  public boolean isStringConstant() {
-    return false;
-  }
-
-  @Override
-  public String getStringValue() {
-    throw new RuntimeException("Instance field is not a String constant");
-  }
-
-  @Override
   public boolean isCast() {
     return false;
   }
@@ -110,8 +95,68 @@ public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef 
   }
 
   @Override
+  public Val withNewMethod(Method callee) {
+    throw new RuntimeException("Only allowed for static fields");
+  }
+
+  @Override
+  public IArrayRef getArrayBase() {
+    throw new RuntimeException("Instance field is not an array ref");
+  }
+
+  @Override
   public boolean isIntConstant() {
     return false;
+  }
+
+  @Override
+  public int getIntValue() {
+    throw new RuntimeException("Instance field is not an int constant");
+  }
+
+  @Override
+  public boolean isLongConstant() {
+    return false;
+  }
+
+  @Override
+  public long getLongValue() {
+    throw new RuntimeException("Instance field is not a long constant");
+  }
+
+  @Override
+  public boolean isFloatConstant() {
+    return false;
+  }
+
+  @Override
+  public float getFloatValue() {
+    throw new RuntimeException("Instance field is not a float constant");
+  }
+
+  @Override
+  public boolean isDoubleConstant() {
+    return false;
+  }
+
+  @Override
+  public double getDoubleValue() {
+    throw new RuntimeException("Instance field is not a double constant");
+  }
+
+  @Override
+  public boolean isNull() {
+    return false;
+  }
+
+  @Override
+  public boolean isStringConstant() {
+    return false;
+  }
+
+  @Override
+  public String getStringValue() {
+    throw new RuntimeException("Instance field is not a String constant");
   }
 
   @Override
@@ -122,30 +167,5 @@ public abstract class InstanceFieldVal extends Val implements IInstanceFieldRef 
   @Override
   public Type getClassConstantType() {
     throw new RuntimeException("Instance field is not a class constant");
-  }
-
-  @Override
-  public Val withNewMethod(Method callee) {
-    throw new RuntimeException("Only allowed for static fields");
-  }
-
-  @Override
-  public boolean isLongConstant() {
-    return false;
-  }
-
-  @Override
-  public int getIntValue() {
-    throw new RuntimeException("Instance field is not an int constant");
-  }
-
-  @Override
-  public long getLongValue() {
-    throw new RuntimeException("Instance field is not a long constant");
-  }
-
-  @Override
-  public IArrayRef getArrayBase() {
-    throw new RuntimeException("Instance field is not an array ref");
   }
 }

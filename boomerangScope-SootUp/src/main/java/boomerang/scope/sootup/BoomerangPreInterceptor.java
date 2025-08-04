@@ -43,7 +43,7 @@ import sootup.core.views.View;
 
 public class BoomerangPreInterceptor implements BodyInterceptor {
 
-  private final boolean TRANSFORM_CONSTANTS_SETTINGS;
+  private final boolean transformConstantsSettings;
 
   private static final String CONSTRUCTOR = "<init>";
   private static final String LABEL = "varReplacer";
@@ -54,7 +54,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   public BoomerangPreInterceptor(boolean transformConstantsSettings) {
-    TRANSFORM_CONSTANTS_SETTINGS = transformConstantsSettings;
+    this.transformConstantsSettings = transformConstantsSettings;
   }
 
   @Override
@@ -65,7 +65,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
       addNullifiedFields(bodyBuilder, view);
     }
 
-    if (TRANSFORM_CONSTANTS_SETTINGS) {
+    if (transformConstantsSettings) {
       transformConstantsAtFieldWrites(bodyBuilder);
     }
   }

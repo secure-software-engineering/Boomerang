@@ -14,8 +14,10 @@
  */
 package boomerang.scope.opal
 
-import boomerang.scope._
+import boomerang.scope.DataFlowScope
+import boomerang.scope.FrameworkScope
 import org.opalj.br.analyses.Project
+import org.opalj.tac.cg.CallGraph
 
 /**
  * Framework scope implementation for the static analysis framework Opal
@@ -27,14 +29,14 @@ import org.opalj.br.analyses.Project
  */
 class OpalFrameworkScope(
     project: Project[_],
-    callGraph: org.opalj.tac.cg.CallGraph,
+    callGraph: CallGraph,
     entryPoints: Set[org.opalj.br.Method],
     dataFlowScope: DataFlowScope
 ) extends FrameworkScope {
 
   private val opalCallGraph = new OpalCallGraph(project, callGraph, entryPoints)
 
-  override def getCallGraph: CallGraph = opalCallGraph
+  override def getCallGraph: OpalCallGraph = opalCallGraph
 
   override def getDataFlowScope: DataFlowScope = dataFlowScope
 }

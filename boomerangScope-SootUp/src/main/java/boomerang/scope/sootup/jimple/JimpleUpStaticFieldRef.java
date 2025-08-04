@@ -41,6 +41,10 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
     this.method = method;
   }
 
+  public JStaticFieldRef getDelegate() {
+    return delegate;
+  }
+
   @Override
   public WrappedClass getDeclaringClass() {
     return new JimpleUpWrappedClass(

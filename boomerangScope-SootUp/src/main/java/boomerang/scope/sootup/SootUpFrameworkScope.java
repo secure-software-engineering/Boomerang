@@ -14,12 +14,12 @@
  */
 package boomerang.scope.sootup;
 
-import boomerang.scope.CallGraph;
 import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import java.util.Collection;
 import org.jspecify.annotations.NonNull;
-import sootup.java.core.*;
+import sootup.callgraph.CallGraph;
+import sootup.java.core.JavaSootMethod;
 import sootup.java.core.views.JavaView;
 
 public class SootUpFrameworkScope implements FrameworkScope {
@@ -28,12 +28,12 @@ public class SootUpFrameworkScope implements FrameworkScope {
   public static final String STATIC_INITIALIZER_NAME = "<clinit>";
 
   protected final JavaView view;
-  protected final CallGraph sootUpCallGraph;
+  protected final SootUpCallGraph sootUpCallGraph;
   protected DataFlowScope dataflowScope;
 
   public SootUpFrameworkScope(
       @NonNull JavaView view,
-      sootup.callgraph.@NonNull CallGraph callGraph,
+      @NonNull CallGraph callGraph,
       @NonNull Collection<JavaSootMethod> entryPoints,
       @NonNull DataFlowScope dataFlowScope) {
     this.view = view;
@@ -42,7 +42,7 @@ public class SootUpFrameworkScope implements FrameworkScope {
   }
 
   @Override
-  public CallGraph getCallGraph() {
+  public SootUpCallGraph getCallGraph() {
     return sootUpCallGraph;
   }
 
