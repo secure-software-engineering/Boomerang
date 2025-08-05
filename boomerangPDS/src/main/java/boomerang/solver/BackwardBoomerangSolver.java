@@ -25,15 +25,14 @@ import boomerang.options.BoomerangOptions;
 import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.DataFlowScope;
 import boomerang.scope.Field;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.ValCollection;
-import com.google.common.collect.Multimap;
 import de.fraunhofer.iem.Location;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
@@ -65,18 +64,24 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
               INode<Node<ControlFlowGraph.Edge, Val>>>
           genField,
       BackwardQuery query,
-      BoomerangOptions options,
       NestedWeightedPAutomatons<ControlFlowGraph.Edge, INode<Val>, W> callSummaries,
       NestedWeightedPAutomatons<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> fieldSummaries,
-      DataFlowScope scope,
-      IBackwardFlowFunction backwardFlowFunction,
-      Multimap<Field, Statement> fieldLoadStatements,
-      Multimap<Field, Statement> fieldStoreStatements,
+      FrameworkScope scope,
+      BoomerangOptions options,
       Type propagationType) {
-    super(icfg, cfg, genField, options, callSummaries, fieldSummaries, scope, propagationType);
+    super(
+        icfg,
+        cfg,
+        genField,
+        options,
+        callSummaries,
+        fieldSummaries,
+        scope.getDataFlowScope(),
+        propagationType);
+
     this.query = query;
-    this.flowFunction = backwardFlowFunction;
-    this.flowFunction.setSolver(this, fieldLoadStatements, fieldStoreStatements);
+    this.flowFunction =
+        options.getFlowFunctionFactory().createBackwardFlowFunction(scope, options, this);
   }
 
   private boolean notUsedInMethod(Method m, Statement curr, Val value) {
@@ -121,13 +126,13 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
   protected void callFlow(Method caller, Node<Edge, Val> curr, Statement callSite) {
     InvokeExpr invokeExpr = callSite.getInvokeExpr();
     if (dataFlowScope.isExcluded(invokeExpr.getDeclaredMethod())) {
-      byPassFlowAtCallsite(caller, curr);
+      byPassFlowAtCallSite(caller, curr);
       return;
     }
     icfg.addCalleeListener(new CallSiteCalleeListener(curr, caller));
   }
 
-  private void byPassFlowAtCallsite(Method caller, Node<Edge, Val> curr) {
+  private void byPassFlowAtCallSite(Method caller, Node<Edge, Val> curr) {
     for (Statement returnSite :
         curr.stmt()
             .getStart()
@@ -370,7 +375,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
 
     @Override
     public void onNoCalleeFound() {
-      byPassFlowAtCallsite(caller, curr);
+      byPassFlowAtCallSite(caller, curr);
     }
 
     @Override

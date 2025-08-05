@@ -14,7 +14,7 @@
  */
 package boomerang.flowfunction;
 
-import boomerang.options.IAllocationSite;
+import boomerang.options.BoomerangOptions;
 import boomerang.scope.FrameworkScope;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
@@ -22,12 +22,8 @@ import boomerang.solver.ForwardBoomerangSolver;
 public interface IFlowFunctionFactory {
 
   IForwardFlowFunction createForwardFlowFunction(
-      FrameworkScope frameworkScope,
-      ForwardBoomerangSolver<?> solver,
-      IAllocationSite allocationSite);
+      FrameworkScope frameworkScope, BoomerangOptions options, ForwardBoomerangSolver<?> solver);
 
   IBackwardFlowFunction createBackwardFlowFunction(
-      FrameworkScope frameworkScope,
-      BackwardBoomerangSolver<?> solver,
-      IAllocationSite allocationSite);
+      FrameworkScope frameworkScope, BoomerangOptions options, BackwardBoomerangSolver<?> solver);
 }

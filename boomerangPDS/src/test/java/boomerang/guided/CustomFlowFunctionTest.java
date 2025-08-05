@@ -17,7 +17,9 @@ package boomerang.guided;
 import boomerang.BackwardQuery;
 import boomerang.Boomerang;
 import boomerang.ForwardQuery;
-import boomerang.flowfunction.FlowFunctionOptions;
+import boomerang.flowfunction.IBackwardFlowFunction;
+import boomerang.flowfunction.IFlowFunctionFactory;
+import boomerang.flowfunction.IForwardFlowFunction;
 import boomerang.guided.flowfunction.CustomBackwardFlowFunction;
 import boomerang.guided.flowfunction.CustomForwardFlowFunction;
 import boomerang.guided.targets.CustomFlowFunctionIntTarget;
@@ -33,6 +35,8 @@ import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import boomerang.solver.BackwardBoomerangSolver;
+import boomerang.solver.ForwardBoomerangSolver;
+import boomerang.solver.Strategies;
 import boomerang.utils.MethodWrapper;
 import com.google.common.collect.Table;
 import java.util.List;
@@ -192,13 +196,46 @@ public class CustomFlowFunctionTest {
     return new ForwardQuery(cfgEdge, arg);
   }
 
-  private static BoomerangOptions customOptions() {
-    FlowFunctionOptions options =
-        FlowFunctionOptions.builder().withAllocationSite(new IntAndStringAllocationSite()).build();
+  private BoomerangOptions customOptions() {
     return BoomerangOptions.builder()
         .withAllocationSite(new IntAndStringAllocationSite())
-        .withForwardFlowFunction(new CustomForwardFlowFunction(options))
-        .withBackwardFlowFunction(new CustomBackwardFlowFunction(options))
+        .withFlowFunctionFactory(createFlowFunctionFactory())
         .build();
+  }
+
+  private IFlowFunctionFactory createFlowFunctionFactory() {
+    return new IFlowFunctionFactory() {
+      @Override
+      public IForwardFlowFunction createForwardFlowFunction(
+          FrameworkScope frameworkScope,
+          BoomerangOptions options,
+          ForwardBoomerangSolver<?> solver) {
+        Strategies strategies =
+            new Strategies(
+                options.getStaticFieldStrategy(),
+                options.getArrayStrategy(),
+                solver,
+                frameworkScope.getCallGraph().getFieldLoadStatements(),
+                frameworkScope.getCallGraph().getFieldStoreStatements());
+
+        return new CustomForwardFlowFunction(strategies);
+      }
+
+      @Override
+      public IBackwardFlowFunction createBackwardFlowFunction(
+          FrameworkScope frameworkScope,
+          BoomerangOptions options,
+          BackwardBoomerangSolver<?> solver) {
+        Strategies strategies =
+            new Strategies(
+                options.getStaticFieldStrategy(),
+                options.getArrayStrategy(),
+                solver,
+                frameworkScope.getCallGraph().getFieldLoadStatements(),
+                frameworkScope.getCallGraph().getFieldStoreStatements());
+
+        return new CustomBackwardFlowFunction(options.allocationSite(), strategies);
+      }
+    };
   }
 }

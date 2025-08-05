@@ -14,36 +14,50 @@
  */
 package boomerang.flowfunction;
 
-import boomerang.options.IAllocationSite;
+import boomerang.options.BoomerangOptions;
 import boomerang.scope.FrameworkScope;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
+import boomerang.solver.Strategies;
 
 public class DefaultFlowFunctionFactory implements IFlowFunctionFactory {
 
-  private final FlowFunctionOptions options;
+  private final FlowFunctionOptions flowFunctionOptions;
 
   public DefaultFlowFunctionFactory() {
     this(FlowFunctionOptions.DEFAULT());
   }
 
-  public DefaultFlowFunctionFactory(FlowFunctionOptions options) {
-    this.options = options;
+  public DefaultFlowFunctionFactory(FlowFunctionOptions flowFunctionOptions) {
+    this.flowFunctionOptions = flowFunctionOptions;
   }
 
   @Override
   public IForwardFlowFunction createForwardFlowFunction(
-      FrameworkScope frameworkScope,
-      ForwardBoomerangSolver<?> solver,
-      IAllocationSite allocationSite) {
-    return new DefaultForwardFlowFunction(options);
+      FrameworkScope frameworkScope, BoomerangOptions options, ForwardBoomerangSolver<?> solver) {
+    Strategies strategies =
+        new Strategies(
+            options.getStaticFieldStrategy(),
+            options.getArrayStrategy(),
+            solver,
+            frameworkScope.getCallGraph().getFieldLoadStatements(),
+            frameworkScope.getCallGraph().getFieldStoreStatements());
+
+    return new DefaultForwardFlowFunction(strategies, flowFunctionOptions);
   }
 
   @Override
   public IBackwardFlowFunction createBackwardFlowFunction(
-      FrameworkScope frameworkScope,
-      BackwardBoomerangSolver<?> solver,
-      IAllocationSite allocationSite) {
-    return new DefaultBackwardFlowFunction(options);
+      FrameworkScope frameworkScope, BoomerangOptions options, BackwardBoomerangSolver<?> solver) {
+    Strategies strategies =
+        new Strategies(
+            options.getStaticFieldStrategy(),
+            options.getArrayStrategy(),
+            solver,
+            frameworkScope.getCallGraph().getFieldLoadStatements(),
+            frameworkScope.getCallGraph().getFieldStoreStatements());
+
+    return new DefaultBackwardFlowFunction(
+        options.allocationSite(), strategies, flowFunctionOptions);
   }
 }

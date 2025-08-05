@@ -14,11 +14,7 @@
  */
 package boomerang.flowfunction;
 
-import boomerang.options.DefaultAllocationSite;
-import boomerang.options.IAllocationSite;
-import boomerang.solver.Strategies;
-
-public class FlowFunctionOptions implements IFlowFunctionOptions {
+public class FlowFunctionOptions {
 
   private final FlowFunctionOptionsBuilder builder;
 
@@ -32,18 +28,6 @@ public class FlowFunctionOptions implements IFlowFunctionOptions {
 
   public static FlowFunctionOptions DEFAULT() {
     return new FlowFunctionOptionsBuilder().build();
-  }
-
-  public IAllocationSite allocationSite() {
-    return builder.allocationSite;
-  }
-
-  public Strategies.StaticFieldStrategy staticFieldStrategy() {
-    return builder.staticFieldStrategy;
-  }
-
-  public Strategies.ArrayStrategy arrayStrategy() {
-    return builder.arrayStrategy;
   }
 
   public boolean trackFields() {
@@ -64,18 +48,12 @@ public class FlowFunctionOptions implements IFlowFunctionOptions {
 
   public static class FlowFunctionOptionsBuilder {
 
-    private IAllocationSite allocationSite;
-    private Strategies.StaticFieldStrategy staticFieldStrategy;
-    private Strategies.ArrayStrategy arrayStrategy;
     private boolean trackFields;
     private boolean includeInnerClassFields;
     private boolean throwFlows;
     private boolean trackReturnOfInstanceOf;
 
     protected FlowFunctionOptionsBuilder() {
-      this.allocationSite = new DefaultAllocationSite();
-      this.staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON;
-      this.arrayStrategy = Strategies.ArrayStrategy.INDEX_SENSITIVE;
       this.trackFields = true;
       this.includeInnerClassFields = true;
       this.throwFlows = false;
@@ -84,22 +62,6 @@ public class FlowFunctionOptions implements IFlowFunctionOptions {
 
     public FlowFunctionOptions build() {
       return new FlowFunctionOptions(this);
-    }
-
-    public FlowFunctionOptionsBuilder withAllocationSite(IAllocationSite allocationSite) {
-      this.allocationSite = allocationSite;
-      return this;
-    }
-
-    public FlowFunctionOptionsBuilder withStaticFieldStrategy(
-        Strategies.StaticFieldStrategy staticFieldStrategy) {
-      this.staticFieldStrategy = staticFieldStrategy;
-      return this;
-    }
-
-    public FlowFunctionOptionsBuilder withArrayStrategy(Strategies.ArrayStrategy arrayStrategy) {
-      this.arrayStrategy = arrayStrategy;
-      return this;
     }
 
     public FlowFunctionOptionsBuilder enableTrackFields(boolean trackFields) {

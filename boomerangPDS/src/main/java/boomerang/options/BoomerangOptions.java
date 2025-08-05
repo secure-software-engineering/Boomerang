@@ -16,13 +16,11 @@ package boomerang.options;
 
 import boomerang.callgraph.BoomerangResolver;
 import boomerang.callgraph.ICallerCalleeResolutionStrategy;
-import boomerang.flowfunction.DefaultBackwardFlowFunction;
-import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.flowfunction.IBackwardFlowFunction;
-import boomerang.flowfunction.IFlowFunctionOptions;
-import boomerang.flowfunction.IForwardFlowFunction;
+import boomerang.flowfunction.DefaultFlowFunctionFactory;
+import boomerang.flowfunction.IFlowFunctionFactory;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
+import boomerang.solver.Strategies;
 import sparse.SparsificationStrategy;
 
 /**
@@ -33,6 +31,7 @@ import sparse.SparsificationStrategy;
  * <pre>{@code
  * BoomerangOptions options =
  *                     BoomerangOptions.builder()
+ *                            .withAllocationSite(new DefaultAllocationSite())
  *                            .withAnalysisTimeout(10000)
  *                            .build();
  *
@@ -76,20 +75,16 @@ public class BoomerangOptions {
     return builder.allocationSite;
   }
 
-  public IForwardFlowFunction getForwardFlowFunction() {
-    return builder.forwardFlowFunction;
+  public IFlowFunctionFactory getFlowFunctionFactory() {
+    return builder.flowFunctionFactory;
   }
 
-  public IBackwardFlowFunction getBackwardFlowFunction() {
-    return builder.backwardFlowFunction;
+  public Strategies.StaticFieldStrategy getStaticFieldStrategy() {
+    return builder.staticFieldStrategy;
   }
 
-  public IFlowFunctionOptions getForwardFlowFunctionOptions() {
-    return builder.forwardFlowFunction.getFlowFunctionOptions();
-  }
-
-  public IFlowFunctionOptions getBackwardFlowFunctionOptions() {
-    return builder.backwardFlowFunction.getFlowFunctionOptions();
+  public Strategies.ArrayStrategy getArrayStrategy() {
+    return builder.arrayStrategy;
   }
 
   public ICallerCalleeResolutionStrategy.Factory getResolutionStrategy() {
@@ -163,8 +158,9 @@ public class BoomerangOptions {
   public static class OptionsBuilder {
 
     private IAllocationSite allocationSite;
-    private IForwardFlowFunction forwardFlowFunction;
-    private IBackwardFlowFunction backwardFlowFunction;
+    private IFlowFunctionFactory flowFunctionFactory;
+    private Strategies.StaticFieldStrategy staticFieldStrategy;
+    private Strategies.ArrayStrategy arrayStrategy;
     private ICallerCalleeResolutionStrategy.Factory resolutionStrategy;
     private SparsificationStrategy<? extends Method, ? extends Statement> sparsificationStrategy;
 
@@ -187,9 +183,9 @@ public class BoomerangOptions {
 
     protected OptionsBuilder() {
       this.allocationSite = new DefaultAllocationSite();
-      this.forwardFlowFunction = new DefaultForwardFlowFunction();
-      this.backwardFlowFunction = new DefaultBackwardFlowFunction();
-
+      this.flowFunctionFactory = new DefaultFlowFunctionFactory();
+      this.staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON;
+      this.arrayStrategy = Strategies.ArrayStrategy.INDEX_SENSITIVE;
       this.resolutionStrategy = BoomerangResolver.FACTORY;
       this.sparsificationStrategy = SparsificationStrategy.NONE;
 
@@ -220,13 +216,31 @@ public class BoomerangOptions {
       return this;
     }
 
-    public OptionsBuilder withForwardFlowFunction(IForwardFlowFunction forwardFlowFunction) {
-      this.forwardFlowFunction = forwardFlowFunction;
+    public OptionsBuilder withFlowFunctionFactory(IFlowFunctionFactory flowFunctionFactory) {
+      this.flowFunctionFactory = flowFunctionFactory;
       return this;
     }
 
-    public OptionsBuilder withBackwardFlowFunction(IBackwardFlowFunction backwardFlowFunction) {
-      this.backwardFlowFunction = backwardFlowFunction;
+    /**
+     * Sets the strategy {@link Strategies.StaticFieldStrategy} to define how to deal with static
+     * fields.
+     *
+     * @param strategy the array strategy (default: SINGLETON)
+     * @return the builder
+     */
+    public OptionsBuilder withStaticFieldStrategy(Strategies.StaticFieldStrategy strategy) {
+      this.staticFieldStrategy = strategy;
+      return this;
+    }
+
+    /**
+     * Sets the strategy {@link Strategies.ArrayStrategy} to define how to deal with arrays.
+     *
+     * @param strategy the array strategy (default: INDEX_SENSITIVE)
+     * @return the builder
+     */
+    public OptionsBuilder withArrayStrategy(Strategies.ArrayStrategy strategy) {
+      this.arrayStrategy = strategy;
       return this;
     }
 

@@ -25,9 +25,7 @@ import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
 import boomerang.scope.fields.ArrayField;
-import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -43,20 +41,16 @@ import wpds.interfaces.State;
 
 public class DefaultForwardFlowFunction implements IForwardFlowFunction {
 
+  private final Strategies strategies;
   private final FlowFunctionOptions options;
-  private Strategies strategies;
 
-  public DefaultForwardFlowFunction() {
-    this(FlowFunctionOptions.DEFAULT());
+  public DefaultForwardFlowFunction(Strategies strategies) {
+    this(strategies, FlowFunctionOptions.DEFAULT());
   }
 
-  public DefaultForwardFlowFunction(FlowFunctionOptions options) {
+  public DefaultForwardFlowFunction(Strategies strategies, FlowFunctionOptions options) {
+    this.strategies = strategies;
     this.options = options;
-  }
-
-  @Override
-  public FlowFunctionOptions getFlowFunctionOptions() {
-    return options;
   }
 
   @Override
@@ -236,19 +230,5 @@ public class DefaultForwardFlowFunction implements IForwardFlowFunction {
       return Collections.singleton(new Node<>(edge, arg));
     }
     return Collections.emptySet();
-  }
-
-  @Override
-  public void setSolver(
-      ForwardBoomerangSolver<?> solver,
-      Multimap<Field, Statement> fieldLoadStatements,
-      Multimap<Field, Statement> fieldStoreStatements) {
-    this.strategies =
-        new Strategies(
-            options.staticFieldStrategy(),
-            options.arrayStrategy(),
-            solver,
-            fieldLoadStatements,
-            fieldStoreStatements);
   }
 }

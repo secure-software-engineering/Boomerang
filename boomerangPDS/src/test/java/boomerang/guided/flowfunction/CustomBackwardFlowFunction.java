@@ -15,20 +15,21 @@
 package boomerang.guided.flowfunction;
 
 import boomerang.flowfunction.DefaultBackwardFlowFunction;
-import boomerang.flowfunction.FlowFunctionOptions;
+import boomerang.options.IAllocationSite;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.solver.Strategies;
 import java.util.Collection;
 import java.util.Collections;
 import wpds.interfaces.State;
 
 public class CustomBackwardFlowFunction extends DefaultBackwardFlowFunction {
 
-  public CustomBackwardFlowFunction(FlowFunctionOptions options) {
-    super(options);
+  public CustomBackwardFlowFunction(IAllocationSite allocationSite, Strategies strategies) {
+    super(allocationSite, strategies);
   }
 
   @Override

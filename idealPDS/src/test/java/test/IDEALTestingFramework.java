@@ -21,10 +21,6 @@ import assertions.MustBeInAcceptingState;
 import assertions.MustBeInErrorState;
 import assertions.ShouldNotBeAnalyzed;
 import boomerang.WeightedForwardQuery;
-import boomerang.debugger.Debugger;
-import boomerang.flowfunction.DefaultBackwardFlowFunction;
-import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.flowfunction.FlowFunctionOptions;
 import boomerang.options.BoomerangOptions;
 import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph;
@@ -39,7 +35,6 @@ import boomerang.utils.MethodWrapper;
 import ideal.IDEALAnalysis;
 import ideal.IDEALAnalysisDefinition;
 import ideal.IDEALResultHandler;
-import ideal.IDEALSeedSolver;
 import ideal.StoreIDEALResultHandler;
 import java.util.Collection;
 import java.util.HashSet;
@@ -130,25 +125,14 @@ public class IDEALTestingFramework extends TestingFramework {
           }
 
           @Override
-          public Debugger<TransitionFunction> debugger(IDEALSeedSolver<TransitionFunction> solver) {
-            return new Debugger<>();
-          }
-
-          @Override
           public IDEALResultHandler<TransitionFunction> getResultHandler() {
             return resultHandler;
           }
 
           @Override
           public BoomerangOptions boomerangOptions() {
-            FlowFunctionOptions options =
-                FlowFunctionOptions.builder()
-                    .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
-                    .build();
-
             return BoomerangOptions.builder()
-                .withForwardFlowFunction(new DefaultForwardFlowFunction(options))
-                .withBackwardFlowFunction(new DefaultBackwardFlowFunction(options))
+                .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
                 .withAnalysisTimeout(-1)
                 .enableAllowMultipleQueries(true)
                 .build();

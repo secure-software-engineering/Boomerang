@@ -15,18 +15,13 @@
 package boomerang.flowfunction;
 
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.Field;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import boomerang.solver.BackwardBoomerangSolver;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
 import wpds.interfaces.State;
 
 public interface IBackwardFlowFunction {
-
-  IFlowFunctionOptions getFlowFunctionOptions();
 
   /**
    * Called by the backward analysis, when the backward solver reaches the returnStmt (first
@@ -82,9 +77,4 @@ public interface IBackwardFlowFunction {
    * @return A set of data-flow states (states in the pushdown system)
    */
   Collection<State> callToReturnFlow(Edge currEdge, Edge nextEdge, Val fact);
-
-  void setSolver(
-      BackwardBoomerangSolver<?> solver,
-      Multimap<Field, Statement> fieldLoadStatements,
-      Multimap<Field, Statement> fieldStoreStatements);
 }

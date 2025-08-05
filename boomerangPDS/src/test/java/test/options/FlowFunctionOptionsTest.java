@@ -15,7 +15,6 @@
 package test.options;
 
 import boomerang.flowfunction.FlowFunctionOptions;
-import boomerang.solver.Strategies;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +22,25 @@ public class FlowFunctionOptionsTest {
 
   @Test
   public void optionSettingsTest() {
-    FlowFunctionOptions staticFieldStrategy =
-        FlowFunctionOptions.builder()
-            .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
-            .build();
-    Assertions.assertEquals(
-        staticFieldStrategy.staticFieldStrategy(), Strategies.StaticFieldStrategy.FLOW_SENSITIVE);
+    FlowFunctionOptions defaultOptions = FlowFunctionOptions.DEFAULT();
+    Assertions.assertTrue(defaultOptions.trackFields());
+    Assertions.assertTrue(defaultOptions.includeInnerClassFields());
+    Assertions.assertFalse(defaultOptions.throwFlows());
+    Assertions.assertFalse(defaultOptions.trackReturnOfInstanceOf());
+
+    FlowFunctionOptions trackFields =
+        FlowFunctionOptions.builder().enableTrackFields(false).build();
+    Assertions.assertFalse(trackFields.trackFields());
+
+    FlowFunctionOptions includeInnerClassFields =
+        FlowFunctionOptions.builder().enableIncludeInnerClassFields(false).build();
+    Assertions.assertFalse(includeInnerClassFields.includeInnerClassFields());
+
+    FlowFunctionOptions throwFlows = FlowFunctionOptions.builder().enableThrowFlows(true).build();
+    Assertions.assertTrue(throwFlows.throwFlows());
+
+    FlowFunctionOptions trackReturnOfInstanceOf =
+        FlowFunctionOptions.builder().enableTrackReturnOfInstanceOf(true).build();
+    Assertions.assertTrue(trackReturnOfInstanceOf.trackReturnOfInstanceOf());
   }
 }

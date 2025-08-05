@@ -15,14 +15,8 @@
 package ideal;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.debugger.Debugger;
-import boomerang.flowfunction.DefaultBackwardFlowFunction;
-import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.flowfunction.FlowFunctionOptions;
 import boomerang.options.BoomerangOptions;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
 import boomerang.solver.Strategies;
@@ -49,10 +43,6 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
    */
   public abstract WeightFunctions<Edge, Val, Edge, W> weightFunctions();
 
-  public CallGraph callGraph() {
-    return getFrameworkFactory().getCallGraph();
-  }
-
   public boolean enableStrongUpdates() {
     return true;
   }
@@ -69,27 +59,15 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
     return str;
   }
 
-  public abstract Debugger<W> debugger(IDEALSeedSolver<W> idealSeedSolver);
-
   public BoomerangOptions boomerangOptions() {
-    FlowFunctionOptions options =
-        FlowFunctionOptions.builder()
-            .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
-            .build();
-
     return BoomerangOptions.builder()
-        .withForwardFlowFunction(new DefaultForwardFlowFunction(options))
-        .withBackwardFlowFunction(new DefaultBackwardFlowFunction(options))
+        .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
         .enableAllowMultipleQueries(true)
         .build();
   }
 
   public IDEALResultHandler<W> getResultHandler() {
     return new IDEALResultHandler<>();
-  }
-
-  public DataFlowScope getDataFlowScope() {
-    return getFrameworkFactory().getDataFlowScope();
   }
 
   public abstract FrameworkScope getFrameworkFactory();

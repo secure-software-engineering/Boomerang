@@ -137,13 +137,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
                   cfg(),
                   genField,
                   key,
-                  WeightedBoomerang.this.options,
                   createCallSummaries(null, backwardCallSummaries),
                   createFieldSummaries(null, backwardFieldSummaries),
-                  WeightedBoomerang.this.dataFlowscope,
-                  options.getBackwardFlowFunction(),
-                  callGraph.getFieldLoadStatements(),
-                  callGraph.getFieldStoreStatements(),
+                  frameworkScope,
+                  options,
                   null) {
 
                 @Override
@@ -482,13 +479,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
             cfg(),
             sourceQuery,
             genField,
-            options,
             createCallSummaries(sourceQuery, forwardCallSummaries),
             createFieldSummaries(sourceQuery, forwardFieldSummaries),
-            dataFlowscope,
-            options.getForwardFlowFunction(),
-            callGraph.getFieldLoadStatements(),
-            callGraph.getFieldStoreStatements(),
+            frameworkScope,
+            options,
             sourceQuery.getType()) {
 
           @Override
@@ -552,8 +546,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         node -> {
           if (node.stmt().getStart().isFieldStore()) {
             forwardHandleFieldWrite(node, createFieldStore(node.stmt()), sourceQuery);
-          } else if (options.getForwardFlowFunctionOptions().arrayStrategy()
-                  != Strategies.ArrayStrategy.DISABLED
+          } else if (options.getArrayStrategy() != Strategies.ArrayStrategy.DISABLED
               && node.stmt().getStart().isArrayStore()) {
             forwardHandleFieldWrite(node, createArrayFieldStore(node.stmt()), sourceQuery);
           }
@@ -1136,8 +1129,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
     Statement stmt = cfgEdge.getStart();
     if (!(stmt.isFieldStore())
         && query instanceof ForwardQueryArray
-        && options.getForwardFlowFunctionOptions().arrayStrategy()
-            != Strategies.ArrayStrategy.DISABLED) {
+        && options.getArrayStrategy() != Strategies.ArrayStrategy.DISABLED) {
       if (query instanceof ForwardQueryMultiDimensionalArray) {
         ForwardQueryMultiDimensionalArray arrayQuery = ((ForwardQueryMultiDimensionalArray) query);
         Node<ControlFlowGraph.Edge, Val> node =
