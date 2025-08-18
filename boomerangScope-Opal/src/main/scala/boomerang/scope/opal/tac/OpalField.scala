@@ -20,7 +20,7 @@ import org.opalj.br.FieldType
 import org.opalj.br.ObjectType
 
 class OpalField(
-    declaringClass: ObjectType,
+    val declaringClass: ObjectType,
     val fieldType: FieldType,
     val name: String
 ) extends Field {
