@@ -111,10 +111,6 @@ public class BoomerangOptions {
     return builder.maxUnbalancedCallDepth;
   }
 
-  public boolean typeCheck() {
-    return builder.typeCheck;
-  }
-
   public boolean onTheFlyCallGraph() {
     return builder.onTheFlyCallGraph;
   }
@@ -129,10 +125,6 @@ public class BoomerangOptions {
 
   public boolean fieldSummaries() {
     return builder.fieldSummaries;
-  }
-
-  public boolean killNullAtCast() {
-    return builder.killNullAtCast;
   }
 
   public boolean trackStaticFieldAtEntryPointToClinit() {
@@ -169,12 +161,10 @@ public class BoomerangOptions {
     private int maxCallDepth;
     private int maxUnbalancedCallDepth;
 
-    private boolean typeCheck; // TODO This may be removed
     private boolean onTheFlyCallGraph;
     private boolean onTheFlyControlFlow;
     private boolean callSummaries;
     private boolean fieldSummaries;
-    private boolean killNullAtCast;
     private boolean trackStaticFieldAtEntryPointToClinit;
     private boolean handleMaps;
     private boolean allowMultipleQueries;
@@ -194,12 +184,10 @@ public class BoomerangOptions {
       this.maxCallDepth = -1;
       this.maxUnbalancedCallDepth = -1;
 
-      this.typeCheck = true;
       this.onTheFlyCallGraph = false;
       this.onTheFlyControlFlow = false;
       this.callSummaries = false;
       this.fieldSummaries = false;
-      this.killNullAtCast = false;
       this.trackStaticFieldAtEntryPointToClinit = false;
       this.handleMaps = true;
       this.allowMultipleQueries = false;
@@ -283,11 +271,6 @@ public class BoomerangOptions {
       return this;
     }
 
-    public OptionsBuilder enableTypeCheck(boolean typeCheck) {
-      this.typeCheck = typeCheck;
-      return this;
-    }
-
     public OptionsBuilder enableOnTheFlyCallGraph(boolean onTheFlyCallGraph) {
       this.onTheFlyCallGraph = onTheFlyCallGraph;
       return this;
@@ -305,30 +288,6 @@ public class BoomerangOptions {
 
     public OptionsBuilder enableFieldSummaries(boolean fieldSummaries) {
       this.fieldSummaries = fieldSummaries;
-      return this;
-    }
-
-    /**
-     * Assume we have the following code:
-     *
-     * <pre>{@code
-     * Object y = null;
-     * Object x = (Object) y;
-     *
-     * }</pre>
-     *
-     * If the option 'killNullAtCast' is enabled, Boomerang does not continue the analysis with x,
-     * that is, it does not consider x as an alias of y (and vice versa). At runtime, 'null
-     * instanceof Object' evaluates to false, however the cast '(Object) null' does NOT throw a
-     * ClassCastException. Therefore, enabling this option models the runtime behavior more
-     * consistent.
-     *
-     * @param killNullAtCast set to 'true' if cast expressions with 'null' references should not
-     *     create an alias (default: false)
-     * @return the builder
-     */
-    public OptionsBuilder enableKillNullAtCast(boolean killNullAtCast) {
-      this.killNullAtCast = killNullAtCast;
       return this;
     }
 

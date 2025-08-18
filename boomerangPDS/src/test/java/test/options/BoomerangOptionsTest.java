@@ -61,9 +61,6 @@ public class BoomerangOptionsTest {
         BoomerangOptions.builder().withMaxUnbalancedCallDepth(1).build();
     Assertions.assertEquals(maxUnbalancedCallDepth.maxUnbalancedCallDepth(), 1);
 
-    BoomerangOptions typeCheck = BoomerangOptions.builder().enableTypeCheck(false).build();
-    Assertions.assertFalse(typeCheck.typeCheck());
-
     BoomerangOptions onTheFlyCallGraph =
         BoomerangOptions.builder().enableOnTheFlyCallGraph(true).build();
     Assertions.assertTrue(onTheFlyCallGraph.onTheFlyCallGraph());
@@ -77,9 +74,6 @@ public class BoomerangOptionsTest {
 
     BoomerangOptions fieldSummaries = BoomerangOptions.builder().enableFieldSummaries(true).build();
     Assertions.assertTrue(fieldSummaries.fieldSummaries());
-
-    BoomerangOptions killNullAtCast = BoomerangOptions.builder().enableKillNullAtCast(true).build();
-    Assertions.assertTrue(killNullAtCast.killNullAtCast());
 
     BoomerangOptions trackStaticFieldAtEntryPointToClinit =
         BoomerangOptions.builder().enableTrackStaticFieldAtEntryPointToClinit(true).build();

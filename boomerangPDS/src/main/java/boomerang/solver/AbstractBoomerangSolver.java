@@ -127,9 +127,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
           addTransitionToStatement(t.getStart().fact().stmt(), t);
         });
     this.callAutomaton.registerListener(
-        (t, w, aut) -> {
-          addCallTransitionToStatement(t.getLabel(), t, w);
-        });
+        (t, w, aut) -> addCallTransitionToStatement(t.getLabel(), t, w));
     this.callAutomaton.registerListener(new UnbalancedListener());
     this.generatedFieldState = genField;
   }
@@ -167,16 +165,16 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   }
 
   public INode<Node<ControlFlowGraph.Edge, Val>> createQueryNodeField(Query query) {
-    return new SingleNode(
+    return new SingleNode<>(
         /* TODO Replace by new designated type */ new Node<>(
             query.cfgEdge(), query.asNode().fact().asUnbalanced(query.cfgEdge())));
   }
 
-  public void synchedEmptyStackReachable(
+  public void syncedEmptyStackReachable(
       final Node<Edge, Val> sourceNode, final EmptyStackWitnessListener<Edge, Val> listener) {
-    synchedReachable(
+    syncedReachable(
         sourceNode,
-        new WitnessListener<Edge, Val, Field>() {
+        new WitnessListener<>() {
           final Multimap<Val, Node<Edge, Val>> potentialFieldCandidate = HashMultimap.create();
           final Set<Val> potentialCallCandidate = new LinkedHashSet<>();
 
@@ -211,7 +209,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
         });
   }
 
-  public void synchedReachable(
+  public void syncedReachable(
       final Node<ControlFlowGraph.Edge, Val> sourceNode,
       final WitnessListener<ControlFlowGraph.Edge, Val, Field> listener) {
     registerListener(
@@ -286,7 +284,7 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
     if (forceUnbalanced(trans.getTarget(), callAutomaton.getUnbalancedStartOf(trans.getTarget()))) {
       icfg.addCallerListener(
-          new CallerListener<Statement, Method>() {
+          new CallerListener<>() {
 
             @Override
             public Method getObservedCallee() {
@@ -319,9 +317,9 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   }
 
   protected boolean isMatchingCallSiteCalleePair(Statement callSite, Method method) {
-    Set<Statement> callsitesOfCall = new LinkedHashSet<>();
+    Set<Statement> callSitesOfCall = new LinkedHashSet<>();
     icfg.addCallerListener(
-        new CallerListener<Statement, Method>() {
+        new CallerListener<>() {
           @Override
           public Method getObservedCallee() {
             return method;
@@ -329,10 +327,10 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
           @Override
           public void onCallerAdded(Statement statement, Method method) {
-            callsitesOfCall.add(statement);
+            callSitesOfCall.add(statement);
           }
         });
-    return callsitesOfCall.contains(callSite);
+    return callSitesOfCall.contains(callSite);
   }
 
   protected abstract void propagateUnbalancedToCallSite(
@@ -439,10 +437,6 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     return generatedFieldState.get(e);
   }
 
-  private boolean isBackward() {
-    return this instanceof BackwardBoomerangSolver;
-  }
-
   protected abstract Collection<? extends State> computeReturnFlow(
       Method method, Statement curr, Val value);
 
@@ -512,57 +506,18 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
       LOGGER.warn("Prevented illegal edge addition of {}", t);
       return true;
     }
-    if (!t.getLabel().equals(EmptyField.getInstance()) || !options.typeCheck()) {
-      return false;
-    }
-    if (t.getTarget() instanceof GeneratedState || t.getStart() instanceof GeneratedState) {
-      return false;
-    }
-    Val target = t.getTarget().fact().fact();
-    Val source = t.getStart().fact().fact();
 
-    if (source.isStatic()) {
-      return false;
-    }
-
-    Type sourceVal = source.getType();
-    Type targetVal = (isBackward() ? target.getType() : type);
-    if (sourceVal == null) {
-      return true;
-    }
-    if (sourceVal.equals(targetVal)) {
-      return false;
-    }
-    if (!(targetVal.isRefType()) || !(sourceVal.isRefType())) {
-      // A null pointer cannot be cast to any object
-      // TODO This should be more target.isNull
-      return options.killNullAtCast()
-          && targetVal.isNullType()
-          && isCastNode(
-              t.getStart().fact()); // !allocVal.value().getType().equals(varVal.value().getType());
-    }
-    return sourceVal.doesCastFail(targetVal, target);
-  }
-
-  private boolean isCastNode(Node<ControlFlowGraph.Edge, Val> node) {
-    boolean isCast = node.stmt().getStart().isCast();
-    if (isCast) {
-      Val rightOp = node.stmt().getStart().getRightOp();
-      if (rightOp.isCast()) {
-        return rightOp.getCastOp().equals(node.fact());
-      }
-    }
     return false;
   }
 
-  public Map<RegExAccessPath, W> getResultsAt(final Statement stmt) {
+  public Map<RegExAccessPath, W> getResultsAt(ControlFlowGraph.Edge edge) {
     final Map<RegExAccessPath, W> results = Maps.newHashMap();
     fieldAutomaton.registerListener(
         (t, w, aut) -> {
           if (t.getStart() instanceof GeneratedState) {
             return;
           }
-          if (t.getStart().fact().stmt().equals(stmt)) {
+          if (t.getStart().fact().stmt().equals(edge)) {
             for (INode<Node<ControlFlowGraph.Edge, Val>> initState :
                 fieldAutomaton.getInitialStates()) {
               IRegEx<Field> regEx = fieldAutomaton.toRegEx(t.getStart(), initState);
@@ -603,13 +558,13 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     return results;
   }
 
-  public void debugFieldAutomaton(final Statement stmt) {
+  public void debugFieldAutomaton(ControlFlowGraph.Edge edge) {
     fieldAutomaton.registerListener(
         (t, w, aut) -> {
           if (t.getStart() instanceof GeneratedState) {
             return;
           }
-          if (t.getStart().fact().stmt().equals(stmt)) {
+          if (t.getStart().fact().stmt().equals(edge)) {
             for (INode<Node<ControlFlowGraph.Edge, Val>> initState :
                 fieldAutomaton.getInitialStates()) {
               IRegEx<Field> regEx = fieldAutomaton.toRegEx(t.getStart(), initState);

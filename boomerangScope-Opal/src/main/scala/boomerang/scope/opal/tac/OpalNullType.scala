@@ -34,8 +34,6 @@ object OpalNullType extends Type {
     "Null type has no declaring class"
   )
 
-  override def doesCastFail(targetVal: Type, target: Val): Boolean = true
-
   override def isSubtypeOf(superType: String): Boolean = false
 
   override def isSupertypeOf(subType: String): Boolean = false
