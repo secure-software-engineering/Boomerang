@@ -69,7 +69,13 @@ public class BoomerangOptions {
     return new OptionsBuilder();
   }
 
-  public void checkValid() {}
+  public void checkValid() {
+    if (builder.trackStaticFieldAtEntryPointToClinit
+        && builder.staticFieldStrategy != Strategies.StaticFieldStrategy.FLOW_SENSITIVE) {
+      throw new RuntimeException(
+          "The 'trackStaticFieldAtEntryPointToClinit' requires the static field strategy 'Flow Sensitive'");
+    }
+  }
 
   public IAllocationSite allocationSite() {
     return builder.allocationSite;

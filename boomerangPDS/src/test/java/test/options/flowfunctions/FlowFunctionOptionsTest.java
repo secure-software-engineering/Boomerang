@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test.options;
+package test.options.flowfunctions;
 
 import boomerang.flowfunction.FlowFunctionOptions;
 import org.junit.jupiter.api.Assertions;

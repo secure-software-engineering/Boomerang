@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test.options;
+package test.options.boomerang;
 
 import boomerang.callgraph.BoomerangResolver;
 import boomerang.options.BoomerangOptions;

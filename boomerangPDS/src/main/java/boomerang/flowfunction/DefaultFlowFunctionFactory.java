@@ -16,6 +16,7 @@ package boomerang.flowfunction;
 
 import boomerang.options.BoomerangOptions;
 import boomerang.scope.FrameworkScope;
+import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
@@ -35,13 +36,7 @@ public class DefaultFlowFunctionFactory implements IFlowFunctionFactory {
   @Override
   public IForwardFlowFunction createForwardFlowFunction(
       FrameworkScope frameworkScope, BoomerangOptions options, ForwardBoomerangSolver<?> solver) {
-    Strategies strategies =
-        new Strategies(
-            options.getStaticFieldStrategy(),
-            options.getArrayStrategy(),
-            solver,
-            frameworkScope.getCallGraph().getFieldLoadStatements(),
-            frameworkScope.getCallGraph().getFieldStoreStatements());
+    Strategies strategies = createStrategies(frameworkScope, options, solver);
 
     return new DefaultForwardFlowFunction(strategies, flowFunctionOptions);
   }
@@ -49,15 +44,19 @@ public class DefaultFlowFunctionFactory implements IFlowFunctionFactory {
   @Override
   public IBackwardFlowFunction createBackwardFlowFunction(
       FrameworkScope frameworkScope, BoomerangOptions options, BackwardBoomerangSolver<?> solver) {
-    Strategies strategies =
-        new Strategies(
-            options.getStaticFieldStrategy(),
-            options.getArrayStrategy(),
-            solver,
-            frameworkScope.getCallGraph().getFieldLoadStatements(),
-            frameworkScope.getCallGraph().getFieldStoreStatements());
+    Strategies strategies = createStrategies(frameworkScope, options, solver);
 
     return new DefaultBackwardFlowFunction(
         options.allocationSite(), strategies, flowFunctionOptions);
+  }
+
+  protected Strategies createStrategies(
+      FrameworkScope frameworkScope, BoomerangOptions options, AbstractBoomerangSolver<?> solver) {
+    return new Strategies(
+        options.getStaticFieldStrategy(),
+        options.getArrayStrategy(),
+        solver,
+        frameworkScope.getCallGraph().getFieldLoadStatements(),
+        frameworkScope.getCallGraph().getFieldStoreStatements());
   }
 }
