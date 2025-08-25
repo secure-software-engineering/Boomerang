@@ -41,7 +41,7 @@ public class StaticFieldStrategyTest {
       expectedAllocSites = {"direct"},
       staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON)
   public void directSingletonTest() {
-    OptionAssertions.queryForString(directSingleton);
+    OptionAssertions.queryFor(directSingleton);
   }
 
   @Test
@@ -50,7 +50,7 @@ public class StaticFieldStrategyTest {
       staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON)
   public void indirectSingletonTest() {
     String s = getInstance();
-    OptionAssertions.queryForString(s);
+    OptionAssertions.queryFor(s);
   }
 
   @Test
@@ -59,7 +59,7 @@ public class StaticFieldStrategyTest {
       staticFieldStrategy = Strategies.StaticFieldStrategy.SINGLETON)
   public void redefinedSingletonTest() {
     directSingleton = "insideDirect";
-    OptionAssertions.queryForString(directSingleton);
+    OptionAssertions.queryFor(directSingleton);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class StaticFieldStrategyTest {
       staticFieldStrategy = Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
   public void positiveFlowSensitiveWithoutEntryPointsTest() {
     flowSensitiveStaticField = "insideFlowSensitive";
-    OptionAssertions.queryForString(flowSensitiveStaticField);
+    OptionAssertions.queryFor(flowSensitiveStaticField);
   }
 
   @Test
@@ -76,7 +76,7 @@ public class StaticFieldStrategyTest {
       expectedAllocSites = {},
       staticFieldStrategy = Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
   public void negativeFlowSensitiveWithoutEntryPointsTest() {
-    OptionAssertions.queryForString(flowSensitiveStaticField);
+    OptionAssertions.queryFor(flowSensitiveStaticField);
   }
 
   @Test
@@ -85,7 +85,7 @@ public class StaticFieldStrategyTest {
       staticFieldStrategy = Strategies.StaticFieldStrategy.FLOW_SENSITIVE,
       trackStaticFieldAtEntryPointToClinit = true)
   public void flowSensitiveWithEntryPoints() {
-    OptionAssertions.queryForString(flowSensitiveStaticField);
+    OptionAssertions.queryFor(flowSensitiveStaticField);
   }
 
   @Test
@@ -93,7 +93,7 @@ public class StaticFieldStrategyTest {
       expectedAllocSites = {},
       staticFieldStrategy = Strategies.StaticFieldStrategy.IGNORE)
   public void ignoreStaticFieldsTest1() {
-    OptionAssertions.queryForString(directSingleton);
+    OptionAssertions.queryFor(directSingleton);
   }
 
   @Test
@@ -102,6 +102,6 @@ public class StaticFieldStrategyTest {
       staticFieldStrategy = Strategies.StaticFieldStrategy.IGNORE)
   public void ignoreStaticFieldsTest2() {
     flowSensitiveStaticField = "indirect";
-    OptionAssertions.queryForString(flowSensitiveStaticField);
+    OptionAssertions.queryFor(flowSensitiveStaticField);
   }
 }

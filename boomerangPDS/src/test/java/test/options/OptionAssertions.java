@@ -16,7 +16,7 @@ package test.options;
 
 public class OptionAssertions {
 
-  public static final String QUERY_FOR_STRING = "queryForString";
+  public static final String QUERY_FOR = "queryFor";
 
-  public static void queryForString(@SuppressWarnings("unused") Object o) {}
+  public static void queryFor(@SuppressWarnings("unused") Object o) {}
 }

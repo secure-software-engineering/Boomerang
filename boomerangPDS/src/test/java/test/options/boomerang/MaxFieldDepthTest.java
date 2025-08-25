@@ -39,7 +39,7 @@ public class MaxFieldDepthTest {
     // TODO null should not be an allocation site
     FirstLayer firstLayer = new FirstLayer();
     firstLayer.secondLayer.field = "field";
-    OptionAssertions.queryForString(firstLayer.secondLayer.field);
+    OptionAssertions.queryFor(firstLayer.secondLayer.field);
   }
 
   @Test
@@ -49,6 +49,6 @@ public class MaxFieldDepthTest {
   public void negativeMaxFieldDepth() {
     FirstLayer firstLayer = new FirstLayer();
     firstLayer.secondLayer.field = "field";
-    OptionAssertions.queryForString(firstLayer.secondLayer.field);
+    OptionAssertions.queryFor(firstLayer.secondLayer.field);
   }
 }

@@ -29,7 +29,7 @@ public class MaxCallDepthTest {
       maxCallDepth = 3)
   public void positiveMaxCallDepthTest() {
     String s = call1();
-    OptionAssertions.queryForString(s);
+    OptionAssertions.queryFor(s);
   }
 
   @Test
@@ -38,7 +38,7 @@ public class MaxCallDepthTest {
       maxCallDepth = 2)
   public void negativeMaxCallDepthTest() {
     String s = call1();
-    OptionAssertions.queryForString(s);
+    OptionAssertions.queryFor(s);
   }
 
   public String call1() {

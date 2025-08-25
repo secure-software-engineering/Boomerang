@@ -34,7 +34,7 @@ public class TimeoutTest {
   @TestOptions(expectedAllocSites = "timeout", flowFunctionFactory = TimeoutFlowFunctions.class)
   public void noTimeoutTest() {
     String s = "timeout";
-    OptionAssertions.queryForString(s);
+    OptionAssertions.queryFor(s);
   }
 
   @Test
@@ -44,7 +44,7 @@ public class TimeoutTest {
       timeout = 10000)
   public void positiveTimeoutTest() {
     String s = "timeout";
-    OptionAssertions.queryForString(s);
+    OptionAssertions.queryFor(s);
   }
 
   @Test
@@ -54,14 +54,16 @@ public class TimeoutTest {
       timeout = 1000)
   public void negativeTimeoutTest() {
     String s = "timeout";
-    OptionAssertions.queryForString(s);
+    OptionAssertions.queryFor(s);
   }
 
   /**
-   * Flow function that adds a timeout of 2 seconds to each backward step. This way, we can delay
-   * Boomerang's execution, leading to timeouts
+   * Flow function that adds a timeout of 2 seconds for the first backward step. This way, we can
+   * delay Boomerang's execution, leading to timeouts
    */
   public static class TimeoutFlowFunctions extends DefaultFlowFunctionFactory {
+
+    private boolean appliedTimeout = false;
 
     @Override
     public IBackwardFlowFunction createBackwardFlowFunction(
@@ -71,7 +73,10 @@ public class TimeoutTest {
       Strategies strategies = createStrategies(frameworkScope, options, solver);
 
       try {
-        Thread.sleep(2000);
+        if (!appliedTimeout) {
+          Thread.sleep(2000);
+          appliedTimeout = true;
+        }
       } catch (InterruptedException ignored) {
       }
 

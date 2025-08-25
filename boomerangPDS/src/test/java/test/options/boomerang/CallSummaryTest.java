@@ -14,7 +14,7 @@
  */
 package test.options.boomerang;
 
-import boomerang.solver.Strategies;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import test.options.OptionAssertions;
@@ -22,32 +22,30 @@ import test.options.OptionsTestInterceptor;
 import test.options.TestOptions;
 
 @ExtendWith(OptionsTestInterceptor.class)
-public class ArrayStrategyTest {
+public class CallSummaryTest {
 
   @Test
-  @TestOptions(
-      expectedAllocSites = {"there"},
-      arrayStrategy = Strategies.ArrayStrategy.INDEX_SENSITIVE)
-  public void indexSensitiveTest() {
-    String[] s = new String[] {"Hello", "there"};
-    OptionAssertions.queryFor(s[1]);
+  @TestOptions(expectedAllocSites = {"summary"})
+  public void disabledCallSummaryTest() {
+    String s = "summary";
+    String s1 = identity(s);
+    String s2 = identity(s1);
+    OptionAssertions.queryFor(s2);
   }
 
+  @Disabled("TODO Throws a NullPointerException")
   @Test
   @TestOptions(
-      expectedAllocSites = {"new java.lang.String[]", "Hello", "there"},
-      arrayStrategy = Strategies.ArrayStrategy.INDEX_INSENSITIVE)
-  public void indexInsensitiveTest() {
-    String[] s = new String[] {"Hello", "there"};
-    OptionAssertions.queryFor(s[0]);
+      expectedAllocSites = {"summary"},
+      callSummaries = true)
+  public void enabledCallSummaryTest() {
+    String s = "summary";
+    String s1 = identity(s);
+    String s2 = identity(s1);
+    OptionAssertions.queryFor(s2);
   }
 
-  @Test
-  @TestOptions(
-      expectedAllocSites = {},
-      arrayStrategy = Strategies.ArrayStrategy.DISABLED)
-  public void disabledTest() {
-    String[] s = new String[] {"Hello", "there"};
-    OptionAssertions.queryFor(s[1]);
+  public String identity(String s) {
+    return s;
   }
 }

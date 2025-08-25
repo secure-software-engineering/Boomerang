@@ -85,6 +85,8 @@ public class OptionsTestInterceptor implements InvocationInterceptor, AfterEachC
             testOptions.trackStaticFieldAtEntryPointToClinit())
         .withMaxFieldDepth(testOptions.maxFieldDepth())
         .withMaxCallDepth(testOptions.maxCallDepth())
+        .enableCallSummaries(testOptions.callSummaries())
+        .enableFieldSummaries(testOptions.fieldSummaries())
         .withAnalysisTimeout(testOptions.timeout())
         .build();
   }

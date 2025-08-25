@@ -40,5 +40,9 @@ public @interface TestOptions {
 
   int maxCallDepth() default -1;
 
+  boolean callSummaries() default false;
+
+  boolean fieldSummaries() default false;
+
   int timeout() default -1;
 }

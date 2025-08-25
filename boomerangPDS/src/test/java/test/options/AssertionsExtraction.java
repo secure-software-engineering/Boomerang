@@ -44,7 +44,7 @@ public class AssertionsExtraction extends AnalysisScope {
           .getDeclaringClass()
           .getFullyQualifiedName()
           .equals(OptionAssertions.class.getName())) {
-        if (declaredMethod.getName().equals(OptionAssertions.QUERY_FOR_STRING)) {
+        if (declaredMethod.getName().equals(OptionAssertions.QUERY_FOR)) {
           Val arg = invokeExpr.getArg(0);
           BackwardQuery query = BackwardQuery.make(edge, arg);
 

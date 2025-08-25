@@ -14,7 +14,7 @@
  */
 package test.options.boomerang;
 
-import boomerang.solver.Strategies;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import test.options.OptionAssertions;
@@ -22,32 +22,42 @@ import test.options.OptionsTestInterceptor;
 import test.options.TestOptions;
 
 @ExtendWith(OptionsTestInterceptor.class)
-public class ArrayStrategyTest {
+public class FieldSummaryTest {
 
   @Test
-  @TestOptions(
-      expectedAllocSites = {"there"},
-      arrayStrategy = Strategies.ArrayStrategy.INDEX_SENSITIVE)
-  public void indexSensitiveTest() {
-    String[] s = new String[] {"Hello", "there"};
-    OptionAssertions.queryFor(s[1]);
+  @TestOptions(expectedAllocSites = {"summary", "null"})
+  public void disabledFieldSummaryTest() {
+    String s = "summary";
+
+    Layer1 layer = new Layer1();
+    writeToField(layer, s);
+
+    OptionAssertions.queryFor(layer.layer.field);
   }
 
+  @Disabled("TODO Throws NullPointerException")
   @Test
   @TestOptions(
-      expectedAllocSites = {"new java.lang.String[]", "Hello", "there"},
-      arrayStrategy = Strategies.ArrayStrategy.INDEX_INSENSITIVE)
-  public void indexInsensitiveTest() {
-    String[] s = new String[] {"Hello", "there"};
-    OptionAssertions.queryFor(s[0]);
+      expectedAllocSites = {"summary", "null"},
+      fieldSummaries = true)
+  public void enabledFieldSummaryTest() {
+    String s = "summary";
+
+    Layer1 layer = new Layer1();
+    writeToField(layer, s);
+
+    OptionAssertions.queryFor(layer.layer.field);
   }
 
-  @Test
-  @TestOptions(
-      expectedAllocSites = {},
-      arrayStrategy = Strategies.ArrayStrategy.DISABLED)
-  public void disabledTest() {
-    String[] s = new String[] {"Hello", "there"};
-    OptionAssertions.queryFor(s[1]);
+  private void writeToField(Layer1 layer, String s) {
+    layer.layer.field = s;
+  }
+
+  private static class Layer1 {
+    private final Layer2 layer = new Layer2();
+  }
+
+  private static class Layer2 {
+    private String field;
   }
 }
