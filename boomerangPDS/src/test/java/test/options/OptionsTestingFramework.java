@@ -87,6 +87,10 @@ public class OptionsTestingFramework extends TestingFramework {
         actualAllocSiteStrings.add(allocVal.getStringValue());
       } else if (allocVal.isIntConstant()) {
         actualAllocSiteStrings.add(String.valueOf(allocVal.getIntValue()));
+      } else if (allocVal.isConstant()) {
+        actualAllocSiteStrings.add(allocVal.toString());
+      } else if (allocVal.isNull()) {
+        actualAllocSiteStrings.add(allocVal.toString());
       }
     }
 
