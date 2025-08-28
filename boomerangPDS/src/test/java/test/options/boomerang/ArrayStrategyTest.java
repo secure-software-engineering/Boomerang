@@ -35,7 +35,7 @@ public class ArrayStrategyTest {
 
   @Test
   @TestOptions(
-      expectedAllocSites = {"new java.lang.String[]", "Hello", "there"},
+      expectedAllocSites = {"Hello", "there"},
       arrayStrategy = Strategies.ArrayStrategy.INDEX_INSENSITIVE)
   public void indexInsensitiveTest() {
     String[] s = new String[] {"Hello", "there"};

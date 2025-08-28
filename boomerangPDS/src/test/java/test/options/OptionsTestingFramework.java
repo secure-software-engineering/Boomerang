@@ -22,7 +22,9 @@ import boomerang.options.BoomerangOptions;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.scope.AllocVal;
 import boomerang.scope.DataFlowScope;
+import boomerang.scope.DeclaredMethod;
 import boomerang.scope.FrameworkScope;
+import boomerang.scope.Method;
 import boomerang.scope.Val;
 import boomerang.utils.MethodWrapper;
 import java.util.Arrays;
@@ -45,11 +47,7 @@ public class OptionsTestingFramework extends TestingFramework {
       BoomerangOptions options,
       String[] expectedAllocSites) {
     analyze(
-        targetClassName,
-        targetMethodName,
-        options,
-        DataFlowScope.EXCLUDE_PHANTOM_CLASSES,
-        expectedAllocSites);
+        targetClassName, targetMethodName, options, new OptionsDataFlowScope(), expectedAllocSites);
   }
 
   public void analyze(
@@ -87,8 +85,8 @@ public class OptionsTestingFramework extends TestingFramework {
 
       if (allocVal.isStringConstant()) {
         actualAllocSiteStrings.add(allocVal.getStringValue());
-      } else {
-        actualAllocSiteStrings.add(allocVal.toString());
+      } else if (allocVal.isIntConstant()) {
+        actualAllocSiteStrings.add(String.valueOf(allocVal.getIntValue()));
       }
     }
 
@@ -117,5 +115,28 @@ public class OptionsTestingFramework extends TestingFramework {
     }
 
     return allocSites;
+  }
+
+  /**
+   * For some reason, Soot does not consider the Object and String class as phantom, i.e. the
+   * analysis tries to find data flows within these classes. Hence, we have to exclude them
+   * manually.
+   */
+  private static class OptionsDataFlowScope implements DataFlowScope {
+
+    private final Collection<String> excludedClasses =
+        Set.of(Object.class.getName(), String.class.getName());
+
+    @Override
+    public boolean isExcluded(DeclaredMethod method) {
+      return method.getDeclaringClass().isPhantom()
+          || excludedClasses.contains(method.getDeclaringClass().getFullyQualifiedName());
+    }
+
+    @Override
+    public boolean isExcluded(Method method) {
+      return method.getDeclaringClass().isPhantom()
+          || excludedClasses.contains(method.getDeclaringClass().getFullyQualifiedName());
+    }
   }
 }
