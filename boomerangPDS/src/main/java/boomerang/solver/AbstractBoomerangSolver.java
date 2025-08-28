@@ -114,7 +114,9 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
         fieldSummaries,
         options.maxCallDepth(),
         options.maxFieldDepth(),
-        options.maxUnbalancedCallDepth());
+        options.maxUnbalancedCallDepth(),
+        options.isFieldSensitive(),
+        options.isContextSensitive());
     this.options = options;
     this.icfg = icfg;
     this.cfg = cfg;

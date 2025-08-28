@@ -117,6 +117,14 @@ public class BoomerangOptions {
     return builder.maxUnbalancedCallDepth;
   }
 
+  public boolean isFieldSensitive() {
+    return builder.fieldSensitivity;
+  }
+
+  public boolean isContextSensitive() {
+    return builder.contextSensitivity;
+  }
+
   public boolean onTheFlyCallGraph() {
     return builder.onTheFlyCallGraph;
   }
@@ -167,6 +175,8 @@ public class BoomerangOptions {
     private int maxCallDepth;
     private int maxUnbalancedCallDepth;
 
+    private boolean fieldSensitivity;
+    private boolean contextSensitivity;
     private boolean onTheFlyCallGraph;
     private boolean onTheFlyControlFlow;
     private boolean callSummaries;
@@ -190,6 +200,8 @@ public class BoomerangOptions {
       this.maxCallDepth = -1;
       this.maxUnbalancedCallDepth = -1;
 
+      this.fieldSensitivity = true;
+      this.contextSensitivity = true;
       this.onTheFlyCallGraph = false;
       this.onTheFlyControlFlow = false;
       this.callSummaries = false;
@@ -274,6 +286,16 @@ public class BoomerangOptions {
 
     public OptionsBuilder withMaxUnbalancedCallDepth(int maxUnbalancedCallDepth) {
       this.maxUnbalancedCallDepth = maxUnbalancedCallDepth;
+      return this;
+    }
+
+    public OptionsBuilder enableFieldSensitivity(boolean fieldSensitivity) {
+      this.fieldSensitivity = fieldSensitivity;
+      return this;
+    }
+
+    public OptionsBuilder enableContextSensitivity(boolean contextSensitivity) {
+      this.contextSensitivity = contextSensitivity;
       return this;
     }
 

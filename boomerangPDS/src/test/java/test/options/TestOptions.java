@@ -40,9 +40,13 @@ public @interface TestOptions {
 
   int maxCallDepth() default -1;
 
+  int timeout() default -1;
+
+  boolean fieldSensitivity() default true;
+
+  boolean contextSensitivity() default true;
+
   boolean callSummaries() default false;
 
   boolean fieldSummaries() default false;
-
-  int timeout() default -1;
 }

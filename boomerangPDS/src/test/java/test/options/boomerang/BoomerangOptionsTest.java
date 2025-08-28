@@ -61,6 +61,14 @@ public class BoomerangOptionsTest {
         BoomerangOptions.builder().withMaxUnbalancedCallDepth(1).build();
     Assertions.assertEquals(maxUnbalancedCallDepth.maxUnbalancedCallDepth(), 1);
 
+    BoomerangOptions fieldSensitivity =
+        BoomerangOptions.builder().enableFieldSensitivity(false).build();
+    Assertions.assertFalse(fieldSensitivity.isFieldSensitive());
+
+    BoomerangOptions contextSensitivity =
+        BoomerangOptions.builder().enableContextSensitivity(false).build();
+    Assertions.assertFalse(contextSensitivity.isContextSensitive());
+
     BoomerangOptions onTheFlyCallGraph =
         BoomerangOptions.builder().enableOnTheFlyCallGraph(true).build();
     Assertions.assertTrue(onTheFlyCallGraph.onTheFlyCallGraph());
