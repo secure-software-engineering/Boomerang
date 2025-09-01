@@ -8,6 +8,7 @@ on:
 jobs:
   deploy-snapshot:
     runs-on: ubuntu-latest
+    environment: Deploy
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
