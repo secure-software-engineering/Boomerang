@@ -20,6 +20,8 @@ import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.Map;
+
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionImpl;
@@ -58,7 +60,7 @@ public class TransitionFunctionOne implements TransitionFunction {
       return this;
     }
 
-    TransitionFunction func = (TransitionFunction) other;
+    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
     Multimap<Transition, Statement> result = HashMultimap.create(func.getStateChangeStatements());
     for (Transition t : func.getStateChangeStatements().keySet()) {
       Transition transition = new TransitionImpl(t.from(), t.from());
@@ -67,7 +69,7 @@ public class TransitionFunctionOne implements TransitionFunction {
       result.putAll(transition, statement);
     }
 
-    return new TransitionFunctionImpl(result);
+    return new TransitionFunctionImpl(result, func.getStateChangeSequences(), func.getLastStateChangeStatement());
   }
 
   public String toString() {
