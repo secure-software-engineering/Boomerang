@@ -16,7 +16,6 @@ package typestate;
 
 import static typestate.TransitionFunctionZero.zero;
 
-import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
@@ -37,8 +36,8 @@ public class TransitionFunctionOne implements TransitionFunction {
 
   @NonNull
   @Override
-  public Multimap<Transition, Statement> getStateChangeStatements() {
-    throw new IllegalStateException("TransitionFunctionOne.getStateChangeStatements() - don't");
+  public Multimap<Transition, StatementSequence> getStateChangeSequences() {
+    return HashMultimap.create();
   }
 
   @NonNull
@@ -51,23 +50,26 @@ public class TransitionFunctionOne implements TransitionFunction {
   @Override
   public Weight combineWith(@NonNull Weight other) {
     if (!(other instanceof TransitionFunction)) {
-      throw new IllegalStateException("should not happen!");
+      throw new IllegalStateException(
+          "Cannot combine TransitionFunction with non TransitionsFunction");
     }
 
     if (other == zero() || other == one()) {
       return this;
     }
 
-    TransitionFunction func = (TransitionFunction) other;
-    Multimap<Transition, Statement> result = HashMultimap.create(func.getStateChangeStatements());
-    for (Transition t : func.getStateChangeStatements().keySet()) {
+    TransitionFunctionImpl func = (TransitionFunctionImpl) other;
+    Multimap<Transition, StatementSequence> result =
+        HashMultimap.create(func.getStateChangeSequences());
+    for (Transition t : func.getStateChangeSequences().keySet()) {
       Transition transition = new TransitionImpl(t.from(), t.from());
-      Collection<Statement> statement = func.getStateChangeStatements().get(t);
+      Collection<StatementSequence> statement = func.getStateChangeSequences().get(t);
 
       result.putAll(transition, statement);
     }
 
-    return new TransitionFunctionImpl(result);
+    return new TransitionFunctionImpl(
+        func.getStateChangeSequences(), func.getStateChangeStatement());
   }
 
   public String toString() {
