@@ -45,7 +45,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
       @NonNull Transition transition, @NonNull Statement stateChangeStatement) {
     this.stateChangeStatements = ImmutableMultimap.of(transition, stateChangeStatement);
 
-    this.stateChangeSequences = ImmutableMultimap.of(transition, new StatementSequence(stateChangeStatement));
+    this.stateChangeSequences = ImmutableMultimap.of(transition, new StatementSequence(new StatementSequence.Entry(stateChangeStatement, transition)));
     this.lastStateChangeStatement = stateChangeStatement;
   }
 
@@ -60,7 +60,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
 
     Multimap<Transition, StatementSequence> sequencesMap = HashMultimap.create();
     for (Transition transition : transitions) {
-      sequencesMap.put(transition, new StatementSequence(stateChangeStatement));
+      sequencesMap.put(transition, new StatementSequence(new StatementSequence.Entry(stateChangeStatement, transition)));
     }
 
     this.stateChangeSequences = ImmutableMultimap.copyOf(sequencesMap);
@@ -123,8 +123,8 @@ public class TransitionFunctionImpl implements TransitionFunction {
 
           Collection<StatementSequence> firstSequences = stateChangeSequences.get(first);
           for (StatementSequence sequence : firstSequences) {
-            List<Statement> statementList = new ArrayList<>(sequence.getSequence());
-            statementList.add(func.getLastStateChangeStatement());
+            List<StatementSequence.Entry> statementList = new ArrayList<>(sequence.getSequence());
+            statementList.add(new StatementSequence.Entry(func.getLastStateChangeStatement(), second));
 
             sequences.put(transition, new StatementSequence(statementList));
           }
