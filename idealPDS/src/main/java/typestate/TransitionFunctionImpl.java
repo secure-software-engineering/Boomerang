@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 import typestate.finiteautomata.TransitionIdentity;
@@ -34,7 +35,7 @@ import wpds.impl.Weight;
 public class TransitionFunctionImpl implements TransitionFunction {
 
   @NonNull private final Multimap<Transition, StatementSequence> stateChangeSequences;
-  @NonNull private final Statement lastStateChangeStatement;
+  @NonNull private final Statement stateChangeStatement;
 
   public TransitionFunctionImpl(
       @NonNull Transition transition, @NonNull Statement stateChangeStatement) {
@@ -42,7 +43,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
         ImmutableMultimap.of(
             transition,
             new StatementSequence(new StatementSequence.Entry(stateChangeStatement, transition)));
-    this.lastStateChangeStatement = stateChangeStatement;
+    this.stateChangeStatement = stateChangeStatement;
   }
 
   public TransitionFunctionImpl(
@@ -55,14 +56,14 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
 
     this.stateChangeSequences = ImmutableMultimap.copyOf(sequencesMap);
-    this.lastStateChangeStatement = stateChangeStatement;
+    this.stateChangeStatement = stateChangeStatement;
   }
 
   public TransitionFunctionImpl(
       @NonNull Multimap<Transition, StatementSequence> transitionStatementSequences,
       @NonNull Statement stateChangeStatement) {
     this.stateChangeSequences = ImmutableMultimap.copyOf(transitionStatementSequences);
-    this.lastStateChangeStatement = stateChangeStatement;
+    this.stateChangeStatement = stateChangeStatement;
   }
 
   @NonNull
@@ -71,8 +72,8 @@ public class TransitionFunctionImpl implements TransitionFunction {
     return stateChangeSequences;
   }
 
-  public Statement getLastStateChangeStatement() {
-    return lastStateChangeStatement;
+  public Statement getStateChangeStatement() {
+    return stateChangeStatement;
   }
 
   @NonNull
@@ -104,15 +105,24 @@ public class TransitionFunctionImpl implements TransitionFunction {
           Collection<StatementSequence> sequences = stateChangeSequences.get(first);
           for (StatementSequence sequence : sequences) {
             List<StatementSequence.Entry> statementList = new ArrayList<>(sequence.getSequence());
-            statementList.add(
-                new StatementSequence.Entry(func.getLastStateChangeStatement(), second));
+            Collection<Statement> statements =
+                statementList.stream()
+                    .map(StatementSequence.Entry::getStatement)
+                    .collect(Collectors.toSet());
+
+            // Avoid loops: if a statement is already in a sequence, it should not be added again
+            // (happens in loops)
+            if (!statements.contains(func.getStateChangeStatement())) {
+              statementList.add(
+                  new StatementSequence.Entry(func.getStateChangeStatement(), second));
+            }
 
             result.put(transition, new StatementSequence(statementList));
           }
         }
       }
     }
-    return new TransitionFunctionImpl(result, func.lastStateChangeStatement);
+    return new TransitionFunctionImpl(result, func.stateChangeStatement);
   }
 
   @NonNull
@@ -136,7 +146,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
         transitions.putAll(idTransition, statements);
       }
 
-      return new TransitionFunctionImpl(transitions, this.lastStateChangeStatement);
+      return new TransitionFunctionImpl(transitions, this.stateChangeStatement);
     }
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -145,7 +155,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
     sequences.putAll(stateChangeSequences);
     sequences.putAll(func.stateChangeSequences);
 
-    return new TransitionFunctionImpl(sequences, func.lastStateChangeStatement);
+    return new TransitionFunctionImpl(sequences, func.stateChangeStatement);
   }
 
   @Override
@@ -159,11 +169,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (o == null || getClass() != o.getClass()) return false;
     TransitionFunctionImpl that = (TransitionFunctionImpl) o;
     return Objects.equals(stateChangeSequences, that.stateChangeSequences)
-        && Objects.equals(lastStateChangeStatement, that.lastStateChangeStatement);
+        && Objects.equals(stateChangeStatement, that.stateChangeStatement);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(stateChangeSequences, lastStateChangeStatement);
+    return Objects.hash(stateChangeSequences, stateChangeStatement);
   }
 }

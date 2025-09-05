@@ -69,7 +69,7 @@ public class TransitionFunctionOne implements TransitionFunction {
     }
 
     return new TransitionFunctionImpl(
-        func.getStateChangeSequences(), func.getLastStateChangeStatement());
+        func.getStateChangeSequences(), func.getStateChangeStatement());
   }
 
   public String toString() {
