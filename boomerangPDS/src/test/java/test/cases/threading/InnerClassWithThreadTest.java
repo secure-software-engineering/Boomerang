@@ -17,11 +17,15 @@ package test.cases.threading;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import test.TestingFramework;
 import test.core.BoomerangTestRunnerInterceptor;
 import test.core.QueryMethods;
+import test.core.TestConfig;
+import test.core.TestParameters;
 import test.core.selfrunning.AllocatedObject;
 
 @ExtendWith(BoomerangTestRunnerInterceptor.class)
+@TestConfig(includedClasses = {"java.lang.Thread"})
 public class InnerClassWithThreadTest {
 
   private static ThreadingAlloc param;
@@ -73,6 +77,8 @@ public class InnerClassWithThreadTest {
   }
 
   @Test
+  @TestParameters(
+      skipFramework = {TestingFramework.Framework.SOOT_UP, TestingFramework.Framework.OPAL})
   public void threadQuery() {
     for (int i = 1; i < 3; i++) {
       Thread t = new MyThread();
