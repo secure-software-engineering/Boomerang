@@ -3,7 +3,7 @@
 Boomerang defines its own scope that is not related to any static analysis framework.
 The scope consists of a set of interfaces and classes that specify relevant information required by Boomerang to perform its analyses. 
 Currently, we provide a scope implementations for the static analysis frameworks [Soot](https://github.com/soot-oss/soot), [SootUp](https://github.com/soot-oss/sootup) and [Opal](https://github.com/opalj/opal) (see the [FrameworkScopes](framework_scopes.md)).
-The scopes contain implementations for all relevant interfaces and objects s.t. Boomerang can be used with those frameworks without the need of additional implementation.
+The scopes contain implementations for all relevant interfaces and objects such that Boomerang can be used with those frameworks without the need of additional work.
 
 ## Dealing with Framework Objects
 
@@ -185,6 +185,8 @@ public class ExtendedDataFlowScope implements DataFlowScope {
     To deal with such cases, we provide a solution when defining the [AllocationSite](./../boomerang/allocation_sites.md#allocation-site-with-dataflowscope)
 
 ## Queries
+
+// TODO ForwardQueries and BackwardQueries
 
 ## AnalysisScope
 

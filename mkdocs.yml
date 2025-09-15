@@ -9,6 +9,7 @@ nav:
       - Installation: general/installation.md
       - Boomerang Scope: general/boomerang_scope.md
       - Framework Scopes: general/framework_scopes.md
+      - Android Setup: general/android_setup.md
   - Boomerang:
       - Boomerang Setup: boomerang/boomerang_setup.md
       - Options: boomerang/options.md
