@@ -8,6 +8,7 @@ on:
 jobs:
   deploy-snapshot:
     runs-on: ubuntu-latest
+    name: Deploy SNAPSHOT version
     environment: Deploy
     steps:
       - name: Checkout source code
@@ -18,8 +19,9 @@ jobs:
         with:
           java-distribution: adopt
           java-version: 11
-          maven-username: ${{ secrets.SONATYPE_USER }}
-          maven-token: ${{ secrets.SONATYPE_PW }}
+          server-id: central
+          server-username: ${{ secrets.MAVEN_USERNAME }}
+          server-password: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
           mvn-cli-args: '-DskipTests -Pdeployment'
