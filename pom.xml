@@ -369,6 +369,15 @@
                             <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
+                    <!-- Disable the default deplpy plugin to avoid clashes with the central-publishing plugin -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>3.1.4</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
