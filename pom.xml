@@ -365,11 +365,12 @@
                         <configuration>
                             <!-- Same id as in the deployment workflow -->
                             <publishingServerId>central</publishingServerId>
+                            <centralSnapshotsUrl>https://s01.oss.sonatype.org/content/repositories/snapshots/</centralSnapshotsUrl>
                             <waitUntil>published</waitUntil>
                             <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
-                    <!-- Disable the default deplpy plugin to avoid clashes with the central-publishing plugin -->
+                    <!-- Disable the default deploy plugin to avoid clashes with the central-publishing plugin -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
