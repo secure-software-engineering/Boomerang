@@ -368,15 +368,10 @@
                             <publishingServerId>central</publishingServerId>
                             <waitUntil>published</waitUntil>
                             <autoPublish>true</autoPublish>
-                        </configuration>
-                    </plugin>
-                    <!-- Disable the default deploy plugin to avoid clashes with the central-publishing plugin -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>3.1.4</version>
-                        <configuration>
-                            <skip>true</skip>
+                            <excludeArtifacts>
+                                <exclude>testCore</exclude>
+                                <exclude>SparseBoomerangCorrectness</exclude>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                 </plugins>
