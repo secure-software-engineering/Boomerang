@@ -22,7 +22,11 @@ concurrency: pages
 
 jobs:
   deploy-preview:
-    uses: secure-software-engineering/actions/documentation/handle-pr-preview/action.yml@develop
-    with:
-      enable_comment: true
-      title_prefix: "Boomerang PR Preview: "
+    runs-on: ubuntu-latest
+    name: Deploy Documentation
+    steps:
+      - name: sad
+        uses: secure-software-engineering/actions/documentation/handle-pr-preview/action.yml@develop
+        with:
+          enable_comment: true
+          title_prefix: "Boomerang PR Preview: "
