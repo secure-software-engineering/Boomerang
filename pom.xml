@@ -363,9 +363,9 @@
                         <version>0.8.0</version>
                         <extensions>true</extensions>
                         <configuration>
+                            <deploymentName>${project.artifactId} ${project.version}</deploymentName>
                             <!-- Same id as in the deployment workflow -->
                             <publishingServerId>central</publishingServerId>
-                            <centralSnapshotsUrl>https://s01.oss.sonatype.org/content/repositories/snapshots/</centralSnapshotsUrl>
                             <waitUntil>published</waitUntil>
                             <autoPublish>true</autoPublish>
                         </configuration>
