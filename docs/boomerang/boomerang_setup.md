@@ -5,7 +5,7 @@ Starting at a specific statement, it traverses the program and its data-flow pat
 While doing that, it computes relevant alias information.
 
 In the following sections, we give an overview of relevant constructs and API calls. 
-We highly recommend to take a look at the [Examples](./../boomerang/examples.md) to see the best way to combine these constructs.
+We highly recommend to take a look at the examples to see the best way to combine these constructs.
 
 ## Backward Queries
 

@@ -14,7 +14,8 @@ nav:
       - Boomerang Setup: boomerang/boomerang_setup.md
       - Options: boomerang/options.md
       - Allocation Sites: boomerang/allocation_sites.md
-      - Examples: boomerang/examples.md
+  - Examples:
+      - Taint Analysis: examples/taint_analysis.md
 
 theme:
   name: material

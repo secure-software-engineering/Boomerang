@@ -26,7 +26,7 @@ import java.util.Set;
 
 public class Main {
 
-  private static final String appToAnalyze = "./targets/BranchingSingleExample.jar";
+  private static final String appToAnalyze = "./targets/IntraProceduralFieldsExample.jar";
 
   private static final Collection<MethodWrapper> sources =
       Set.of(new MethodWrapper("taints.SourceClass", "source", "java.lang.String"));

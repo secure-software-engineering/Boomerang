@@ -43,7 +43,7 @@ Each framework scope consists of the following objects:
 - A set of entry point methods
 
 Boomerang uses the framework scope to access the main instance, call graph and data-flow scope during the analysis.
-Additionally, you may specify a set of entry point methods that define the starting points in the call graph when using the [AnalysisScope](boomerang_scope.md#AnalysisScope).
+Additionally, you may specify a set of entry point methods that define the starting points in the call graph when using the [AnalysisScope](boomerang_scope.md#analysisscope).
 
 ## Transformations
 
