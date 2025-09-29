@@ -16,17 +16,18 @@ on:
     paths:
       - 'mkdocs.yml'
       - 'docs/**'
-      - '.github/workflows/deploy-pr-preview.yml'
+      - 'documentation-pr-preview.yml'
 
 concurrency: pages
 
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
-    name: Deploy Documentation
+    name: Deploy Documentation Preview
     steps:
       - name: sad
-        uses: secure-software-engineering/actions/documentation/handle-pr-preview/action.yml@develop
+        uses: secure-software-engineering/actions/documentation/handle-pr-preview@develop
         with:
           enable_comment: true
-          title_prefix: "Boomerang PR Preview: "
+          name: ${{ github.base_ref }}
+          title: "Boomerang PR Preview: "

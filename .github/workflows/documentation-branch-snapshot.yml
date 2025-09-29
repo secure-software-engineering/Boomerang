@@ -14,7 +14,7 @@ on:
     paths:
       - 'mkdocs.yml'
       - 'docs/**'
-      - '.github/workflows/deploy-branch-snapshot.yml'
+      - 'documentation-branch-snapshot.yml'
 
 concurrency: pages
 
