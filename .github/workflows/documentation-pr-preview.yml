@@ -16,7 +16,7 @@ on:
     paths:
       - 'mkdocs.yml'
       - 'docs/**'
-      - 'documentation-pr-preview.yml'
+      - '.github/workflows/documentation-pr-preview.yml'
 
 concurrency: pages
 

@@ -14,13 +14,13 @@ on:
     paths:
       - 'mkdocs.yml'
       - 'docs/**'
-      - 'documentation-branch-snapshot.yml'
+      - '.github/workflows/documentation-branch-snapshot.yml'
 
 concurrency: pages
 
 jobs:
   deploy-snapshot:
-    uses: secure-software-engineering/actions/documentation/pin-version/action.yml@develop
+    uses: secure-software-engineering/actions/documentation/handle-deployment@develop
     with:
       latest_branch: develop
       version: "maven"
