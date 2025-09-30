@@ -28,6 +28,5 @@ jobs:
       - name: sad
         uses: secure-software-engineering/actions/documentation/handle-pr-preview@develop
         with:
-          enable_comment: true
-          name: ${{ github.base_ref }}
-          title: "Boomerang PR Preview: "
+          preview-name: ${{ github.base_ref }}
+          title: "Preview: ${{ github.base_ref }}"
