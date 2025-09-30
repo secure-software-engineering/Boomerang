@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy SNAPSHOT version
-        uses: secure-software-engineering/actions/deployment/maven-deployment@maven-central-deploy
+        uses: secure-software-engineering/actions/deployment/maven-deployment@develop
         with:
           java-distribution: adopt
           java-version: 11
