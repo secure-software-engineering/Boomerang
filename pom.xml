@@ -363,20 +363,11 @@
                         <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <deploymentName>${project.artifactId} ${project.version}</deploymentName>
                             <!-- Same id as in the deployment workflow -->
                             <publishingServerId>central</publishingServerId>
-                            <waitUntil>published</waitUntil>
                             <autoPublish>true</autoPublish>
-                        </configuration>
-                    </plugin>
-                    <!-- Disable the default deploy plugin to avoid clashes with the central-publishing plugin -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>3.1.4</version>
-                        <configuration>
-                            <skip>true</skip>
+                            <waitUntil>validated</waitUntil>
+                            <deploymentName>${project.name} ${project.version}</deploymentName>
                         </configuration>
                     </plugin>
                 </plugins>
