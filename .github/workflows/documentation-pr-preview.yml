@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # mike needs full history to push to gh-pages
 
       - name: Create Documentation Preview
         uses: secure-software-engineering/actions/documentation/pr-preview@develop
