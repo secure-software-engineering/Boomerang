@@ -1,1 +1,1 @@
-# Welcome to Boomerang Documentation
+# Welcome to the Documentation of Boomerang

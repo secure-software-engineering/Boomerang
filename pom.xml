@@ -366,8 +366,9 @@
                             <deploymentName>${project.artifactId} ${project.version}</deploymentName>
                             <!-- Same id as in the deployment workflow -->
                             <publishingServerId>central</publishingServerId>
-                            <waitUntil>published</waitUntil>
+                            <waitUntil>validated</waitUntil>
                             <autoPublish>true</autoPublish>
+                            <waitUntil>validated</waitUntil>
                             <excludeArtifacts>
                                 <exclude>testCore</exclude>
                                 <exclude>SparseBoomerangCorrectness</exclude>
