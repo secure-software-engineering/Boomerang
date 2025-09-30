@@ -1,10 +1,4 @@
-name: PR Documentation Preview
-
-permissions:
-  pages: write
-  deployments: write
-  contents: write
-  pull-requests: write
+name: Documentation Preview
 
 on:
   pull_request:
@@ -14,19 +8,24 @@ on:
       - synchronize
       - reopened
     paths:
-      - 'mkdocs.yml'
-      - 'docs/**'
-      - '.github/workflows/documentation-pr-preview.yml'
+      - mkdocs.yml
+      - docs/**
+      - .github/workflows/documentation-pr-preview.yml
 
-concurrency: pages
+concurrency:
+  group: gh-pages
 
 jobs:
   deploy-preview:
+    name: Preview documentation
     runs-on: ubuntu-latest
-    name: Deploy Documentation Preview
+    permissions:
+      contents: write
+      pull-requests: write      # for posting a comment
+
     steps:
-      - name: sad
-        uses: secure-software-engineering/actions/documentation/handle-pr-preview@develop
-        with:
-          preview-name: ${{ github.base_ref }}
-          title: "Preview: ${{ github.base_ref }}"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Documentation Preview
+        uses: secure-software-engineering/actions/documentation/pr-preview@develop

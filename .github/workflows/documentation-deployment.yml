@@ -1,0 +1,40 @@
+name: Documentation Deployment
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - '*'
+
+concurrency:
+  group: gh-pages
+
+jobs:
+  deploy-doc:
+    name: Deploy Stable Documentation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Configuration
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" != "push" ]]; then
+            # use tag name
+            VERSION="${{ github.ref_name }}"
+          else
+            # use extracted version from pom.xml on pushes i.e. on develop
+            VERSION="develop"
+          fi  
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Deploy Documentation
+        uses: secure-software-engineering/actions/documentation/deployment@develop
+        with:
+          version: ${{ env.version }}
