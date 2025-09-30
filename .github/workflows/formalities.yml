@@ -1,6 +1,6 @@
 name: Codestyle etc.
 
-on: [pull_request]
+on: [ pull_request ]
 
 jobs:
   check-formatting:
