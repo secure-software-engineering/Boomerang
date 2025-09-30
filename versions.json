@@ -3,5 +3,12 @@
     "version": "pr-192",
     "title": "Preview for PR-192",
     "aliases": []
+  },
+  {
+    "version": "4.3.3-SNAPSHOT",
+    "title": "4.3.3-SNAPSHOT",
+    "aliases": [
+      "latest"
+    ]
   }
 ]
