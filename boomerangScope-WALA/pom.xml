@@ -21,7 +21,7 @@
     </scm>
 
     <properties>
-        <wala.version>1.6.11</wala.version>
+        <wala.version>1.6.12</wala.version>
         <license.dir>${project.parent.basedir}</license.dir>
     </properties>
 
