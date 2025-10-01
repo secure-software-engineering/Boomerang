@@ -14,7 +14,7 @@
  */
 package typestate;
 
-import boomerang.scope.Statement;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
@@ -33,8 +33,8 @@ public class TransitionFunctionZero implements TransitionFunction {
 
   @NonNull
   @Override
-  public Multimap<Transition, Statement> getStateChangeStatements() {
-    throw new IllegalStateException("TransitionZero.getStateChangeStatements() - don't");
+  public Multimap<Transition, StatementSequence> getStateChangeSequences() {
+    return HashMultimap.create();
   }
 
   @NonNull
