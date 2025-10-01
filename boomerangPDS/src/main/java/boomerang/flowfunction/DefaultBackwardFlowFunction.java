@@ -14,6 +14,7 @@
  */
 package boomerang.flowfunction;
 
+import boomerang.options.IAllocationSite;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.IArrayRef;
@@ -25,9 +26,7 @@ import boomerang.scope.Statement;
 import boomerang.scope.StaticFieldVal;
 import boomerang.scope.Val;
 import boomerang.scope.fields.ArrayField;
-import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.Strategies;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -43,10 +42,18 @@ import wpds.interfaces.State;
 
 public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
 
-  private final DefaultBackwardFlowFunctionOptions options;
-  private Strategies strategies;
+  private final IAllocationSite allocationSite;
+  private final Strategies strategies;
+  private final FlowFunctionOptions options;
 
-  public DefaultBackwardFlowFunction(DefaultBackwardFlowFunctionOptions options) {
+  public DefaultBackwardFlowFunction(IAllocationSite allocationSite, Strategies strategies) {
+    this(allocationSite, strategies, FlowFunctionOptions.DEFAULT());
+  }
+
+  public DefaultBackwardFlowFunction(
+      IAllocationSite allocationSite, Strategies strategies, FlowFunctionOptions options) {
+    this.allocationSite = allocationSite;
+    this.strategies = strategies;
     this.options = options;
   }
 
@@ -105,10 +112,7 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
   @Override
   public Collection<State> normalFlow(Edge currEdge, Edge nextEdge, Val fact) {
     Statement nextStmt = nextEdge.getTarget();
-    if (options
-        .allocationSite()
-        .getAllocationSite(nextStmt.getMethod(), nextStmt, fact)
-        .isPresent()) {
+    if (allocationSite.getAllocationSite(nextStmt.getMethod(), nextStmt, fact).isPresent()) {
       return Collections.emptySet();
     }
     if (nextStmt.isThrowStmt()) {
@@ -191,20 +195,6 @@ public class DefaultBackwardFlowFunction implements IBackwardFlowFunction {
       return systemArrayCopyFlow(nextEdge, fact);
     }
     return normalFlow(currEdge, nextEdge, fact);
-  }
-
-  @Override
-  public void setSolver(
-      BackwardBoomerangSolver<?> solver,
-      Multimap<Field, Statement> fieldLoadStatements,
-      Multimap<Field, Statement> fieldStoreStatements) {
-    this.strategies =
-        new Strategies(
-            options.staticFieldStrategy(),
-            options.arrayStrategy(),
-            solver,
-            fieldLoadStatements,
-            fieldStoreStatements);
   }
 
   protected Collection<State> systemArrayCopyFlow(Edge edge, Val fact) {

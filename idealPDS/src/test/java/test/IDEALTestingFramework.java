@@ -21,7 +21,6 @@ import assertions.MustBeInAcceptingState;
 import assertions.MustBeInErrorState;
 import assertions.ShouldNotBeAnalyzed;
 import boomerang.WeightedForwardQuery;
-import boomerang.debugger.Debugger;
 import boomerang.options.BoomerangOptions;
 import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph;
@@ -36,7 +35,6 @@ import boomerang.utils.MethodWrapper;
 import ideal.IDEALAnalysis;
 import ideal.IDEALAnalysisDefinition;
 import ideal.IDEALResultHandler;
-import ideal.IDEALSeedSolver;
 import ideal.StoreIDEALResultHandler;
 import java.util.Collection;
 import java.util.HashSet;
@@ -124,11 +122,6 @@ public class IDEALTestingFramework extends TestingFramework {
                   ControlFlowGraph.Edge, Val, ControlFlowGraph.Edge, TransitionFunction>
               weightFunctions() {
             return stateMachine;
-          }
-
-          @Override
-          public Debugger<TransitionFunction> debugger(IDEALSeedSolver<TransitionFunction> solver) {
-            return new Debugger<>();
           }
 
           @Override

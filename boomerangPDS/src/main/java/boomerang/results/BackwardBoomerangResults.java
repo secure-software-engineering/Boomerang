@@ -44,21 +44,21 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
   private final BackwardQuery query;
   private final BackwardBoomerangSolver<W> backwardSolver;
   private Map<ForwardQuery, Context> allocationSites;
-  private final boolean timedout;
+  private final boolean timedOut;
   private final IBoomerangStats<W> stats;
   private final Stopwatch analysisWatch;
   private final long maxMemory;
 
   public BackwardBoomerangResults(
       BackwardQuery query,
-      boolean timedout,
+      boolean timedOut,
       DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> queryToSolvers,
       BackwardBoomerangSolver<W> backwardSolver,
       IBoomerangStats<W> stats,
       Stopwatch analysisWatch) {
     super(queryToSolvers);
     this.query = query;
-    this.timedout = timedout;
+    this.timedOut = timedOut;
     this.stats = stats;
     this.analysisWatch = analysisWatch;
     this.backwardSolver = backwardSolver;
@@ -71,8 +71,8 @@ public class BackwardBoomerangResults<W extends Weight> extends AbstractBoomeran
     return allocationSites;
   }
 
-  public boolean isTimedout() {
-    return timedout;
+  public boolean isTimedOut() {
+    return timedOut;
   }
 
   public IBoomerangStats<W> getStats() {

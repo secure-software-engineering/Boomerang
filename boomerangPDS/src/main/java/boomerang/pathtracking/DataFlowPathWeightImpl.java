@@ -12,13 +12,13 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
+import boomerang.pathtracking.PathConditionWeight.ConditionDomain;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Objects;
 import java.util.Map;
 import java.util.Set;

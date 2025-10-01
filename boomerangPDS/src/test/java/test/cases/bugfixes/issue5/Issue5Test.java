@@ -125,7 +125,7 @@ public class Issue5Test {
     ForwardQuery fwq = new ForwardQuery(new Edge(queryStatement, successorStmt.get()), var);
     Boomerang solver =
         new Boomerang(
-            scopeFactory, BoomerangOptions.WITH_ALLOCATION_SITE(new IntAndStringAllocationSite()));
+            scopeFactory, BoomerangOptions.withAllocationSite(new IntAndStringAllocationSite()));
     ForwardBoomerangResults<NoWeight> results = solver.solve(fwq);
     return results.getInvokeStatementsOnInstance();
   }

@@ -558,7 +558,7 @@ public class DemandDrivenGuidedAnalysisTest {
             .build();
 
     DemandDrivenGuidedAnalysis demandDrivenGuidedAnalysis =
-        new DemandDrivenGuidedAnalysis(queryManager, options, scopeFactory);
+        new DemandDrivenGuidedAnalysis(queryManager, scopeFactory, options);
 
     QueryGraph<NoWeight> queryGraph = demandDrivenGuidedAnalysis.run(query);
     demandDrivenGuidedAnalysis.cleanUp();

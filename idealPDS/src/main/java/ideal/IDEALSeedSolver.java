@@ -247,7 +247,7 @@ public class IDEALSeedSolver<W extends Weight> {
       for (final Entry<ForwardQuery, ForwardBoomerangSolver<W>> e :
           boomerang.getSolvers().entrySet()) {
         e.getValue()
-            .synchedEmptyStackReachable(
+            .syncedEmptyStackReachable(
                 strongUpdateNode,
                 targetFact -> {
                   if (!e.getKey().asNode().equals(seed.asNode())) {

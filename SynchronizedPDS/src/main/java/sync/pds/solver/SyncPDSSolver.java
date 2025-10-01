@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sync.pds.solver.nodes.ExclusionNode;
 import sync.pds.solver.nodes.GeneratedState;
@@ -58,9 +59,7 @@ public abstract class SyncPDSSolver<
     CALLS
   }
 
-  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SyncPDSSolver.class);
-  private static final boolean FieldSensitive = true;
-  private static final boolean ContextSensitive = true;
+  private static final Logger logger = LoggerFactory.getLogger(SyncPDSSolver.class);
   protected final WeightedPushdownSystem<Stmt, INode<Fact>, W> callingPDS =
       new WeightedPushdownSystem<Stmt, INode<Fact>, W>() {
         public String toString() {
@@ -81,6 +80,8 @@ public abstract class SyncPDSSolver<
       reachedStateUpdateListeners = HashMultimap.create();
   protected final WeightedPAutomaton<Field, INode<Node<Stmt, Fact>>, W> fieldAutomaton;
   protected final WeightedPAutomaton<Stmt, INode<Fact>, W> callAutomaton;
+  private final boolean fieldSensitive;
+  private final boolean contextSensitive;
 
   protected boolean preventFieldTransitionAdd(
       Transition<Field, INode<Node<Stmt, Fact>>> trans, W weight) {
@@ -99,8 +100,33 @@ public abstract class SyncPDSSolver<
       int maxCallDepth,
       int maxFieldDepth,
       int maxUnbalancedCallDepth) {
+    this(
+        useCallSummaries,
+        callSummaries,
+        useFieldSummaries,
+        fieldSummaries,
+        maxCallDepth,
+        maxFieldDepth,
+        maxUnbalancedCallDepth,
+        true,
+        true);
+  }
+
+  public SyncPDSSolver(
+      final boolean useCallSummaries,
+      NestedWeightedPAutomatons<Stmt, INode<Fact>, W> callSummaries,
+      final boolean useFieldSummaries,
+      NestedWeightedPAutomatons<Field, INode<Node<Stmt, Fact>>, W> fieldSummaries,
+      int maxCallDepth,
+      int maxFieldDepth,
+      int maxUnbalancedCallDepth,
+      boolean fieldSensitive,
+      boolean contextSensitive) {
+    this.fieldSensitive = fieldSensitive;
+    this.contextSensitive = contextSensitive;
+
     fieldAutomaton =
-        new WeightedPAutomaton<Field, INode<Node<Stmt, Fact>>, W>() {
+        new WeightedPAutomaton<>() {
           @Override
           public INode<Node<Stmt, Fact>> createState(INode<Node<Stmt, Fact>> d, Field loc) {
             if (loc.equals(emptyField())) return d;
@@ -141,7 +167,7 @@ public abstract class SyncPDSSolver<
         };
 
     callAutomaton =
-        new WeightedPAutomaton<Stmt, INode<Fact>, W>() {
+        new WeightedPAutomaton<>() {
           @Override
           public INode<Fact> createState(INode<Fact> d, Stmt loc) {
             return generateCallState(d, loc);
@@ -556,7 +582,7 @@ public abstract class SyncPDSSolver<
     Object location = popNode.location();
     if (system.equals(PDSSystem.FIELDS)) {
       NodeWithLocation<Stmt, Fact, Field> node = (NodeWithLocation) location;
-      if (FieldSensitive) {
+      if (fieldSensitive) {
         addFieldRule(
             new PopRule<>(
                 asFieldFact(curr),
@@ -568,7 +594,7 @@ public abstract class SyncPDSSolver<
       }
       addNormalCallFlow(curr, node.fact());
     } else if (system.equals(PDSSystem.CALLS)) {
-      if (ContextSensitive) {
+      if (contextSensitive) {
         addCallRule(
             new PopRule<>(
                 wrap(curr.fact()), curr.stmt(), wrap((Fact) location), getCallWeights().pop(curr)));
@@ -657,7 +683,7 @@ public abstract class SyncPDSSolver<
       Node<Stmt, Fact> curr, Location location, PushNode<Stmt, Fact, ?> succ, PDSSystem system) {
     if (system.equals(PDSSystem.FIELDS)) {
 
-      if (FieldSensitive) {
+      if (fieldSensitive) {
         addFieldRule(
             new PushRule<>(
                 asFieldFact(curr),
@@ -673,7 +699,7 @@ public abstract class SyncPDSSolver<
 
     } else if (system.equals(PDSSystem.CALLS)) {
       addNormalFieldFlow(curr, succ);
-      if (ContextSensitive) {
+      if (contextSensitive) {
         addCallRule(
             new PushRule<>(
                 wrap(curr.fact()),

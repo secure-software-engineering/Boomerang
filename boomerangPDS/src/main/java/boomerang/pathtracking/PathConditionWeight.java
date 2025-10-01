@@ -12,25 +12,21 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.results;
+package boomerang.pathtracking;
 
-import boomerang.Query;
-import java.util.Collection;
+import boomerang.scope.Statement;
+import boomerang.scope.Val;
+import java.util.Map;
+import wpds.impl.Weight;
 
-public class QueryResults {
-  private final Query query;
-  private final Collection<AffectedLocation> affectedLocations;
+public interface PathConditionWeight extends Weight {
+  Map<Statement, ConditionDomain> getConditions();
 
-  public QueryResults(Query query, Collection<AffectedLocation> npes) {
-    this.query = query;
-    this.affectedLocations = npes;
-  }
+  Map<Val, ConditionDomain> getEvaluationMap();
 
-  public Query getQuery() {
-    return query;
-  }
-
-  public Collection<AffectedLocation> getAffectedLocations() {
-    return affectedLocations;
+  public enum ConditionDomain {
+    TRUE,
+    FALSE,
+    TOP
   }
 }

@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Val;

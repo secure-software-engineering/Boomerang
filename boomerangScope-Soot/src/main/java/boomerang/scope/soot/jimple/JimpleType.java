@@ -14,9 +14,7 @@
  */
 package boomerang.scope.soot.jimple;
 
-import boomerang.scope.AllocVal;
 import boomerang.scope.Type;
-import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import java.util.Collection;
 import java.util.HashSet;
@@ -82,27 +80,6 @@ public class JimpleType implements Type {
     }
 
     throw new RuntimeException("Class of non reference type is not available");
-  }
-
-  @Override
-  public boolean doesCastFail(Type targetVal, Val target) {
-    RefType targetType = (RefType) ((JimpleType) targetVal).getDelegate();
-    RefType sourceType = (RefType) this.getDelegate();
-    if (targetType.getSootClass().isPhantom() || sourceType.getSootClass().isPhantom())
-      return false;
-    if (target instanceof AllocVal && ((AllocVal) target).getAllocVal().isNewExpr()) {
-      boolean castFails = scene.getOrMakeFastHierarchy().canStoreType(targetType, sourceType);
-      return !castFails;
-    }
-    // TODO this line is necessary as canStoreType does not properly work for
-    // interfaces, see Java doc.
-    if (targetType.getSootClass().isInterface()) {
-      return false;
-    }
-    boolean castFails =
-        scene.getOrMakeFastHierarchy().canStoreType(targetType, sourceType)
-            || scene.getOrMakeFastHierarchy().canStoreType(sourceType, targetType);
-    return !castFails;
   }
 
   // TODO Use FullHierarchy

@@ -210,8 +210,7 @@ public class BoomerangTestingFramework extends TestingFramework {
             .get(q)
             .getFieldAutomaton()
             .registerListener(
-                new WPAStateListener<Field, INode<Node<ControlFlowGraph.Edge, Val>>, NoWeight>(
-                    new SingleNode<>(queryForCallSite.asNode())) {
+                new WPAStateListener<>(new SingleNode<>(queryForCallSite.asNode())) {
 
                   @Override
                   public void onOutTransitionAdded(
@@ -322,7 +321,7 @@ public class BoomerangTestingFramework extends TestingFramework {
 
   protected BoomerangOptions createBoomerangOptions() {
     if (queryDetector.integerQueries) {
-      return BoomerangOptions.WITH_ALLOCATION_SITE(new IntAndStringAllocationSite());
+      return BoomerangOptions.withAllocationSite(new IntAndStringAllocationSite());
     }
 
     return BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();
