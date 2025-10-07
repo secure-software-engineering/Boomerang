@@ -10,7 +10,7 @@ on:
     paths:
       - mkdocs.yml
       - docs/**
-      - .github/workflows/doc_preview.yml
+      - .github/workflows/documentation-pr-preview.yml
 
 concurrency:
   group: gh-pages
@@ -21,16 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
+      pull-requests: write      # for posting a comment
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0    # mike needs full history to push to gh-pages
 
       - name: Create Documentation Preview
-        uses: secure-software-engineering/actions/documentation/handle-pr-preview@develop
-        with:
-          preview-name: pr-${{ github.event.pull_request.number }}
-          preview-title: Preview for PR-${{ github.event.pull_request.number }}
+        uses: secure-software-engineering/actions/documentation/pr-preview@develop

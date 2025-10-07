@@ -363,11 +363,16 @@
                         <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
+                            <deploymentName>${project.artifactId} ${project.version}</deploymentName>
                             <!-- Same id as in the deployment workflow -->
                             <publishingServerId>central</publishingServerId>
+                            <waitUntil>validated</waitUntil>
                             <autoPublish>true</autoPublish>
                             <waitUntil>validated</waitUntil>
-                            <deploymentName>${project.name} ${project.version}</deploymentName>
+                            <excludeArtifacts>
+                                <exclude>testCore</exclude>
+                                <exclude>SparseBoomerangCorrectness</exclude>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                 </plugins>

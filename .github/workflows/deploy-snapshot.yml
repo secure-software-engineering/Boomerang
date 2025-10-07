@@ -24,5 +24,5 @@ jobs:
           server-password: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-          mvn-cli-args: '-DskipTests -Dmaven.javadoc.skip=true -Pdeployment'
+          mvn-cli-args: '-DskipTests -Pdeployment'
           deploy-mode: snapshot
