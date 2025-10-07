@@ -1,10 +1,5 @@
 [
   {
-    "version": "pr-221",
-    "title": "Preview for PR-221",
-    "aliases": []
-  },
-  {
     "version": "4.3.3-SNAPSHOT",
     "title": "4.3.3-SNAPSHOT",
     "aliases": [
