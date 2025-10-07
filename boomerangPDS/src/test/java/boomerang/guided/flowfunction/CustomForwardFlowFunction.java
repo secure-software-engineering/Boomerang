@@ -16,12 +16,12 @@ package boomerang.guided.flowfunction;
 
 import boomerang.ForwardQuery;
 import boomerang.flowfunction.DefaultForwardFlowFunction;
-import boomerang.flowfunction.DefaultForwardFlowFunctionOptions;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DeclaredMethod;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.solver.Strategies;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -29,8 +29,8 @@ import wpds.interfaces.State;
 
 public class CustomForwardFlowFunction extends DefaultForwardFlowFunction {
 
-  public CustomForwardFlowFunction(DefaultForwardFlowFunctionOptions options) {
-    super(options);
+  public CustomForwardFlowFunction(Strategies strategies) {
+    super(strategies);
   }
 
   @Override

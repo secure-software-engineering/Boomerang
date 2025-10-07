@@ -12,21 +12,11 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package test.options;
 
-import boomerang.scope.Statement;
-import boomerang.scope.Val;
-import java.util.Map;
-import wpds.impl.Weight;
+public class OptionAssertions {
 
-public interface PathConditionWeight extends Weight {
-  Map<Statement, ConditionDomain> getConditions();
+  public static final String QUERY_FOR = "queryFor";
 
-  Map<Val, ConditionDomain> getEvaluationMap();
-
-  public enum ConditionDomain {
-    TRUE,
-    FALSE,
-    TOP
-  }
+  public static void queryFor(@SuppressWarnings("unused") Object o) {}
 }

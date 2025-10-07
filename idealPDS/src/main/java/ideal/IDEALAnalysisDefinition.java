@@ -15,11 +15,8 @@
 package ideal;
 
 import boomerang.WeightedForwardQuery;
-import boomerang.debugger.Debugger;
 import boomerang.options.BoomerangOptions;
-import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.DataFlowScope;
 import boomerang.scope.FrameworkScope;
 import boomerang.scope.Val;
 import boomerang.solver.Strategies;
@@ -46,10 +43,6 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
    */
   public abstract WeightFunctions<Edge, Val, Edge, W> weightFunctions();
 
-  public CallGraph callGraph() {
-    return getFrameworkFactory().getCallGraph();
-  }
-
   public boolean enableStrongUpdates() {
     return true;
   }
@@ -66,8 +59,6 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
     return str;
   }
 
-  public abstract Debugger<W> debugger(IDEALSeedSolver<W> idealSeedSolver);
-
   public BoomerangOptions boomerangOptions() {
     return BoomerangOptions.builder()
         .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
@@ -75,12 +66,8 @@ public abstract class IDEALAnalysisDefinition<W extends Weight> {
         .build();
   }
 
-  public IDEALResultHandler getResultHandler() {
-    return new IDEALResultHandler();
-  }
-
-  protected DataFlowScope getDataFlowScope() {
-    return getFrameworkFactory().getDataFlowScope();
+  public IDEALResultHandler<W> getResultHandler() {
+    return new IDEALResultHandler<>();
   }
 
   public abstract FrameworkScope getFrameworkFactory();

@@ -271,11 +271,6 @@ public final class ValCollection {
     }
 
     @Override
-    public boolean doesCastFail(Type targetVal, Val target) {
-      return false;
-    }
-
-    @Override
     public boolean isSubtypeOf(String type) {
       return false;
     }

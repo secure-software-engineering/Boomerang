@@ -15,7 +15,6 @@
 package boomerang.scope.sootup.jimple;
 
 import boomerang.scope.Type;
-import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import java.util.Objects;
 import sootup.core.typehierarchy.TypeHierarchy;
@@ -74,38 +73,6 @@ public class JimpleUpType implements Type {
     }
 
     throw new RuntimeException("Class of non reference type not available");
-  }
-
-  @Override
-  public boolean doesCastFail(Type targetVal, Val target) {
-    // TODO Requires revisit as it cannot handle NullTypes
-    return false;
-    /*ClassType targetType = (ClassType) ((JimpleUpType) targetVal).getDelegate();
-    if (this.getDelegate() instanceof NullType) {
-      return true;
-    }
-
-    JavaClassType sourceType = (JavaClassType) this.getDelegate();
-    Optional<JavaSootClass> sourceClass = view.getClass(sourceType);
-    Optional<JavaSootClass> targetClass = view.getClass(targetType);
-
-    if (sourceClass.isEmpty() || targetClass.isEmpty()) {
-      return false;
-    }
-
-    if (target instanceof AllocVal && ((AllocVal) target).getAllocVal().isNewExpr()) {
-      boolean castFails = view.getTypeHierarchy().isSubtype(targetType, sourceType);
-      return !castFails;
-    }
-    // TODO this line is necessary as canStoreType does not properly work for
-    // interfaces, see Java doc.
-    if (targetClass.get().isInterface()) {
-      return false;
-    }
-    boolean castFails =
-        view.getTypeHierarchy().isSubtype(targetType, sourceType)
-            || view.getTypeHierarchy().isSubtype(sourceType, targetType);
-    return !castFails;*/
   }
 
   @Override

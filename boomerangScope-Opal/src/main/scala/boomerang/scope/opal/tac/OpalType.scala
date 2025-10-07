@@ -79,14 +79,6 @@ class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Typ
     throw new RuntimeException("Class of non reference type not available")
   }
 
-  override def doesCastFail(targetValType: Type, target: Val): Boolean = {
-    if (!isRefType || !targetValType.isRefType) {
-      return false
-    }
-
-    false
-  }
-
   override def isSubtypeOf(otherType: String): Boolean = {
     if (!delegate.isObjectType) {
       return false

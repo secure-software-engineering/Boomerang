@@ -24,15 +24,14 @@ import boomerang.options.BoomerangOptions;
 import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
-import boomerang.scope.DataFlowScope;
 import boomerang.scope.Field;
+import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.fields.ArrayField;
-import com.google.common.collect.Multimap;
 import de.fraunhofer.iem.Location;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,18 +65,24 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       ObservableControlFlowGraph cfg,
       ForwardQuery query,
       Map<Entry<INode<Node<Edge, Val>>, Field>, INode<Node<Edge, Val>>> genField,
-      BoomerangOptions options,
       NestedWeightedPAutomatons<Edge, INode<Val>, W> callSummaries,
       NestedWeightedPAutomatons<Field, INode<Node<Edge, Val>>, W> fieldSummaries,
-      DataFlowScope scope,
-      IForwardFlowFunction flowFunctions,
-      Multimap<Field, Statement> fieldLoadStatements,
-      Multimap<Field, Statement> fieldStoreStatements,
+      FrameworkScope scope,
+      BoomerangOptions options,
       Type propagationType) {
-    super(callGraph, cfg, genField, options, callSummaries, fieldSummaries, scope, propagationType);
+    super(
+        callGraph,
+        cfg,
+        genField,
+        options,
+        callSummaries,
+        fieldSummaries,
+        scope.getDataFlowScope(),
+        propagationType);
+
     this.query = query;
-    this.flowFunctions = flowFunctions;
-    this.flowFunctions.setSolver(this, fieldLoadStatements, fieldStoreStatements);
+    this.flowFunctions =
+        options.getFlowFunctionFactory().createForwardFlowFunction(scope, options, this);
   }
 
   @Override

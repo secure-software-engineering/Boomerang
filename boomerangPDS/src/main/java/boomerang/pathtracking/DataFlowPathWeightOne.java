@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Statement;
@@ -53,13 +53,13 @@ public class DataFlowPathWeightOne implements DataFlowPathWeight {
 
   @NonNull
   @Override
-  public Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions() {
+  public Map<Statement, PathConditionWeight.ConditionDomain> getConditions() {
     throw new IllegalStateException("MinDistanceWeight.getAllStatements() - don't");
   }
 
   @NonNull
   @Override
-  public Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap() {
+  public Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap() {
     throw new IllegalStateException("MinDistanceWeight.getEvaluationMap() - don't");
   }
 

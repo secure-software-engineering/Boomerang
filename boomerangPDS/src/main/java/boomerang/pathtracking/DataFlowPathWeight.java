@@ -12,7 +12,7 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.weights;
+package boomerang.pathtracking;
 
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Statement;
@@ -30,7 +30,7 @@ public interface DataFlowPathWeight extends Weight {
 
   @NonNull Set<Node<ControlFlowGraph.Edge, Val>> getAllStatements();
 
-  @NonNull Map<Statement, PathConditionWeightImpl.ConditionDomain> getConditions();
+  @NonNull Map<Statement, PathConditionWeight.ConditionDomain> getConditions();
 
-  @NonNull Map<Val, PathConditionWeightImpl.ConditionDomain> getEvaluationMap();
+  @NonNull Map<Val, PathConditionWeight.ConditionDomain> getEvaluationMap();
 }

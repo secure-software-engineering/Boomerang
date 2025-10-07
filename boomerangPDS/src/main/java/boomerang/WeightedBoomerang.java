@@ -137,13 +137,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
                   cfg(),
                   genField,
                   key,
-                  WeightedBoomerang.this.options,
                   createCallSummaries(null, backwardCallSummaries),
                   createFieldSummaries(null, backwardFieldSummaries),
-                  WeightedBoomerang.this.dataFlowscope,
-                  options.getBackwardFlowFunction(),
-                  callGraph.getFieldLoadStatements(),
-                  callGraph.getFieldStoreStatements(),
+                  frameworkScope,
+                  options,
                   null) {
 
                 @Override
@@ -435,6 +432,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
   private final CallGraph callGraph;
   private INode<Val> rootQuery;
 
+  public WeightedBoomerang(FrameworkScope frameworkScope) {
+    this(frameworkScope, BoomerangOptions.DEFAULT());
+  }
+
   public WeightedBoomerang(FrameworkScope frameworkScope, BoomerangOptions options) {
     this.frameworkScope = frameworkScope;
     this.options = options;
@@ -461,10 +462,6 @@ public abstract class WeightedBoomerang<W extends Weight> {
     this.queryGraph = new QueryGraph<>(this);
   }
 
-  public WeightedBoomerang(FrameworkScope frameworkScope) {
-    this(frameworkScope, BoomerangOptions.DEFAULT());
-  }
-
   protected void addVisitedMethod(Method method) {
     if (!dataFlowscope.isExcluded(method) && visitedMethods.add(method)) {
       LOGGER.trace("Reach Method: {}", method);
@@ -482,13 +479,10 @@ public abstract class WeightedBoomerang<W extends Weight> {
             cfg(),
             sourceQuery,
             genField,
-            options,
             createCallSummaries(sourceQuery, forwardCallSummaries),
             createFieldSummaries(sourceQuery, forwardFieldSummaries),
-            dataFlowscope,
-            options.getForwardFlowFunction(),
-            callGraph.getFieldLoadStatements(),
-            callGraph.getFieldStoreStatements(),
+            frameworkScope,
+            options,
             sourceQuery.getType()) {
 
           @Override
@@ -990,10 +984,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         this.queryToSolvers,
         getStats(),
         analysisWatch,
-        visitedMethods,
-        options.trackDataFlowPath(),
-        options.prunePathConditions(),
-        options.trackImplicitFlows());
+        visitedMethods);
   }
 
   public BackwardBoomerangResults<W> solve(BackwardQuery query) {
@@ -1103,10 +1094,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
         this.queryToSolvers,
         getStats(),
         analysisWatch,
-        visitedMethods,
-        options.trackDataFlowPath(),
-        options.prunePathConditions(),
-        options.trackImplicitFlows());
+        visitedMethods);
   }
 
   public void debugOutput() {
