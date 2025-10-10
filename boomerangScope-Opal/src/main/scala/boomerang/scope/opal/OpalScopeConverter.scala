@@ -29,10 +29,10 @@ import boomerang.scope.opal.tac.OpalType
 import boomerang.scope.opal.tac.OpalVal
 import boomerang.scope.opal.tac.OpalWrappedClass
 import boomerang.scope.opal.transformation.TacLocal
+import org.opalj.br.ClassType
 import org.opalj.br.FieldType
 import org.opalj.br.Method
 import org.opalj.br.MethodDescriptor
-import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 import org.opalj.tac.Expr
 import org.opalj.tac.Stmt
@@ -52,7 +52,7 @@ object OpalScopeConverter {
    * @param name the field's name
    * @return the field object in Boomerang's Opal scope
    */
-  def createOpalField(declaringClass: ObjectType, fieldType: FieldType, name: String) =
+  def createOpalField(declaringClass: ClassType, fieldType: FieldType, name: String) =
     new OpalField(declaringClass, fieldType, name)
 
   /**
@@ -100,7 +100,7 @@ object OpalScopeConverter {
    * @return the method object in Boomerang's Soot scope
    */
   def createOpalPhantomMethod(
-      declaringClassType: ObjectType,
+      declaringClassType: ClassType,
       name: String,
       descriptor: MethodDescriptor,
       static: Boolean,
@@ -206,24 +206,24 @@ object OpalScopeConverter {
   }
 
   /**
-   * Create an [[OpalWrappedClass]] from an [[ObjectType]]. The returned object represents a
+   * Create an [[OpalWrappedClass]] from an [[ClassType]]. The returned object represents a
    * class in Boomerang's Opal scope.
    *
    * @param objectType the object type containing relevant class information
    * @param project    the project containing the class type
    * @return the class object in Boomerang's Opal scope
    */
-  def createOpalWrappedClass(objectType: ObjectType, project: Project[_]) =
+  def createOpalWrappedClass(objectType: ClassType, project: Project[_]) =
     new OpalWrappedClass(objectType, project)
 
   /**
-   * Extract the delegated [[ObjectType]] from a [[WrappedClass]]. This requires the type to
+   * Extract the delegated [[ClassType]] from a [[WrappedClass]]. This requires the type to
    * be an [[OpalWrappedClass]].
    *
-   * @param wrappedClass the [[OpalWrappedClass]] to extract the [[ObjectType]] from
-   * @return the delegated [[ObjectType]]
+   * @param wrappedClass the [[OpalWrappedClass]] to extract the [[ClassType]] from
+   * @return the delegated [[ClassType]]
    */
-  def extractOpalClass(wrappedClass: WrappedClass): ObjectType = wrappedClass match {
+  def extractOpalClass(wrappedClass: WrappedClass): ClassType = wrappedClass match {
     case opalClass: OpalWrappedClass => opalClass.delegate
     case _ => throw new RuntimeException("WrappedClass is not an OpalWrappedClass")
   }

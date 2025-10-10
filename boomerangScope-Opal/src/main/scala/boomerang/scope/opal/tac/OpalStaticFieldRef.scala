@@ -22,11 +22,11 @@ import boomerang.scope.Type
 import boomerang.scope.Val
 import boomerang.scope.WrappedClass
 import java.util.Objects
+import org.opalj.br.ClassType
 import org.opalj.br.FieldType
-import org.opalj.br.ObjectType
 
 class OpalStaticFieldRef(
-    val declaringClass: ObjectType,
+    val declaringClass: ClassType,
     val fieldType: FieldType,
     val name: String,
     method: OpalMethod,

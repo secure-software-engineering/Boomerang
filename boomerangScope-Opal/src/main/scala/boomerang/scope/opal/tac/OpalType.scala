@@ -15,11 +15,11 @@
 package boomerang.scope.opal.tac
 
 import boomerang.scope.Type
-import boomerang.scope.Val
 import boomerang.scope.WrappedClass
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
 import org.opalj.br.ArrayType
+import org.opalj.br.ClassType
 import org.opalj.br.ComputationalType
 import org.opalj.br.ComputationalTypeDouble
 import org.opalj.br.ComputationalTypeFloat
@@ -32,7 +32,6 @@ import org.opalj.br.FieldType
 import org.opalj.br.FloatType
 import org.opalj.br.IntegerType
 import org.opalj.br.LongType
-import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 import org.opalj.tac.ArrayLength
 import org.opalj.tac.ArrayLoad
@@ -65,7 +64,7 @@ class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Typ
 
   override def isNullType: Boolean = false
 
-  override def isRefType: Boolean = delegate.isObjectType
+  override def isRefType: Boolean = delegate.isClassType
 
   override def isArrayType: Boolean = delegate.isArrayType
 
@@ -73,31 +72,31 @@ class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Typ
 
   override def getWrappedClass: WrappedClass = {
     if (isRefType) {
-      return new OpalWrappedClass(delegate.asReferenceType.mostPreciseObjectType, project)
+      return new OpalWrappedClass(delegate.asReferenceType.mostPreciseClassType, project)
     }
 
     throw new RuntimeException("Class of non reference type not available")
   }
 
   override def isSubtypeOf(otherType: String): Boolean = {
-    if (!delegate.isObjectType) {
+    if (!delegate.isClassType) {
       return false
     }
 
     project.classHierarchy.isSubtypeOf(
-      delegate.asObjectType,
-      ObjectType(otherType.replace(".", "/"))
+      delegate.asClassType,
+      ClassType(otherType.replace(".", "/"))
     )
   }
 
   override def isSupertypeOf(subType: String): Boolean = {
-    if (!delegate.isObjectType) {
+    if (!delegate.isClassType) {
       return false
     }
 
     project.classHierarchy.isSubtypeOf(
-      ObjectType(subType.replace(".", "/")),
-      delegate.asObjectType
+      ClassType(subType.replace(".", "/")),
+      delegate.asClassType
     )
   }
 
@@ -126,7 +125,7 @@ object OpalType {
       case _: LongConst => return new OpalType(LongType, project)
       case _: FloatConst => return new OpalType(FloatType, project)
       case _: DoubleConst => return new OpalType(DoubleType, project)
-      case _: StringConst => return new OpalType(ObjectType.String, project)
+      case _: StringConst => return new OpalType(ClassType.String, project)
       case classConst: ClassConst => return new OpalType(classConst.value, project)
       case dynamicConst: DynamicConst => return new OpalType(dynamicConst.descriptor, project)
       case nullExpr: NullExpr => return new OpalType(nullExpr.tpe, project)
@@ -159,8 +158,8 @@ object OpalType {
       case ComputationalTypeFloat => FloatType
       case ComputationalTypeLong => LongType
       case ComputationalTypeDouble => DoubleType
-      case ComputationalTypeReference => ObjectType.Object
-      case ComputationalTypeReturnAddress => ObjectType.Object
+      case ComputationalTypeReference => ClassType.Object
+      case ComputationalTypeReturnAddress => ClassType.Object
       case _ =>
         throw new RuntimeException("Unknown computational type " + cTpe)
     }

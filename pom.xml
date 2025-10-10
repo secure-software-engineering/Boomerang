@@ -75,7 +75,7 @@
 
         <soot.version>4.6.0</soot.version>
         <sootup.version>2.0.0</sootup.version>
-        <opal.version>5.0.0</opal.version>
+        <opal.version>6.0.0</opal.version>
         <junit.version>5.13.4</junit.version>
         <guava.version>33.5.0-jre</guava.version>
         <jspecify.version>1.0.0</jspecify.version>
@@ -171,6 +171,10 @@
                             <!-- The JUnit api requires a concrete engine that is not explicitly used by this project -->
                             <ignoredUnusedDeclaredDependency>org.junit.jupiter:junit-jupiter-engine</ignoredUnusedDeclaredDependency>
                         </ignoredUnusedDeclaredDependencies>
+                        <ignoredNonTestScopedDependencies>
+                            <!-- This dependency is not explicitly used by Boomerang, but defines relevant components for Opal -->
+                            <ignoredNonTestScopedDependency>de.opal-project:static-analysis-infrastructure_2.13</ignoredNonTestScopedDependency>
+                        </ignoredNonTestScopedDependencies>
                     </configuration>
                 </plugin>
             </plugins>

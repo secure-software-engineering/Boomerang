@@ -21,7 +21,6 @@
     </scm>
 
     <properties>
-        <opal.version>5.0.0</opal.version>
         <license.dir>${project.parent.basedir}</license.dir>
     </properties>
 
@@ -66,6 +65,11 @@
         <dependency>
             <groupId>de.opal-project</groupId>
             <artifactId>three-address-code_2.13</artifactId>
+            <version>${opal.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.opal-project</groupId>
+            <artifactId>static-analysis-infrastructure_2.13</artifactId>
             <version>${opal.version}</version>
         </dependency>
 

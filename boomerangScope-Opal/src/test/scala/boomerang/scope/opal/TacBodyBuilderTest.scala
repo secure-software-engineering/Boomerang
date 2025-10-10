@@ -54,21 +54,11 @@ class TacBodyBuilderTest {
     // Consider only java.lang package classes to reduce the number of classes
     // TODO
     //  Maybe create additional tests for other packages (java.io, java.util) that run in parallel.
-    //  Running them sequential would take too long
+    //  Running them sequentially would take too long
     if (!method.toJava.startsWith("java.lang.")) return true
 
     // Static initializers may be very complex and take some time to compute (e.g. com.sun.crypto.provider.AESCrypt)
     if (method.isStaticInitializer) return true
-
-    // Bug in Opal causes an exception
-    if (method.toJava.equals(
-          "java.lang.Thread{ private static long nextThreadID() }"
-        )
-    ) return true
-    if (method.toJava.equals(
-          "java.util.concurrent.CompletableFuture$Signaller{ public boolean isReleasable() }"
-        )
-    ) return true
 
     false
   }
