@@ -33,7 +33,7 @@ class OpalSetup {
     OPALLogger.updateLogger(GlobalLogContext, DevNullLogger)
     project = Some(Project(new File(TargetClassPath.TARGET_CLASS_PATH)))
 
-    targetClass = project.get.classFile(ObjectType(targetClassName.replace(".", "/")))
+    targetClass = project.get.classFile(ClassType(targetClassName.replace(".", "/")))
   }
 
   def resolveMethod(methodSignature: MethodSignature): Method = {

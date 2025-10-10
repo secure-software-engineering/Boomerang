@@ -21,7 +21,6 @@
     </scm>
 
     <properties>
-        <opal.version>5.0.0</opal.version>
         <license.dir>${project.parent.basedir}</license.dir>
     </properties>
 
