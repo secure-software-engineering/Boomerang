@@ -12,27 +12,15 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test;
+package chains;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class Chain {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TestConfig {
-
-  enum FlowFunctions {
-    DEFAULT,
-    CHAINING
+  public Chain chain1() {
+    return this;
   }
 
-  Class<?> stateMachine();
-
-  Class<?>[] includedClasses() default {};
-
-  Class<?>[] excludedClasses() default {};
-
-  FlowFunctions flowFunctions() default FlowFunctions.DEFAULT;
+  public Chain chain2() {
+    return this;
+  }
 }

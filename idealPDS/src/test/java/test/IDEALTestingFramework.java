@@ -30,7 +30,6 @@ import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import boomerang.solver.Strategies;
 import boomerang.utils.MethodWrapper;
 import ideal.IDEALAnalysis;
 import ideal.IDEALAnalysisDefinition;
@@ -61,7 +60,11 @@ public class IDEALTestingFramework extends TestingFramework {
   }
 
   public void analyze(
-      String targetClassName, String targetMethodName, int expectedSeeds, int expectedAssertions) {
+      String targetClassName,
+      String targetMethodName,
+      int expectedSeeds,
+      int expectedAssertions,
+      BoomerangOptions options) {
     LOGGER.info(
         "Running '{}' in class '{}' with {} assertions",
         targetMethodName,
@@ -87,7 +90,8 @@ public class IDEALTestingFramework extends TestingFramework {
 
     // Run IDEal
     StoreIDEALResultHandler<TransitionFunction> resultHandler = new StoreIDEALResultHandler<>();
-    IDEALAnalysis<TransitionFunction> idealAnalysis = createAnalysis(frameworkScope, resultHandler);
+    IDEALAnalysis<TransitionFunction> idealAnalysis =
+        createAnalysis(frameworkScope, resultHandler, options);
     idealAnalysis.run();
 
     // Update results
@@ -107,7 +111,9 @@ public class IDEALTestingFramework extends TestingFramework {
   }
 
   protected IDEALAnalysis<TransitionFunction> createAnalysis(
-      FrameworkScope frameworkScope, StoreIDEALResultHandler<TransitionFunction> resultHandler) {
+      FrameworkScope frameworkScope,
+      StoreIDEALResultHandler<TransitionFunction> resultHandler,
+      BoomerangOptions options) {
     return new IDEALAnalysis<>(
         new IDEALAnalysisDefinition<>() {
 
@@ -131,11 +137,7 @@ public class IDEALTestingFramework extends TestingFramework {
 
           @Override
           public BoomerangOptions boomerangOptions() {
-            return BoomerangOptions.builder()
-                .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
-                .withAnalysisTimeout(-1)
-                .enableAllowMultipleQueries(true)
-                .build();
+            return options;
           }
 
           @Override
