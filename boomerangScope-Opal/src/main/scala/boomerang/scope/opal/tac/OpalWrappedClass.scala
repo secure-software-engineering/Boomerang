@@ -19,10 +19,10 @@ import boomerang.scope.Type
 import boomerang.scope.WrappedClass
 import java.util
 import java.util.Objects
-import org.opalj.br.ObjectType
+import org.opalj.br.ClassType
 import org.opalj.br.analyses.Project
 
-class OpalWrappedClass(val delegate: ObjectType, project: Project[_]) extends WrappedClass {
+class OpalWrappedClass(val delegate: ClassType, project: Project[_]) extends WrappedClass {
 
   override def getMethods: util.Set[Method] = {
     val classFile = project.classFile(delegate)

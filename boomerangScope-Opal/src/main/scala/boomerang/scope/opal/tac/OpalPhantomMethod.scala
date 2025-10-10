@@ -20,13 +20,13 @@ import boomerang.scope.WrappedClass
 import boomerang.scope.opal.OpalFrameworkScope
 import java.util
 import java.util.Objects
+import org.opalj.br.ClassType
 import org.opalj.br.MethodDescriptor
 import org.opalj.br.MethodSignature
-import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 
 class OpalPhantomMethod private (
-    val declaringClassType: ObjectType,
+    val declaringClassType: ClassType,
     val name: String,
     val descriptor: MethodDescriptor,
     val static: Boolean,
@@ -78,7 +78,7 @@ class OpalPhantomMethod private (
 object OpalPhantomMethod {
 
   def of(
-      declaringClassType: ObjectType,
+      declaringClassType: ClassType,
       name: String,
       descriptor: MethodDescriptor,
       static: Boolean,

@@ -35,6 +35,7 @@ import org.opalj.br.BooleanType$;
 import org.opalj.br.ByteType$;
 import org.opalj.br.CharType$;
 import org.opalj.br.ClassFile;
+import org.opalj.br.ClassType;
 import org.opalj.br.DoubleType$;
 import org.opalj.br.FieldType;
 import org.opalj.br.FloatType$;
@@ -42,7 +43,6 @@ import org.opalj.br.IntegerType$;
 import org.opalj.br.JVMMethod;
 import org.opalj.br.LongType$;
 import org.opalj.br.MethodDescriptor$;
-import org.opalj.br.ObjectType;
 import org.opalj.br.ReturnType;
 import org.opalj.br.ShortType$;
 import org.opalj.br.Type;
@@ -89,7 +89,7 @@ public class OpalTestSetup implements TestSetup {
 
     // Load the class that contains the test method
     Option<ClassFile> testClass =
-        project.classFile(ObjectType.apply(methodWrapper.getDeclaringClass().replace(".", "/")));
+        project.classFile(ClassType.apply(methodWrapper.getDeclaringClass().replace(".", "/")));
     if (testClass.isEmpty()) {
       throw new RuntimeException("Could not find class " + methodWrapper.getDeclaringClass());
     }

@@ -45,7 +45,7 @@ class OpalDeclaredMethod(
   )
 
   override def getDeclaringClass: WrappedClass =
-    new OpalWrappedClass(delegate.declaringClass.mostPreciseObjectType, method.project)
+    new OpalWrappedClass(delegate.declaringClass.mostPreciseClassType, method.project)
 
   override def getParameterTypes: util.List[Type] = {
     val result = new util.ArrayList[Type]()
