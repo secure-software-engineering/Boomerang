@@ -14,6 +14,11 @@
  */
 package test;
 
+import boomerang.flowfunction.DefaultFlowFunctionFactory;
+import boomerang.flowfunction.IFlowFunctionFactory;
+import boomerang.options.BoomerangOptions;
+import boomerang.solver.Strategies;
+import chains.ChainingTestFlowFunctionFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -32,6 +37,7 @@ public class IDEALTestRunnerInterceptor
     implements BeforeAllCallback, InvocationInterceptor, AfterEachCallback {
 
   private IDEALTestingFramework testingFramework;
+  private BoomerangOptions options;
 
   @Override
   public void beforeAll(ExtensionContext context) {
@@ -78,6 +84,7 @@ public class IDEALTestRunnerInterceptor
             .map(Class::getName)
             .collect(Collectors.toList());
     testingFramework = new IDEALTestingFramework(stateMachine, includedClasses, excludedClasses);
+    options = createOptions(testConfig);
   }
 
   @Override
@@ -97,7 +104,7 @@ public class IDEALTestRunnerInterceptor
               + "' in class '"
               + testClassName
               + "' is not annotated with '"
-              + TestConfig.class.getSimpleName()
+              + TestParameters.class.getSimpleName()
               + "'");
     }
 
@@ -111,17 +118,39 @@ public class IDEALTestRunnerInterceptor
         testClassName,
         testMethodName,
         parameters.expectedSeedCount(),
-        parameters.expectedAssertionCount());
+        parameters.expectedAssertionCount(),
+        options);
 
     try {
       invocation.proceed();
     } catch (Throwable ignored) {
-
     }
   }
 
   @Override
   public void afterEach(ExtensionContext context) {
     testingFramework.cleanUp();
+  }
+
+  private BoomerangOptions createOptions(TestConfig config) {
+    IFlowFunctionFactory factory = getFlowFunctionFactory(config.flowFunctions());
+
+    return BoomerangOptions.builder()
+        .withFlowFunctionFactory(factory)
+        .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
+        .withAnalysisTimeout(-1)
+        .enableAllowMultipleQueries(true)
+        .build();
+  }
+
+  private IFlowFunctionFactory getFlowFunctionFactory(TestConfig.FlowFunctions flowFunctions) {
+    switch (flowFunctions) {
+      case DEFAULT:
+        return new DefaultFlowFunctionFactory();
+      case CHAINING:
+        return new ChainingTestFlowFunctionFactory();
+      default:
+        throw new RuntimeException("Unknown FlowFunctions: " + flowFunctions);
+    }
   }
 }

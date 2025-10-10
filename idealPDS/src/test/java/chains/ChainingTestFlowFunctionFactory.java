@@ -12,27 +12,18 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package test;
+package chains;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import boomerang.utils.MethodWrapper;
+import java.util.Set;
+import typestate.ChainingFlowFunctionFactory;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TestConfig {
+public class ChainingTestFlowFunctionFactory extends ChainingFlowFunctionFactory {
 
-  enum FlowFunctions {
-    DEFAULT,
-    CHAINING
+  public ChainingTestFlowFunctionFactory() {
+    super(
+        Set.of(
+            new MethodWrapper(Chain.class.getName(), "chain1", Chain.class.getName()),
+            new MethodWrapper(Chain.class.getName(), "chain2", Chain.class.getName())));
   }
-
-  Class<?> stateMachine();
-
-  Class<?>[] includedClasses() default {};
-
-  Class<?>[] excludedClasses() default {};
-
-  FlowFunctions flowFunctions() default FlowFunctions.DEFAULT;
 }
