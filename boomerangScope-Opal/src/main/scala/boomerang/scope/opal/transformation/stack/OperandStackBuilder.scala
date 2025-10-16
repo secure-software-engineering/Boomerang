@@ -106,8 +106,7 @@ object OperandStackBuilder {
 
             schedule(pcOfNextStatement(pc), stack)
           case ReturnValue(_, expr: IdBasedVar) =>
-          // TODO Bug in Opal causes to return the wrong operand (fixed but not released yet)
-          // stack.pop(expr)
+            stack.pop(expr)
           // No scheduling since there is no next statement
           case Return(_) => // No scheduling since there is no next statement
           case Nop(pc) =>

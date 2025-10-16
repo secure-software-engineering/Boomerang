@@ -57,7 +57,7 @@ class TacBodyBuilderTest {
     //  Running them sequentially would take too long
     if (!method.toJava.startsWith("java.lang.")) return true
 
-    // Static initializers may be very complex and take some time to compute (e.g. com.sun.crypto.provider.AESCrypt)
+    // Static initializers may be very complex and take some time to compute (e.g. java.lang.Character$UnicodeScript)
     if (method.isStaticInitializer) return true
 
     false
