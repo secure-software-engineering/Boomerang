@@ -18,7 +18,6 @@ import boomerang.scope.opal.transformation.RegisterLocal
 import boomerang.scope.opal.transformation.StackLocal
 import boomerang.scope.opal.transformation.TacLocal
 import boomerang.scope.opal.transformation.stack.OperandStackHandler
-import org.opalj.collection.immutable.IntIntPair
 import org.opalj.tac.ArrayLength
 import org.opalj.tac.ArrayLoad
 import org.opalj.tac.ArrayStore
@@ -88,208 +87,190 @@ object LocalPropagationTransformer {
         stackLocal: StackLocal,
         registerLocal: RegisterLocal
     ): Stmt[TacLocal] = {
-      stmt.astID match {
-        case If.ASTID =>
-          val ifStmt = stmt.asIf
+      stmt match {
+        case If(pc, left, condition, right, target) =>
+          val updatedLeft =
+            updateExpressionWithLocal(left, stackLocal, registerLocal)
+          val updatedRight =
+            updateExpressionWithLocal(right, stackLocal, registerLocal)
 
-          val left =
-            updateExpressionWithLocal(ifStmt.left, stackLocal, registerLocal)
-          val right =
-            updateExpressionWithLocal(ifStmt.left, stackLocal, registerLocal)
-
-          return If(ifStmt.pc, left, ifStmt.condition, right, ifStmt.targetStmt)
-        case Switch.ASTID =>
-          val switchStmt = stmt.asSwitch
-          val index = updateExpressionWithLocal(
-            switchStmt.index,
+          return If(pc, updatedLeft, condition, updatedRight, target)
+        case Switch(pc, defaultTarget, index, npairs) =>
+          val updatedIndex = updateExpressionWithLocal(
+            index,
             stackLocal,
             registerLocal
           )
 
           return Switch(
-            switchStmt.pc,
-            switchStmt.defaultStmt,
+            pc,
+            defaultTarget,
+            updatedIndex,
+            npairs
+          )
+        case Assignment(pc, targetVar, expr) =>
+          val updatedTargetVar = updateExpressionWithLocal(
+            targetVar,
+            stackLocal,
+            registerLocal
+          )
+          val updatedExpr = updateExpressionWithLocal(
+            expr,
+            stackLocal,
+            registerLocal
+          )
+
+          return Assignment(pc, updatedTargetVar.asVar, updatedExpr)
+        case ReturnValue(pc, expr) =>
+          val updatedExpr = updateExpressionWithLocal(
+            expr,
+            stackLocal,
+            registerLocal
+          )
+
+          return ReturnValue(pc, updatedExpr)
+        case MonitorEnter(pc, objRef) =>
+          val updatedObjRef = updateExpressionWithLocal(
+            objRef,
+            stackLocal,
+            registerLocal
+          )
+
+          return MonitorEnter(pc, updatedObjRef)
+        case MonitorExit(pc, objRef) =>
+          val updatedObjRef = updateExpressionWithLocal(
+            objRef,
+            stackLocal,
+            registerLocal
+          )
+
+          return MonitorExit(pc, updatedObjRef)
+        case ArrayStore(pc, arrayRef, index, value) =>
+          val updatedArrayRef = updateExpressionWithLocal(
+            arrayRef,
+            stackLocal,
+            registerLocal
+          )
+          val updatedIndex = updateExpressionWithLocal(
             index,
-            switchStmt.caseStmts.map(p => IntIntPair(-1, p))
-          )
-        case Assignment.ASTID =>
-          val assignStmt = stmt.asAssignment
-          val targetVar = updateExpressionWithLocal(
-            assignStmt.targetVar,
             stackLocal,
             registerLocal
           )
-          val expr = updateExpressionWithLocal(
-            assignStmt.expr,
+          val updatedValue = updateExpressionWithLocal(
+            value,
             stackLocal,
             registerLocal
           )
 
-          return Assignment(assignStmt.pc, targetVar.asVar, expr)
-        case ReturnValue.ASTID =>
-          val expr = updateExpressionWithLocal(
-            stmt.asReturnValue.expr,
+          return ArrayStore(pc, updatedArrayRef, updatedIndex, updatedValue)
+        case Throw(pc, exception) =>
+          val updatedException = updateExpressionWithLocal(
+            exception,
             stackLocal,
             registerLocal
           )
 
-          return ReturnValue(stmt.pc, expr)
-        case MonitorEnter.ASTID =>
-          val objRef = updateExpressionWithLocal(
-            stmt.asMonitorEnter.objRef,
-            stackLocal,
-            registerLocal
-          )
-
-          return MonitorEnter(stmt.pc, objRef)
-        case MonitorExit.ASTID =>
-          val objRef = updateExpressionWithLocal(
-            stmt.asMonitorExit.objRef,
-            stackLocal,
-            registerLocal
-          )
-
-          return MonitorExit(stmt.pc, objRef)
-        case ArrayStore.ASTID =>
-          val arrayStore = stmt.asArrayStore
-
-          val arrayRef = updateExpressionWithLocal(
-            arrayStore.arrayRef,
-            stackLocal,
-            registerLocal
-          )
-          val index = updateExpressionWithLocal(
-            arrayStore.index,
-            stackLocal,
-            registerLocal
-          )
-          val value = updateExpressionWithLocal(
-            arrayStore.value,
-            stackLocal,
-            registerLocal
-          )
-
-          return ArrayStore(arrayStore.pc, arrayRef, index, value)
-        case Throw.ASTID =>
-          val throwStmt = stmt.asThrow
-          val exception = updateExpressionWithLocal(
-            throwStmt.exception,
-            stackLocal,
-            registerLocal
-          )
-
-          return Throw(throwStmt.pc, exception)
-        case PutStatic.ASTID =>
-          val putStatic = stmt.asPutStatic
-          val value = updateExpressionWithLocal(
-            putStatic.value,
+          return Throw(pc, updatedException)
+        case PutStatic(pc, declaringClass, name, declaredFieldType, value) =>
+          val updatedValue = updateExpressionWithLocal(
+            value,
             stackLocal,
             registerLocal
           )
 
           return PutStatic(
-            putStatic.pc,
-            putStatic.declaringClass,
-            putStatic.name,
-            putStatic.declaredFieldType,
-            value
+            pc,
+            declaringClass,
+            name,
+            declaredFieldType,
+            updatedValue
           )
-        case PutField.ASTID =>
-          val putField = stmt.asPutField
-
-          val objRef = updateExpressionWithLocal(
-            putField.objRef,
+        case PutField(pc, declaringClass, name, declaredFieldType, objRef, value) =>
+          val updatedObjRef = updateExpressionWithLocal(
+            objRef,
             stackLocal,
             registerLocal
           )
-          val value =
-            updateExpressionWithLocal(putField.value, stackLocal, registerLocal)
+          val updatedValue =
+            updateExpressionWithLocal(value, stackLocal, registerLocal)
 
           return PutField(
-            putField.pc,
-            putField.declaringClass,
-            putField.name,
-            putField.declaredFieldType,
-            objRef,
-            value
+            pc,
+            declaringClass,
+            name,
+            declaredFieldType,
+            updatedObjRef,
+            updatedValue
           )
-        case NonVirtualMethodCall.ASTID =>
-          val methodCall = stmt.asNonVirtualMethodCall
-
+        case NonVirtualMethodCall(pc, declaringClass, isInterface, name, descriptor, receiver, params) =>
           val baseLocal = updateExpressionWithLocal(
-            methodCall.receiver,
+            receiver,
             stackLocal,
             registerLocal
           )
           val paramLocals =
-            methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+            params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return NonVirtualMethodCall(
-            methodCall.pc,
-            methodCall.declaringClass,
-            methodCall.isInterface,
-            methodCall.name,
-            methodCall.descriptor,
+            pc,
+            declaringClass,
+            isInterface,
+            name,
+            descriptor,
             baseLocal,
             paramLocals
           )
-        case VirtualMethodCall.ASTID =>
-          val methodCall = stmt.asVirtualMethodCall
-
+        case VirtualMethodCall(pc, declaringClass, isInterface, name, descriptor, receiver, params) =>
           val baseLocal = updateExpressionWithLocal(
-            methodCall.receiver,
+            receiver,
             stackLocal,
             registerLocal
           )
-          val paramLocals =
-            methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+          val paramLocals = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return VirtualMethodCall(
-            methodCall.pc,
-            methodCall.declaringClass,
-            methodCall.isInterface,
-            methodCall.name,
-            methodCall.descriptor,
+            pc,
+            declaringClass,
+            isInterface,
+            name,
+            descriptor,
             baseLocal,
             paramLocals
           )
-        case StaticMethodCall.ASTID =>
-          val methodCall = stmt.asStaticMethodCall
-          val params = methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+        case StaticMethodCall(pc, declaringClass, isInterface, name, descriptor, params) =>
+          val updatedParams = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return StaticMethodCall(
-            methodCall.pc,
-            methodCall.declaringClass,
-            methodCall.isInterface,
-            methodCall.name,
-            methodCall.descriptor,
-            params
+            pc,
+            declaringClass,
+            isInterface,
+            name,
+            descriptor,
+            updatedParams
           )
-        case InvokedynamicMethodCall.ASTID =>
-          val methodCall = stmt.asInvokedynamicMethodCall
-          val params = methodCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+        case InvokedynamicMethodCall(pc, bootstrapMethod, name, descriptor, params) =>
+          val updatedParams = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return InvokedynamicMethodCall(
-            methodCall.pc,
-            methodCall.bootstrapMethod,
-            methodCall.name,
-            methodCall.descriptor,
-            params
+            pc,
+            bootstrapMethod,
+            name,
+            descriptor,
+            updatedParams
           )
-        case ExprStmt.ASTID =>
-          val expr = updateExpressionWithLocal(
-            stmt.asExprStmt.expr,
+        case ExprStmt(pc, expr) =>
+          val updatedExpr = updateExpressionWithLocal(
+            expr,
             stackLocal,
             registerLocal
           )
 
-          return ExprStmt(stmt.pc, expr)
-        case Checkcast.ASTID =>
-          val castExpr = stmt.asCheckcast
-          val value =
-            updateExpressionWithLocal(castExpr.value, stackLocal, registerLocal)
+          return ExprStmt(pc, updatedExpr)
+        case Checkcast(pc, value, cmpTpe) =>
+          val updatedValue =
+            updateExpressionWithLocal(value, stackLocal, registerLocal)
 
-          return Checkcast(castExpr.pc, value, castExpr.cmpTpe)
+          return Checkcast(pc, updatedValue, cmpTpe)
         case _ => return stmt
       }
 
@@ -312,190 +293,169 @@ object LocalPropagationTransformer {
         }
       }
 
-      expr.astID match {
-        case InstanceOf.ASTID =>
-          val instanceOf = expr.asInstanceOf
-          val value = updateExpressionWithLocal(
-            instanceOf.value,
+      expr match {
+        case InstanceOf(pc, value, cmpTpe) =>
+          val updatedValue = updateExpressionWithLocal(
+            value,
             stackLocal,
             registerLocal
           )
 
-          return InstanceOf(instanceOf.pc, value, instanceOf.cmpTpe)
-        case Compare.ASTID =>
-          val compareExpr = expr.asCompare
-
+          return InstanceOf(pc, updatedValue, cmpTpe)
+        case Compare(pc, left, condition, right) =>
           val leftLocal = updateExpressionWithLocal(
-            compareExpr.left,
+            left,
             stackLocal,
             registerLocal
           )
           val rightLocal = updateExpressionWithLocal(
-            compareExpr.right,
+            right,
             stackLocal,
             registerLocal
           )
 
           return Compare(
-            compareExpr.pc,
+            pc,
             leftLocal,
-            compareExpr.condition,
+            condition,
             rightLocal
           )
-        case BinaryExpr.ASTID =>
-          val binaryExpr = expr.asBinaryExpr
-
-          val left = updateExpressionWithLocal(
-            binaryExpr.left,
+        case BinaryExpr(pc, cTpe, op, left, right) =>
+          val updatedLeft = updateExpressionWithLocal(
+            left,
             stackLocal,
             registerLocal
           )
-          val right = updateExpressionWithLocal(
-            binaryExpr.right,
+          val updatedRight = updateExpressionWithLocal(
+            right,
             stackLocal,
             registerLocal
           )
 
           return BinaryExpr(
-            binaryExpr.pc,
-            binaryExpr.cTpe,
-            binaryExpr.op,
-            left,
-            right
+            pc,
+            cTpe,
+            op,
+            updatedLeft,
+            updatedRight
           )
-        case PrefixExpr.ASTID =>
-          val prefixExpr = expr.asPrefixExpr
-          val operand = updateExpressionWithLocal(
-            prefixExpr.operand,
+        case PrefixExpr(pc, cTpe, op, operand) =>
+          val updatedOperand = updateExpressionWithLocal(
+            operand,
             stackLocal,
             registerLocal
           )
 
           return PrefixExpr(
-            prefixExpr.pc,
-            prefixExpr.cTpe,
-            prefixExpr.op,
-            operand
+            pc,
+            cTpe,
+            op,
+            updatedOperand
           )
-        case PrimitiveTypecastExpr.ASTID =>
-          val primitiveTypecastExpr = expr.asPrimitiveTypeCastExpr
-          val operand = updateExpressionWithLocal(
-            primitiveTypecastExpr.operand,
+        case PrimitiveTypecastExpr(pc, targetTpe, operand) =>
+          val updatedOperand = updateExpressionWithLocal(
+            operand,
             stackLocal,
             registerLocal
           )
 
           return PrimitiveTypecastExpr(
-            primitiveTypecastExpr.pc,
-            primitiveTypecastExpr.targetTpe,
-            operand
+            pc,
+            targetTpe,
+            updatedOperand
           )
-        case NewArray.ASTID =>
-          val newArray = expr.asNewArray
-          val counts = newArray.counts.map(c => updateExpressionWithLocal(c, stackLocal, registerLocal))
+        case NewArray(pc, counts, tpe) =>
+          val updatedCounts = counts.map(c => updateExpressionWithLocal(c, stackLocal, registerLocal))
 
-          return NewArray(newArray.pc, counts, newArray.tpe)
-        case ArrayLoad.ASTID =>
-          val arrayLoad = expr.asArrayLoad
-
-          val index = updateExpressionWithLocal(
-            arrayLoad.index,
+          return NewArray(pc, updatedCounts, tpe)
+        case ArrayLoad(pc, index, arrayRef) =>
+          val updatedIndex = updateExpressionWithLocal(
+            index,
             stackLocal,
             registerLocal
           )
-          val arrayRef = updateExpressionWithLocal(
-            arrayLoad.arrayRef,
-            stackLocal,
-            registerLocal
-          )
-
-          return ArrayLoad(arrayLoad.pc, index, arrayRef)
-        case ArrayLength.ASTID =>
-          val arrayLength = expr.asArrayLength
-          val arrayRef = updateExpressionWithLocal(
-            arrayLength.arrayRef,
+          val updatedArrayRef = updateExpressionWithLocal(
+            arrayRef,
             stackLocal,
             registerLocal
           )
 
-          return ArrayLength(arrayLength.pc, arrayRef)
-        case GetField.ASTID =>
-          val getField = expr.asGetField
-          val objRef = updateExpressionWithLocal(
-            getField.objRef,
+          return ArrayLoad(pc, updatedIndex, updatedArrayRef)
+        case ArrayLength(pc, arrayRef) =>
+          val updatedArrayRef = updateExpressionWithLocal(
+            arrayRef,
+            stackLocal,
+            registerLocal
+          )
+
+          return ArrayLength(pc, updatedArrayRef)
+        case GetField(pc, declaringClass, name, declaredFieldType, objRef) =>
+          val updatedObjRef = updateExpressionWithLocal(
+            objRef,
             stackLocal,
             registerLocal
           )
 
           return GetField(
-            getField.pc,
-            getField.declaringClass,
-            getField.name,
-            getField.declaredFieldType,
-            objRef
+            pc,
+            declaringClass,
+            name,
+            declaredFieldType,
+            updatedObjRef
           )
-        case InvokedynamicFunctionCall.ASTID =>
-          val functionCall = expr.asInvokedynamicFunctionCall
-          val params = functionCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+        case InvokedynamicFunctionCall(pc, bootstrapMethod, name, descriptor, params) =>
+          val updatedParams = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return InvokedynamicFunctionCall(
-            functionCall.pc,
-            functionCall.bootstrapMethod,
-            functionCall.name,
-            functionCall.descriptor,
-            params
+            pc,
+            bootstrapMethod,
+            name,
+            descriptor,
+            updatedParams
           )
-        case NonVirtualFunctionCall.ASTID =>
-          val functionCall = expr.asNonVirtualFunctionCall
-
+        case NonVirtualFunctionCall(pc, declaringClass, isInterface, name, descriptor, receiver, params) =>
           val base = updateExpressionWithLocal(
-            functionCall.receiver,
+            receiver,
             stackLocal,
             registerLocal
           )
-          val params = functionCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+          val updatedParams = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return NonVirtualFunctionCall(
-            functionCall.pc,
-            functionCall.declaringClass,
-            functionCall.isInterface,
-            functionCall.name,
-            functionCall.descriptor,
+            pc,
+            declaringClass,
+            isInterface,
+            name,
+            descriptor,
             base,
-            params
+            updatedParams
           )
-        case VirtualFunctionCall.ASTID =>
-          val functionCall = expr.asVirtualFunctionCall
-
+        case VirtualFunctionCall(pc, declaringClass, isInterface, name, descriptor, receiver, params) =>
           val base = updateExpressionWithLocal(
-            functionCall.receiver,
+            receiver,
             stackLocal,
             registerLocal
           )
-          val params = functionCall.params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+          val updatedParams = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return VirtualFunctionCall(
-            functionCall.pc,
-            functionCall.declaringClass,
-            functionCall.isInterface,
-            functionCall.name,
-            functionCall.descriptor,
+            pc,
+            declaringClass,
+            isInterface,
+            name,
+            descriptor,
             base,
-            params
+            updatedParams
           )
-        case StaticFunctionCall.ASTID =>
-          val functionCall = expr.asStaticFunctionCall
-
-          val params = functionCall.params
-          val paramLocals =
-            params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
+        case StaticFunctionCall(pc, declaringClass, isInterface, name, descriptor, params) =>
+          val paramLocals = params.map(p => updateExpressionWithLocal(p, stackLocal, registerLocal))
 
           return StaticFunctionCall(
-            functionCall.pc,
-            functionCall.declaringClass,
-            functionCall.isInterface,
-            functionCall.name,
-            functionCall.descriptor,
+            pc,
+            declaringClass,
+            isInterface,
+            name,
+            descriptor,
             paramLocals
           )
         case _ => return expr
