@@ -25,19 +25,17 @@ import org.opalj.br.analyses.Project
 class OpalWrappedClass(val delegate: ClassType, project: Project[_]) extends WrappedClass {
 
   override def getMethods: util.Set[Method] = {
+    val methods = new util.HashSet[Method]
     val classFile = project.classFile(delegate)
 
     if (classFile.isDefined) {
-      val methods = new util.HashSet[Method]
-
-      classFile.get.methods.foreach(method => {
-        methods.add(OpalMethod.of(method, project))
-      })
-
-      return methods
+      classFile.get.methods
+        .filter(!_.body.isEmpty)
+        .foreach(method => {
+          methods.add(OpalMethod.of(method, project))
+        })
     }
-
-    throw new RuntimeException("Class file of class not available: " + delegate.fqn)
+    return methods
   }
 
   override def hasSuperclass: Boolean = {
