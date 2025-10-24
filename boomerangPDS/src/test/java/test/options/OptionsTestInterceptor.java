@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import test.core.BoomerangTestingOptionsBuilder;
 
 public class OptionsTestInterceptor implements InvocationInterceptor, AfterEachCallback {
 
@@ -77,7 +78,7 @@ public class OptionsTestInterceptor implements InvocationInterceptor, AfterEachC
           e);
     }
 
-    return BoomerangOptions.builder()
+    return BoomerangTestingOptionsBuilder.create()
         .withFlowFunctionFactory(flowFunctionFactory)
         .withArrayStrategy(testOptions.arrayStrategy())
         .withStaticFieldStrategy(testOptions.staticFieldStrategy())

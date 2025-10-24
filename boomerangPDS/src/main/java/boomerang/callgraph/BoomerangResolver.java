@@ -15,7 +15,6 @@
 package boomerang.callgraph;
 
 import boomerang.BackwardQuery;
-import boomerang.Boomerang;
 import boomerang.ForwardQuery;
 import boomerang.Query;
 import boomerang.SolverCreationListener;
@@ -24,7 +23,6 @@ import boomerang.results.ExtractAllocationSiteStateListener;
 import boomerang.scope.CallGraph;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.DeclaredMethod;
-import boomerang.scope.FrameworkScope;
 import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
@@ -34,17 +32,17 @@ import boomerang.scope.WrappedClass;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sync.pds.solver.nodes.INode;
-import sync.pds.solver.nodes.Node;
 import wpds.impl.Weight;
 
 public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
@@ -62,116 +60,117 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
   private static final String THREAD_RUN_SUB_SIGNATURE = "void run()";
 
   private static final NoCalleeFoundFallbackOptions FALLBACK_OPTION =
-      NoCalleeFoundFallbackOptions.BYPASS;
+      NoCalleeFoundFallbackOptions.PRECOMPUTED;
   private static final Multimap<DeclaredMethod, WrappedClass> didNotFindMethodLog =
       HashMultimap.create();
 
   private final CallGraph precomputedCallGraph;
   private final WeightedBoomerang<? extends Weight> solver;
   private final Set<Statement> queriedInvokeExprAndAllocationSitesFound = new LinkedHashSet<>();
-  private final Set<Statement> queriedInvokeExpr = new LinkedHashSet<>();
-
-  public BoomerangResolver(FrameworkScope frameworkScope) {
-    this.solver = new Boomerang(frameworkScope);
-    this.precomputedCallGraph = frameworkScope.getCallGraph();
-  }
+  private Set<Statement> queriedInvokeExpr = new LinkedHashSet<>();
 
   public BoomerangResolver(WeightedBoomerang<? extends Weight> solver, CallGraph initialCallGraph) {
-    this(solver, true, initialCallGraph);
-  }
-
-  public BoomerangResolver(
-      WeightedBoomerang<? extends Weight> solver,
-      boolean enableExceptions,
-      CallGraph initialCallGraph) {
     this.solver = solver;
     this.precomputedCallGraph = initialCallGraph;
   }
 
   @Override
-  public void computeFallback(ObservableDynamicICFG observableDynamicICFG) {
+  public boolean computeFallback(
+      BiConsumer<Statement, Method> onCallerCalleeFoundCallback,
+      Consumer<Statement> onNoCalleeFoundCallback) {
     int refined = 0;
     int precomputed = 0;
-    for (Statement s : Lists.newArrayList(queriedInvokeExpr)) {
+    Set<Statement> todo = queriedInvokeExpr;
+    queriedInvokeExpr = new LinkedHashSet<>();
+    boolean changes = false;
+    for (Statement s : todo) {
       if (!queriedInvokeExprAndAllocationSitesFound.contains(s)) {
         logger.debug("Call graph ends at {}", s);
         precomputed++;
+        changes = true;
         if (FALLBACK_OPTION == NoCalleeFoundFallbackOptions.PRECOMPUTED) {
+          // strictly speaking, no alloc site was found - but we shouldn't process this stmt again
+          queriedInvokeExprAndAllocationSitesFound.add(s);
           for (CallGraph.Edge e : precomputedCallGraph.edgesOutOf(s)) {
             // TODO Refactor. Should not be required, if the backward analysis is sound (data-flow
             // of static fields)
             if (e.tgt().isDefined()) {
-              observableDynamicICFG.addCallIfNotInGraph(e.src(), e.tgt());
+              onCallerCalleeFoundCallback.accept(e.src(), e.tgt());
             }
           }
         }
         if (FALLBACK_OPTION == NoCalleeFoundFallbackOptions.BYPASS) {
-          observableDynamicICFG.notifyNoCalleeFound(s);
+          onNoCalleeFoundCallback.accept(s);
         }
       } else {
         refined++;
       }
     }
     logger.debug("Refined edges {}, fallback to precomputed {}", refined, precomputed);
+    return changes;
   }
 
   @Override
-  public Method resolveSpecialInvoke(InvokeExpr ie) {
+  public void resolveCallersForCalleeFallback(
+      Method callee, BiConsumer<Statement, Method> onCallerCalleeFoundCallback) {
+    Collection<CallGraph.Edge> edges = precomputedCallGraph.edgesInto(callee);
+    for (CallGraph.Edge edge : edges) {
+      onCallerCalleeFoundCallback.accept(edge.src(), edge.tgt());
+    }
+  }
+
+  @Override
+  public void resolveSpecialInvoke(
+      Statement stmt, BiConsumer<Statement, Method> onCallerCalleeFoundCallback) {
+    InvokeExpr ie = stmt.getInvokeExpr();
     Collection<Method> methodFromClassOrFromSuperclass =
         getMethodFromClassOrFromSuperclass(
             ie.getDeclaredMethod(), ie.getDeclaredMethod().getDeclaringClass());
     if (methodFromClassOrFromSuperclass.size() > 1) {
       throw new RuntimeException(
           "Illegal state, a special call should exactly resolve to one target");
+    } else if (!methodFromClassOrFromSuperclass.isEmpty()) {
+      onCallerCalleeFoundCallback.accept(
+          stmt, methodFromClassOrFromSuperclass.stream().findFirst().get());
     }
-    return Iterables.getFirst(methodFromClassOrFromSuperclass, null);
   }
 
   @Override
-  public Method resolveStaticInvoke(InvokeExpr ie) {
+  public void resolveStaticInvoke(
+      Statement stmt, BiConsumer<Statement, Method> onCallerCalleeFoundCallback) {
+    InvokeExpr ie = stmt.getInvokeExpr();
     Collection<Method> methodFromClassOrFromSuperclass =
         getMethodFromClassOrFromSuperclass(
             ie.getDeclaredMethod(), ie.getDeclaredMethod().getDeclaringClass());
     if (methodFromClassOrFromSuperclass.size() > 1) {
       throw new RuntimeException(
           "Illegal state, a static call should exactly resolve to one target");
+    } else if (!methodFromClassOrFromSuperclass.isEmpty()) {
+      onCallerCalleeFoundCallback.accept(
+          stmt, methodFromClassOrFromSuperclass.stream().findFirst().get());
     }
-    return Iterables.getFirst(methodFromClassOrFromSuperclass, null);
   }
 
   @Override
-  public Collection<Method> resolveInstanceInvoke(Statement stmt) {
-    return queryForCallees(stmt);
-  }
-
-  private Collection<Method> queryForCallees(Statement resolvingStmt) {
+  public void resolveInstanceInvoke(
+      Statement resolvingStmt, BiConsumer<Statement, Method> onCallerCalleeFoundCallback) {
     logger.debug("Queried for callees of '{}'.", resolvingStmt);
     // Construct BackwardQuery, so we know which types the object might have
     InvokeExpr invokeExpr = resolvingStmt.getInvokeExpr();
     queriedInvokeExpr.add(resolvingStmt);
     Val value = invokeExpr.getBase();
 
-    Collection<Method> res = new ArrayList<>();
-
     // Not using cfg here because we are iterating backward
     for (Statement pred :
         resolvingStmt.getMethod().getControlFlowGraph().getPredsOf(resolvingStmt)) {
       BackwardQuery query = BackwardQuery.make(new Edge(pred, resolvingStmt), value);
-      solver.solve(query, false);
-      res.addAll(forAnyAllocationSiteOfQuery(query, resolvingStmt, pred));
+      solver.solve(query, false, false);
+      solver.registerSolverCreationListener(
+          new IterateSolvers(query, resolvingStmt, onCallerCalleeFoundCallback));
     }
-
-    return res;
   }
 
-  @SuppressWarnings("rawtypes")
-  private Collection<Method> forAnyAllocationSiteOfQuery(
-      BackwardQuery query, Statement resolvingStmt, Statement callSite) {
-    IterateSolvers callback = new IterateSolvers(query, callSite, resolvingStmt);
-    solver.registerSolverCreationListener(callback);
-    return callback.results;
-  }
-
+  // XXX: interface default methods
   private Collection<Method> getMethodFromClassOrFromSuperclass(
       DeclaredMethod method, WrappedClass sootClass) {
     Set<Method> res = new LinkedHashSet<>();
@@ -182,8 +181,10 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
           res.add(candidate);
         }
       }
-      handlingForThreading(method, sootClass, res);
-      if (!res.isEmpty()) return res;
+      if (!res.isEmpty()) {
+        handlingForThreading(method, originalClass, res);
+        return res;
+      }
       if (sootClass.hasSuperclass()) {
         sootClass = sootClass.getSuperclass();
       } else {
@@ -202,29 +203,45 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
   }
 
   private void handlingForThreading(
-      DeclaredMethod method, WrappedClass sootClass, Set<Method> res) {
-    // throw new RuntimeException("Threading not implemented");
-    // if (Scene.v().getFastHierarchy().isSubclass(sootClass,
-    // Scene.v().getSootClass(THREAD_CLASS)))
-    // {
-    // if (method.getSignature().equals(THREAD_START_SIGNATURE)) {
-    // for (SootMethod candidate : sootClass.getMethods()) {
-    // if (candidate.getSubSignature().equals(THREAD_RUN_SUB_SIGNATURE)) {
-    // res.add(candidate);
-    // }
-    // }
-    // }
-    // }
+      DeclaredMethod method, WrappedClass wrappedClass, Set<Method> res) {
+    if (!THREAD_START_SIGNATURE.equals(method.getSignature())) {
+      return;
+    }
+    List<WrappedClass> lookupClasses = new ArrayList<>();
+    lookupClasses.add(wrappedClass);
+    boolean inheritsFromThreadClass = THREAD_CLASS.equals(wrappedClass.getFullyQualifiedName());
+    while (wrappedClass.hasSuperclass() && !inheritsFromThreadClass) {
+      wrappedClass = wrappedClass.getSuperclass();
+      lookupClasses.add(wrappedClass);
+      inheritsFromThreadClass = THREAD_CLASS.equals(wrappedClass.getFullyQualifiedName());
+    }
+    if (!inheritsFromThreadClass) {
+      return;
+    }
+    for (WrappedClass candidateClass : lookupClasses) {
+      Optional<Method> runMethod =
+          candidateClass.getMethods().stream()
+              .filter(m -> THREAD_RUN_SUB_SIGNATURE.equals(m.getSubSignature()))
+              .findFirst();
+      if (runMethod.isPresent()) {
+        res.add(runMethod.get());
+        break;
+      }
+    }
   }
 
   private final class IterateSolvers<W extends Weight> implements SolverCreationListener<W> {
     private final BackwardQuery query;
     private final Statement invokeExpr;
-    private final Collection<Method> results = new ArrayList<>();
+    private final BiConsumer<Statement, Method> onCallerCalleeFoundCallback;
 
-    private IterateSolvers(BackwardQuery query, Statement unit, Statement invokeExpr) {
+    private IterateSolvers(
+        BackwardQuery query,
+        Statement invokeExpr,
+        BiConsumer<Statement, Method> onCallerCalleeFoundCallback) {
       this.query = query;
       this.invokeExpr = invokeExpr;
+      this.onCallerCalleeFoundCallback = onCallerCalleeFoundCallback;
     }
 
     @Override
@@ -232,40 +249,45 @@ public class BoomerangResolver implements ICallerCalleeResolutionStrategy {
       if (solver instanceof ForwardBoomerangSolver) {
         ForwardQuery forwardQuery = (ForwardQuery) q;
         ForwardBoomerangSolver<W> forwardBoomerangSolver = (ForwardBoomerangSolver<W>) solver;
-        for (INode<Node<Edge, Val>> initialState :
-            forwardBoomerangSolver.getFieldAutomaton().getInitialStates()) {
-          forwardBoomerangSolver
-              .getFieldAutomaton()
-              .registerListener(
-                  new ExtractAllocationSiteStateListener<W>(initialState, query, (ForwardQuery) q) {
+        forwardBoomerangSolver
+            .getFieldAutomaton()
+            .registerListener(
+                initialState ->
+                    forwardBoomerangSolver
+                        .getFieldAutomaton()
+                        .registerListener(
+                            new ExtractAllocationSiteStateListener<W>(
+                                initialState, query, (ForwardQuery) q) {
 
-                    @Override
-                    protected void allocationSiteFound(
-                        ForwardQuery allocationSite, BackwardQuery query) {
-                      logger.debug("Found AllocationSite '{}'.", forwardQuery);
-                      queriedInvokeExprAndAllocationSitesFound.add(invokeExpr);
-                      Type type = forwardQuery.getType();
-                      if (type.isRefType()) {
-                        for (Method calleeMethod :
-                            getMethodFromClassOrFromSuperclass(
-                                invokeExpr.getInvokeExpr().getDeclaredMethod(),
-                                type.getWrappedClass())) {
-                          results.add(calleeMethod);
-                        }
-                      } else if (type.isArrayType()) {
-                        Type base = type.getArrayBaseType();
-                        if (base.isRefType()) {
-                          for (Method calleeMethod :
-                              getMethodFromClassOrFromSuperclass(
-                                  invokeExpr.getInvokeExpr().getDeclaredMethod(),
-                                  base.getWrappedClass())) {
-                            results.add(calleeMethod);
-                          }
-                        }
-                      }
-                    }
-                  });
-        }
+                              @Override
+                              protected void allocationSiteFound(
+                                  ForwardQuery allocationSite, BackwardQuery query) {
+                                logger.debug("Found AllocationSite '{}'.", forwardQuery);
+                                queriedInvokeExprAndAllocationSitesFound.add(invokeExpr);
+                                Type type = forwardQuery.getType();
+                                if (type.isNullType()) {
+                                  return;
+                                }
+                                if (type.isRefType()) {
+                                  for (Method calleeMethod :
+                                      getMethodFromClassOrFromSuperclass(
+                                          invokeExpr.getInvokeExpr().getDeclaredMethod(),
+                                          type.getWrappedClass())) {
+                                    onCallerCalleeFoundCallback.accept(invokeExpr, calleeMethod);
+                                  }
+                                } else if (type.isArrayType()) {
+                                  Type base = type.getArrayBaseType();
+                                  if (base.isRefType()) {
+                                    for (Method calleeMethod :
+                                        getMethodFromClassOrFromSuperclass(
+                                            invokeExpr.getInvokeExpr().getDeclaredMethod(),
+                                            base.getWrappedClass())) {
+                                      onCallerCalleeFoundCallback.accept(invokeExpr, calleeMethod);
+                                    }
+                                  }
+                                }
+                              }
+                            }));
       }
     }
 

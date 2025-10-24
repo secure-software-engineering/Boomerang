@@ -159,9 +159,12 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
               : t.getLabel().getStart()))) {
         Statement exitStmt = t.getLabel().getTarget();
         Method callee = exitStmt.getMethod();
-        if (callAutomaton.getInitialStates().contains(t.getTarget())) {
-          addPotentialUnbalancedFlow(callee, t, w);
-        }
+        callAutomaton.registerListener(
+            initialState -> {
+              if (initialState.equals(t.getTarget())) {
+                addPotentialUnbalancedFlow(callee, t, w);
+              }
+            });
       }
     }
   }
@@ -318,10 +321,12 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
     }
   }
 
-  protected boolean isMatchingCallSiteCalleePair(Statement callSite, Method method) {
-    Set<Statement> callSitesOfCall = new LinkedHashSet<>();
+  protected void onMatchingCallSiteCalleePair(
+      Statement callSite, Method method, Runnable callback) {
     icfg.addCallerListener(
         new CallerListener<>() {
+          private boolean isCallbackExecuted = false;
+
           @Override
           public Method getObservedCallee() {
             return method;
@@ -329,10 +334,12 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
 
           @Override
           public void onCallerAdded(Statement statement, Method method) {
-            callSitesOfCall.add(statement);
+            if (!isCallbackExecuted && callSite.equals(statement)) {
+              isCallbackExecuted = true;
+              callback.run();
+            }
           }
         });
-    return callSitesOfCall.contains(callSite);
   }
 
   protected abstract void propagateUnbalancedToCallSite(

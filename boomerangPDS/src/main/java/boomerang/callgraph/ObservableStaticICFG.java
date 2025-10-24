@@ -127,7 +127,7 @@ public class ObservableStaticICFG implements ObservableICFG<Statement, Method> {
   }
 
   @Override
-  public void addEdges(Edge e) {
+  public void addEdge(Edge e) {
     throw new RuntimeException("Unnecessary");
   }
 }

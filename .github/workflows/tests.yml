@@ -15,6 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         framework: [ Soot, SootUp, Opal ]
+        enableOnTheFlyCallGraph: [ false, true ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -26,4 +27,4 @@ jobs:
           java-package: jdk
           java-version: 11
       - name: Build with Maven
-        run: mvn -B clean verify -DtestSetup=${{ matrix.framework }}
+        run: mvn -B clean verify -DtestSetup=${{ matrix.framework }} -DenableOnTheFlyCallGraph=${{ matrix.enableOnTheFlyCallGraph }}

@@ -24,6 +24,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +48,6 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
 
   private int numberOfEdgesTakenFromPrecomputedCallGraph = 0;
 
-  private final CallGraphOptions options = new CallGraphOptions();
   private CallGraph demandDrivenCallGraph = new CallGraph();
 
   private final Multimap<Statement, CalleeListener<Statement, Method>> calleeListeners =
@@ -52,8 +55,12 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
   private final Multimap<Method, CallerListener<Statement, Method>> callerListeners =
       HashMultimap.create();
 
+  private final Set<CallerListener<Statement, Method>> processedCallerListeners = new HashSet<>();
+
   private final ObservableControlFlowGraph cfg;
   private final ICallerCalleeResolutionStrategy resolutionStrategy;
+  private final BiConsumer<Statement, Method> onCallerCalleeFoundCallback =
+      (stmt, method) -> addEdge(new CallGraph.Edge(stmt, method));
 
   public ObservableDynamicICFG(
       ObservableControlFlowGraph cfg, ICallerCalleeResolutionStrategy resolutionStrategy) {
@@ -81,7 +88,7 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
       }
     }
 
-    for (Edge e : edges) {
+    for (Edge e : Lists.newArrayList(edges)) {
       if (e.tgt().isDefined()) {
         listener.onCalleeAdded(stmt, e.tgt());
       }
@@ -92,16 +99,14 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
     if ((ie.isInstanceInvokeExpr())) {
       // If it was invoked on an object we might find new instances
       if (ie.isSpecialInvokeExpr()) {
-        addCallIfNotInGraph(stmt, resolutionStrategy.resolveSpecialInvoke(ie));
+        resolutionStrategy.resolveSpecialInvoke(stmt, onCallerCalleeFoundCallback);
       } else {
         // Query for callees of the unit and add edges to the graph
-        for (Method method : resolutionStrategy.resolveInstanceInvoke(stmt)) {
-          addCallIfNotInGraph(stmt, method);
-        }
+        resolutionStrategy.resolveInstanceInvoke(stmt, onCallerCalleeFoundCallback);
       }
     } else {
       // Call was not invoked on an object. Must be static
-      addCallIfNotInGraph(stmt, resolutionStrategy.resolveStaticInvoke(ie));
+      resolutionStrategy.resolveStaticInvoke(stmt, onCallerCalleeFoundCallback);
     }
   }
 
@@ -129,17 +134,22 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
     for (Edge e : Lists.newArrayList(edges)) {
       listener.onCallerAdded(e.src(), method);
     }
+    if (!edges.isEmpty()) {
+      processedCallerListeners.add(listener);
+    }
   }
 
   /**
    * Returns true if the call was added to the call graph, false if it was already present and the
    * call graph did not change
    */
-  protected boolean addCallIfNotInGraph(Statement caller, Method callee) {
-    Edge edge = new Edge(caller, callee);
+  @Override
+  public void addEdge(Edge edge) {
     if (!demandDrivenCallGraph.addEdge(edge)) {
-      return false;
+      return;
     }
+    Statement caller = edge.src();
+    Method callee = edge.tgt();
     logger.debug("Added call from unit '{}' to method '{}'", caller, callee);
     // Notify all interested listeners, so ..
     // .. CalleeListeners interested in callees of the caller or the CallGraphExtractor that is
@@ -154,7 +164,6 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
         Lists.newArrayList(callerListeners.get(callee))) {
       listener.onCallerAdded(caller, callee);
     }
-    return true;
   }
 
   protected void notifyNoCalleeFound(Statement s) {
@@ -203,11 +212,39 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
 
   @Override
   public void computeFallback() {
-    resolutionStrategy.computeFallback(this);
+    boolean changes = false;
+    do {
+      /*
+       * Idea/"heuristic": run the caller listeners fallback before the callee
+       * listeners fallback (the hope is that the backward queries, which were
+       * issued by the resolutionStrategy, are resolved, when discovering new
+       * callers).
+       */
+      do {
+        changes = runCallerListeners();
+      } while (changes);
+      changes = resolutionStrategy.computeFallback(
+          onCallerCalleeFoundCallback, stmt -> notifyNoCalleeFound(stmt));
+    } while (changes);
   }
 
-  @Override
-  public void addEdges(Edge e) {
-    demandDrivenCallGraph.addEdge(e);
+  private boolean runCallerListeners() {
+    int count = processedCallerListeners.size();
+    Set<CallerListener<Statement, Method>> todo;
+    do {
+      todo =
+          callerListeners.values().stream()
+              .filter(l -> !processedCallerListeners.contains(l))
+              .collect(Collectors.toSet());
+      for (CallerListener<Statement, Method> listener : todo) {
+        if (processedCallerListeners.contains(listener)) {
+          continue;
+        }
+        processedCallerListeners.add(listener);
+        resolutionStrategy.resolveCallersForCalleeFallback(
+            listener.getObservedCallee(), onCallerCalleeFoundCallback);
+      }
+    } while (!todo.isEmpty());
+    return count != processedCallerListeners.size();
   }
 }

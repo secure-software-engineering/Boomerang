@@ -267,21 +267,24 @@ public abstract class WeightedBoomerang<W extends Weight> {
                 BackwardQuery bwq =
                     BackwardQuery.make(new Edge(pred, stmt), stmt.getInvokeExpr().getArg(0));
                 backwardSolve(bwq);
-                for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
-                  if (queryToSolvers.get(q).getReachedStates().contains(bwq.asNode())) {
-                    AllocVal v = q.getAllocVal();
-                    if (v.getAllocVal().isStringConstant()) {
-                      String key = v.getAllocVal().getStringValue();
-                      backwardSolverIns.propagate(
-                          node,
-                          new PushNode<>(
-                              new Edge(pred, stmt),
-                              stmt.getInvokeExpr().getBase(),
-                              StringBasedField.getInstance(key),
-                              PDSSystem.FIELDS));
-                    }
-                  }
-                }
+                WeightedBoomerang.this.registerSolverCreationListener(
+                    (q, solver) ->
+                        solver.registerListener(
+                            n -> {
+                              if (n.equals(bwq.asNode()) && q instanceof ForwardQuery) {
+                                AllocVal v = ((ForwardQuery) q).getAllocVal();
+                                if (v.getAllocVal().isStringConstant()) {
+                                  String key = v.getAllocVal().getStringValue();
+                                  backwardSolverIns.propagate(
+                                      node,
+                                      new PushNode<>(
+                                          new Edge(pred, stmt),
+                                          stmt.getInvokeExpr().getBase(),
+                                          StringBasedField.getInstance(key),
+                                          PDSSystem.FIELDS));
+                                }
+                              }
+                            }));
               }
             });
       }
@@ -296,21 +299,25 @@ public abstract class WeightedBoomerang<W extends Weight> {
                 BackwardQuery bwq =
                     BackwardQuery.make(new Edge(pred, stmt), stmt.getInvokeExpr().getArg(0));
                 backwardSolve(bwq);
-                for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
-                  if (queryToSolvers.get(q).getReachedStates().contains(bwq.asNode())) {
-                    AllocVal v = q.getAllocVal();
+                WeightedBoomerang.this.registerSolverCreationListener(
+                    (q, solver) ->
+                        solver.registerListener(
+                            n -> {
+                              if (n.equals(bwq.asNode()) && q instanceof ForwardQuery) {
+                                AllocVal v = ((ForwardQuery) q).getAllocVal();
 
-                    if (v.getAllocVal().isStringConstant()) {
-                      String key = v.getAllocVal().getStringValue();
-                      NodeWithLocation<Edge, Val, Field> succNode =
-                          new NodeWithLocation<>(
-                              new Edge(pred, stmt),
-                              stmt.getInvokeExpr().getArg(1),
-                              StringBasedField.getInstance(key));
-                      backwardSolverIns.propagate(node, new PopNode<>(succNode, PDSSystem.FIELDS));
-                    }
-                  }
-                }
+                                if (v.getAllocVal().isStringConstant()) {
+                                  String key = v.getAllocVal().getStringValue();
+                                  NodeWithLocation<Edge, Val, Field> succNode =
+                                      new NodeWithLocation<>(
+                                          new Edge(pred, stmt),
+                                          stmt.getInvokeExpr().getArg(1),
+                                          StringBasedField.getInstance(key));
+                                  backwardSolverIns.propagate(
+                                      node, new PopNode<>(succNode, PDSSystem.FIELDS));
+                                }
+                              }
+                            }));
               }
             });
       }
@@ -325,27 +332,30 @@ public abstract class WeightedBoomerang<W extends Weight> {
         if (stmt.getInvokeExpr().getBase().equals(node.fact())) {
           BackwardQuery bwq = BackwardQuery.make(node.stmt(), stmt.getInvokeExpr().getArg(0));
           backwardSolve(bwq);
-          cfg.addSuccsOfListener(
-              new SuccessorListener(stmt) {
-                @Override
-                public void getSuccessor(Statement succ) {
-                  for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
-                    if (queryToSolvers.get(q).getReachedStates().contains(bwq.asNode())) {
-                      AllocVal v = q.getAllocVal();
+          registerSolverCreationListener(
+              (q, solverForKeyArg) ->
+                  solverForKeyArg.registerListener(
+                      n ->
+                          cfg.addSuccsOfListener(
+                              new SuccessorListener(stmt) {
+                                @Override
+                                public void getSuccessor(Statement succ) {
+                                  if (n.equals(bwq.asNode()) && q instanceof ForwardQuery) {
+                                    AllocVal v = ((ForwardQuery) q).getAllocVal();
 
-                      if (v.getAllocVal().isStringConstant()) {
-                        String key = v.getAllocVal().getStringValue();
-                        NodeWithLocation<Edge, Val, Field> succNode =
-                            new NodeWithLocation<>(
-                                new Edge(stmt, succ),
-                                stmt.getLeftOp(),
-                                StringBasedField.getInstance(key));
-                        solver.propagate(node, new PopNode<>(succNode, PDSSystem.FIELDS));
-                      }
-                    }
-                  }
-                }
-              });
+                                    if (v.getAllocVal().isStringConstant()) {
+                                      String key = v.getAllocVal().getStringValue();
+                                      NodeWithLocation<Edge, Val, Field> succNode =
+                                          new NodeWithLocation<>(
+                                              new Edge(stmt, succ),
+                                              stmt.getLeftOp(),
+                                              StringBasedField.getInstance(key));
+                                      solver.propagate(
+                                          node, new PopNode<>(succNode, PDSSystem.FIELDS));
+                                    }
+                                  }
+                                }
+                              })));
         }
       }
       if (stmt.getInvokeExpr().getDeclaredMethod().toMethodWrapper().equals(MAP_PUT_SIGNATURE)) {
@@ -353,27 +363,29 @@ public abstract class WeightedBoomerang<W extends Weight> {
 
           BackwardQuery bwq = BackwardQuery.make(node.stmt(), stmt.getInvokeExpr().getArg(0));
           backwardSolve(bwq);
-          cfg.addSuccsOfListener(
-              new SuccessorListener(stmt) {
-                @Override
-                public void getSuccessor(Statement succ) {
-                  for (ForwardQuery q : Lists.newArrayList(queryToSolvers.keySet())) {
-                    if (queryToSolvers.get(q).getReachedStates().contains(bwq.asNode())) {
-                      AllocVal v = q.getAllocVal();
-                      if (v.getAllocVal().isStringConstant()) {
-                        String key = v.getAllocVal().getStringValue();
-                        solver.propagate(
-                            node,
-                            new PushNode<>(
-                                new Edge(stmt, succ),
-                                stmt.getInvokeExpr().getBase(),
-                                StringBasedField.getInstance(key),
-                                PDSSystem.FIELDS));
-                      }
-                    }
-                  }
-                }
-              });
+          registerSolverCreationListener(
+              (q, solverForKeyArg) ->
+                  solverForKeyArg.registerListener(
+                      n ->
+                          cfg.addSuccsOfListener(
+                              new SuccessorListener(stmt) {
+                                @Override
+                                public void getSuccessor(Statement succ) {
+                                  if (n.equals(bwq.asNode()) && q instanceof ForwardQuery) {
+                                    AllocVal v = ((ForwardQuery) q).getAllocVal();
+                                    if (v.getAllocVal().isStringConstant()) {
+                                      String key = v.getAllocVal().getStringValue();
+                                      solver.propagate(
+                                          node,
+                                          new PushNode<>(
+                                              new Edge(stmt, succ),
+                                              stmt.getInvokeExpr().getBase(),
+                                              StringBasedField.getInstance(key),
+                                              PDSSystem.FIELDS));
+                                    }
+                                  }
+                                }
+                              })));
         }
       }
     }
@@ -988,10 +1000,14 @@ public abstract class WeightedBoomerang<W extends Weight> {
   }
 
   public BackwardBoomerangResults<W> solve(BackwardQuery query) {
-    return solve(query, true);
+    return solve(query, true, true);
   }
 
   public BackwardBoomerangResults<W> solve(BackwardQuery query, boolean timing) {
+    return solve(query, timing, true);
+  }
+
+  public BackwardBoomerangResults<W> solve(BackwardQuery query, boolean timing, boolean fallback) {
     if (!options.allowMultipleQueries() && solving) {
       throw new RuntimeException(
           "One cannot re-use the same Boomerang solver for more than one query, unless option allowMultipleQueries is enabled. If allowMultipleQueries is enabled, ensure to call unregisterAllListeners() on this instance upon termination of all queries.");
@@ -1005,6 +1021,9 @@ public abstract class WeightedBoomerang<W extends Weight> {
       queryGraph.addRoot(query);
       LOGGER.trace("Starting backward analysis of: {}", query);
       backwardSolve(query);
+      if (fallback) {
+        icfg.computeFallback();
+      }
     } catch (BoomerangTimeoutException e) {
       timedout = true;
       LOGGER.trace("Timeout ({}) of query: {} ", analysisWatch, query);
@@ -1037,6 +1056,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
       LOGGER.trace("Starting backward analysis of: {}", query);
       backwardSolve(query);
       queryGraph.addEdge(parentQuery, triggeringNode, query);
+      icfg.computeFallback();
       this.debugOutput();
     } catch (BoomerangTimeoutException e) {
       timedout = true;
@@ -1064,6 +1084,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
       LOGGER.trace("Starting forward analysis of: {}", query);
       forwardSolve(query);
       queryGraph.addEdge(parentQuery, triggeringNode, query);
+      icfg.computeFallback();
       LOGGER.trace(
           "Query terminated in {} ({}), visited methods {}",
           analysisWatch,
