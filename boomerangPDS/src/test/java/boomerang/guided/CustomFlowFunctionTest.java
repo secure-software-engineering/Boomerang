@@ -44,6 +44,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import test.TestingFramework;
+import test.core.BoomerangTestingOptionsBuilder;
 import wpds.impl.NoWeight;
 
 public class CustomFlowFunctionTest {
@@ -197,7 +198,7 @@ public class CustomFlowFunctionTest {
   }
 
   private BoomerangOptions customOptions() {
-    return BoomerangOptions.builder()
+    return BoomerangTestingOptionsBuilder.create()
         .withAllocationSite(new IntAndStringAllocationSite())
         .withFlowFunctionFactory(createFlowFunctionFactory())
         .build();

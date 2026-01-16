@@ -77,7 +77,7 @@ public class BackwardsObservableICFG implements ObservableICFG<Statement, Method
   }
 
   @Override
-  public void addEdges(Edge e) {
-    this.delegate.addEdges(e);
+  public void addEdge(Edge e) {
+    this.delegate.addEdge(e);
   }
 }

@@ -117,7 +117,7 @@ public class MultiQueryBoomerangTest extends TestingFramework {
 
   private void runDemandDrivenBackward(FrameworkScope frameworkScope) {
     BoomerangOptions options =
-        BoomerangOptions.builder()
+        BoomerangTestingOptionsBuilder.create()
             .withAnalysisTimeout(analysisTimeout)
             .enableAllowMultipleQueries(true)
             .build();

@@ -135,7 +135,7 @@ public class IDEALTestRunnerInterceptor
   private BoomerangOptions createOptions(TestConfig config) {
     IFlowFunctionFactory factory = getFlowFunctionFactory(config.flowFunctions());
 
-    return BoomerangOptions.builder()
+    return BoomerangTestingOptionsBuilder.create()
         .withFlowFunctionFactory(factory)
         .withStaticFieldStrategy(Strategies.StaticFieldStrategy.FLOW_SENSITIVE)
         .withAnalysisTimeout(-1)

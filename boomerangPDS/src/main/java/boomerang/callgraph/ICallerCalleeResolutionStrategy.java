@@ -16,10 +16,10 @@ package boomerang.callgraph;
 
 import boomerang.WeightedBoomerang;
 import boomerang.scope.CallGraph;
-import boomerang.scope.InvokeExpr;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
-import java.util.Collection;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface ICallerCalleeResolutionStrategy {
 
@@ -27,11 +27,19 @@ public interface ICallerCalleeResolutionStrategy {
     ICallerCalleeResolutionStrategy newInstance(WeightedBoomerang solver, CallGraph cg);
   }
 
-  void computeFallback(ObservableDynamicICFG observableDynamicICFG);
+  boolean computeFallback(
+      BiConsumer<Statement, Method> onCallerCalleeFoundCallback,
+      Consumer<Statement> onNoCalleeFoundCallback);
 
-  Method resolveSpecialInvoke(InvokeExpr ie);
+  void resolveCallersForCalleeFallback(
+      Method callee, BiConsumer<Statement, Method> onCallerCalleeFoundCallback);
 
-  Collection<Method> resolveInstanceInvoke(Statement stmt);
+  void resolveSpecialInvoke(
+      Statement stmt, BiConsumer<Statement, Method> onCallerCalleeFoundCallback);
 
-  Method resolveStaticInvoke(InvokeExpr ie);
+  void resolveInstanceInvoke(
+      Statement stmt, BiConsumer<Statement, Method> onCallerCalleeFoundCallback);
+
+  void resolveStaticInvoke(
+      Statement stmt, BiConsumer<Statement, Method> onCallerCalleeFoundCallback);
 }
