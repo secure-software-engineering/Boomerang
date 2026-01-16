@@ -68,7 +68,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <scala.version>2.13.17</scala.version>
+        <scala.version>2.13.18</scala.version>
         <enforced-maven-version>3.6.1</enforced-maven-version>
         <!-- See https://www.eclipse.org/projects/handbook/#ip-copyright-headers -->
         <license.dir>${project.basedir}</license.dir>
@@ -118,14 +118,14 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.19.1</version>
+                    <version>2.20.1</version>
                 </plugin>
 
                 <!-- Plugin to format pom files and source code -->
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <pom>
                             <sortPom>
@@ -212,7 +212,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -244,7 +244,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -356,7 +356,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.3.1</version>
                         <configuration>
                             <tagNameFormat>@{project.version}</tagNameFormat>
                         </configuration>
@@ -364,7 +364,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.9.0</version>
+                        <version>0.10.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <deploymentName>${project.artifactId} ${project.version}</deploymentName>
