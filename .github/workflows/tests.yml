@@ -11,6 +11,7 @@ on:
 
 jobs:
   BuildAndTest:
+    name: Test with ${{ matrix.framework }} , ${{ matrix.enableOnTheFlyCallGraph }}
     strategy:
       fail-fast: false
       matrix:
