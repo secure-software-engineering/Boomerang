@@ -57,6 +57,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import test.TestingFramework;
+import test.core.BoomerangTestingOptionsBuilder;
 import wpds.impl.NoWeight;
 
 public class DemandDrivenGuidedAnalysisTest {
@@ -552,13 +553,13 @@ public class DemandDrivenGuidedAnalysisTest {
       BackwardQuery query,
       Object... expectedValues) {
     BoomerangOptions options =
-        BoomerangOptions.builder()
+        BoomerangTestingOptionsBuilder.create()
             .withAllocationSite(allocationSite())
             .enableAllowMultipleQueries(true)
             .build();
 
     DemandDrivenGuidedAnalysis demandDrivenGuidedAnalysis =
-        new DemandDrivenGuidedAnalysis(queryManager, options, scopeFactory);
+        new DemandDrivenGuidedAnalysis(queryManager, scopeFactory, options);
 
     QueryGraph<NoWeight> queryGraph = demandDrivenGuidedAnalysis.run(query);
     demandDrivenGuidedAnalysis.cleanUp();

@@ -22,20 +22,14 @@ import boomerang.controlflowgraph.ObservableControlFlowGraph;
 import boomerang.controlflowgraph.PredecessorListener;
 import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.DeclaredMethod;
-import boomerang.scope.Field;
-import boomerang.scope.IfStatement;
-import boomerang.scope.IfStatement.Evaluation;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
-import boomerang.scope.ValCollection;
 import boomerang.scope.fields.EmptyField;
 import boomerang.solver.AbstractBoomerangSolver;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.stats.IBoomerangStats;
 import boomerang.util.DefaultValueMap;
-import boomerang.weights.DataFlowPathWeightImpl;
-import boomerang.weights.PathConditionWeight.ConditionDomain;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
@@ -46,17 +40,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import sync.pds.solver.nodes.GeneratedState;
-import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
-import wpds.impl.Transition;
 import wpds.impl.Weight;
-import wpds.impl.WeightedPAutomaton;
 import wpds.interfaces.State;
 
 public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerangResults<W> {
@@ -67,11 +57,8 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   private final Stopwatch analysisWatch;
   private final long maxMemory;
   private final ObservableICFG<Statement, Method> icfg;
-  private final Set<Method> visitedMethods;
-  private final boolean trackDataFlowPath;
-  private final boolean pruneContradictoryDataFlowPath;
+  private final Collection<Method> visitedMethods;
   private final ObservableControlFlowGraph cfg;
-  private final boolean pruneImplictFlows;
 
   public ForwardBoomerangResults(
       ForwardQuery query,
@@ -81,10 +68,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
       DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> queryToSolvers,
       IBoomerangStats<W> stats,
       Stopwatch analysisWatch,
-      Set<Method> visitedMethods,
-      boolean trackDataFlowPath,
-      boolean pruneContradictoryDataFlowPath,
-      boolean pruneImplicitFlows) {
+      Collection<Method> visitedMethods) {
     super(queryToSolvers);
     this.query = query;
     this.icfg = icfg;
@@ -93,9 +77,6 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     this.stats = stats;
     this.analysisWatch = analysisWatch;
     this.visitedMethods = visitedMethods;
-    this.trackDataFlowPath = trackDataFlowPath;
-    this.pruneContradictoryDataFlowPath = pruneContradictoryDataFlowPath;
-    this.pruneImplictFlows = pruneImplicitFlows;
     stats.terminated(query, this);
     this.maxMemory = Util.getReallyUsedMemory();
   }
@@ -255,7 +236,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
 
           if (escapes.isEmpty()) {
             Map<Val, W> row = res.row(exitEdge);
-            findLastUsage(exitEdge, row, destructingStatement, forwardSolver);
+            findLastUsage(exitEdge, row, destructingStatement);
           }
         }
       }
@@ -267,8 +248,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   private void findLastUsage(
       ControlFlowGraph.Edge exitStmt,
       Map<Val, W> row,
-      Table<ControlFlowGraph.Edge, Val, W> destructingStatement,
-      ForwardBoomerangSolver<W> forwardSolver) {
+      Table<ControlFlowGraph.Edge, Val, W> destructingStatement) {
     LinkedList<ControlFlowGraph.Edge> worklist = Lists.newLinkedList();
     worklist.add(exitStmt);
     Set<ControlFlowGraph.Edge> visited = new LinkedHashSet<>();
@@ -352,162 +332,6 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return statements;
   }
 
-  public QueryResults getPotentialNullPointerDereferences() {
-    // FIXME this should be located nullpointer analysis
-    Set<Node<ControlFlowGraph.Edge, Val>> res = new LinkedHashSet<>();
-    for (Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t :
-        queryToSolvers.get(query).getFieldAutomaton().getTransitions()) {
-      if (!t.getLabel().equals(EmptyField.getInstance())
-          || t.getStart() instanceof GeneratedState) {
-        continue;
-      }
-      Node<ControlFlowGraph.Edge, Val> nullPointerNode = t.getStart().fact();
-      if (NullPointerDereference.isNullPointerNode(nullPointerNode)
-          && queryToSolvers.get(query).getReachedStates().contains(nullPointerNode)) {
-        res.add(nullPointerNode);
-      }
-    }
-    Set<AffectedLocation> resWithContext = new LinkedHashSet<>();
-    for (Node<ControlFlowGraph.Edge, Val> r : res) {
-      // Context context = constructContextGraph(query, r);
-      if (trackDataFlowPath) {
-        DataFlowPathWeightImpl dataFlowPath = getDataFlowPathWeight(query, r);
-        if (isValidPath(dataFlowPath)) {
-          List<PathElement> p = transformPath(dataFlowPath.getAllStatements(), r);
-          resWithContext.add(new NullPointerDereference(query, r.stmt(), r.fact(), null, null, p));
-        }
-      } else {
-        List<PathElement> dataFlowPath = Lists.newArrayList();
-        resWithContext.add(
-            new NullPointerDereference(query, r.stmt(), r.fact(), null, null, dataFlowPath));
-      }
-    }
-    QueryResults nullPointerResult =
-        new QueryResults(query, resWithContext, visitedMethods, timedOut);
-    return nullPointerResult;
-  }
-
-  private boolean isValidPath(DataFlowPathWeightImpl dataFlowPath) {
-    if (!pruneContradictoryDataFlowPath) {
-      return true;
-    }
-    Map<Statement, ConditionDomain> conditions = dataFlowPath.getConditions();
-    for (Entry<Statement, ConditionDomain> c : conditions.entrySet()) {
-      if (contradiction(c.getKey(), c.getValue(), dataFlowPath.getEvaluationMap())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private DataFlowPathWeightImpl getDataFlowPathWeight(
-      ForwardQuery query, Node<ControlFlowGraph.Edge, Val> sinkLocation) {
-    WeightedPAutomaton<ControlFlowGraph.Edge, INode<Val>, W> callAut =
-        queryToSolvers.getOrCreate(query).getCallAutomaton();
-    // Iterating over whole set to find the matching transition is not the most elegant solution....
-    for (Entry<Transition<ControlFlowGraph.Edge, INode<Val>>, W> e :
-        callAut.getTransitionsToFinalWeights().entrySet()) {
-      Transition<ControlFlowGraph.Edge, INode<Val>> t = e.getKey();
-
-      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) {
-        continue;
-      }
-
-      if (t.getStart().fact().isLocal()
-          && !t.getLabel().getMethod().equals(t.getStart().fact().m())) {
-        continue;
-      }
-      if (t.getStart().fact().equals(sinkLocation.fact())
-          && t.getLabel().equals(sinkLocation.stmt())) {
-        if (e.getValue() instanceof DataFlowPathWeightImpl) {
-          DataFlowPathWeightImpl v = (DataFlowPathWeightImpl) e.getValue();
-          return v;
-        }
-      }
-    }
-    return null;
-  }
-
-  private boolean contradiction(
-      Statement ifStmt, ConditionDomain mustBeVal, Map<Val, ConditionDomain> evaluationMap) {
-    if (ifStmt.isIfStmt()) {
-      IfStatement ifStmt1 = ifStmt.getIfStmt();
-      for (Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t :
-          queryToSolvers.get(query).getFieldAutomaton().getTransitions()) {
-
-        if (!t.getStart().fact().stmt().equals(ifStmt)) {
-          continue;
-        }
-        if (!t.getLabel().equals(EmptyField.getInstance())
-            || t.getStart() instanceof GeneratedState) {
-          continue;
-        }
-
-        Node<ControlFlowGraph.Edge, Val> node = t.getStart().fact();
-        Val fact = node.fact();
-        switch (ifStmt1.evaluate(fact)) {
-          case TRUE:
-            if (mustBeVal.equals(ConditionDomain.FALSE)) {
-              return true;
-            }
-            break;
-          case FALSE:
-            if (mustBeVal.equals(ConditionDomain.TRUE)) {
-              return true;
-            }
-        }
-      }
-      if (pruneImplictFlows) {
-        for (Entry<Val, ConditionDomain> e : evaluationMap.entrySet()) {
-
-          Val key = e.getKey();
-          if (ifStmt1.uses(key)) {
-            Evaluation eval = null;
-            if (e.getValue().equals(ConditionDomain.TRUE)) {
-              // Map first to JimpleVal
-              eval = ifStmt1.evaluate(ValCollection.trueVal());
-            } else if (e.getValue().equals(ConditionDomain.FALSE)) {
-              // Map first to JimpleVal
-              eval = ifStmt1.evaluate(ValCollection.falseVal());
-            }
-            if (eval != null) {
-              if (mustBeVal.equals(ConditionDomain.FALSE)) {
-                if (eval.equals(Evaluation.FALSE)) {
-                  return true;
-                }
-              } else if (mustBeVal.equals(ConditionDomain.TRUE)) {
-                if (eval.equals(Evaluation.TRUE)) {
-                  return true;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  private List<PathElement> transformPath(
-      Set<Node<ControlFlowGraph.Edge, Val>> allStatements,
-      Node<ControlFlowGraph.Edge, Val> sinkLocation) {
-    List<PathElement> res = Lists.newArrayList();
-    int index = 0;
-    for (Node<ControlFlowGraph.Edge, Val> x : allStatements) {
-      res.add(new PathElement(x.stmt(), x.fact(), index++));
-    }
-    // TODO The analysis misses
-    if (!allStatements.contains(sinkLocation)) {
-      res.add(new PathElement(sinkLocation.stmt(), sinkLocation.fact(), index));
-    }
-
-    for (PathElement n : res) {
-      LOGGER.trace(
-          "Statement: {}, Variable {}, Index {}", n.getEdge(), n.getVariable(), n.stepIndex());
-    }
-    return res;
-  }
-
   public Context getContext(Node<ControlFlowGraph.Edge, Val> node) {
     return constructContextGraph(query, node);
   }
@@ -530,7 +354,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     return false;
   }
 
-  public Set<Method> getVisitedMethods() {
+  public Collection<Method> getVisitedMethods() {
     return visitedMethods;
   }
 

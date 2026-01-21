@@ -38,6 +38,11 @@ public abstract class StackListener<N extends Location, D extends State, W exten
   public void onOutTransitionAdded(
       Transition<N, D> t, W w, WeightedPAutomaton<N, D, W> weightedPAutomaton) {
     if (t.getLabel().equals(aut.epsilon())) return;
+    /*
+     * XXX: Does this always work, if the BoomerangOptions.onTheFlyCallGraph
+     * option is active? For now, the testcases seem to pass - reconsider this
+     * (that is, try to use an InitialStateListener).
+     */
     if (this.aut.getInitialStates().contains(t.getTarget())) {
       if (t.getLabel().equals(source)) {
         anyContext(source);

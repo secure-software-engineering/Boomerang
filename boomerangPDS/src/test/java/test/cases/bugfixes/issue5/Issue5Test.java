@@ -16,7 +16,6 @@ package test.cases.bugfixes.issue5;
 
 import boomerang.Boomerang;
 import boomerang.ForwardQuery;
-import boomerang.options.BoomerangOptions;
 import boomerang.options.IntAndStringAllocationSite;
 import boomerang.results.ForwardBoomerangResults;
 import boomerang.scope.AllocVal;
@@ -37,6 +36,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import test.TestingFramework;
+import test.core.BoomerangTestingOptionsBuilder;
 import wpds.impl.NoWeight;
 
 /**
@@ -125,7 +125,10 @@ public class Issue5Test {
     ForwardQuery fwq = new ForwardQuery(new Edge(queryStatement, successorStmt.get()), var);
     Boomerang solver =
         new Boomerang(
-            scopeFactory, BoomerangOptions.WITH_ALLOCATION_SITE(new IntAndStringAllocationSite()));
+            scopeFactory,
+            BoomerangTestingOptionsBuilder.create()
+                .withAllocationSite(new IntAndStringAllocationSite())
+                .build());
     ForwardBoomerangResults<NoWeight> results = solver.solve(fwq);
     return results.getInvokeStatementsOnInstance();
   }

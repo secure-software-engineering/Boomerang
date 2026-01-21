@@ -14,9 +14,7 @@
  */
 package boomerang.scope.wala;
 
-import boomerang.scope.AllocVal;
 import boomerang.scope.Type;
-import boomerang.scope.Val;
 import boomerang.scope.WrappedClass;
 import com.ibm.wala.analysis.typeInference.ConeType;
 import com.ibm.wala.analysis.typeInference.PointType;
@@ -62,20 +60,7 @@ public class WALAType implements Type {
 
   @Override
   public WrappedClass getWrappedClass() {
-    // TODO Auto-generated method stub
     return new WALAClass(typeAbstraction.getTypeReference());
-  }
-
-  @Override
-  public boolean doesCastFail(Type targetVal, Val target) {
-    if (target instanceof AllocVal && ((AllocVal) target).getAllocVal().isNewExpr()) {
-      boolean subclassOfNew = this.isSubclassOf((WALAType) targetVal);
-      return !subclassOfNew;
-    }
-
-    boolean castFails =
-        this.isSubclassOf((WALAType) targetVal) || ((WALAType) targetVal).isSubclassOf(this);
-    return !castFails;
   }
 
   private boolean isSubclassOf(WALAType targetType) {

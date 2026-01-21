@@ -36,8 +36,9 @@ import wpds.impl.WeightedPAutomaton;
 import wpds.interfaces.WPAStateListener;
 
 public class AbstractBoomerangResults<W extends Weight> {
-  protected final DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> queryToSolvers;
+
   protected final Logger LOGGER = LoggerFactory.getLogger(AbstractBoomerangResults.class);
+  protected final DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> queryToSolvers;
 
   public AbstractBoomerangResults(
       DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> solverMap) {

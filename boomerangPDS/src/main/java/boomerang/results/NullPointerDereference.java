@@ -15,19 +15,42 @@
 package boomerang.results;
 
 import boomerang.Query;
+import boomerang.pathtracking.DataFlowPathWeight;
+import boomerang.pathtracking.DataFlowPathWeightImpl;
+import boomerang.pathtracking.PathConditionWeight;
 import boomerang.scope.ControlFlowGraph;
+import boomerang.scope.Field;
 import boomerang.scope.IInstanceFieldRef;
+import boomerang.scope.IfStatement;
 import boomerang.scope.Method;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
+import boomerang.scope.ValCollection;
+import boomerang.scope.fields.EmptyField;
+import boomerang.solver.ForwardBoomerangSolver;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sync.pds.solver.nodes.GeneratedState;
 import sync.pds.solver.nodes.INode;
 import sync.pds.solver.nodes.Node;
 import wpds.impl.PAutomaton;
+import wpds.impl.Transition;
+import wpds.impl.WeightedPAutomaton;
 
+/**
+ * TODO This class requires a complete revisit. It is not clear what is supposed to happen and if it
+ * works with the refactored scopes in 3.0.0+
+ */
 public class NullPointerDereference implements AffectedLocation {
   public static final int RULE_INDEX = 0;
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(NullPointerDereference.class);
+  private final ForwardBoomerangSolver<?> solver;
   private final ControlFlowGraph.Edge statement;
   private final Val variable;
   private final PAutomaton<Statement, INode<Val>> openingContext;
@@ -37,17 +60,22 @@ public class NullPointerDereference implements AffectedLocation {
   private final Val sourceVariable;
   private final Query query;
 
-  public NullPointerDereference(ControlFlowGraph.Edge statement) {
-    this(null, statement, null, null, null, null);
-  }
+  private final boolean trackDataFlowPath;
+  private final boolean pruneContradictoryDataFlowPath;
+  private final boolean pruneImplicitFlows;
 
   public NullPointerDereference(
+      ForwardBoomerangSolver<?> solver,
       Query query,
       ControlFlowGraph.Edge statement,
       Val variable,
       PAutomaton<Statement, INode<Val>> openingContext,
       PAutomaton<Statement, INode<Val>> closingContext,
-      List<PathElement> dataFlowPath) {
+      List<PathElement> dataFlowPath,
+      boolean trackDataFlowPath,
+      boolean pruneContradictoryDataFlowPath,
+      boolean pruneImplicitFlows) {
+    this.solver = solver;
     this.query = query;
     this.sourceStatement = query.cfgEdge();
     this.sourceVariable = query.var();
@@ -56,6 +84,10 @@ public class NullPointerDereference implements AffectedLocation {
     this.openingContext = openingContext;
     this.closingContext = closingContext;
     this.dataFlowPath = dataFlowPath;
+
+    this.trackDataFlowPath = trackDataFlowPath;
+    this.pruneContradictoryDataFlowPath = pruneContradictoryDataFlowPath;
+    this.pruneImplicitFlows = pruneImplicitFlows;
   }
 
   /**
@@ -204,7 +236,7 @@ public class NullPointerDereference implements AffectedLocation {
   public static boolean isNullPointerNode(Node<ControlFlowGraph.Edge, Val> nullPointerNode) {
     Val fact = nullPointerNode.fact();
     Method m = fact.m();
-    // A this variable can never be null.
+    // A 'this' variable can never be null.
     if (!m.isStatic() && m.getThisLocal().equals(fact)) {
       return false;
     }
@@ -230,5 +262,179 @@ public class NullPointerDereference implements AffectedLocation {
       }
     }
     return false;
+  }
+
+  public QueryResults getPotentialNullPointerDereferences() {
+    Collection<Node<ControlFlowGraph.Edge, Val>> res = new LinkedHashSet<>();
+    for (Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t :
+        solver.getFieldAutomaton().getTransitions()) {
+      if (!t.getLabel().equals(EmptyField.getInstance())
+          || t.getStart() instanceof GeneratedState) {
+        continue;
+      }
+      Node<ControlFlowGraph.Edge, Val> nullPointerNode = t.getStart().fact();
+      if (NullPointerDereference.isNullPointerNode(nullPointerNode)
+          && solver.getReachedStates().contains(nullPointerNode)) {
+        res.add(nullPointerNode);
+      }
+    }
+
+    Collection<AffectedLocation> resWithContext = new LinkedHashSet<>();
+    for (Node<ControlFlowGraph.Edge, Val> r : res) {
+      // Context context = constructContextGraph(query, r);
+      if (trackDataFlowPath) {
+        DataFlowPathWeight dataFlowPath = getDataFlowPathWeight(r);
+        if (isValidPath(dataFlowPath)) {
+          List<PathElement> p = transformPath(dataFlowPath.getAllStatements(), r);
+          resWithContext.add(
+              new NullPointerDereference(
+                  solver,
+                  query,
+                  r.stmt(),
+                  r.fact(),
+                  null,
+                  null,
+                  p,
+                  true,
+                  pruneContradictoryDataFlowPath,
+                  pruneImplicitFlows));
+        }
+      } else {
+        List<PathElement> dataFlowPath = new ArrayList<>();
+        resWithContext.add(
+            new NullPointerDereference(
+                solver,
+                query,
+                r.stmt(),
+                r.fact(),
+                null,
+                null,
+                dataFlowPath,
+                false,
+                pruneContradictoryDataFlowPath,
+                pruneImplicitFlows));
+      }
+    }
+    return new QueryResults(query, resWithContext);
+  }
+
+  private boolean isValidPath(DataFlowPathWeight dataFlowPath) {
+    if (!pruneContradictoryDataFlowPath) {
+      return true;
+    }
+    Map<Statement, PathConditionWeight.ConditionDomain> conditions = dataFlowPath.getConditions();
+    for (Map.Entry<Statement, PathConditionWeight.ConditionDomain> c : conditions.entrySet()) {
+      if (contradiction(c.getKey(), c.getValue(), dataFlowPath.getEvaluationMap())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private DataFlowPathWeight getDataFlowPathWeight(Node<ControlFlowGraph.Edge, Val> sinkLocation) {
+    WeightedPAutomaton<ControlFlowGraph.Edge, INode<Val>, ?> callAut = solver.getCallAutomaton();
+    // Iterating over whole set to find the matching transition is not the most elegant solution....
+    for (Map.Entry<Transition<ControlFlowGraph.Edge, INode<Val>>, ?> e :
+        callAut.getTransitionsToFinalWeights().entrySet()) {
+      Transition<ControlFlowGraph.Edge, INode<Val>> t = e.getKey();
+
+      if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) {
+        continue;
+      }
+
+      if (t.getStart().fact().isLocal()
+          && !t.getLabel().getMethod().equals(t.getStart().fact().m())) {
+        continue;
+      }
+      if (t.getStart().fact().equals(sinkLocation.fact())
+          && t.getLabel().equals(sinkLocation.stmt())) {
+        if (e.getValue() instanceof DataFlowPathWeightImpl) {
+          return (DataFlowPathWeightImpl) e.getValue();
+        }
+      }
+    }
+    return null;
+  }
+
+  private boolean contradiction(
+      Statement ifStmt,
+      PathConditionWeight.ConditionDomain mustBeVal,
+      Map<Val, PathConditionWeight.ConditionDomain> evaluationMap) {
+    if (ifStmt.isIfStmt()) {
+      IfStatement ifStmt1 = ifStmt.getIfStmt();
+      for (Transition<Field, INode<Node<ControlFlowGraph.Edge, Val>>> t :
+          solver.getFieldAutomaton().getTransitions()) {
+
+        if (!t.getStart().fact().stmt().equals(ifStmt)) {
+          continue;
+        }
+        if (!t.getLabel().equals(EmptyField.getInstance())
+            || t.getStart() instanceof GeneratedState) {
+          continue;
+        }
+
+        Node<ControlFlowGraph.Edge, Val> node = t.getStart().fact();
+        Val fact = node.fact();
+        switch (ifStmt1.evaluate(fact)) {
+          case TRUE:
+            if (mustBeVal.equals(PathConditionWeight.ConditionDomain.FALSE)) {
+              return true;
+            }
+            break;
+          case FALSE:
+            if (mustBeVal.equals(PathConditionWeight.ConditionDomain.TRUE)) {
+              return true;
+            }
+        }
+      }
+      if (pruneImplicitFlows) {
+        for (Map.Entry<Val, PathConditionWeight.ConditionDomain> e : evaluationMap.entrySet()) {
+
+          Val key = e.getKey();
+          if (ifStmt1.uses(key)) {
+            IfStatement.Evaluation eval = null;
+            if (e.getValue().equals(PathConditionWeight.ConditionDomain.TRUE)) {
+              // Map first to JimpleVal
+              eval = ifStmt1.evaluate(ValCollection.trueVal());
+            } else if (e.getValue().equals(PathConditionWeight.ConditionDomain.FALSE)) {
+              // Map first to JimpleVal
+              eval = ifStmt1.evaluate(ValCollection.falseVal());
+            }
+            if (eval != null) {
+              if (mustBeVal.equals(PathConditionWeight.ConditionDomain.FALSE)) {
+                if (eval.equals(IfStatement.Evaluation.FALSE)) {
+                  return true;
+                }
+              } else if (mustBeVal.equals(PathConditionWeight.ConditionDomain.TRUE)) {
+                if (eval.equals(IfStatement.Evaluation.TRUE)) {
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  private List<PathElement> transformPath(
+      Collection<Node<ControlFlowGraph.Edge, Val>> allStatements,
+      Node<ControlFlowGraph.Edge, Val> sinkLocation) {
+    List<PathElement> res = new ArrayList<>();
+    int index = 0;
+    for (Node<ControlFlowGraph.Edge, Val> x : allStatements) {
+      res.add(new PathElement(x.stmt(), x.fact(), index++));
+    }
+    // TODO The analysis misses
+    if (!allStatements.contains(sinkLocation)) {
+      res.add(new PathElement(sinkLocation.stmt(), sinkLocation.fact(), index));
+    }
+
+    for (PathElement n : res) {
+      LOGGER.trace(
+          "Statement: {}, Variable {}, Index {}", n.getEdge(), n.getVariable(), n.stepIndex());
+    }
+    return res;
   }
 }

@@ -1,0 +1,33 @@
+name: Documentation Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - closed
+      - synchronize
+      - reopened
+    paths:
+      - mkdocs.yml
+      - docs/**
+      - .github/workflows/documentation-pr-preview.yml
+
+concurrency:
+  group: gh-pages
+
+jobs:
+  deploy-preview:
+    name: Preview documentation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write      # for posting a comment
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # mike needs full history to push to gh-pages
+
+      - name: Create Documentation Preview
+        uses: secure-software-engineering/actions/documentation/pr-preview@develop

@@ -11,3 +11,4 @@ shippable/
 *.prefs
 *.xml
 **/target
+**/site

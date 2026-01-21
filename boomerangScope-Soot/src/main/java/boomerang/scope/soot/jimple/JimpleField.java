@@ -37,7 +37,7 @@ public class JimpleField implements Field {
 
   @Override
   public boolean isInnerClassField() {
-    return this.delegate.name().contains("$");
+    return delegate.declaringClass().getName().contains("$");
   }
 
   @Override

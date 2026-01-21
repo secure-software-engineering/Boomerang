@@ -16,11 +16,11 @@ package boomerang.scope.opal.tac
 
 import boomerang.scope.Field
 import java.util.Objects
+import org.opalj.br.ClassType
 import org.opalj.br.FieldType
-import org.opalj.br.ObjectType
 
 class OpalField(
-    val declaringClass: ObjectType,
+    val declaringClass: ClassType,
     val fieldType: FieldType,
     val name: String
 ) extends Field {

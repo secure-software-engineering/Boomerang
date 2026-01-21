@@ -17,7 +17,7 @@ package wpds.impl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -42,6 +42,7 @@ import pathexpression.PathExpressionComputer;
 import pathexpression.RegEx;
 import wpds.interfaces.ForwardDFSEpsilonVisitor;
 import wpds.interfaces.ForwardDFSVisitor;
+import wpds.interfaces.InitialStateListener;
 import wpds.interfaces.ReachabilityListener;
 import wpds.interfaces.State;
 import wpds.interfaces.WPAStateListener;
@@ -57,13 +58,14 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   protected Set<Transition<N, D>> transitions = new LinkedHashSet<>();
   // set F in paper [Reps2003]
   protected Set<D> finalState = new LinkedHashSet<>();
-  protected Multimap<D, D> initialStatesToSource = HashMultimap.create();
+  protected Multimap<D, D> initialStatesToSource = LinkedHashMultimap.create();
   // set P in paper [Reps2003]
   protected Set<D> states = new LinkedHashSet<>();
-  private final Multimap<D, Transition<N, D>> transitionsOutOf = HashMultimap.create();
-  private final Multimap<D, Transition<N, D>> transitionsInto = HashMultimap.create();
+  private final Multimap<D, Transition<N, D>> transitionsOutOf = LinkedHashMultimap.create();
+  private final Multimap<D, Transition<N, D>> transitionsInto = LinkedHashMultimap.create();
   private final Set<WPAUpdateListener<N, D, W>> listeners = new LinkedHashSet<>();
-  private final Multimap<D, WPAStateListener<N, D, W>> stateListeners = HashMultimap.create();
+  private final Set<InitialStateListener<D>> initialStateListeners = new LinkedHashSet<>();
+  private final Multimap<D, WPAStateListener<N, D, W>> stateListeners = LinkedHashMultimap.create();
   private final Map<D, ForwardDFSVisitor<N, D, W>> stateToDFS = Maps.newHashMap();
   private final Map<D, ForwardDFSVisitor<N, D, W>> stateToEpsilonDFS = Maps.newHashMap();
   private final Set<WeightedPAutomaton<N, D, W>> nestedAutomatons = new LinkedHashSet<>();
@@ -368,6 +370,15 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     }
     for (WeightedPAutomaton<N, D, W> nested : Lists.newArrayList(nestedAutomatons)) {
       nested.registerListener(listener);
+    }
+  }
+
+  public void registerListener(InitialStateListener<D> listener) {
+    if (!initialStateListeners.add(listener)) {
+      return;
+    }
+    for (D initialState : Lists.newArrayList(getInitialStates())) {
+      listener.onInitialStateAdded(initialState);
     }
   }
 
@@ -825,7 +836,13 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   }
 
   public boolean addInitialState(D state) {
-    return initialStatesToSource.put(state, state);
+    if (!initialStatesToSource.get(state).add(state)) {
+      return false;
+    }
+    for (InitialStateListener<D> listener : Lists.newArrayList(initialStateListeners)) {
+      listener.onInitialStateAdded(state);
+    }
+    return true;
   }
 
   public void unregisterAllListeners() {

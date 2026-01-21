@@ -17,13 +17,13 @@ package boomerang.scope.opal.tac
 import boomerang.scope._
 import boomerang.scope.opal.transformation.TacLocal
 import java.util.Objects
+import org.opalj.br.ClassType
 import org.opalj.br.FieldType
-import org.opalj.br.ObjectType
 import org.opalj.tac.Expr
 
 class OpalInstanceFieldRef(
     val objRef: Expr[TacLocal],
-    val declaringClass: ObjectType,
+    val declaringClass: ClassType,
     val fieldType: FieldType,
     val fieldName: String,
     method: OpalMethod,

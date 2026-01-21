@@ -26,8 +26,6 @@ public interface Type {
 
   WrappedClass getWrappedClass();
 
-  boolean doesCastFail(Type targetVal, Val target);
-
   boolean isSubtypeOf(String type);
 
   boolean isSupertypeOf(String subType);

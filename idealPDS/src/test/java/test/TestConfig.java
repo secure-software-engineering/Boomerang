@@ -23,9 +23,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface TestConfig {
 
+  enum FlowFunctions {
+    DEFAULT,
+    CHAINING
+  }
+
   Class<?> stateMachine();
 
   Class<?>[] includedClasses() default {};
 
   Class<?>[] excludedClasses() default {};
+
+  FlowFunctions flowFunctions() default FlowFunctions.DEFAULT;
 }

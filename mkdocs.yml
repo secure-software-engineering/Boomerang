@@ -5,14 +5,21 @@ edit_uri: edit/develop/docs/
 
 nav:
   - Home: index.md
-  - Getting Started:
-      - Installation: installation.md
-      - First Steps: getting-started.md
-      - Example Analyses: examples.md
+  - General:
+      - Installation: general/installation.md
+      - Boomerang Scope: general/boomerang_scope.md
+      - Framework Scopes: general/framework_scopes.md
+      - Android Setup: general/android_setup.md
+  - Boomerang:
+      - Boomerang Setup: boomerang/boomerang_setup.md
+      - Options: boomerang/options.md
+      - Allocation Sites: boomerang/allocation_sites.md
+  - Examples:
+      - Taint Analysis: examples/taint_analysis.md
 
 theme:
   name: material
-  logo: ./img/SparseBoomerangLogo.png
+  logo: ./img/BoomerangLogo.png
 #  favicon: ./img/icon.png
   palette:
     primary: blue

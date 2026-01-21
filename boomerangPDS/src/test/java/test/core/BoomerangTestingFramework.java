@@ -174,7 +174,7 @@ public class BoomerangTestingFramework extends TestingFramework {
   private void runWholeProgram(FrameworkScope frameworkScope) {
     final Set<Node<ControlFlowGraph.Edge, Val>> results = new LinkedHashSet<>();
     BoomerangOptions options =
-        BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();
+        BoomerangTestingOptionsBuilder.create().withAnalysisTimeout(analysisTimeout).build();
     WholeProgramBoomerang<NoWeight> solver =
         new WholeProgramBoomerang<>(frameworkScope, options) {
 
@@ -210,8 +210,7 @@ public class BoomerangTestingFramework extends TestingFramework {
             .get(q)
             .getFieldAutomaton()
             .registerListener(
-                new WPAStateListener<Field, INode<Node<ControlFlowGraph.Edge, Val>>, NoWeight>(
-                    new SingleNode<>(queryForCallSite.asNode())) {
+                new WPAStateListener<>(new SingleNode<>(queryForCallSite.asNode())) {
 
                   @Override
                   public void onOutTransitionAdded(
@@ -321,11 +320,12 @@ public class BoomerangTestingFramework extends TestingFramework {
   }
 
   protected BoomerangOptions createBoomerangOptions() {
+    BoomerangOptions.OptionsBuilder builder = BoomerangTestingOptionsBuilder.create();
     if (queryDetector.integerQueries) {
-      return BoomerangOptions.WITH_ALLOCATION_SITE(new IntAndStringAllocationSite());
+      return builder.withAllocationSite(new IntAndStringAllocationSite()).build();
     }
 
-    return BoomerangOptions.builder().withAnalysisTimeout(analysisTimeout).build();
+    return builder.withAnalysisTimeout(analysisTimeout).build();
   }
 
   private void compareQuery(
