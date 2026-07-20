@@ -1,0 +1,25 @@
+name: Prepare Release
+run-name: Release ${{ inputs.release_type }} triggered by ${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  prepare-release:
+    uses: secure-software-engineering/actions/.github/workflows/maven-release-prepare.yml@develop
+    with:
+      release_type: ${{ inputs.release_type }}
+      head_branch: develop
+      java_version: '11'
+      java_distribution: adopt
+    secrets:
+      release_pat: ${{ secrets.AUTO_MERGE_PAT }}

@@ -1,0 +1,29 @@
+name: Publish Release
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+  push:
+    branches:
+      - develop
+
+jobs:
+  publish:
+    uses: secure-software-engineering/actions/.github/workflows/maven-release-publish.yml@develop
+    with:
+      head_branch: develop
+      java_version: '11'
+      prepare_java_distribution: adopt
+      release_java_distribution: adopt
+      maven_server_id: central
+      maven_deploy_args: '-DskipTests -Pdeployment'
+      deployment_environment: Deploy
+    secrets:
+      release_pat: ${{ secrets.AUTO_MERGE_PAT }}
+      gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      gpg_passphrase: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
+      maven_username: ${{ secrets.MAVEN_USERNAME }}
+      maven_central_token: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
