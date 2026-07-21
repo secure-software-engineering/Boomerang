@@ -21,6 +21,7 @@ jobs:
       maven_server_id: central
       maven_deploy_args: '-DskipTests -Pdeployment'
       deployment_environment: Deploy
+      tag_pattern: '{major}.{minor}.{patch}'
     secrets:
       release_pat: ${{ secrets.AUTO_MERGE_PAT }}
       gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}

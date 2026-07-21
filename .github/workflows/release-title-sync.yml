@@ -12,5 +12,6 @@ jobs:
     with:
       java_version: '11'
       java_distribution: adopt
+      tag_pattern: '{major}.{minor}.{patch}'
     secrets:
       release_pat: ${{ secrets.AUTO_MERGE_PAT }}
