@@ -10,7 +10,7 @@ jobs:
   sync:
     uses: secure-software-engineering/actions/.github/workflows/maven-release-title-sync.yml@develop
     with:
-      java_version: '11'
+      java_version: '17'
       java_distribution: adopt
       tag_pattern: '{major}.{minor}.{patch}'
     secrets:

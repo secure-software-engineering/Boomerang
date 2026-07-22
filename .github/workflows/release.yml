@@ -19,7 +19,7 @@ jobs:
     with:
       release_type: ${{ inputs.release_type }}
       head_branch: develop
-      java_version: '11'
+      java_version: '17'
       java_distribution: adopt
       tag_pattern: '{major}.{minor}.{patch}'
     secrets:
