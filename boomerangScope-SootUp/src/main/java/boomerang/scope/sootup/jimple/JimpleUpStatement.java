@@ -26,7 +26,7 @@ import boomerang.scope.fields.ArrayField;
 import com.google.common.base.Joiner;
 import java.util.Collection;
 import java.util.Objects;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JCaughtExceptionRef;
@@ -65,7 +65,7 @@ public class JimpleUpStatement extends Statement {
 
   @Override
   public boolean containsInvokeExpr() {
-    return delegate.isInvokableStmt() && delegate.asInvokableStmt().containsInvokeExpr();
+    return delegate.isInvokableStmt() && delegate.asInvokableStmt().getInvokeExpr().isPresent();
   }
 
   @Override
@@ -369,7 +369,7 @@ public class JimpleUpStatement extends Statement {
   }
 
   private String shortName(Stmt s) {
-    if (s.isInvokableStmt() && s.asInvokableStmt().containsInvokeExpr()) {
+    if (s.isInvokableStmt() && s.asInvokableStmt().getInvokeExpr().isPresent()) {
       String base = "";
       AbstractInvokeExpr abstractInvokeExpr = s.asInvokableStmt().getInvokeExpr().get();
       if (abstractInvokeExpr instanceof AbstractInstanceInvokeExpr) {

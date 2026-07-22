@@ -17,7 +17,7 @@ package boomerang.scope.sootup.jimple;
 import boomerang.scope.Val;
 import boomerang.scope.ValWithFalseVariable;
 import java.util.Objects;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 
 public class JimpleUpDoubleVal extends JimpleUpVal implements ValWithFalseVariable {
 

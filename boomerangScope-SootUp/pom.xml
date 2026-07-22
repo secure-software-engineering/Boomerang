@@ -23,7 +23,6 @@
 
     <properties>
         <license.dir>${project.parent.basedir}</license.dir>
-        <sootup.version>2.0.0</sootup.version>
     </properties>
 
     <dependencies>

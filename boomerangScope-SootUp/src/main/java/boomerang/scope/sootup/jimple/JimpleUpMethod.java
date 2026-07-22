@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import sootup.core.jimple.basic.Local;
+import sootup.core.jimple.common.Local;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.views.JavaView;
 

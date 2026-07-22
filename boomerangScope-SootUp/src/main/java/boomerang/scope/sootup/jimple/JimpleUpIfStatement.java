@@ -18,7 +18,7 @@ import boomerang.scope.IfStatement;
 import boomerang.scope.Statement;
 import boomerang.scope.Val;
 import java.util.Objects;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.constant.NullConstant;
 import sootup.core.jimple.common.expr.AbstractConditionExpr;

@@ -24,7 +24,7 @@ import boomerang.scope.sootup.jimple.JimpleUpWrappedClass;
 import boomerang.scope.test.targets.ScopeTarget;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.FieldSignature;
 import sootup.core.signatures.MethodSignature;
