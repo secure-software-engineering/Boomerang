@@ -19,7 +19,7 @@ import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.ref.JArrayRef;
 
