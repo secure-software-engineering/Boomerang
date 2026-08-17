@@ -1142,7 +1142,7 @@ However, a setup with Soot and Opal may be added easily.</p>
 <span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SourceClass</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">source</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;secret&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">"secret"</span><span class="p">;</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
@@ -1216,10 +1216,10 @@ If we find a call to <code>SinkClass.sink(s)</code>, we create a backward query 
 <span class="cm">   */</span>
 <span class="w">  </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">MethodWrapper</span><span class="w"> </span><span class="n">sink</span><span class="w"> </span><span class="o">=</span>
 <span class="w">                          </span><span class="k">new</span><span class="w"> </span><span class="n">MethodWrapper</span><span class="p">(</span>
-<span class="w">                              </span><span class="s">&quot;taints.SinkClass&quot;</span><span class="p">,</span>
-<span class="w">                              </span><span class="s">&quot;sink&quot;</span><span class="p">,</span>
-<span class="w">                              </span><span class="s">&quot;void&quot;</span><span class="p">,</span>
-<span class="w">                              </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;java.lang.String&quot;</span><span class="p">));</span>
+<span class="w">                              </span><span class="s">"taints.SinkClass"</span><span class="p">,</span>
+<span class="w">                              </span><span class="s">"sink"</span><span class="p">,</span>
+<span class="w">                              </span><span class="s">"void"</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"java.lang.String"</span><span class="p">));</span>
 
 <span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="nf">TaintAnalysisScope</span><span class="p">(</span><span class="n">FrameworkScope</span><span class="w"> </span><span class="n">frameworkScope</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">super</span><span class="p">(</span><span class="n">frameworkScope</span><span class="p">);</span>
@@ -1312,9 +1312,9 @@ We can implement an allocation site as follows:</p>
 <span class="cm">   */</span>
 <span class="w">  </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">MethodWrapper</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span>
 <span class="w">                          </span><span class="k">new</span><span class="w"> </span><span class="n">MethodWrapper</span><span class="p">(</span>
-<span class="w">                              </span><span class="s">&quot;taints.SourceClass&quot;</span><span class="p">,</span>
-<span class="w">                              </span><span class="s">&quot;source&quot;</span><span class="p">,</span>
-<span class="w">                              </span><span class="s">&quot;java.lang.String&quot;</span><span class="p">,</span>
+<span class="w">                              </span><span class="s">"taints.SourceClass"</span><span class="p">,</span>
+<span class="w">                              </span><span class="s">"source"</span><span class="p">,</span>
+<span class="w">                              </span><span class="s">"java.lang.String"</span><span class="p">,</span>
 <span class="w">                              </span><span class="n">Collections</span><span class="p">.</span><span class="na">emptyList</span><span class="p">());</span>
 
 <span class="w">  </span><span class="nd">@Override</span>
@@ -1405,7 +1405,7 @@ Recall that we start the analysis at a sink and end it when we reach a source or
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">fqn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">declaringClass</span><span class="p">.</span><span class="na">getFullyQualifiedName</span><span class="p">();</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;tains.SourceClass&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;taints.SinkClass&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">"tains.SourceClass"</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">"taints.SinkClass"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
@@ -1421,7 +1421,7 @@ Recall that we start the analysis at a sink and end it when we reach a source or
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">fqn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">declaringClass</span><span class="p">.</span><span class="na">getFullyQualifiedName</span><span class="p">();</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;tains.SourceClass&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;taints.SinkClass&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">"tains.SourceClass"</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">fqn</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">"taints.SinkClass"</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
@@ -1509,7 +1509,7 @@ Recall that we start the analysis at a sink and end it when we reach a source or
 <span class="w">  </span><span class="n">TaintAnalysisScope</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TaintAnalysisScope</span><span class="p">(</span><span class="n">frameworkScope</span><span class="p">,</span><span class="w"> </span><span class="n">sinks</span><span class="p">);</span>
 <span class="w">  </span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">Query</span><span class="o">&gt;</span><span class="w"> </span><span class="n">queries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scope</span><span class="p">.</span><span class="na">computeSeeds</span><span class="p">();</span>
 
-<span class="w">  </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">&quot;Found &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">queries</span><span class="p">.</span><span class="na">size</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; sink(s)&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"Found "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">queries</span><span class="p">.</span><span class="na">size</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" sink(s)"</span><span class="p">);</span>
 
 <span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Query</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">queries</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">query</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">BackwardQuery</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
@@ -1519,24 +1519,24 @@ Recall that we start the analysis at a sink and end it when we reach a source or
 <span class="w">    </span><span class="c1">// Use Boomerang to compute whether the sink variables point to </span>
 <span class="w">    </span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">AllocVal</span><span class="o">&gt;</span><span class="w"> </span><span class="n">allocSites</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solveQuery</span><span class="p">((</span><span class="n">BackwardQuery</span><span class="p">)</span><span class="w"> </span><span class="n">query</span><span class="p">);</span>
 <span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span>
-<span class="w">        </span><span class="s">&quot;Found {} leaks for variable {} @ {}:&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s">"Found {} leaks for variable {} @ {}:"</span><span class="p">,</span>
 <span class="w">        </span><span class="n">allocSites</span><span class="p">.</span><span class="na">size</span><span class="p">(),</span>
 <span class="w">        </span><span class="n">query</span><span class="p">.</span><span class="na">var</span><span class="p">().</span><span class="na">getVariableName</span><span class="p">(),</span>
 <span class="w">        </span><span class="n">query</span><span class="p">.</span><span class="na">cfgEdge</span><span class="p">().</span><span class="na">getTarget</span><span class="p">());</span>
 
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">AllocVal</span><span class="w"> </span><span class="n">allocVal</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">allocSites</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span>
-<span class="w">            </span><span class="s">&quot;\tSource: &quot;</span>
+<span class="w">            </span><span class="s">"\tSource: "</span>
 <span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocVal</span><span class="p">()</span>
-<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; @ &quot;</span>
+<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="s">" @ "</span>
 <span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocStatement</span><span class="p">()</span>
-<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; @ line &quot;</span>
+<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="s">" @ line "</span>
 <span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocStatement</span><span class="p">().</span><span class="na">getLineNumber</span><span class="p">());</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">queries</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">&quot;Did not find any leaks!&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">"Did not find any leaks!"</span><span class="p">);</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
@@ -1633,7 +1633,7 @@ The analyzed variable is tainted only in an optional branch:</p>
 <span class="normal">7</span>
 <span class="normal">8</span>
 <span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1">// Our analysis does not return this allocation site because we do not </span>
-<span class="c1">// configure the call to &#39;noSource&#39; as source in TaintAllocationSite.java</span>
+<span class="c1">// configure the call to 'noSource' as source in TaintAllocationSite.java</span>
 <span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SourceClass</span><span class="p">.</span><span class="na">noSource</span><span class="p">();</span>
 
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">staticallyUnknown</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>

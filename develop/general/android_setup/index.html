@@ -890,11 +890,11 @@ For example, we can use the following FlowDroid setup:</p>
 <span class="n">app</span><span class="p">.</span><span class="na">setSootConfig</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SootConfigForAndroid</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nd">@Override</span>
 <span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setSootOptions</span><span class="p">(</span><span class="n">Options</span><span class="w"> </span><span class="n">options</span><span class="p">,</span><span class="w"> </span><span class="n">InfoFlowConfiguration</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">setPhaseOptions</span><span class="p">(</span><span class="s">&quot;jb.sils&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;enabled:false&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">setPhaseOptions</span><span class="p">(</span><span class="s">"jb.sils"</span><span class="p">,</span><span class="w"> </span><span class="s">"enabled:false"</span><span class="p">);</span>
 
 <span class="w">        </span><span class="c1">// By default, FlowDroid loads the Android packages which makes the call graph very large</span>
 <span class="w">        </span><span class="c1">// and the analysis slow. Only include them, if they are really needed</span>
-<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">set_exclude</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;android.*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;androidx.*&quot;</span><span class="p">));</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">set_exclude</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"android.*"</span><span class="p">,</span><span class="w"> </span><span class="s">"androidx.*"</span><span class="p">));</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">})</span>
 </code></pre></div></td></tr></table></div>

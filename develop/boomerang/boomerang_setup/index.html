@@ -930,13 +930,13 @@ public void solveQueries(
 <span class="w">        </span><span class="c1">// This is a single allocation site</span>
 <span class="w">        </span><span class="n">AllocVal</span><span class="w"> </span><span class="n">allocVal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">query</span><span class="p">.</span><span class="na">getAllocVal</span><span class="p">();</span>
 <span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span>
-<span class="w">                </span><span class="s">&quot;Query variable points to &quot;</span>
+<span class="w">                </span><span class="s">"Query variable points to "</span>
 <span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocVal</span><span class="p">()</span>
-<span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; @ statement&quot;</span>
+<span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="s">" @ statement"</span>
 <span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocStatement</span><span class="p">()</span>
-<span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; @ line &quot;</span>
+<span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="s">" @ line "</span>
 <span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocStatement</span><span class="p">().</span><span class="na">getLineNumber</span><span class="p">()</span>
-<span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; in method &quot;</span>
+<span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="s">" in method "</span>
 <span class="w">                </span><span class="o">+</span><span class="w"> </span><span class="n">allocVal</span><span class="p">.</span><span class="na">getAllocStatement</span><span class="p">().</span><span class="na">getMethod</span><span class="p">());</span><span class="w">   </span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -955,9 +955,9 @@ public void solveQueries(
 <span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">extractAliases</span><span class="p">(</span><span class="n">BackwardBoomerangResults</span><span class="o">&lt;</span><span class="n">NoWeight</span><span class="o">&gt;</span><span class="w"> </span><span class="n">results</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">AccessPath</span><span class="o">&gt;</span><span class="w"> </span><span class="n">aliases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">results</span><span class="p">.</span><span class="na">getAllAliases</span><span class="p">();</span>
 
-<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Found the following aliases:&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Found the following aliases:"</span><span class="p">)</span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">AccessPath</span><span class="w"> </span><span class="n">alias</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">aliases</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="c1">// &#39;toCompactString()&#39; transforms the access path into a basic String, e.g. x.f.g</span>
+<span class="w">        </span><span class="c1">// 'toCompactString()' transforms the access path into a basic String, e.g. x.f.g</span>
 <span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">alias</span><span class="p">.</span><span class="na">toCompactString</span><span class="p">());</span>
 <span class="w">    </span><span class="p">}</span>
 

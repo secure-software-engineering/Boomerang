@@ -961,7 +961,7 @@ However, a common scenario where Boomerang cannot find an allocation site occurs
 For example, using the <code>SimpleAllocationSite</code> from the previous section, Boomerang would not find an allocation site in the following program:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;property&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Most precise allocation site</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">"property"</span><span class="p">);</span><span class="w">  </span><span class="c1">// Most precise allocation site</span>
 <span class="p">...</span>
 <span class="n">queryFor</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w">                                </span>
 </code></pre></div></td></tr></table></div>
