@@ -119,4 +119,26 @@ public class VectorTest {
     v.firstElement();
     Assertions.mustBeInErrorState(v);
   }
+
+  public void doSth(Vector<Object> x, Object element) {
+    if (staticallyUnknown()) {
+      x.add(element);
+    } else {
+      element = x.elementAt(0);
+    }
+  }
+
+  @Test
+  @TestParameters(expectedSeedCount = 1, expectedAssertionCount = 1)
+  public void testNoStackOverflowDueToNonCommutativeCombineWith() {
+    Vector<Object> x = new Vector<>();
+    Object element = new Object();
+    x.add(element);
+    while (staticallyUnknown()) {
+      // the method call seems to be crucial for triggering the StackOverflowError
+      // (inlining the code from doSth does not trigger the error)
+      doSth(x, element);
+    }
+    Assertions.mustBeInAcceptingState(x);
+  }
 }
