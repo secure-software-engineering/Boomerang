@@ -39,6 +39,7 @@ public class JimpleUpMethod extends DefinedMethod {
   private final JavaSootMethod delegate;
   private final JavaView view;
   private final JimpleUpControlFlowGraph cfg;
+  private final int hashCode;
 
   private Set<Val> localCache;
   private List<Val> parameterLocalCache;
@@ -46,6 +47,7 @@ public class JimpleUpMethod extends DefinedMethod {
   protected JimpleUpMethod(JavaSootMethod delegate, JavaView view) {
     this.delegate = delegate;
     this.view = view;
+    this.hashCode = Objects.hash(delegate);
 
     if (!delegate.hasBody()) {
       throw new RuntimeException("Trying to build a Jimple method without body present");
@@ -175,7 +177,7 @@ public class JimpleUpMethod extends DefinedMethod {
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate);
+    return hashCode;
   }
 
   @Override
@@ -185,6 +187,7 @@ public class JimpleUpMethod extends DefinedMethod {
     if (getClass() != obj.getClass()) return false;
 
     JimpleUpMethod other = (JimpleUpMethod) obj;
+    if (hashCode != other.hashCode) return false;
     if (delegate == null) {
       return other.delegate == null;
     } else return delegate.equals(other.delegate);

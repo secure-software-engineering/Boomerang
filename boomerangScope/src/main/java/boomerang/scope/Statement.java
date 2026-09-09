@@ -21,9 +21,11 @@ import java.util.Objects;
 public abstract class Statement implements Location {
 
   protected final Method method;
+  private final int baseHashCode;
 
   protected Statement(Method method) {
     this.method = method;
+    this.baseHashCode = Objects.hash(method);
   }
 
   public Method getMethod() {
@@ -185,11 +187,12 @@ public abstract class Statement implements Location {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Statement statement = (Statement) o;
+    if (baseHashCode != statement.baseHashCode) return false;
     return Objects.equals(method, statement.method);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(method);
+    return baseHashCode;
   }
 }

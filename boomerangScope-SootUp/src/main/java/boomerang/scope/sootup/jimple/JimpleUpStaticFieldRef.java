@@ -28,6 +28,7 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
   private final JStaticFieldRef delegate;
   private final JimpleUpMethod method;
+  private final int hashCode;
 
   public JimpleUpStaticFieldRef(JStaticFieldRef delegate, JimpleUpMethod method) {
     this(delegate, method, null);
@@ -39,6 +40,7 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
     this.delegate = delegate;
     this.method = method;
+    this.hashCode = Objects.hash(super.hashCode(), delegate);
   }
 
   public JStaticFieldRef getDelegate() {
@@ -84,18 +86,21 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleUpStaticFieldRef that = (JimpleUpStaticFieldRef) o;
+    if (!super.equals(o)) return false;
     // TODO
     //  Wrong equals implementation in SootUp. Once fixed, replace this with
     //  the commented line
+    // Note: no hashCode-mismatch fast path here (unlike sibling classes) because SootUp's
+    // JStaticFieldRef#equals is known to be looser than a hashCode consistent with it would
+    // allow -- delegate.equals(...) can be true for objects whose hashCode() differs.
     return (delegate != null && delegate.equals(that.delegate));
     // return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    return hashCode;
   }
 
   @Override

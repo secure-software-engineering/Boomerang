@@ -22,11 +22,13 @@ import sootup.core.jimple.common.Value;
 public class JimpleUpDoubleVal extends JimpleUpVal implements ValWithFalseVariable {
 
   private final Val falseVal;
+  private final int hashCode;
 
   public JimpleUpDoubleVal(Value value, JimpleUpMethod method, Val falseVal) {
     super(value, method);
 
     this.falseVal = falseVal;
+    this.hashCode = Objects.hash(super.hashCode(), falseVal);
   }
 
   @Override
@@ -38,14 +40,15 @@ public class JimpleUpDoubleVal extends JimpleUpVal implements ValWithFalseVariab
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleUpDoubleVal that = (JimpleUpDoubleVal) o;
+    if (hashCode != that.hashCode) return false;
+    if (!super.equals(o)) return false;
     return Objects.equals(falseVal, that.falseVal);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), falseVal);
+    return hashCode;
   }
 
   @Override

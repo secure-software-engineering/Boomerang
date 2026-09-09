@@ -43,6 +43,7 @@ public class JimpleUpStatement extends Statement {
 
   private final Stmt delegate;
   private final JimpleUpMethod method;
+  private final int hashCode;
 
   private JimpleUpStatement(Stmt delegate, JimpleUpMethod method) {
     super(method);
@@ -53,6 +54,7 @@ public class JimpleUpStatement extends Statement {
 
     this.delegate = delegate;
     this.method = method;
+    this.hashCode = Objects.hash(super.hashCode(), delegate);
   }
 
   public static JimpleUpStatement create(Stmt delegate, JimpleUpMethod method) {
@@ -353,14 +355,15 @@ public class JimpleUpStatement extends Statement {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleUpStatement that = (JimpleUpStatement) o;
+    if (hashCode != that.hashCode) return false;
+    if (!super.equals(o)) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    return hashCode;
   }
 
   @Override
