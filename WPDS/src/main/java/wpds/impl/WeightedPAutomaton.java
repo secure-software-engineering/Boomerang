@@ -79,6 +79,13 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   private final Set<UnbalancedPopListener<N, D, W>> unbalancedPopListeners = new LinkedHashSet<>();
   private final Map<UnbalancedPopEntry, W> unbalancedPops = Maps.newHashMap();
   private final Map<Transition<N, D>, W> transitionsToFinalWeights = Maps.newHashMap();
+
+  /**
+   * Incremented whenever {@link #transitionsToFinalWeights} actually changes. Callers that derive a
+   * view of the final weights can cache that view and compare this counter to detect that their
+   * snapshot went stale, instead of rebuilding it on every access.
+   */
+  private int finalWeightsVersion = 0;
   private ForwardDFSVisitor<N, D, W> dfsVisitor;
   private ForwardDFSVisitor<N, D, W> dfsEpsVisitor;
   public int failedAdditions;
@@ -625,6 +632,16 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     }
   }
 
+  /**
+   * A version counter for {@link #getTransitionsToFinalWeights()}. It changes exactly when the
+   * final weights change, so a derived view captured together with this value stays valid for as
+   * long as the value does. Read it <em>after</em> {@link #getTransitionsToFinalWeights()}, which
+   * may itself compute weights on its first call.
+   */
+  public int getFinalWeightsVersion() {
+    return finalWeightsVersion;
+  }
+
   public Map<Transition<N, D>, W> getTransitionsToFinalWeights() {
     LOGGER.trace("Start computing final weights");
     final Stopwatch w = Stopwatch.createStarted();
@@ -652,7 +669,10 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       W newWeight = (W) weight.extendWith(w);
       W weightAtTarget = transitionsToFinalWeights.get(t);
       W newVal = (weightAtTarget == null ? newWeight : (W) weightAtTarget.combineWith(newWeight));
-      transitionsToFinalWeights.put(t, newVal);
+      if (!newVal.equals(weightAtTarget)) {
+        transitionsToFinalWeights.put(t, newVal);
+        finalWeightsVersion++;
+      }
       if (isGeneratedState(t.getStart())) {
         registerListener(new ValueComputationListener(t.getStart(), newVal));
       }
