@@ -20,10 +20,12 @@ public class Pair<X, Y> {
 
   private final Y y;
   private final X x;
+  private final int hashCode;
 
   public Pair(X x, Y y) {
     this.x = x;
     this.y = y;
+    this.hashCode = Objects.hash(y, x);
   }
 
   public X getX() {
@@ -44,11 +46,12 @@ public class Pair<X, Y> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Pair<?, ?> pair = (Pair<?, ?>) o;
+    if (hashCode != pair.hashCode) return false;
     return Objects.equals(y, pair.y) && Objects.equals(x, pair.x);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(y, x);
+    return hashCode;
   }
 }

@@ -32,11 +32,13 @@ public class JimpleUpWrappedClass implements WrappedClass {
 
   private final ClassType delegate;
   private final JavaView view;
+  private final int hashCode;
   private Collection<Method> methodsCache;
 
   public JimpleUpWrappedClass(ClassType delegate, JavaView view) {
     this.view = view;
     this.delegate = delegate;
+    this.hashCode = Objects.hash(delegate);
   }
 
   public ClassType getDelegate() {
@@ -117,12 +119,13 @@ public class JimpleUpWrappedClass implements WrappedClass {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleUpWrappedClass that = (JimpleUpWrappedClass) o;
+    if (hashCode != that.hashCode) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate);
+    return hashCode;
   }
 
   @Override

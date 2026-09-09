@@ -30,10 +30,12 @@ public class JimpleUpIfStatement implements IfStatement {
 
   private final JIfStmt delegate;
   private final JimpleUpMethod method;
+  private final int hashCode;
 
   public JimpleUpIfStatement(JIfStmt delegate, JimpleUpMethod method) {
     this.delegate = delegate;
     this.method = method;
+    this.hashCode = Objects.hash(delegate);
   }
 
   @Override
@@ -113,12 +115,13 @@ public class JimpleUpIfStatement implements IfStatement {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleUpIfStatement that = (JimpleUpIfStatement) o;
+    if (hashCode != that.hashCode) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate);
+    return hashCode;
   }
 
   @Override
