@@ -41,6 +41,7 @@ public class JimpleUpVal extends Val {
 
   private final JimpleUpMethod method;
   private final Value delegate;
+  private final int hashCode;
 
   public JimpleUpVal(Value delegate, JimpleUpMethod method) {
     this(delegate, method, null);
@@ -51,6 +52,7 @@ public class JimpleUpVal extends Val {
 
     this.delegate = delegate;
     this.method = method;
+    this.hashCode = Objects.hash(super.hashCode(), delegate);
 
     if (delegate == null) {
       throw new RuntimeException("Value must not be null");
@@ -293,14 +295,15 @@ public class JimpleUpVal extends Val {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleUpVal that = (JimpleUpVal) o;
+    if (hashCode != that.hashCode) return false;
+    if (!super.equals(o)) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    return hashCode;
   }
 
   @Override

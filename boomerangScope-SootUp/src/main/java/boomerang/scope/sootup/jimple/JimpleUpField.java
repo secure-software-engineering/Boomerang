@@ -21,9 +21,12 @@ import sootup.core.signatures.FieldSignature;
 public class JimpleUpField implements Field {
 
   private final FieldSignature delegate;
+  private final int hashCode;
 
   public JimpleUpField(FieldSignature delegate) {
     this.delegate = delegate;
+    // Important: Do not include the declaring class because subclasses may access the field, too
+    this.hashCode = Objects.hash(delegate.getType(), delegate.getName());
   }
 
   public FieldSignature getDelegate() {
@@ -45,6 +48,7 @@ public class JimpleUpField implements Field {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleUpField that = (JimpleUpField) o;
+    if (hashCode != that.hashCode) return false;
     // Important: Do not include the declaring class because subclasses may access the field, too
     return Objects.equals(delegate.getType(), that.delegate.getType())
         && Objects.equals(delegate.getName(), that.delegate.getName());
@@ -52,8 +56,7 @@ public class JimpleUpField implements Field {
 
   @Override
   public int hashCode() {
-    // Important: Do not include the declaring class because subclasses may access the field, too
-    return Objects.hash(delegate.getType(), delegate.getName());
+    return hashCode;
   }
 
   @Override
