@@ -40,6 +40,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -97,6 +98,10 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   protected final DataFlowScope dataFlowScope;
   protected final BoomerangOptions options;
   protected final Type type;
+  private Table<Edge, Val, W> edgeValWeightTable;
+  private int edgeValWeightTableVersion;
+  private Table<Statement, Val, W> statementValWeightTable;
+  private int statementValWeightTableVersion;
 
   public AbstractBoomerangSolver(
       ObservableICFG<Statement, Method> icfg,
@@ -239,11 +244,15 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
   }
 
   public Table<Edge, Val, W> asEdgeValWeightTable() {
-    final Table<Edge, Val, W> results = HashBasedTable.create();
-
     WeightedPAutomaton<Edge, INode<Val>, W> callAut = getCallAutomaton();
-    for (Entry<Transition<Edge, INode<Val>>, W> e :
-        callAut.getTransitionsToFinalWeights().entrySet()) {
+    Map<Transition<Edge, INode<Val>>, W> finalWeights = callAut.getTransitionsToFinalWeights();
+    int version = callAut.getFinalWeightsVersion();
+    if (edgeValWeightTable != null && edgeValWeightTableVersion == version) {
+      return edgeValWeightTable;
+    }
+
+    final Table<Edge, Val, W> results = HashBasedTable.create();
+    for (Entry<Transition<Edge, INode<Val>>, W> e : finalWeights.entrySet()) {
       Transition<Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
       if (t.getLabel().equals(ControlFlowGraph.Edge.epsilon())) continue;
@@ -251,15 +260,22 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
           && !t.getLabel().getMethod().equals(t.getStart().fact().m())) continue;
       results.put(t.getLabel(), t.getStart().fact(), w);
     }
-    return results;
+
+    edgeValWeightTable = Tables.unmodifiableTable(results);
+    edgeValWeightTableVersion = version;
+    return edgeValWeightTable;
   }
 
   public Table<Statement, Val, W> asStatementValWeightTable() {
-    Table<Statement, Val, W> results = HashBasedTable.create();
-
     WeightedPAutomaton<Edge, INode<Val>, W> callAut = getCallAutomaton();
-    for (Entry<Transition<Edge, INode<Val>>, W> e :
-        callAut.getTransitionsToFinalWeights().entrySet()) {
+    Map<Transition<Edge, INode<Val>>, W> finalWeights = callAut.getTransitionsToFinalWeights();
+    int version = callAut.getFinalWeightsVersion();
+    if (statementValWeightTable != null && statementValWeightTableVersion == version) {
+      return statementValWeightTable;
+    }
+
+    Table<Statement, Val, W> results = HashBasedTable.create();
+    for (Entry<Transition<Edge, INode<Val>>, W> e : finalWeights.entrySet()) {
       Transition<Edge, INode<Val>> t = e.getKey();
       W w = e.getValue();
 
@@ -274,7 +290,9 @@ public abstract class AbstractBoomerangSolver<W extends Weight>
       }
     }
 
-    return results;
+    statementValWeightTable = Tables.unmodifiableTable(results);
+    statementValWeightTableVersion = version;
+    return statementValWeightTable;
   }
 
   protected void addPotentialUnbalancedFlow(

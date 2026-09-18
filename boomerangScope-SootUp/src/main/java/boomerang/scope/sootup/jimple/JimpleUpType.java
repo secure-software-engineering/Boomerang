@@ -30,10 +30,12 @@ public class JimpleUpType implements Type {
 
   private final sootup.core.types.Type delegate;
   private final JavaView view;
+  private final int hashCode;
 
   public JimpleUpType(sootup.core.types.Type delegate, JavaView view) {
     this.delegate = delegate;
     this.view = view;
+    this.hashCode = Objects.hash(delegate);
   }
 
   public sootup.core.types.Type getDelegate() {
@@ -150,12 +152,13 @@ public class JimpleUpType implements Type {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleUpType that = (JimpleUpType) o;
+    if (hashCode != that.hashCode) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate);
+    return hashCode;
   }
 
   @Override
