@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ import wpds.impl.Weight;
 public class TransitionFunctionImpl implements TransitionFunction {
 
   @NonNull private final Multimap<Transition, StatementSequence> stateChangeSequences;
-  @NonNull private final Statement stateChangeStatement;
+  @NonNull private final LinkedHashSet<Statement> stateChangeStatements;
 
   public TransitionFunctionImpl(
       @NonNull Transition transition, @NonNull Statement stateChangeStatement) {
@@ -43,7 +44,8 @@ public class TransitionFunctionImpl implements TransitionFunction {
         ImmutableMultimap.of(
             transition,
             new StatementSequence(new StatementSequence.Entry(stateChangeStatement, transition)));
-    this.stateChangeStatement = stateChangeStatement;
+    this.stateChangeStatements = new LinkedHashSet<>();
+    stateChangeStatements.add(stateChangeStatement);
   }
 
   public TransitionFunctionImpl(
@@ -56,14 +58,23 @@ public class TransitionFunctionImpl implements TransitionFunction {
     }
 
     this.stateChangeSequences = ImmutableMultimap.copyOf(sequencesMap);
-    this.stateChangeStatement = stateChangeStatement;
+    this.stateChangeStatements = new LinkedHashSet<>();
+    stateChangeStatements.add(stateChangeStatement);
   }
 
   public TransitionFunctionImpl(
       @NonNull Multimap<Transition, StatementSequence> transitionStatementSequences,
       @NonNull Statement stateChangeStatement) {
     this.stateChangeSequences = ImmutableMultimap.copyOf(transitionStatementSequences);
-    this.stateChangeStatement = stateChangeStatement;
+    this.stateChangeStatements = new LinkedHashSet<>();
+    stateChangeStatements.add(stateChangeStatement);
+  }
+
+  public TransitionFunctionImpl(
+      @NonNull Multimap<Transition, StatementSequence> transitionStatementSequences,
+      @NonNull LinkedHashSet<Statement> stateChangeStatements) {
+    this.stateChangeSequences = ImmutableMultimap.copyOf(transitionStatementSequences);
+    this.stateChangeStatements = new LinkedHashSet<>(stateChangeStatements);
   }
 
   @NonNull
@@ -73,7 +84,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
   }
 
   public Statement getStateChangeStatement() {
-    return stateChangeStatement;
+    return stateChangeStatements.iterator().next();
   }
 
   @NonNull
@@ -122,7 +133,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
         }
       }
     }
-    return new TransitionFunctionImpl(result, func.stateChangeStatement);
+    return new TransitionFunctionImpl(result, func.getStateChangeStatement());
   }
 
   @NonNull
@@ -146,7 +157,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
         transitions.putAll(idTransition, statements);
       }
 
-      return new TransitionFunctionImpl(transitions, this.stateChangeStatement);
+      return new TransitionFunctionImpl(transitions, this.getStateChangeStatement());
     }
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -154,8 +165,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
     Multimap<Transition, StatementSequence> sequences = HashMultimap.create();
     sequences.putAll(stateChangeSequences);
     sequences.putAll(func.stateChangeSequences);
+    LinkedHashSet<Statement> mergedStateChangeStatements = new LinkedHashSet<>();
+    mergedStateChangeStatements.addAll(func.stateChangeStatements);
+    mergedStateChangeStatements.addAll(stateChangeStatements);
 
-    return new TransitionFunctionImpl(sequences, func.stateChangeStatement);
+    return new TransitionFunctionImpl(sequences, mergedStateChangeStatements);
   }
 
   @Override
@@ -169,11 +183,11 @@ public class TransitionFunctionImpl implements TransitionFunction {
     if (o == null || getClass() != o.getClass()) return false;
     TransitionFunctionImpl that = (TransitionFunctionImpl) o;
     return Objects.equals(stateChangeSequences, that.stateChangeSequences)
-        && Objects.equals(stateChangeStatement, that.stateChangeStatement);
+        && Objects.equals(stateChangeStatements, that.stateChangeStatements);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(stateChangeSequences, stateChangeStatement);
+    return Objects.hash(stateChangeSequences, stateChangeStatements);
   }
 }
