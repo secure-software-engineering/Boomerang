@@ -21,10 +21,12 @@ public class TransitionImpl implements Transition {
 
   @NonNull private final State from;
   @NonNull private final State to;
+  private final int hashCode;
 
   public TransitionImpl(@NonNull State from, @NonNull State to) {
     this.from = from;
     this.to = to;
+    this.hashCode = Objects.hash(from, to);
   }
 
   @Override
@@ -44,12 +46,13 @@ public class TransitionImpl implements Transition {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     TransitionImpl that = (TransitionImpl) o;
+    if (hashCode != that.hashCode) return false;
     return Objects.equals(from, that.from) && Objects.equals(to, that.to);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(from, to);
+    return hashCode;
   }
 
   @Override
