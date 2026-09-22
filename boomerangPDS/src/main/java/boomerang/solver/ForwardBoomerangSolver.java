@@ -342,6 +342,18 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Val returnedFact) {
     Statement callSite = returnSiteStatement.getStart();
 
+    // A ForwardQuery keeps its AllocVal as the query variable, so the call automaton's target
+    // state carries the wrapper while every propagated fact is the unwrapped delegate (see the
+    // "Convert AllocVal -> Val" step in WeightedBoomerang.forwardSolve). SyncPDSSolver reads this
+    // fact straight off a transition's start state, which can be that target state, so unwrap it
+    // here. Without this, the isThisLocal/isReturnLocal/isParameterLocal checks below compare an
+    // AllocVal against the method's plain locals and are always false -- AllocVal.equals requires
+    // both sides to be AllocVal -- so the summary is silently dropped, and the wrapper is
+    // propagated on, tripping the assertion in computeSuccessor.
+    if (returnedFact instanceof AllocVal) {
+      returnedFact = ((AllocVal) returnedFact).getDelegate();
+    }
+
     Set<Node<ControlFlowGraph.Edge, Val>> out = new LinkedHashSet<>();
     if (callSite.containsInvokeExpr()) {
       if (returnedFact.isThisLocal()) {

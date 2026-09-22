@@ -20,6 +20,7 @@ import boomerang.Query;
 import boomerang.WeightedBoomerang;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
+import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Statement;
@@ -83,7 +84,8 @@ public class IDEALSeedSolver<W extends Weight> {
       if (t.getLabel().equals(callSite)) {
         idealWeightFunctions.addNonKillFlow(new Node<>(callSite, returnedFact));
         idealWeightFunctions.addIndirectFlow(
-            new Node<>(callSite, returnedFact), new Node<>(callSite, t.getStart().fact()));
+            new Node<>(callSite, returnedFact),
+            new Node<>(callSite, unwrapAllocVal(t.getStart().fact())));
       }
     }
 
@@ -237,7 +239,9 @@ public class IDEALSeedSolver<W extends Weight> {
                               .stmt()) /* && !t.getStart().fact().equals(curr.fact()) */) {
                     idealWeightFunctions.addNonKillFlow(strongUpdateNode);
                     idealWeightFunctions.addIndirectFlow(
-                        strongUpdateNode, new Node<>(strongUpdateNode.stmt(), t.getStart().fact()));
+                        strongUpdateNode,
+                        new Node<>(
+                            strongUpdateNode.stmt(), unwrapAllocVal(t.getStart().fact())));
                   }
                 });
       }
@@ -407,12 +411,26 @@ public class IDEALSeedSolver<W extends Weight> {
     }
   }
 
+  /**
+   * A ForwardQuery keeps its AllocVal as the query variable, so the call automaton's target state
+   * carries that wrapper while every propagated fact is the unwrapped delegate (see the "Convert
+   * AllocVal -> Val" step in WeightedBoomerang.forwardSolve). Facts lifted off a transition's start
+   * state can therefore be wrappers, and must be unwrapped before they are turned into
+   * indirect-flow nodes: AllocVal.equals only matches another AllocVal, so a wrapper never compares
+   * equal to the plain locals these nodes are matched against, and propagating one trips the
+   * assertion in ForwardBoomerangSolver.computeSuccessor.
+   */
+  private static Val unwrapAllocVal(Val fact) {
+    return fact instanceof AllocVal ? ((AllocVal) fact).getDelegate() : fact;
+  }
+
   private void registerIndirectFlowListener(AbstractBoomerangSolver<W> solver) {
     WeightedPAutomaton<Edge, INode<Val>, W> callAutomaton = solver.getCallAutomaton();
     callAutomaton.registerListener(
         (t, w, aut) -> {
           if (t.getStart() instanceof GeneratedState) return;
-          Node<Edge, Val> source = new Node<>(t.getLabel(), t.getStart().fact());
+          Node<Edge, Val> source =
+              new Node<>(t.getLabel(), unwrapAllocVal(t.getStart().fact()));
           Collection<Node<Edge, Val>> indirectFlows = idealWeightFunctions.getAliasesFor(source);
           for (Node<Edge, Val> indirectFlow : indirectFlows) {
             solver.addCallRule(
