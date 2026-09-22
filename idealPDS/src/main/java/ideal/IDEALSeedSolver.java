@@ -62,7 +62,8 @@ public class IDEALSeedSolver<W extends Weight> {
   private final ForwardQuery seed;
   private final IDEALWeightFunctions<W> idealWeightFunctions;
   private final W one;
-  private final WeightedBoomerang<W> phase1Solver;
+  /** Not final: cleared once phase 1 is done so its automata can be collected during phase 2. */
+  private WeightedBoomerang<W> phase1Solver;
   private final WeightedBoomerang<W> phase2Solver;
   private final Stopwatch analysisStopwatch = Stopwatch.createUnstarted();
   private final Multimap<Node<Edge, Val>, Edge> affectedStrongUpdateStmt = HashMultimap.create();
@@ -295,6 +296,15 @@ public class IDEALSeedSolver<W extends Weight> {
       }
       throw new IDEALSeedTimeout(this, this.phase1Solver, resultPhase1);
     }
+    // Phase 2 does not read phase 1's automata; it consumes only the aliasing and strong-update
+    // facts that phase 1 recorded on idealWeightFunctions. Drop every reference to phase 1 so its
+    // automata are collectable while phase 2 runs, rather than both phases being live at once.
+    // The listener set has to be cleared too: runPhase registers a lambda there that captures the
+    // phase's solver, and outside the object-flow phase its body is a no-op anyway.
+    idealWeightFunctions.clearListeners();
+    this.phase1Solver = null;
+    resultPhase1 = null;
+
     LOGGER.debug("Starting Phase 2 of IDEal");
     ForwardBoomerangResults<W> resultPhase2 = runPhase(this.phase2Solver, Phases.ValueFlow);
     if (resultPhase2.isTimedOut()) {

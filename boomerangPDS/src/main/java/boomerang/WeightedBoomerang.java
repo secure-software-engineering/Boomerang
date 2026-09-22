@@ -988,15 +988,22 @@ public abstract class WeightedBoomerang<W extends Weight> {
     if (analysisWatch.isRunning()) {
       analysisWatch.stop();
     }
-    return new ForwardBoomerangResults<>(
-        query,
-        icfg(),
-        cfg(),
-        timedout,
-        this.queryToSolvers,
-        getStats(),
-        analysisWatch,
-        visitedMethods);
+    ForwardBoomerangResults<W> forwardResults =
+        new ForwardBoomerangResults<>(
+            query,
+            icfg(),
+            cfg(),
+            timedout,
+            this.queryToSolvers,
+            getStats(),
+            analysisWatch,
+            visitedMethods);
+    // Only the top-level query releases: solveUnderScope(..) runs nested inside an outer analysis
+    // that still needs these solvers.
+    if (options.releaseSolversAfterQuery()) {
+      forwardResults.releaseSolvers();
+    }
+    return forwardResults;
   }
 
   public BackwardBoomerangResults<W> solve(BackwardQuery query) {
