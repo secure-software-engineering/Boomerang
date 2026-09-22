@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,11 +52,18 @@ import wpds.interfaces.WPAUpdateListener;
 public abstract class WeightedPAutomaton<N extends Location, D extends State, W extends Weight>
     implements LabeledGraph<D, N> {
   private static final Logger LOGGER = LoggerFactory.getLogger(WeightedPAutomaton.class);
-  private final Map<Transition<N, D>, W> transitionToWeights = new HashMap<>();
+  /**
+   * Insertion-ordered because its key set now *is* the set of transitions: the separate
+   * LinkedHashSet that used to hold them stored exactly the same elements (every transition added
+   * there is put here in the same call, and a fresh transition always has a null old weight, so the
+   * put always fires), at 40 bytes per transition for nothing. A LinkedHashMap costs 8 bytes more
+   * per entry than a HashMap but removes a whole duplicate entry, and it preserves the iteration
+   * order callers of getTransitions() previously relied on.
+   */
+  private final Map<Transition<N, D>, W> transitionToWeights = new LinkedHashMap<>();
   // Set Q is implicit
   // Weighted Pushdown Systems and their Application to Interprocedural
   // Dataflow Analysis
-  protected Set<Transition<N, D>> transitions = new LinkedHashSet<>();
   // set F in paper [Reps2003]
   protected Set<D> finalState = new LinkedHashSet<>();
   protected SimpleSetMultimap<D, D> initialStatesToSource = new SimpleSetMultimap<>();
@@ -104,7 +112,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   public abstract boolean isGeneratedState(D d);
 
   public Collection<Transition<N, D>> getTransitions() {
-    return Lists.newArrayList(transitions);
+    return Lists.newArrayList(transitionToWeights.keySet());
   }
 
   public boolean addTransition(Transition<N, D> trans) {
@@ -218,7 +226,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       }
     }
 
-    s += "Transitions: " + transitions.size() + " Nested: " + nestedAutomatons.size() + "\n";
+    s += "Transitions: " + transitionToWeights.size() + " Nested: " + nestedAutomatons.size() + "\n";
     for (WeightedPAutomaton<N, D, W> nested : nestedAutomatons) {
       s += "NESTED -> \n";
       s += nested.toDotString(visited);
@@ -237,7 +245,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
 
   public String toLabelGroupedDotString() {
     HashBasedTable<D, N, Collection<D>> groupedByTargetAndLabel = HashBasedTable.create();
-    for (Transition<N, D> t : transitions) {
+    for (Transition<N, D> t : transitionToWeights.keySet()) {
       Collection<D> collection = groupedByTargetAndLabel.get(t.getTarget(), t.getLabel());
       if (collection == null) collection = new LinkedHashSet<>();
       collection.add(t.getStart());
@@ -254,7 +262,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       }
     }
     s += "}\n";
-    s += "Transitions: " + transitions.size() + "\n";
+    s += "Transitions: " + transitionToWeights.size() + "\n";
     for (WeightedPAutomaton<N, D, W> nested : nestedAutomatons) {
       s += "NESTED -> \n";
       s += nested.toDotString();
@@ -292,7 +300,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
 
   public Set<Edge<D, N>> getEdges() {
     Set<Edge<D, N>> trans = new LinkedHashSet<>();
-    for (Edge<D, N> tran : transitions) {
+    for (Edge<D, N> tran : transitionToWeights.keySet()) {
       if (!tran.getLabel().equals(epsilon())) {
         trans.add(new Transition<N, D>(tran.getTarget(), tran.getLabel(), tran.getStart()));
       }
@@ -323,8 +331,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       stateCreatingTransition.put(trans.getTarget(), trans);
     }
     states.add(trans.getStart());
-    boolean added = transitions.add(trans);
     W oldWeight = transitionToWeights.get(trans);
+    boolean added = oldWeight == null;
     W newWeight = (W) (oldWeight == null ? weight : oldWeight.combineWith(weight));
 
     if (!newWeight.equals(oldWeight)) {
