@@ -409,8 +409,11 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
     releasedContainsFieldLoop = containsFieldLoop();
 
     released = true;
-    // Drop only this object's reference; the map belongs to the WeightedBoomerang instance, which
-    // is itself unreachable once the seed is done, so the automata become collectable.
+    // queryToSolvers is an anonymous DefaultValueMap declared in WeightedBoomerang, so it captures
+    // the enclosing instance: a retained result would otherwise pin that instance and every solver
+    // in it. Dropping this reference is what makes them collectable. The trade is that the views
+    // materialized above are now retained eagerly, where lazily some may never have been computed
+    // at all -- hence opt-in.
     queryToSolvers = null;
   }
 
