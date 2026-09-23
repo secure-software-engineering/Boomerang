@@ -38,7 +38,12 @@ import wpds.interfaces.WPAStateListener;
 public class AbstractBoomerangResults<W extends Weight> {
 
   protected final Logger LOGGER = LoggerFactory.getLogger(AbstractBoomerangResults.class);
-  protected final DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> queryToSolvers;
+  /**
+   * Not final: {@link boomerang.results.ForwardBoomerangResults#releaseSolvers()} drops this
+   * reference once every query-scoped result has been materialized, so the automata can be
+   * collected. The map itself is owned by the WeightedBoomerang instance and is never mutated here.
+   */
+  protected DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> queryToSolvers;
 
   public AbstractBoomerangResults(
       DefaultValueMap<ForwardQuery, ForwardBoomerangSolver<W>> solverMap) {

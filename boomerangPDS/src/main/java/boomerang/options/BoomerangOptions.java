@@ -153,6 +153,16 @@ public class BoomerangOptions {
     return builder.allowMultipleQueries;
   }
 
+  /**
+   * When enabled, a completed forward query materializes all of its query-scoped results and then
+   * drops the solvers, so the automata do not stay reachable from the results object. Off by
+   * default: it makes {@link boomerang.results.ForwardBoomerangResults#getContext} unavailable, and
+   * it computes every accessor whether or not the client uses them.
+   */
+  public boolean releaseSolversAfterQuery() {
+    return builder.releaseSolversAfterQuery;
+  }
+
   public boolean handleSpecialInvokeAsNormalPropagation() {
     return builder.handleSpecialInvokeAsNormalPropagation;
   }
@@ -184,6 +194,7 @@ public class BoomerangOptions {
     private boolean trackStaticFieldAtEntryPointToClinit;
     private boolean handleMaps;
     private boolean allowMultipleQueries;
+    private boolean releaseSolversAfterQuery;
     private boolean handleSpecialInvokeAsNormalPropagation;
     private boolean ignoreSparsificationAfterQuery;
 
@@ -209,6 +220,7 @@ public class BoomerangOptions {
       this.trackStaticFieldAtEntryPointToClinit = false;
       this.handleMaps = true;
       this.allowMultipleQueries = false;
+      this.releaseSolversAfterQuery = false;
       this.handleSpecialInvokeAsNormalPropagation = false;
       this.ignoreSparsificationAfterQuery = true;
     }
@@ -332,6 +344,11 @@ public class BoomerangOptions {
 
     public OptionsBuilder enableAllowMultipleQueries(boolean allowMultipleQueries) {
       this.allowMultipleQueries = allowMultipleQueries;
+      return this;
+    }
+
+    public OptionsBuilder enableReleaseSolversAfterQuery(boolean releaseSolversAfterQuery) {
+      this.releaseSolversAfterQuery = releaseSolversAfterQuery;
       return this;
     }
 

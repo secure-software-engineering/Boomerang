@@ -60,6 +60,18 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   private final Collection<Method> visitedMethods;
   private final ObservableControlFlowGraph cfg;
 
+  // Set by releaseSolvers(): every accessor whose value is query-scoped and finite is computed
+  // once, after which the solver graph (the automata, which dominate the live set) is dropped.
+  private boolean released = false;
+  private Table<ControlFlowGraph.Edge, Val, W> releasedEdgeValWeightTable;
+  private Table<Statement, Val, W> releasedStatementValWeightTable;
+  private Table<Statement, Val, W> releasedFinalWeights;
+  private Table<ControlFlowGraph.Edge, Val, W> releasedObjectDestructingStatements;
+  private Map<ControlFlowGraph.Edge, DeclaredMethod> releasedInvokedMethodOnInstance;
+  private Collection<Statement> releasedInvokeStatementsOnInstance;
+  private boolean releasedContainsCallRecursion;
+  private boolean releasedContainsFieldLoop;
+
   public ForwardBoomerangResults(
       ForwardQuery query,
       ObservableICFG<Statement, Method> icfg,
@@ -90,10 +102,12 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   public Table<ControlFlowGraph.Edge, Val, W> asEdgeValWeightTable() {
+    if (released) return releasedEdgeValWeightTable;
     return asEdgeValWeightTable(query);
   }
 
   public Table<Statement, Val, W> asStatementValWeightTable() {
+    if (released) return releasedStatementValWeightTable;
     return asStatementValWeightTable(query);
   }
 
@@ -105,6 +119,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
    *     weights
    */
   public Table<Statement, Val, W> computeFinalWeights() {
+    if (released) return releasedFinalWeights;
     ForwardBoomerangSolver<W> solver = queryToSolvers.get(query);
     if (solver == null) {
       return HashBasedTable.create();
@@ -198,6 +213,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   public Table<ControlFlowGraph.Edge, Val, W> getObjectDestructingStatements() {
+    if (released) return releasedObjectDestructingStatements;
     AbstractBoomerangSolver<W> solver = queryToSolvers.get(query);
     if (solver == null) {
       return HashBasedTable.create();
@@ -285,6 +301,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   public Map<ControlFlowGraph.Edge, DeclaredMethod> getInvokedMethodOnInstance() {
+    if (released) return releasedInvokedMethodOnInstance;
     Map<ControlFlowGraph.Edge, DeclaredMethod> invokedMethodsOnInstance = Maps.newHashMap();
     if (query.cfgEdge().getStart().containsInvokeExpr()) {
       invokedMethodsOnInstance.put(
@@ -322,6 +339,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
    * @return the statements that contain invoke expressions belonging to the original seed.
    */
   public Collection<Statement> getInvokeStatementsOnInstance() {
+    if (released) return releasedInvokeStatementsOnInstance;
     Collection<Statement> statements = new HashSet<>();
 
     Map<ControlFlowGraph.Edge, DeclaredMethod> callsOnObject = getInvokedMethodOnInstance();
@@ -333,10 +351,17 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   public Context getContext(Node<ControlFlowGraph.Edge, Val> node) {
+    if (released) {
+      throw new IllegalStateException(
+          "getContext(..) needs the solver automata, which releaseSolvers() has dropped. Its"
+              + " argument is unbounded, so unlike the other accessors it cannot be precomputed."
+              + " Do not enable BoomerangOptions.releaseSolversAfterQuery() if you call it.");
+    }
     return constructContextGraph(query, node);
   }
 
   public boolean containsCallRecursion() {
+    if (released) return releasedContainsCallRecursion;
     for (Entry<ForwardQuery, ForwardBoomerangSolver<W>> e : queryToSolvers.entrySet()) {
       if (e.getValue().getCallAutomaton().containsLoop()) {
         return true;
@@ -346,6 +371,7 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
   }
 
   public boolean containsFieldLoop() {
+    if (released) return releasedContainsFieldLoop;
     for (Entry<ForwardQuery, ForwardBoomerangSolver<W>> e : queryToSolvers.entrySet()) {
       if (e.getValue().getFieldAutomaton().containsLoop()) {
         return true;
@@ -356,6 +382,39 @@ public class ForwardBoomerangResults<W extends Weight> extends AbstractBoomerang
 
   public Collection<Method> getVisitedMethods() {
     return visitedMethods;
+  }
+
+  /**
+   * Materializes every query-scoped accessor and then drops the solvers, so that the automata --
+   * which dominate the live set and are retained for the whole analysis by result handlers such as
+   * IDEal's StoreIDEALResultHandler -- become unreachable while the results stay usable.
+   *
+   * <p>Order matters: the accessors that register listeners on the automata or the ICFG run first,
+   * because they can still add weights, and the weight tables must be materialized from the final
+   * state. {@link #getContext(Node)} cannot be precomputed and is unavailable afterwards.
+   */
+  public void releaseSolvers() {
+    if (released) {
+      return;
+    }
+    // Register-and-replay accessors first: these can still drive weights.
+    releasedInvokedMethodOnInstance = getInvokedMethodOnInstance();
+    releasedInvokeStatementsOnInstance = getInvokeStatementsOnInstance();
+    releasedObjectDestructingStatements = getObjectDestructingStatements();
+    releasedFinalWeights = computeFinalWeights();
+    // Then the derived views, which must see the final weights.
+    releasedEdgeValWeightTable = asEdgeValWeightTable();
+    releasedStatementValWeightTable = asStatementValWeightTable();
+    releasedContainsCallRecursion = containsCallRecursion();
+    releasedContainsFieldLoop = containsFieldLoop();
+
+    released = true;
+    // queryToSolvers is an anonymous DefaultValueMap declared in WeightedBoomerang, so it captures
+    // the enclosing instance: a retained result would otherwise pin that instance and every solver
+    // in it. Dropping this reference is what makes them collectable. The trade is that the views
+    // materialized above are now retained eagerly, where lazily some may never have been computed
+    // at all -- hence opt-in.
+    queryToSolvers = null;
   }
 
   public long getMaxMemory() {

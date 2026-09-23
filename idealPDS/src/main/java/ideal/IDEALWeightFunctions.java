@@ -92,6 +92,15 @@ public class IDEALWeightFunctions<W extends Weight> implements WeightFunctions<E
     return delegate.pop(curr);
   }
 
+  /**
+   * Drops the registered listeners. IDEALSeedSolver calls this between phases: the lambda it
+   * registers in runPhase captures that phase's WeightedBoomerang, so leaving it in place keeps the
+   * finished phase's automata reachable for the whole of the next phase.
+   */
+  public void clearListeners() {
+    listeners.clear();
+  }
+
   public void registerListener(NonOneFlowListener listener) {
     if (listeners.add(listener)) {
       for (Node<Edge, Val> existing : Lists.newArrayList(nonOneFlowNodes)) {

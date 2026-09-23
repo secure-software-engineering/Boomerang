@@ -20,6 +20,7 @@ import boomerang.Query;
 import boomerang.WeightedBoomerang;
 import boomerang.results.BackwardBoomerangResults;
 import boomerang.results.ForwardBoomerangResults;
+import boomerang.scope.AllocVal;
 import boomerang.scope.ControlFlowGraph.Edge;
 import boomerang.scope.Field;
 import boomerang.scope.Statement;
@@ -61,7 +62,8 @@ public class IDEALSeedSolver<W extends Weight> {
   private final ForwardQuery seed;
   private final IDEALWeightFunctions<W> idealWeightFunctions;
   private final W one;
-  private final WeightedBoomerang<W> phase1Solver;
+  /** Not final: cleared once phase 1 is done so its automata can be collected during phase 2. */
+  private WeightedBoomerang<W> phase1Solver;
   private final WeightedBoomerang<W> phase2Solver;
   private final Stopwatch analysisStopwatch = Stopwatch.createUnstarted();
   private final Multimap<Node<Edge, Val>, Edge> affectedStrongUpdateStmt = HashMultimap.create();
@@ -83,7 +85,8 @@ public class IDEALSeedSolver<W extends Weight> {
       if (t.getLabel().equals(callSite)) {
         idealWeightFunctions.addNonKillFlow(new Node<>(callSite, returnedFact));
         idealWeightFunctions.addIndirectFlow(
-            new Node<>(callSite, returnedFact), new Node<>(callSite, t.getStart().fact()));
+            new Node<>(callSite, returnedFact),
+            new Node<>(callSite, unwrapAllocVal(t.getStart().fact())));
       }
     }
 
@@ -237,7 +240,9 @@ public class IDEALSeedSolver<W extends Weight> {
                               .stmt()) /* && !t.getStart().fact().equals(curr.fact()) */) {
                     idealWeightFunctions.addNonKillFlow(strongUpdateNode);
                     idealWeightFunctions.addIndirectFlow(
-                        strongUpdateNode, new Node<>(strongUpdateNode.stmt(), t.getStart().fact()));
+                        strongUpdateNode,
+                        new Node<>(
+                            strongUpdateNode.stmt(), unwrapAllocVal(t.getStart().fact())));
                   }
                 });
       }
@@ -291,6 +296,15 @@ public class IDEALSeedSolver<W extends Weight> {
       }
       throw new IDEALSeedTimeout(this, this.phase1Solver, resultPhase1);
     }
+    // Phase 2 does not read phase 1's automata; it consumes only the aliasing and strong-update
+    // facts that phase 1 recorded on idealWeightFunctions. Drop every reference to phase 1 so its
+    // automata are collectable while phase 2 runs, rather than both phases being live at once.
+    // The listener set has to be cleared too: runPhase registers a lambda there that captures the
+    // phase's solver, and outside the object-flow phase its body is a no-op anyway.
+    idealWeightFunctions.clearListeners();
+    this.phase1Solver = null;
+    resultPhase1 = null;
+
     LOGGER.debug("Starting Phase 2 of IDEal");
     ForwardBoomerangResults<W> resultPhase2 = runPhase(this.phase2Solver, Phases.ValueFlow);
     if (resultPhase2.isTimedOut()) {
@@ -407,12 +421,26 @@ public class IDEALSeedSolver<W extends Weight> {
     }
   }
 
+  /**
+   * A ForwardQuery keeps its AllocVal as the query variable, so the call automaton's target state
+   * carries that wrapper while every propagated fact is the unwrapped delegate (see the "Convert
+   * AllocVal -> Val" step in WeightedBoomerang.forwardSolve). Facts lifted off a transition's start
+   * state can therefore be wrappers, and must be unwrapped before they are turned into
+   * indirect-flow nodes: AllocVal.equals only matches another AllocVal, so a wrapper never compares
+   * equal to the plain locals these nodes are matched against, and propagating one trips the
+   * assertion in ForwardBoomerangSolver.computeSuccessor.
+   */
+  private static Val unwrapAllocVal(Val fact) {
+    return fact instanceof AllocVal ? ((AllocVal) fact).getDelegate() : fact;
+  }
+
   private void registerIndirectFlowListener(AbstractBoomerangSolver<W> solver) {
     WeightedPAutomaton<Edge, INode<Val>, W> callAutomaton = solver.getCallAutomaton();
     callAutomaton.registerListener(
         (t, w, aut) -> {
           if (t.getStart() instanceof GeneratedState) return;
-          Node<Edge, Val> source = new Node<>(t.getLabel(), t.getStart().fact());
+          Node<Edge, Val> source =
+              new Node<>(t.getLabel(), unwrapAllocVal(t.getStart().fact()));
           Collection<Node<Edge, Val>> indirectFlows = idealWeightFunctions.getAliasesFor(source);
           for (Node<Edge, Val> indirectFlow : indirectFlows) {
             solver.addCallRule(

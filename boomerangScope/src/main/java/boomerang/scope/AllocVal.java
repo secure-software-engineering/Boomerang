@@ -84,6 +84,21 @@ public class AllocVal extends Val {
   }
 
   @Override
+  public boolean isThisLocal() {
+    return delegate.isThisLocal();
+  }
+
+  @Override
+  public boolean isReturnLocal() {
+    return delegate.isReturnLocal();
+  }
+
+  @Override
+  public boolean isParameterLocal(int i) {
+    return delegate.isParameterLocal(i);
+  }
+
+  @Override
   public boolean isArrayAllocationVal() {
     return delegate.isArrayAllocationVal();
   }
