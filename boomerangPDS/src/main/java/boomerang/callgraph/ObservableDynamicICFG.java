@@ -223,8 +223,9 @@ public class ObservableDynamicICFG implements ObservableICFG<Statement, Method> 
       do {
         changes = runCallerListeners();
       } while (changes);
-      changes = resolutionStrategy.computeFallback(
-          onCallerCalleeFoundCallback, stmt -> notifyNoCalleeFound(stmt));
+      changes =
+          resolutionStrategy.computeFallback(
+              onCallerCalleeFoundCallback, stmt -> notifyNoCalleeFound(stmt));
     } while (changes);
   }
 
