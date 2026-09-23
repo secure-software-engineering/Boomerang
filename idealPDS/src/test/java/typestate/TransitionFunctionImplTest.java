@@ -15,6 +15,7 @@
 package typestate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import boomerang.scope.Method;
@@ -53,5 +54,38 @@ public class TransitionFunctionImplTest {
     assertEquals(
         firstTransitionFunction.getStateChangeStatement(),
         ((TransitionFunctionImpl) secondFirstResult).getStateChangeStatement());
+  }
+
+  @Test
+  public void testCombineWithIdempotentAndCommutativeForMoreStatements() {
+    TestingFramework testingFramework = new TestingFramework();
+    testingFramework.getFrameworkScope(
+        new MethodWrapper(
+            getClass().getName(), "testCombineWithIdempotentAndCommutativeForMoreStatements"));
+    Method method = testingFramework.getTestMethod();
+    TransitionFunctionImpl first =
+        new TransitionFunctionImpl(Collections.emptySet(), method.getStatements().get(0));
+    TransitionFunctionImpl second =
+        new TransitionFunctionImpl(Collections.emptySet(), method.getStatements().get(1));
+    TransitionFunctionImpl third =
+        new TransitionFunctionImpl(Collections.emptySet(), method.getStatements().get(2));
+
+    // combining a function with itself must not change it, and in particular must not turn it
+    // into a combined function
+    Weight firstFirst = first.combineWith(first);
+    assertEquals(first, firstFirst);
+    assertInstanceOf(TransitionFunctionImpl.class, firstFirst);
+    assertNotEquals(CombinedTransitionFunctionImpl.class, firstFirst.getClass());
+
+    Weight firstSecond = first.combineWith(second);
+    assertInstanceOf(CombinedTransitionFunctionImpl.class, firstSecond);
+    assertEquals(firstSecond, firstSecond.combineWith(first));
+    assertEquals(firstSecond, firstSecond.combineWith(firstSecond));
+
+    Weight left = firstSecond.combineWith(third);
+    Weight right = third.combineWith(second.combineWith(first));
+    assertEquals(left, right);
+    assertEquals(left.hashCode(), right.hashCode());
+    assertNotEquals(firstSecond, left);
   }
 }
