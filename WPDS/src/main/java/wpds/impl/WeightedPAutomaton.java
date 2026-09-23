@@ -17,13 +17,13 @@ package wpds.impl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import de.fraunhofer.iem.Location;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -58,14 +58,15 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   protected Set<Transition<N, D>> transitions = new LinkedHashSet<>();
   // set F in paper [Reps2003]
   protected Set<D> finalState = new LinkedHashSet<>();
-  protected Multimap<D, D> initialStatesToSource = LinkedHashMultimap.create();
+  protected SimpleSetMultimap<D, D> initialStatesToSource = new SimpleSetMultimap<>();
   // set P in paper [Reps2003]
   protected Set<D> states = new LinkedHashSet<>();
-  private final Multimap<D, Transition<N, D>> transitionsOutOf = LinkedHashMultimap.create();
-  private final Multimap<D, Transition<N, D>> transitionsInto = LinkedHashMultimap.create();
+  private final SimpleSetMultimap<D, Transition<N, D>> transitionsOutOf = new SimpleSetMultimap<>();
+  private final SimpleSetMultimap<D, Transition<N, D>> transitionsInto = new SimpleSetMultimap<>();
   private final Set<WPAUpdateListener<N, D, W>> listeners = new LinkedHashSet<>();
   private final Set<InitialStateListener<D>> initialStateListeners = new LinkedHashSet<>();
-  private final Multimap<D, WPAStateListener<N, D, W>> stateListeners = LinkedHashMultimap.create();
+  private final SimpleSetMultimap<D, WPAStateListener<N, D, W>> stateListeners =
+      new SimpleSetMultimap<>();
   private final Map<D, ForwardDFSVisitor<N, D, W>> stateToDFS = Maps.newHashMap();
   private final Map<D, ForwardDFSVisitor<N, D, W>> stateToEpsilonDFS = Maps.newHashMap();
   private final Set<WeightedPAutomaton<N, D, W>> nestedAutomatons = new LinkedHashSet<>();
@@ -79,6 +80,13 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   private final Set<UnbalancedPopListener<N, D, W>> unbalancedPopListeners = new LinkedHashSet<>();
   private final Map<UnbalancedPopEntry, W> unbalancedPops = Maps.newHashMap();
   private final Map<Transition<N, D>, W> transitionsToFinalWeights = Maps.newHashMap();
+
+  /**
+   * Incremented whenever {@link #transitionsToFinalWeights} actually changes. Callers that derive a
+   * view of the final weights can cache that view and compare this counter to detect that their
+   * snapshot went stale, instead of rebuilding it on every access.
+   */
+  private int finalWeightsVersion = 0;
   private ForwardDFSVisitor<N, D, W> dfsVisitor;
   private ForwardDFSVisitor<N, D, W> dfsEpsVisitor;
   public int failedAdditions;
@@ -309,8 +317,8 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     if (!watch.isRunning()) {
       watch.start();
     }
-    transitionsOutOf.get(trans.getStart()).add(trans);
-    transitionsInto.get(trans.getTarget()).add(trans);
+    transitionsOutOf.put(trans.getStart(), trans);
+    transitionsInto.put(trans.getTarget(), trans);
     if (states.add(trans.getTarget())) {
       stateCreatingTransition.put(trans.getTarget(), trans);
     }
@@ -625,6 +633,16 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
     }
   }
 
+  /**
+   * A version counter for {@link #getTransitionsToFinalWeights()}. It changes exactly when the
+   * final weights change, so a derived view captured together with this value stays valid for as
+   * long as the value does. Read it <em>after</em> {@link #getTransitionsToFinalWeights()}, which
+   * may itself compute weights on its first call.
+   */
+  public int getFinalWeightsVersion() {
+    return finalWeightsVersion;
+  }
+
   public Map<Transition<N, D>, W> getTransitionsToFinalWeights() {
     LOGGER.trace("Start computing final weights");
     final Stopwatch w = Stopwatch.createStarted();
@@ -652,7 +670,10 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
       W newWeight = (W) weight.extendWith(w);
       W weightAtTarget = transitionsToFinalWeights.get(t);
       W newVal = (weightAtTarget == null ? newWeight : (W) weightAtTarget.combineWith(newWeight));
-      transitionsToFinalWeights.put(t, newVal);
+      if (!newVal.equals(weightAtTarget)) {
+        transitionsToFinalWeights.put(t, newVal);
+        finalWeightsVersion++;
+      }
       if (isGeneratedState(t.getStart())) {
         registerListener(new ValueComputationListener(t.getStart(), newVal));
       }
@@ -836,7 +857,7 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
   }
 
   public boolean addInitialState(D state) {
-    if (!initialStatesToSource.get(state).add(state)) {
+    if (!initialStatesToSource.put(state, state)) {
       return false;
     }
     for (InitialStateListener<D> listener : Lists.newArrayList(initialStateListeners)) {
@@ -874,5 +895,52 @@ public abstract class WeightedPAutomaton<N extends Location, D extends State, W 
 
   public Collection<D> getUnbalancedStartOf(D target) {
     return initialStatesToSource.get(target);
+  }
+
+  /**
+   * A minimal per-key set-multimap used for the hottest state-keyed collections in this class
+   * (listener registrations and in/out transitions per state), in place of Guava's
+   * LinkedHashMultimap. Guava's LinkedHashMultimap additionally maintains a global, cross-key
+   * doubly-linked iteration order shared by every key (its "refreshIfEmpty" bookkeeping runs on
+   * every single access), which is unused here: every hot access on these fields is a per-key
+   * get()/put(), never a whole-multimap iteration-order guarantee. Per-key insertion order and
+   * per-key deduplication (matching Multimap.put()'s "false if already present" semantics) are
+   * preserved via the per-key LinkedHashSet.
+   */
+  private static final class SimpleSetMultimap<K, V> {
+    private final Map<K, LinkedHashSet<V>> map = new HashMap<>();
+
+    Set<V> get(K key) {
+      Set<V> values = map.get(key);
+      return values != null ? values : Collections.emptySet();
+    }
+
+    boolean put(K key, V value) {
+      return map.computeIfAbsent(key, k -> new LinkedHashSet<>()).add(value);
+    }
+
+    void putAll(K key, Collection<? extends V> values) {
+      map.computeIfAbsent(key, k -> new LinkedHashSet<>()).addAll(values);
+    }
+
+    boolean containsKey(K key) {
+      return map.containsKey(key);
+    }
+
+    Set<K> keySet() {
+      return map.keySet();
+    }
+
+    Collection<V> values() {
+      List<V> all = new ArrayList<>();
+      for (Set<V> v : map.values()) {
+        all.addAll(v);
+      }
+      return all;
+    }
+
+    void clear() {
+      map.clear();
+    }
   }
 }

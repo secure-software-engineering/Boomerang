@@ -28,7 +28,7 @@ import boomerang.scope.sootup.jimple.JimpleUpType;
 import boomerang.scope.sootup.jimple.JimpleUpVal;
 import boomerang.scope.sootup.jimple.JimpleUpWrappedClass;
 import org.jspecify.annotations.NonNull;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.FieldSignature;
 import sootup.core.signatures.MethodSignature;

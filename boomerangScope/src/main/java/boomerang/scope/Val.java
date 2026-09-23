@@ -20,20 +20,24 @@ public abstract class Val {
 
   protected final Method m;
   protected final ControlFlowGraph.Edge unbalancedStmt;
+  private final int baseHashCode;
 
   protected Val(Method m) {
     this.m = m;
     this.unbalancedStmt = null;
+    this.baseHashCode = Objects.hash(m, unbalancedStmt);
   }
 
   protected Val(Method m, ControlFlowGraph.Edge unbalancedStmt) {
     this.m = m;
     this.unbalancedStmt = unbalancedStmt;
+    this.baseHashCode = Objects.hash(m, unbalancedStmt);
   }
 
   protected Val() {
     this.m = null;
     this.unbalancedStmt = null;
+    this.baseHashCode = Objects.hash(m, unbalancedStmt);
   }
 
   public abstract Type getType();
@@ -137,11 +141,12 @@ public abstract class Val {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Val val = (Val) o;
+    if (baseHashCode != val.baseHashCode) return false;
     return Objects.equals(m, val.m) && Objects.equals(unbalancedStmt, val.unbalancedStmt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m, unbalancedStmt);
+    return baseHashCode;
   }
 }

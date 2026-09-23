@@ -17,9 +17,13 @@ package boomerang.scope.sootup;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
-import sootup.core.graph.MutableStmtGraph;
+import sootup.core.graph.MutableControlFlowGraph;
 import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
+import sootup.core.jimple.common.Immediate;
+import sootup.core.jimple.common.LValue;
+import sootup.core.jimple.common.Local;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.constant.ClassConstant;
 import sootup.core.jimple.common.constant.Constant;
 import sootup.core.jimple.common.constant.NullConstant;
@@ -33,10 +37,9 @@ import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.model.Body;
 import sootup.core.model.SootClass;
-import sootup.core.model.SootClassMember;
 import sootup.core.model.SootField;
 import sootup.core.signatures.FieldSignature;
-import sootup.core.transform.BodyInterceptor;
+import sootup.core.interceptor.BodyInterceptor;
 import sootup.core.types.ClassType;
 import sootup.core.types.ReferenceType;
 import sootup.core.views.View;
@@ -73,7 +76,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   private void addNopStatementsToMethod(Body.BodyBuilder body) {
     // Initial nop statement
     JNopStmt initialNop = Jimple.newNopStmt(StmtPositionInfo.getNoStmtPositionInfo());
-    MutableStmtGraph stmtGraph = body.getStmtGraph();
+    MutableControlFlowGraph stmtGraph = body.getControlFlowGraph();
     stmtGraph.insertBefore(stmtGraph.getStartingStmt(), initialNop);
 
     // Collect if-statements
@@ -124,11 +127,11 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
           JAssignStmt newAssignStmt = Jimple.newAssignStmt(local, rightOp, stmt.getPositionInfo());
 
           body.addLocal(local);
-          body.getStmtGraph().insertBefore(stmt, newAssignStmt);
+          body.getControlFlowGraph().insertBefore(stmt, newAssignStmt);
 
           JAssignStmt updatedAssignStmt =
               Jimple.newAssignStmt(leftOp, local, stmt.getPositionInfo());
-          body.getStmtGraph().replaceNode(stmt, updatedAssignStmt);
+          body.getControlFlowGraph().replaceNode(stmt, updatedAssignStmt);
         }
       }
 
@@ -165,10 +168,10 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
             Jimple.newAssignStmt(local, returnStmt.getOp(), returnStmt.getPositionInfo());
 
         body.addLocal(local);
-        body.getStmtGraph().insertBefore(stmt, assignStmt);
+        body.getControlFlowGraph().insertBefore(stmt, assignStmt);
 
         JReturnStmt newReturnStmt = Jimple.newReturnStmt(local, returnStmt.getPositionInfo());
-        body.getStmtGraph().replaceNode(stmt, newReturnStmt);
+        body.getControlFlowGraph().replaceNode(stmt, newReturnStmt);
       }
     }
   }
@@ -190,7 +193,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
         JAssignStmt newAssignStmt = Jimple.newAssignStmt(paramLocal, arg, stmt.getPositionInfo());
 
         body.addLocal(paramLocal);
-        body.getStmtGraph().insertBefore(stmt, newAssignStmt);
+        body.getControlFlowGraph().insertBefore(stmt, newAssignStmt);
         newArgs.add(paramLocal);
       } else {
         newArgs.add(arg);
@@ -211,10 +214,10 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
     if (stmt instanceof JInvokeStmt) {
       JInvokeStmt newStmt = ((JInvokeStmt) stmt).withInvokeExpr(newInvokeExpr);
-      body.getStmtGraph().replaceNode(stmt, newStmt);
+      body.getControlFlowGraph().replaceNode(stmt, newStmt);
     } else if (stmt instanceof JAssignStmt) {
       JAssignStmt newStmt = ((JAssignStmt) stmt).withRValue(newInvokeExpr);
-      body.getStmtGraph().replaceNode(stmt, newStmt);
+      body.getControlFlowGraph().replaceNode(stmt, newStmt);
     }
   }
 
@@ -237,7 +240,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
               }
               if (stmt.isInvokableStmt()) {
                 InvokableStmt invokableStmt = stmt.asInvokableStmt();
-                if (invokableStmt.containsInvokeExpr()) {
+                if (invokableStmt.getInvokeExpr().isPresent()) {
                   Optional<AbstractInvokeExpr> invokeExpr = invokableStmt.getInvokeExpr();
                   if (invokeExpr.isPresent()) {
                     for (Value arg : invokeExpr.get().getArgs()) {
@@ -275,7 +278,7 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
     Collection<FieldSignature> allFields =
         sootClass.get().getFields().stream()
-            .map(SootClassMember::getSignature)
+            .map(SootField::getSignature)
             .collect(Collectors.toSet());
     Collection<FieldSignature> definedFields = getDefinedFields(bodyBuilder);
 
@@ -306,9 +309,9 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
         Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(bodyBuilder);
         if (firstNonIdentityStmt.isPresent()) {
-          bodyBuilder.getStmtGraph().insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
+          bodyBuilder.getControlFlowGraph().insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
         } else {
-          bodyBuilder.getStmtGraph().addNode(nullifiedFieldStmt);
+          bodyBuilder.getControlFlowGraph().addNode(nullifiedFieldStmt);
         }
       }
     }

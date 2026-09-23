@@ -22,14 +22,13 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.JIdentityStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 
 public class JimpleUpControlFlowGraph implements ControlFlowGraph {
 
   private final JimpleUpMethod method;
-  private final StmtGraph<?> graph;
+  private final sootup.core.graph.ControlFlowGraph<?> graph;
 
   private boolean cacheBuilt = false;
   private final List<Statement> statements = Lists.newArrayList();
@@ -40,7 +39,7 @@ public class JimpleUpControlFlowGraph implements ControlFlowGraph {
 
   public JimpleUpControlFlowGraph(JimpleUpMethod method) {
     this.method = method;
-    this.graph = method.getDelegate().getBody().getStmtGraph();
+    this.graph = method.getDelegate().getBody().getControlFlowGraph();
   }
 
   @Override

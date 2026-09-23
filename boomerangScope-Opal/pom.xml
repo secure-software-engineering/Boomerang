@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
         <artifactId>Boomerang-Parent</artifactId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>boomerangScope-Opal</artifactId>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.9</version>
             <scope>test</scope>
         </dependency>
 
@@ -123,7 +123,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <id>empty-javadoc-jar</id>

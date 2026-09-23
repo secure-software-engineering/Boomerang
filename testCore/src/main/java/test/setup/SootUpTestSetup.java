@@ -34,7 +34,7 @@ import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.model.SootClassMember;
 import sootup.core.model.SourceType;
 import sootup.core.signatures.MethodSignature;
-import sootup.core.transform.BodyInterceptor;
+import sootup.core.interceptor.BodyInterceptor;
 import sootup.core.types.ClassType;
 import sootup.interceptors.TypeAssigner;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;

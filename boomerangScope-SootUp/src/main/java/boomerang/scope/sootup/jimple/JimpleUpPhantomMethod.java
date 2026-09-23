@@ -33,11 +33,13 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
   private final MethodSignature delegate;
   private final JavaView view;
   private final boolean isStatic;
+  private final int hashCode;
 
   protected JimpleUpPhantomMethod(MethodSignature delegate, JavaView view, boolean isStatic) {
     this.delegate = delegate;
     this.view = view;
     this.isStatic = isStatic;
+    this.hashCode = Objects.hash(delegate);
   }
 
   public static JimpleUpPhantomMethod of(
@@ -105,12 +107,13 @@ public class JimpleUpPhantomMethod extends PhantomMethod {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleUpPhantomMethod that = (JimpleUpPhantomMethod) o;
+    if (hashCode != that.hashCode) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(delegate);
+    return hashCode;
   }
 
   @Override
