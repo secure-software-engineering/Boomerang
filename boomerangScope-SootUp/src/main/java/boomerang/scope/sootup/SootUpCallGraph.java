@@ -41,7 +41,7 @@ public class SootUpCallGraph extends CallGraph {
         .flatMap((MethodSignature methodSignature) -> callGraph.callsTo(methodSignature).stream())
         .forEach(
             call -> {
-              Optional<JavaSootMethod> sourceOpt = view.getMethod(call.getSourceMethodSignature());
+              Optional<JavaSootMethod> sourceOpt = view.getMethod(call.sourceMethodSignature());
               if (sourceOpt.isEmpty()) {
                 return;
               }
@@ -51,15 +51,15 @@ public class SootUpCallGraph extends CallGraph {
                 return;
               }
 
-              InvokableStmt invokableStmt = call.getInvokableStmt();
-              if (!invokableStmt.containsInvokeExpr()) {
+              InvokableStmt invokableStmt = call.invokableStmt();
+              if (!invokableStmt.getInvokeExpr().isPresent()) {
                 return;
               }
 
               Statement callSite =
                   JimpleUpStatement.create(invokableStmt, JimpleUpMethod.of(sourceMethod, view));
 
-              MethodSignature targetSig = call.getTargetMethodSignature();
+              MethodSignature targetSig = call.targetMethodSignature();
               Optional<JavaSootMethod> targetOpt = view.getMethod(targetSig);
 
               Optional<AbstractInvokeExpr> invokeExprOpt = invokableStmt.getInvokeExpr();

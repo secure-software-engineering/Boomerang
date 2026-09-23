@@ -19,7 +19,7 @@ import boomerang.scope.ControlFlowGraph;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import java.util.Objects;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.Value;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.ref.JArrayRef;
 
@@ -27,6 +27,7 @@ public class JimpleUpArrayRef extends ArrayVal {
 
   private final JArrayRef delegate;
   private final JimpleUpMethod method;
+  private final int hashCode;
 
   public JimpleUpArrayRef(JArrayRef delegate, JimpleUpMethod method) {
     this(delegate, method, null);
@@ -38,6 +39,7 @@ public class JimpleUpArrayRef extends ArrayVal {
 
     this.delegate = delegate;
     this.method = method;
+    this.hashCode = Objects.hash(super.hashCode(), delegate);
   }
 
   public JArrayRef getDelegate() {
@@ -84,14 +86,15 @@ public class JimpleUpArrayRef extends ArrayVal {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     JimpleUpArrayRef that = (JimpleUpArrayRef) o;
+    if (hashCode != that.hashCode) return false;
+    if (!super.equals(o)) return false;
     return Objects.equals(delegate, that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    return hashCode;
   }
 
   @Override

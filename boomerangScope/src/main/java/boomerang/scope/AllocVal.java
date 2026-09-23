@@ -22,11 +22,13 @@ public class AllocVal extends Val {
   private final Val delegate;
   private final Statement allocStatement;
   private final Val allocationVal;
+  private final int hashCode;
 
   public AllocVal(Val delegate, Statement allocStatement, Val allocationVal) {
     this.delegate = delegate;
     this.allocStatement = allocStatement;
     this.allocationVal = allocationVal;
+    this.hashCode = Objects.hash(super.hashCode(), delegate, allocStatement, allocationVal);
   }
 
   public Val getDelegate() {
@@ -79,6 +81,21 @@ public class AllocVal extends Val {
   @Override
   public boolean isLocal() {
     return delegate.isLocal();
+  }
+
+  @Override
+  public boolean isThisLocal() {
+    return delegate.isThisLocal();
+  }
+
+  @Override
+  public boolean isReturnLocal() {
+    return delegate.isReturnLocal();
+  }
+
+  @Override
+  public boolean isParameterLocal(int i) {
+    return delegate.isParameterLocal(i);
   }
 
   @Override
@@ -215,8 +232,9 @@ public class AllocVal extends Val {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
     AllocVal allocVal = (AllocVal) o;
+    if (hashCode != allocVal.hashCode) return false;
+    if (!super.equals(o)) return false;
     return Objects.equals(delegate, allocVal.getDelegate())
         && Objects.equals(allocStatement, allocVal.getAllocStatement())
         && Objects.equals(allocationVal, allocVal.getAllocVal());
@@ -224,7 +242,7 @@ public class AllocVal extends Val {
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate, allocStatement, allocationVal);
+    return hashCode;
   }
 
   @Override
