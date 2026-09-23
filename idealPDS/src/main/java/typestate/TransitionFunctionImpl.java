@@ -20,11 +20,11 @@ import static typestate.TransitionFunctionZero.zero;
 import boomerang.scope.Statement;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -39,6 +39,12 @@ public class TransitionFunctionImpl implements TransitionFunction {
 
   @NonNull private final Multimap<Transition, StatementSequence> stateChangeSequences;
   @NonNull private final Statement stateChangeStatement;
+
+  /**
+   * Cached {@link #hashCode()}, 0 until computed. Hashing the sequences is expensive, and weights
+   * are hashed over and over as keys of the automata's maps.
+   */
+  private int hashCode;
 
   public TransitionFunctionImpl(
       @NonNull Transition transition, @NonNull Statement stateChangeStatement) {
@@ -70,11 +76,10 @@ public class TransitionFunctionImpl implements TransitionFunction {
   }
 
   /**
-   * Returns a transition function with the given sequences and the state change statements of
-   * this function.
+   * Returns a transition function with the given sequences and the state change statements of this
+   * function.
    */
-  @NonNull
-  TransitionFunctionImpl withStateChangeSequences(
+  @NonNull TransitionFunctionImpl withStateChangeSequences(
       @NonNull Multimap<Transition, StatementSequence> transitionStatementSequences) {
     return new TransitionFunctionImpl(transitionStatementSequences, stateChangeStatement);
   }
@@ -94,8 +99,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
    * statement returns just that one; a combination of functions returns the statements of all of
    * them (see {@link CombinedTransitionFunctionImpl}).
    */
-  @NonNull
-  Set<Statement> getStateChangeStatements() {
+  @NonNull Set<Statement> getStateChangeStatements() {
     return Collections.singleton(stateChangeStatement);
   }
 
@@ -181,13 +185,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
     // combineWith has to be commutative, so the result keeps the state change statements of both
     // functions. Keeping only one of them makes PostStar.update and
     // WeightedPAutomaton.addWeightForTransition replace each other's weights forever.
-    Set<Statement> mergedStateChangeStatements =
-        new LinkedHashSet<>(func.getStateChangeStatements());
-    mergedStateChangeStatements.addAll(getStateChangeStatements());
-    if (mergedStateChangeStatements.size() == 1) {
-      return new TransitionFunctionImpl(sequences, func.getStateChangeStatement());
+    // The common case is that func already has all of this function's statements (typically both
+    // have the same single one), so the result has func's statements and no set is built.
+    Set<Statement> ownStatements = getStateChangeStatements();
+    Set<Statement> otherStatements = func.getStateChangeStatements();
+    if (otherStatements.containsAll(ownStatements)) {
+      return func.withStateChangeSequences(sequences);
     }
-    return new CombinedTransitionFunctionImpl(sequences, mergedStateChangeStatements);
+    return new CombinedTransitionFunctionImpl(
+        sequences,
+        ImmutableSet.<Statement>builder().addAll(otherStatements).addAll(ownStatements).build());
   }
 
   @Override
@@ -206,6 +213,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
 
   @Override
   public int hashCode() {
+    int h = hashCode;
+    if (h == 0) {
+      h = computeHashCode();
+      hashCode = h;
+    }
+    return h;
+  }
+
+  /** The uncached {@link #hashCode()}. */
+  int computeHashCode() {
     return Objects.hash(stateChangeSequences, stateChangeStatement);
   }
 }
