@@ -50,7 +50,6 @@ import soot.jimple.internal.JNopStmt;
 import soot.jimple.internal.JReturnStmt;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.toolkits.callgraph.ReachableMethods;
-import soot.tagkit.AttributeValueException;
 import soot.tagkit.LineNumberTag;
 import soot.tagkit.SourceLnPosTag;
 import soot.tagkit.Tag;
@@ -67,11 +66,6 @@ public class BoomerangPretransformer extends BodyTransformer {
         @Override
         public String getName() {
           return UNINITIALIZED_FIELD_TAG_NAME;
-        }
-
-        @Override
-        public byte[] getValue() throws AttributeValueException {
-          return new byte[0];
         }
       };
   private static BoomerangPretransformer instance;
