@@ -23,9 +23,9 @@ import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
 
 /**
- * The result of combining transition functions with different state change statements. It keeps
- * all of them so that {@link TransitionFunctionImpl#combineWith} stays commutative, while the
- * common single-statement case in {@link TransitionFunctionImpl} does not pay for a set.
+ * The result of combining transition functions with different state change statements. It keeps all
+ * of them so that {@link TransitionFunctionImpl#combineWith} stays commutative, while the common
+ * single-statement case in {@link TransitionFunctionImpl} does not pay for a set.
  */
 final class CombinedTransitionFunctionImpl extends TransitionFunctionImpl {
 
@@ -71,7 +71,7 @@ final class CombinedTransitionFunctionImpl extends TransitionFunctionImpl {
   }
 
   @Override
-  public int hashCode() {
+  int computeHashCode() {
     return Objects.hash(getStateChangeSequences(), stateChangeStatements);
   }
 }

@@ -80,6 +80,9 @@ public class TransitionFunctionImplTest {
     Weight firstSecond = first.combineWith(second);
     assertInstanceOf(CombinedTransitionFunctionImpl.class, firstSecond);
     assertEquals(firstSecond, firstSecond.combineWith(first));
+    // the other direction takes the shortcut for a function that already has all statements
+    assertEquals(firstSecond, first.combineWith(firstSecond));
+    assertEquals(firstSecond.hashCode(), first.combineWith(firstSecond).hashCode());
     assertEquals(firstSecond, firstSecond.combineWith(firstSecond));
 
     Weight left = firstSecond.combineWith(third);
