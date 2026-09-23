@@ -68,8 +68,7 @@ public class TransitionFunctionOne implements TransitionFunction {
       result.putAll(transition, statement);
     }
 
-    return new TransitionFunctionImpl(
-        func.getStateChangeSequences(), func.getStateChangeStatement());
+    return func.withStateChangeSequences(func.getStateChangeSequences());
   }
 
   public String toString() {

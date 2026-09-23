@@ -23,8 +23,11 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import typestate.finiteautomata.Transition;
@@ -66,6 +69,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
     this.stateChangeStatement = stateChangeStatement;
   }
 
+  /**
+   * Returns a transition function with the given sequences and the state change statements of
+   * this function.
+   */
+  @NonNull
+  TransitionFunctionImpl withStateChangeSequences(
+      @NonNull Multimap<Transition, StatementSequence> transitionStatementSequences) {
+    return new TransitionFunctionImpl(transitionStatementSequences, stateChangeStatement);
+  }
+
   @NonNull
   @Override
   public Multimap<Transition, StatementSequence> getStateChangeSequences() {
@@ -74,6 +87,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
 
   public Statement getStateChangeStatement() {
     return stateChangeStatement;
+  }
+
+  /**
+   * The statements whose state changes this function describes. A function built from a single
+   * statement returns just that one; a combination of functions returns the statements of all of
+   * them (see {@link CombinedTransitionFunctionImpl}).
+   */
+  @NonNull
+  Set<Statement> getStateChangeStatements() {
+    return Collections.singleton(stateChangeStatement);
   }
 
   @NonNull
@@ -122,7 +145,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
         }
       }
     }
-    return new TransitionFunctionImpl(result, func.stateChangeStatement);
+    return new TransitionFunctionImpl(result, func.getStateChangeStatement());
   }
 
   @NonNull
@@ -146,7 +169,7 @@ public class TransitionFunctionImpl implements TransitionFunction {
         transitions.putAll(idTransition, statements);
       }
 
-      return new TransitionFunctionImpl(transitions, this.stateChangeStatement);
+      return withStateChangeSequences(transitions);
     }
 
     TransitionFunctionImpl func = (TransitionFunctionImpl) other;
@@ -155,7 +178,16 @@ public class TransitionFunctionImpl implements TransitionFunction {
     sequences.putAll(stateChangeSequences);
     sequences.putAll(func.stateChangeSequences);
 
-    return new TransitionFunctionImpl(sequences, func.stateChangeStatement);
+    // combineWith has to be commutative, so the result keeps the state change statements of both
+    // functions. Keeping only one of them makes PostStar.update and
+    // WeightedPAutomaton.addWeightForTransition replace each other's weights forever.
+    Set<Statement> mergedStateChangeStatements =
+        new LinkedHashSet<>(func.getStateChangeStatements());
+    mergedStateChangeStatements.addAll(getStateChangeStatements());
+    if (mergedStateChangeStatements.size() == 1) {
+      return new TransitionFunctionImpl(sequences, func.getStateChangeStatement());
+    }
+    return new CombinedTransitionFunctionImpl(sequences, mergedStateChangeStatements);
   }
 
   @Override
