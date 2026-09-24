@@ -32,6 +32,7 @@ public class CallGraph {
   private final Set<Method> entryPoints = new LinkedHashSet<>();
   private final Multimap<Field, Statement> fieldLoadStatements = HashMultimap.create();
   private final Multimap<Field, Statement> fieldStoreStatements = HashMultimap.create();
+  private boolean fieldIndexValid = false;
 
   public Collection<Edge> edgesOutOf(Statement stmt) {
     return edgesOutOf.get(stmt);
@@ -79,11 +80,11 @@ public class CallGraph {
     edgesOutOf.put(edge.callSite, edge);
     edgesInto.put(edge.tgt(), edge);
 
-    if (edge.tgt().isDefined()) {
-      computeStaticFieldsLoadAndStores(edge.tgt());
+    boolean added = edges.add(edge);
+    if (added) {
+      fieldIndexValid = false;
     }
-
-    return edges.add(edge);
+    return added;
   }
 
   public Collection<Edge> edgesInto(Method m) {
@@ -103,8 +104,11 @@ public class CallGraph {
   }
 
   public boolean addEntryPoint(Method m) {
-    computeStaticFieldsLoadAndStores(m);
-    return entryPoints.add(m);
+    boolean added = entryPoints.add(m);
+    if (added) {
+      fieldIndexValid = false;
+    }
+    return added;
   }
 
   public Set<Method> getReachableMethods() {
@@ -114,12 +118,37 @@ public class CallGraph {
     return reachableMethod;
   }
 
+  /**
+   * Static field stores of all reachable methods, indexed by field. The index is built on first
+   * access and rebuilt in place after the graph changed, so a returned reference stays valid.
+   */
   public Multimap<Field, Statement> getFieldStoreStatements() {
+    ensureFieldIndex();
     return fieldStoreStatements;
   }
 
+  /**
+   * Static field loads of all reachable methods, indexed by field. The index is built on first
+   * access and rebuilt in place after the graph changed, so a returned reference stays valid.
+   */
   public Multimap<Field, Statement> getFieldLoadStatements() {
+    ensureFieldIndex();
     return fieldLoadStatements;
+  }
+
+  private void ensureFieldIndex() {
+    if (fieldIndexValid) {
+      return;
+    }
+
+    fieldLoadStatements.clear();
+    fieldStoreStatements.clear();
+    for (Method m : getReachableMethods()) {
+      if (m.isDefined()) {
+        computeStaticFieldsLoadAndStores(m);
+      }
+    }
+    fieldIndexValid = true;
   }
 
   private void computeStaticFieldsLoadAndStores(Method m) {
