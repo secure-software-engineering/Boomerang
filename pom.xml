@@ -68,7 +68,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <scala.version>2.13.18</scala.version>
+        <scala.version>3.9.0</scala.version>
         <enforced-maven-version>3.6.1</enforced-maven-version>
         <!-- See https://www.eclipse.org/projects/handbook/#ip-copyright-headers -->
         <license.dir>${project.basedir}</license.dir>
