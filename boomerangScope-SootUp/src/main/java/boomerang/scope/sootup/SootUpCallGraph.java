@@ -22,14 +22,17 @@ import boomerang.scope.sootup.jimple.JimpleUpPhantomMethod;
 import boomerang.scope.sootup.jimple.JimpleUpStatement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import sootup.callgraph.CallGraph.Call;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.expr.JStaticInvokeExpr;
 import sootup.core.jimple.common.stmt.InvokableStmt;
+import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.views.JavaView;
@@ -40,6 +43,7 @@ public class SootUpCallGraph extends LazyCallGraph {
   private final JavaView view;
   private final sootup.callgraph.CallGraph callGraph;
   private final List<JavaSootMethod> entryPoints;
+  private final Map<MethodSignature, Map<Stmt, List<Call>>> callsByCaller = new HashMap<>();
 
   public SootUpCallGraph(
       JavaView view, sootup.callgraph.CallGraph callGraph, Collection<JavaSootMethod> entryPoints) {
@@ -81,6 +85,24 @@ public class SootUpCallGraph extends LazyCallGraph {
     return new Edge(callSite, toTarget(call));
   }
 
+  /** The valid calls out of {@code caller}, grouped by call site, so callsFrom runs once. */
+  private Map<Stmt, List<Call>> callsOf(MethodSignature caller) {
+    return callsByCaller.computeIfAbsent(
+        caller,
+        sig -> {
+          Map<Stmt, List<Call>> bySite = new HashMap<>();
+          if (view.getMethod(sig).filter(JavaSootMethod::hasBody).isEmpty()) {
+            return bySite;
+          }
+          for (Call call : callGraph.callsFrom(sig)) {
+            if (call.invokableStmt().getInvokeExpr().isPresent()) {
+              bySite.computeIfAbsent(call.invokableStmt(), k -> new ArrayList<>()).add(call);
+            }
+          }
+          return bySite;
+        });
+  }
+
   @Override
   protected Collection<Edge> computeEdgesOutOf(Statement callSite) {
     if (!(callSite instanceof JimpleUpStatement)
@@ -89,13 +111,11 @@ public class SootUpCallGraph extends LazyCallGraph {
     }
 
     JavaSootMethod caller = ((JimpleUpMethod) callSite.getMethod()).getDelegate();
-    sootup.core.jimple.common.stmt.Stmt stmt = ((JimpleUpStatement) callSite).getDelegate();
+    Stmt stmt = ((JimpleUpStatement) callSite).getDelegate();
 
     Collection<Edge> result = new ArrayList<>();
-    for (Call call : callGraph.callsFrom(caller.getSignature())) {
-      if (call.invokableStmt().equals(stmt) && validSource(call).isPresent()) {
-        result.add(toEdge(callSite, call));
-      }
+    for (Call call : callsOf(caller.getSignature()).getOrDefault(stmt, List.of())) {
+      result.add(toEdge(callSite, call));
     }
     return result;
   }
