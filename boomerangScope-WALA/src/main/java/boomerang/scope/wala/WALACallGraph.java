@@ -14,72 +14,54 @@
  */
 package boomerang.scope.wala;
 
-import boomerang.scope.CallGraph;
-import com.google.common.base.Stopwatch;
+import boomerang.scope.LazyCallGraph;
+import boomerang.scope.Method;
+import boomerang.scope.Statement;
 import com.google.common.collect.Lists;
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-public class WALACallGraph extends CallGraph {
+/** Forwards to WALA's call graph, which is kept alive by this object. */
+public class WALACallGraph extends LazyCallGraph {
 
-  private final Map<IMethod, WALAMethod> iMethodToWALAMethod = new HashMap<>();
+  private final com.ibm.wala.ipa.callgraph.CallGraph cg;
   private final IClassHierarchy cha;
+  private final Map<IMethod, WALAMethod> iMethodToWALAMethod = new HashMap<>();
+
+  // The node whose call sites represent each method: the first one reached from the entry points
+  private Map<IMethod, CGNode> expandedNodes;
 
   public WALACallGraph(com.ibm.wala.ipa.callgraph.CallGraph cg, IClassHierarchy cha) {
+    this.cg = cg;
     this.cha = cha;
-    Collection<CGNode> ep = cg.getEntrypointNodes();
-    Set<WALAMethod> visited = new LinkedHashSet<>();
-    LinkedList<CGNode> worklist = Lists.newLinkedList();
-    for (CGNode e : ep) {
-      worklist.add(e);
-      this.addEntryPoint(getOrCreate(e));
+  }
+
+  private Map<IMethod, CGNode> expandedNodes() {
+    if (expandedNodes != null) {
+      return expandedNodes;
     }
 
-    Stopwatch watch = Stopwatch.createStarted();
-    Stopwatch irw = Stopwatch.createUnstarted();
+    expandedNodes = new LinkedHashMap<>();
+    LinkedList<CGNode> worklist = Lists.newLinkedList(cg.getEntrypointNodes());
     while (!worklist.isEmpty()) {
       CGNode curr = worklist.poll();
       if (ignore(curr.getMethod())) continue;
-      if (!visited.add(getOrCreate(curr))) continue;
-      Iterator<CGNode> succNodes = cg.getSuccNodes(curr);
-      while (succNodes.hasNext()) {
-        CGNode succ = succNodes.next();
-        irw.start();
-        irw.stop();
-        //				if(visited.size() % 100 == 0) {
-        //					System.out.println("Total Time:" +watch.elapsed(TimeUnit.SECONDS));
-        //					System.out.println("IR time: " + irw.elapsed(TimeUnit.SECONDS));
-        //					System.out.println(visited.size());
-        //					System.out.println(worklist.size());
-        //				}
-        worklist.add(succ);
-        Iterator<CallSiteReference> callSites = cg.getPossibleSites(curr, succ);
-        while (callSites.hasNext()) {
-          CallSiteReference ref = callSites.next();
-          SSAAbstractInvokeInstruction[] calls = curr.getIR().getCalls(ref);
-          for (SSAAbstractInvokeInstruction i : calls) {
-            if (ignore(succ.getMethod())) {
-              continue;
-            }
-            this.addEdge(new Edge(new WALAStatement(i, getOrCreate(curr)), getOrCreate(succ)));
-          }
-        }
-      }
+      if (expandedNodes.putIfAbsent(curr.getMethod(), curr) != null) continue;
+      cg.getSuccNodes(curr).forEachRemaining(worklist::add);
     }
-    System.out.println("Edges:" + size());
-    System.out.println("Total Time:" + watch.elapsed(TimeUnit.SECONDS));
-    System.out.println("IR time: " + irw.elapsed(TimeUnit.SECONDS));
+    return expandedNodes;
   }
 
   private WALAMethod getOrCreate(CGNode curr) {
@@ -97,5 +79,82 @@ public class WALACallGraph extends CallGraph {
         || method.isNative()
         || method.isSynthetic()
         || method.isWalaSynthetic();
+  }
+
+  @Override
+  protected Collection<Edge> computeEdgesOutOf(Statement callSite) {
+    if (!(callSite instanceof WALAStatement) || !(callSite.getMethod() instanceof WALAMethod)) {
+      return new ArrayList<>();
+    }
+
+    CGNode node = expandedNodes().get(((WALAMethod) callSite.getMethod()).getDelegate());
+    if (node == null) {
+      return new ArrayList<>();
+    }
+
+    CallSiteReference site =
+        ((SSAAbstractInvokeInstruction) ((WALAStatement) callSite).getDelegate()).getCallSite();
+    Collection<Edge> edges = new ArrayList<>();
+    for (CGNode succ : cg.getPossibleTargets(node, site)) {
+      if (!ignore(succ.getMethod())) {
+        edges.add(new Edge(callSite, getOrCreate(succ)));
+      }
+    }
+    return edges;
+  }
+
+  @Override
+  protected Collection<Edge> computeEdgesInto(Method callee) {
+    Collection<Edge> edges = new ArrayList<>();
+    if (!(callee instanceof WALAMethod)) {
+      return edges;
+    }
+
+    IMethod calleeMethod = ((WALAMethod) callee).getDelegate();
+    if (ignore(calleeMethod)) {
+      return edges;
+    }
+
+    Map<IMethod, CGNode> expanded = expandedNodes();
+    for (CGNode node : cg.getNodes(calleeMethod.getReference())) {
+      for (Iterator<CGNode> preds = cg.getPredNodes(node); preds.hasNext(); ) {
+        CGNode pred = preds.next();
+        if (expanded.get(pred.getMethod()) != pred) {
+          continue;
+        }
+
+        for (Iterator<CallSiteReference> sites = cg.getPossibleSites(pred, node);
+            sites.hasNext(); ) {
+          CallSiteReference ref = sites.next();
+          for (SSAAbstractInvokeInstruction i : pred.getIR().getCalls(ref)) {
+            edges.add(new Edge(new WALAStatement(i, getOrCreate(pred)), getOrCreate(node)));
+          }
+        }
+      }
+    }
+    return edges;
+  }
+
+  @Override
+  protected Collection<Method> computeEntryPoints() {
+    Collection<Method> entryPoints = new ArrayList<>();
+    for (CGNode e : cg.getEntrypointNodes()) {
+      entryPoints.add(getOrCreate(e));
+    }
+    return entryPoints;
+  }
+
+  @Override
+  protected Collection<Method> computeReachableMethods() {
+    Set<Method> reachable = new LinkedHashSet<>();
+    for (CGNode node : expandedNodes().values()) {
+      for (Iterator<CGNode> succs = cg.getSuccNodes(node); succs.hasNext(); ) {
+        CGNode succ = succs.next();
+        if (!ignore(succ.getMethod())) {
+          reachable.add(getOrCreate(succ));
+        }
+      }
+    }
+    return reachable;
   }
 }
