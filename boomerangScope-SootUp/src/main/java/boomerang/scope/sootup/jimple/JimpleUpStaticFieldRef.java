@@ -40,7 +40,11 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
 
     this.delegate = delegate;
     this.method = method;
-    this.hashCode = Objects.hash(super.hashCode(), delegate);
+    // TODO(SootUp > 3.0.1): JFieldRef overrides equals (comparing the field signatures) but not
+    //  hashCode, i.e. equal delegates may have different hash codes. Thus, equality is based on the
+    //  field signature instead of the delegate. Once SootUp fixes hashCode, replace this with
+    //  Objects.hash(super.hashCode(), delegate) and compare the delegates in equals.
+    this.hashCode = Objects.hash(super.hashCode(), delegate.getFieldSignature());
   }
 
   public JStaticFieldRef getDelegate() {
@@ -87,15 +91,9 @@ public class JimpleUpStaticFieldRef extends StaticFieldVal {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JimpleUpStaticFieldRef that = (JimpleUpStaticFieldRef) o;
+    if (hashCode != that.hashCode) return false;
     if (!super.equals(o)) return false;
-    // TODO
-    //  Wrong equals implementation in SootUp. Once fixed, replace this with
-    //  the commented line
-    // Note: no hashCode-mismatch fast path here (unlike sibling classes) because SootUp's
-    // JStaticFieldRef#equals is known to be looser than a hashCode consistent with it would
-    // allow -- delegate.equals(...) can be true for objects whose hashCode() differs.
-    return (delegate != null && delegate.equals(that.delegate));
-    // return Objects.equals(delegate, that.delegate);
+    return delegate.getFieldSignature().equals(that.delegate.getFieldSignature());
   }
 
   @Override
