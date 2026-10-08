@@ -53,6 +53,7 @@ import boomerang.solver.BackwardBoomerangSolver;
 import boomerang.solver.ControlFlowEdgeBasedFieldTransitionListener;
 import boomerang.solver.ForwardBoomerangSolver;
 import boomerang.solver.Strategies;
+import boomerang.sparse.SparseCFGCache;
 import boomerang.stats.IBoomerangStats;
 import boomerang.stats.SimpleBoomerangStats;
 import boomerang.util.DefaultValueMap;
@@ -141,6 +142,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
                   createFieldSummaries(null, backwardFieldSummaries),
                   frameworkScope,
                   options,
+                  sparseCFGCache,
                   null) {
 
                 @Override
@@ -439,6 +441,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
 
   protected final FrameworkScope frameworkScope;
   protected final BoomerangOptions options;
+  private final SparseCFGCache sparseCFGCache;
   private final Stopwatch analysisWatch = Stopwatch.createUnstarted();
   private final DataFlowScope dataFlowscope;
   private final CallGraph callGraph;
@@ -452,6 +455,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
     this.frameworkScope = frameworkScope;
     this.options = options;
     this.options.checkValid();
+    this.sparseCFGCache = options.getSparsificationStrategy().createCache(options);
 
     this.callGraph = frameworkScope.getCallGraph();
     this.dataFlowscope = frameworkScope.getDataFlowScope();
@@ -461,7 +465,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
     if (options.onTheFlyControlFlow()) {
       this.cfg = new DynamicCFG();
     } else {
-      this.cfg = new StaticCFG(options);
+      this.cfg = new StaticCFG(sparseCFGCache);
     }
 
     if (options.onTheFlyCallGraph()) {
@@ -743,7 +747,7 @@ public abstract class WeightedBoomerang<W extends Weight> {
                   new ArrayAllocationListener(
                       ((ArrayField) t.getLabel()).getIndex(), t.getTarget(), val, key, node));
         } else {
-          forwardQuery = new ForwardQuery(node.stmt(), val);
+          forwardQuery = new ForwardQuery(toControlFlowEdge(node.stmt()), val);
           forwardSolve(forwardQuery);
           queryGraph.addEdge(key, node, forwardQuery);
         }
@@ -759,6 +763,20 @@ public abstract class WeightedBoomerang<W extends Weight> {
     private WeightedBoomerang getEnclosingInstance() {
       return WeightedBoomerang.this;
     }
+  }
+
+  /**
+   * The backward propagation along a sparse control flow graph finds allocation sites at edges that
+   * skip statements. The forward queries of the allocation sites start at the edge of the original
+   * control flow graph, such that the results are independent of the sparsification.
+   */
+  private static Edge toControlFlowEdge(Edge edge) {
+    Statement start = edge.getStart();
+    Collection<Statement> succs = start.getMethod().getControlFlowGraph().getSuccsOf(start);
+    if (succs.isEmpty() || succs.contains(edge.getTarget())) {
+      return edge;
+    }
+    return new Edge(start, succs.iterator().next());
   }
 
   private final class ArrayAllocationListener
@@ -788,14 +806,18 @@ public abstract class WeightedBoomerang<W extends Weight> {
         W w,
         WeightedPAutomaton<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> weightedPAutomaton) {
       if (t.getLabel().equals(EmptyField.getInstance())) {
-        ForwardQueryArray forwardQuery = new ForwardQueryArray(node.stmt(), val, arrayAccessIndex);
+        ForwardQueryArray forwardQuery =
+            new ForwardQueryArray(toControlFlowEdge(node.stmt()), val, arrayAccessIndex);
         forwardSolve(forwardQuery);
         queryGraph.addEdge(key, node, forwardQuery);
       }
       if (t.getLabel() instanceof ArrayField) {
         ForwardQueryMultiDimensionalArray forwardQuery =
             new ForwardQueryMultiDimensionalArray(
-                node.stmt(), val, arrayAccessIndex, ((ArrayField) t.getLabel()).getIndex());
+                toControlFlowEdge(node.stmt()),
+                val,
+                arrayAccessIndex,
+                ((ArrayField) t.getLabel()).getIndex());
         forwardSolve(forwardQuery);
         queryGraph.addEdge(key, node, forwardQuery);
       }
@@ -1397,6 +1419,13 @@ public abstract class WeightedBoomerang<W extends Weight> {
 
   public BoomerangOptions getOptions() {
     return this.options;
+  }
+
+  /**
+   * @return the cache of the sparse control flow graphs of this analysis instance
+   */
+  public SparseCFGCache getSparseCFGCache() {
+    return sparseCFGCache;
   }
 
   public CallGraph getCallGraph() {

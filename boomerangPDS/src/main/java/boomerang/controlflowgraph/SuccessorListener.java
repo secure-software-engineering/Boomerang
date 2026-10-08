@@ -15,16 +15,31 @@
 package boomerang.controlflowgraph;
 
 import boomerang.scope.Statement;
+import boomerang.scope.Val;
+import org.jspecify.annotations.Nullable;
 
 public abstract class SuccessorListener {
   private final Statement curr;
+  private final @Nullable Val fact;
 
   public SuccessorListener(Statement curr) {
+    this(curr, null);
+  }
+
+  public SuccessorListener(Statement curr, @Nullable Val fact) {
     this.curr = curr;
+    this.fact = fact;
   }
 
   public Statement getCurr() {
     return curr;
+  }
+
+  /**
+   * @return the data-flow fact that is propagated to the successors, if known
+   */
+  public @Nullable Val getFact() {
+    return fact;
   }
 
   public abstract void getSuccessor(Statement succ);
