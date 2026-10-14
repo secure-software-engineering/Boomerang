@@ -148,6 +148,25 @@ public class JimpleUpType implements Type {
   }
 
   @Override
+  public boolean isAssignableTo(Type target) {
+    if (!(target instanceof JimpleUpType)) {
+      return true;
+    }
+
+    sootup.core.types.Type targetType = ((JimpleUpType) target).getDelegate();
+    if (delegate.equals(targetType)) {
+      return true;
+    }
+
+    try {
+      return view.getTypeHierarchy().isSubtype(targetType, delegate);
+    } catch (RuntimeException e) {
+      // Incomplete hierarchy (e.g. phantom classes): answer conservatively
+      return true;
+    }
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;

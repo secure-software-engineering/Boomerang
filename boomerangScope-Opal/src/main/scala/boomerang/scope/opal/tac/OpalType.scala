@@ -102,6 +102,19 @@ class OpalType(val delegate: org.opalj.br.Type, project: Project[_]) extends Typ
 
   override def isBooleanType: Boolean = delegate.isBooleanType
 
+  override def isAssignableTo(target: Type): Boolean = target match {
+    case that: OpalType =>
+      if (delegate == that.delegate) {
+        true
+      } else if (delegate.isReferenceType && that.delegate.isReferenceType) {
+        // Unknown answers (incomplete hierarchy) are treated as assignable
+        project.classHierarchy.isASubtypeOf(delegate.asReferenceType, that.delegate.asReferenceType).isNotNo
+      } else {
+        false
+      }
+    case _ => true
+  }
+
   override def hashCode: Int = Objects.hash(delegate)
 
   override def equals(other: Any): Boolean = other match {

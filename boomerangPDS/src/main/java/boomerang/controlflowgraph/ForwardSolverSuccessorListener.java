@@ -47,7 +47,7 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
       Node<ControlFlowGraph.Edge, Val> node,
       org.slf4j.Logger LOGGER,
       ForwardBoomerangSolver<?> owner) {
-    super(curr.getTarget());
+    super(curr.getTarget(), value);
     this.query = query;
     this.curr = curr;
     this.value = value;
@@ -81,62 +81,13 @@ public class ForwardSolverSuccessorListener extends SuccessorListener {
           curr.getTarget().getInvokeExpr());
     } else {
       owner.checkForFieldOverwrite(curr, value);
-      // TODO compute for the actual next stmt, but propagate to sparse next stmt.
-      /*    if (value.toString().contains("main")) {
-        // SparseAliasingCFG sparseCFG = getSparseCFG(method, curr.getStart(), value);
-        // Set<Unit> successors =
-        //    sparseCFG.getGraph().successors(SootAdapter.asStmt(curr.getTarget()));
-        // Unit next = successors.iterator().next();
-        Collection<State> out =
-            owner.computeNormalFlow(
-                method, new ControlFlowGraph.Edge(curr.getTarget(), succ), value);
-        for (State s : out) {
-          LOGGER.trace("{}: {} -> {}", s, node, owner.getQuery());
-          owner.propagate(node, s);
-        }
-      } else {*/
       Collection<State> out =
           owner.computeNormalFlow(
               method, curr, new ControlFlowGraph.Edge(curr.getTarget(), succ), value);
-      //      if (method.getName().contains("main")) {
-      //        for (State s : out) {
-      //          if (s instanceof Node) {
-      //            Node node = (Node) s;
-      //            Val fact = (Val) node.fact();
-      //            SparseAliasingCFG sparseCFG = getSparseCFG(method, curr.getTarget(), fact);
-      //            List<Unit> nextUses =
-      // sparseCFG.getNextUses(SootAdapter.asStmt(curr.getTarget()));
-      //            for (Unit nextUse : nextUses) {
-      //              Statement start = curr.getTarget();
-      //              Statement target = SootAdapter.asStatement(nextUse, method);
-      //              ControlFlowGraph.Edge newEdge = new ControlFlowGraph.Edge(start, target);
-      //              State state = new Node<ControlFlowGraph.Edge, Val>(newEdge, fact);
-      //              owner.propagate(node, state);
-      //            }
-      //          } else {
-      //            LOGGER.trace("{}: {} -> {}", s, node, owner.getQuery());
-      //            owner.propagate(node, s);
-      //          }
-      //        }
-      //      } else {
       for (State s : out) {
         LOGGER.trace("{}: {} -> {}", s, node, owner.getQuery());
         owner.propagate(node, s);
       }
-      //      }
-      // }
     }
   }
-
-  /* [ms] method was unused?
-  private SparseAliasingCFG getSparseCFG(Method method, Statement stmt, Val currentVal) {
-    SootMethod sootMethod = ((JimpleMethod) method).getDelegate();
-    Stmt sootStmt = ((JimpleStatement) stmt).getDelegate();
-    SparseCFGCache sparseCFGCache =
-        SparseCFGCache.getInstance(owner.getOptions().getSparsificationStrategy(), true);
-    SparseAliasingCFG sparseCFG =
-        sparseCFGCache.getSparseCFGForForwardPropagation(sootMethod, sootStmt, currentVal);
-    return sparseCFG;
-  }
-  */
 }

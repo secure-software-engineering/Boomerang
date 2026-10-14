@@ -18,10 +18,9 @@ import boomerang.callgraph.BoomerangResolver;
 import boomerang.callgraph.ICallerCalleeResolutionStrategy;
 import boomerang.flowfunction.DefaultFlowFunctionFactory;
 import boomerang.flowfunction.IFlowFunctionFactory;
-import boomerang.scope.Method;
-import boomerang.scope.Statement;
 import boomerang.solver.Strategies;
-import sparse.SparsificationStrategy;
+import boomerang.sparse.SparsificationStrategy;
+import java.util.Objects;
 
 /**
  * Class that defines all options for executing Boomerang queries. The options include flow
@@ -75,6 +74,12 @@ public class BoomerangOptions {
       throw new RuntimeException(
           "The 'trackStaticFieldAtEntryPointToClinit' requires the static field strategy 'Flow Sensitive'");
     }
+
+    if (builder.onTheFlyControlFlow
+        && builder.sparsificationStrategy != SparsificationStrategy.NONE) {
+      throw new RuntimeException(
+          "Sparsification is not supported with an on-the-fly control flow graph");
+    }
   }
 
   public IAllocationSite allocationSite() {
@@ -97,7 +102,7 @@ public class BoomerangOptions {
     return builder.resolutionStrategy;
   }
 
-  public SparsificationStrategy<? extends Method, ? extends Statement> getSparsificationStrategy() {
+  public SparsificationStrategy getSparsificationStrategy() {
     return builder.sparsificationStrategy;
   }
 
@@ -178,7 +183,7 @@ public class BoomerangOptions {
     private Strategies.StaticFieldStrategy staticFieldStrategy;
     private Strategies.ArrayStrategy arrayStrategy;
     private ICallerCalleeResolutionStrategy.Factory resolutionStrategy;
-    private SparsificationStrategy<? extends Method, ? extends Statement> sparsificationStrategy;
+    private SparsificationStrategy sparsificationStrategy;
 
     private int analysisTimeout;
     private int maxFieldDepth;
@@ -269,8 +274,8 @@ public class BoomerangOptions {
     }
 
     public OptionsBuilder withSparsificationStrategy(
-        SparsificationStrategy<? extends Method, ? extends Statement> sparsificationStrategy) {
-      this.sparsificationStrategy = sparsificationStrategy;
+        SparsificationStrategy sparsificationStrategy) {
+      this.sparsificationStrategy = Objects.requireNonNull(sparsificationStrategy);
       return this;
     }
 

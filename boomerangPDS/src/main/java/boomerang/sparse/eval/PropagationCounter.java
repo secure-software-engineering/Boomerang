@@ -12,27 +12,36 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package sparse.eval;
+package boomerang.sparse.eval;
 
+/** Counts the normal flow propagations of one analysis instance. */
 public class PropagationCounter {
+
   private long forwardPropagation = 0;
   private long backwardPropagation = 0;
 
-  public PropagationCounter() {}
-
-  public void countForwardPropagation() {
+  public synchronized void countForwardPropagation() {
     forwardPropagation++;
   }
 
-  public void countBackwardProgragation() {
+  public synchronized void countBackwardPropagation() {
     backwardPropagation++;
   }
 
-  public long getForwardPropagation() {
+  public synchronized long getForwardPropagation() {
     return forwardPropagation;
   }
 
-  public long getBackwardPropagation() {
+  public synchronized long getBackwardPropagation() {
     return backwardPropagation;
+  }
+
+  @Override
+  public String toString() {
+    return "PropagationCounter{forward="
+        + getForwardPropagation()
+        + ", backward="
+        + getBackwardPropagation()
+        + "}";
   }
 }
