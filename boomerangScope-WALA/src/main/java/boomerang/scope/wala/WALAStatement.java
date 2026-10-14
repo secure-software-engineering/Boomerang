@@ -64,6 +64,10 @@ public class WALAStatement extends Statement {
     this.delegate = null;
   }
 
+  public SSAInstruction getDelegate() {
+    return delegate;
+  }
+
   @Override
   public boolean containsInvokeExpr() {
     return delegate instanceof SSAAbstractInvokeInstruction;
