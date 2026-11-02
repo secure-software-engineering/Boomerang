@@ -8,7 +8,7 @@ on:
 
 jobs:
   sync:
-    uses: secure-software-engineering/actions/.github/workflows/maven-release-title-sync.yml@develop
+    uses: secure-software-engineering/actions/.github/workflows/maven-release-title-sync.yml@c98577761faae44108ba0ec2de7ebd67ddd4b40b # develop
     with:
       java_version: '17'
       java_distribution: adopt

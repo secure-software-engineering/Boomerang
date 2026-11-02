@@ -12,7 +12,10 @@ on:
 
 jobs:
   publish:
-    uses: secure-software-engineering/actions/.github/workflows/maven-release-publish.yml@develop
+    permissions:
+      contents: write        # tag + GitHub release, delete abandoned branches
+      pull-requests: write   # GITHUB_TOKEN approves the next-SNAPSHOT PR
+    uses: secure-software-engineering/actions/.github/workflows/maven-release-publish.yml@c98577761faae44108ba0ec2de7ebd67ddd4b40b # develop
     with:
       head_branch: develop
       java_version: '17'

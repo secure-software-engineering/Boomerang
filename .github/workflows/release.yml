@@ -15,7 +15,7 @@ on:
 
 jobs:
   prepare-release:
-    uses: secure-software-engineering/actions/.github/workflows/maven-release-prepare.yml@develop
+    uses: secure-software-engineering/actions/.github/workflows/maven-release-prepare.yml@c98577761faae44108ba0ec2de7ebd67ddd4b40b # develop
     with:
       release_type: ${{ inputs.release_type }}
       head_branch: develop

@@ -23,6 +23,6 @@ jobs:
           fetch-depth: 0    # mike needs full history to push to gh-pages
 
       - name: Deploy Documentation
-        uses: secure-software-engineering/actions/documentation/deployment@develop
+        uses: secure-software-engineering/actions/documentation/deployment@c98577761faae44108ba0ec2de7ebd67ddd4b40b # develop
         with:
           version: ${{ github.ref_name }}
