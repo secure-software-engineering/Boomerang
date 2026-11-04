@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import sootup.core.graph.MutableControlFlowGraph;
+import sootup.core.interceptor.BodyInterceptor;
 import sootup.core.jimple.Jimple;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.Immediate;
@@ -39,7 +40,6 @@ import sootup.core.model.Body;
 import sootup.core.model.SootClass;
 import sootup.core.model.SootField;
 import sootup.core.signatures.FieldSignature;
-import sootup.core.interceptor.BodyInterceptor;
 import sootup.core.types.ClassType;
 import sootup.core.types.ReferenceType;
 import sootup.core.views.View;
@@ -74,10 +74,14 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
   }
 
   private void addNopStatementsToMethod(Body.BodyBuilder body) {
-    // Initial nop statement
-    JNopStmt initialNop = Jimple.newNopStmt(StmtPositionInfo.getNoStmtPositionInfo());
+    // Initial nop statement, only for bodies that do not start with their identity stmts (static
+    // methods without parameters): the backward analysis steps through a statement, e.g. into a
+    // callee, only on the edge from its predecessor, so a first statement needs one
     MutableControlFlowGraph stmtGraph = body.getControlFlowGraph();
-    stmtGraph.insertBefore(stmtGraph.getStartingStmt(), initialNop);
+    if (!(stmtGraph.getStartingStmt() instanceof JIdentityStmt)) {
+      JNopStmt initialNop = Jimple.newNopStmt(StmtPositionInfo.getNoStmtPositionInfo());
+      stmtGraph.insertBefore(stmtGraph.getStartingStmt(), initialNop);
+    }
 
     // Collect if-statements
     Collection<JIfStmt> ifStatements =
@@ -309,7 +313,9 @@ public class BoomerangPreInterceptor implements BodyInterceptor {
 
         Optional<Stmt> firstNonIdentityStmt = findFirstNonIdentityStmt(bodyBuilder);
         if (firstNonIdentityStmt.isPresent()) {
-          bodyBuilder.getControlFlowGraph().insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
+          bodyBuilder
+              .getControlFlowGraph()
+              .insertBefore(firstNonIdentityStmt.get(), nullifiedFieldStmt);
         } else {
           bodyBuilder.getControlFlowGraph().addNode(nullifiedFieldStmt);
         }
