@@ -14,28 +14,17 @@
  */
 package boomerang.controlflowgraph;
 
-import boomerang.options.BoomerangOptions;
-import boomerang.scope.Method;
 import boomerang.scope.Statement;
-import boomerang.scope.Val;
-import sparse.SparsificationStrategy;
+import boomerang.sparse.SparseAliasingCFG;
+import boomerang.sparse.SparseCFGCache;
+import java.util.Collection;
 
 public class StaticCFG implements ObservableControlFlowGraph {
 
-  private final SparsificationStrategy<? extends Method, ? extends Statement>
-      sparsificationStrategy;
+  private final SparseCFGCache sparseCFGCache;
 
-  private final BoomerangOptions options;
-
-  private Val currentVal;
-
-  public void setCurrentVal(Val val) {
-    this.currentVal = val;
-  }
-
-  public StaticCFG(BoomerangOptions options) {
-    this.options = options;
-    this.sparsificationStrategy = options.getSparsificationStrategy();
+  public StaticCFG(SparseCFGCache sparseCFGCache) {
+    this.sparseCFGCache = sparseCFGCache;
   }
 
   @Override
@@ -47,57 +36,25 @@ public class StaticCFG implements ObservableControlFlowGraph {
 
   @Override
   public void addSuccsOfListener(SuccessorListener l) {
-    Method method = l.getCurr().getMethod();
-    Statement curr = l.getCurr();
-    /*
-    TODO: [ms] reenable sparsification
-     if (sparsificationStrategy != SparsificationStrategy.NONE) {
-      SparseAliasingCFG sparseCFG = getSparseCFG(method, curr, currentVal);
-      if (sparseCFG != null) {
-        propagateSparse(l, method, curr, sparseCFG);
-      } else if (options.handleSpecialInvokeAsNormalPropagation()) {
-        propagateDefault(l);
-      } else {
-        propagateDefault(l); // back up when not found
-      }
-    } else */
-    {
-      propagateDefault(l);
-    }
-  }
-
-  /*
-  TODO: [ms] reenable sparsification
-  private void propagateSparse(
-      SuccessorListener l, Method method, Statement curr, SparseAliasingCFG sparseCFG) {
-    Set<Unit> successors = sparseCFG.getGraph().successors(SootAdapter.asStmt(curr));
-    for (Unit succ : successors) {
-      sparsificationStrategy.getCounter().countForward();
-      l.getSuccessor(SootAdapter.asStatement(succ, method));
-    }
-  }
-  */
-
-  private void propagateDefault(SuccessorListener l) {
-    for (Statement s : l.getCurr().getSuccessors()) {
-      sparsificationStrategy.getCounter().countForwardPropagation();
+    for (Statement s : getSuccessors(l)) {
+      sparseCFGCache.getPropagationCounter().countForwardPropagation();
       l.getSuccessor(s);
     }
   }
 
-  /*
-  TODO: [ms] reenable sparsification
-  private SparseAliasingCFG getSparseCFG(Method method, Statement stmt, Val currentVal) {
-    SootMethod sootMethod = ((JimpleMethod) method).getDelegate();
-    Stmt sootStmt = ((JimpleStatement) stmt).getDelegate();
-    SparseCFGCache sparseCFGCache =
-        SparseCFGCache.getInstance(
-            sparsificationStrategy, options.ignoreSparsificationAfterQuery());
+  /**
+   * Returns the successors in the sparse control flow graph if a sparse graph containing the
+   * current statement is available and the successors in the original graph otherwise.
+   */
+  private Collection<Statement> getSuccessors(SuccessorListener l) {
+    Statement curr = l.getCurr();
     SparseAliasingCFG sparseCFG =
-        sparseCFGCache.getSparseCFGForForwardPropagation(sootMethod, sootStmt, currentVal);
-    return sparseCFG;
+        sparseCFGCache.getSparseCFGForForwardPropagation(curr.getMethod(), curr, l.getFact());
+    if (sparseCFG != null && sparseCFG.contains(curr)) {
+      return sparseCFG.successors(curr);
+    }
+    return curr.getSuccessors();
   }
-  */
 
   @Override
   public void step(Statement curr, Statement succ) {}

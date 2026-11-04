@@ -39,7 +39,12 @@ public class JimpleUpArrayRef extends ArrayVal {
 
     this.delegate = delegate;
     this.method = method;
-    this.hashCode = Objects.hash(super.hashCode(), delegate);
+    // TODO(SootUp > 3.0.1): JArrayRef overrides neither equals nor hashCode, i.e. it is compared by
+    //  identity and the same array access in different statements is not equal. Thus, equality is
+    //  based on the base and the index instead of the delegate. Once SootUp implements value-based
+    //  equality, replace this with Objects.hash(super.hashCode(), delegate) and compare the
+    //  delegates in equals.
+    this.hashCode = Objects.hash(super.hashCode(), delegate.getBase(), delegate.getIndex());
   }
 
   public JArrayRef getDelegate() {
@@ -89,7 +94,8 @@ public class JimpleUpArrayRef extends ArrayVal {
     JimpleUpArrayRef that = (JimpleUpArrayRef) o;
     if (hashCode != that.hashCode) return false;
     if (!super.equals(o)) return false;
-    return Objects.equals(delegate, that.delegate);
+    return delegate.getBase().equals(that.delegate.getBase())
+        && delegate.getIndex().equals(that.delegate.getIndex());
   }
 
   @Override

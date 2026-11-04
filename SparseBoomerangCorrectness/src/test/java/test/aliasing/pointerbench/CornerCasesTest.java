@@ -1,14 +1,24 @@
+/**
+ * ***************************************************************************** 
+ * Copyright (c) 2018 Fraunhofer IEM, Paderborn, Germany
+ * <p>
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * <p>
+ * SPDX-License-Identifier: EPL-2.0
+ * <p>
+ * Contributors:
+ *   Johannes Spaeth - initial API and implementation
+ * *****************************************************************************
+ */
 package test.aliasing.pointerbench;
 
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Test;
 import target.aliasing.PointerBench.cornerCases.*;
 import test.aliasing.AliasingTestSetUp;
 
 public class CornerCasesTest extends AliasingTestSetUp {
-
-  private static Logger log = LoggerFactory.getLogger(CornerCasesTest.class);
 
   @Test
   public void accessPath1() {
@@ -67,9 +77,9 @@ public class CornerCasesTest extends AliasingTestSetUp {
   public void objectSensitivity1() {
     String queryLHS = "b4_q1";
     String targetClass = ObjectSensitivity1.class.getName();
-    this.FalsePositiveInDefaultBoomerang = true;
+    this.falsePositiveInDefaultBoomerang = true;
     runAnalyses(queryLHS, targetClass, null);
-    this.FalsePositiveInDefaultBoomerang = false;
+    this.falsePositiveInDefaultBoomerang = false;
   }
 
   @Test
