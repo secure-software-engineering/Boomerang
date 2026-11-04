@@ -22,10 +22,16 @@ import boomerang.scope.sootup.jimple.JimpleUpMethod;
 import boomerang.scope.sootup.jimple.JimpleUpPhantomMethod;
 import boomerang.scope.sootup.jimple.JimpleUpWrappedClass;
 import boomerang.scope.test.targets.ScopeTarget;
+import boomerang.scope.test.targets.StartPointTarget;
+import java.util.Collection;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sootup.core.jimple.common.Value;
+import sootup.core.jimple.common.stmt.JIdentityStmt;
+import sootup.core.jimple.common.stmt.JNopStmt;
 import sootup.core.jimple.common.stmt.Stmt;
+import sootup.core.model.Body;
 import sootup.core.signatures.FieldSignature;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.ClassType;
@@ -107,5 +113,51 @@ public class SootUpScopeTest {
     Assertions.assertTrue(checkedField);
     Assertions.assertTrue(checkedType);
     Assertions.assertTrue(checkedVal);
+  }
+
+  @Test
+  public void identityStmtIsTheStartPointAndHandlersAreNot() {
+    SootUpSetup sootUpSetup = new SootUpSetup();
+    sootUpSetup.setupSootUp(StartPointTarget.class.getName());
+
+    boomerang.scope.test.MethodSignature signature =
+        new boomerang.scope.test.MethodSignature(
+            StartPointTarget.class.getName(), "methodWithHandler", "int", List.of("int"));
+    JavaSootMethod method = sootUpSetup.resolveMethod(signature);
+    JimpleUpMethod jimpleMethod =
+        SootUpScopeConverter.createJimpleUpMethod(method, sootUpSetup.getJavaView());
+
+    // the body starts with this := @this, and the handler starts with $e := @caughtexception
+    Collection<Statement> startPoints = jimpleMethod.getControlFlowGraph().getStartPoints();
+    Assertions.assertEquals(1, startPoints.size());
+    Assertions.assertEquals(
+        method.getBody().getControlFlowGraph().getStartingStmt(),
+        SootUpScopeConverter.extractSootUpStatement(startPoints.iterator().next()));
+  }
+
+  @Test
+  public void leadingNopOnlyForBodiesWithoutIdentityStmts() {
+    SootUpSetup sootUpSetup = new SootUpSetup();
+    sootUpSetup.setupSootUp(StartPointTarget.class.getName());
+    JavaView view = sootUpSetup.getJavaView();
+
+    JavaSootMethod instanceMethod =
+        sootUpSetup.resolveMethod(
+            new boomerang.scope.test.MethodSignature(
+                StartPointTarget.class.getName(), "methodWithHandler", "int", List.of("int")));
+    Assertions.assertInstanceOf(
+        JIdentityStmt.class, firstStmtAfterPreInterceptor(instanceMethod, view));
+
+    JavaSootMethod staticMethod =
+        sootUpSetup.resolveMethod(
+            new boomerang.scope.test.MethodSignature(
+                StartPointTarget.class.getName(), "delegate", "int"));
+    Assertions.assertInstanceOf(JNopStmt.class, firstStmtAfterPreInterceptor(staticMethod, view));
+  }
+
+  private static Stmt firstStmtAfterPreInterceptor(JavaSootMethod method, JavaView view) {
+    Body.BodyBuilder builder = Body.builder(method.getBody(), method.getModifiers());
+    new BoomerangPreInterceptor().interceptBody(builder, view);
+    return builder.getControlFlowGraph().getStartingStmt();
   }
 }

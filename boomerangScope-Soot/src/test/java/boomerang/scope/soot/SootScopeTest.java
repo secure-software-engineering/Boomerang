@@ -23,14 +23,21 @@ import boomerang.scope.soot.jimple.JimplePhantomMethod;
 import boomerang.scope.soot.jimple.JimpleWrappedClass;
 import boomerang.scope.test.MethodSignature;
 import boomerang.scope.test.targets.ScopeTarget;
+import boomerang.scope.test.targets.StartPointTarget;
+import java.util.Collection;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootFieldRef;
 import soot.SootMethod;
 import soot.SootMethodRef;
+import soot.Unit;
 import soot.Value;
+import soot.jimple.IdentityStmt;
+import soot.jimple.NopStmt;
 import soot.jimple.Stmt;
 
 public class SootScopeTest {
@@ -106,5 +113,48 @@ public class SootScopeTest {
     Assertions.assertTrue(checkedField);
     Assertions.assertTrue(checkedType);
     Assertions.assertTrue(checkedVal);
+  }
+
+  @Test
+  public void identityStmtIsTheStartPointAndHandlersAreNot() {
+    SootSetup sootSetup = new SootSetup();
+    sootSetup.setupSoot(StartPointTarget.class.getName());
+
+    MethodSignature signature =
+        new MethodSignature(
+            StartPointTarget.class.getName(), "methodWithHandler", "int", List.of("int"));
+    SootMethod method = sootSetup.resolveMethod(signature);
+    method.retrieveActiveBody();
+    JimpleMethod jimpleMethod = SootScopeConverter.createJimpleMethod(method, Scene.v());
+
+    // the body starts with this := @this, and the handler starts with $e := @caughtexception
+    Collection<Statement> startPoints = jimpleMethod.getControlFlowGraph().getStartPoints();
+    Assertions.assertEquals(1, startPoints.size());
+    Assertions.assertEquals(
+        method.getActiveBody().getUnits().getFirst(),
+        SootScopeConverter.extractSootStatement(startPoints.iterator().next()));
+  }
+
+  @Test
+  public void leadingNopOnlyForBodiesWithoutIdentityStmts() {
+    SootSetup sootSetup = new SootSetup();
+    sootSetup.setupSoot(StartPointTarget.class.getName());
+
+    SootMethod instanceMethod =
+        sootSetup.resolveMethod(
+            new MethodSignature(
+                StartPointTarget.class.getName(), "methodWithHandler", "int", List.of("int")));
+    Assertions.assertInstanceOf(IdentityStmt.class, firstUnitAfterPretransformer(instanceMethod));
+
+    SootMethod staticMethod =
+        sootSetup.resolveMethod(
+            new MethodSignature(StartPointTarget.class.getName(), "delegate", "int"));
+    Assertions.assertInstanceOf(NopStmt.class, firstUnitAfterPretransformer(staticMethod));
+  }
+
+  private static Unit firstUnitAfterPretransformer(SootMethod method) {
+    Body body = method.retrieveActiveBody();
+    BoomerangPretransformer.v().transform(body);
+    return body.getUnits().getFirst();
   }
 }
