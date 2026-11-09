@@ -22,6 +22,7 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import sootup.core.jimple.common.ref.JCaughtExceptionRef;
 import sootup.core.jimple.common.stmt.JIdentityStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -79,7 +80,9 @@ public class JimpleUpControlFlowGraph implements ControlFlowGraph {
 
     Collection<Stmt> heads = graph.getEntrypoints();
     for (Stmt head : heads) {
-      if (head instanceof JIdentityStmt) {
+      // exception handlers are entry points of the graph, not of the method
+      if (head instanceof JIdentityStmt
+          && ((JIdentityStmt) head).getRightOp() instanceof JCaughtExceptionRef) {
         continue;
       }
 
