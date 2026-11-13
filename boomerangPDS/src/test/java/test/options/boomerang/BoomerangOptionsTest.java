@@ -18,9 +18,9 @@ import boomerang.callgraph.BoomerangResolver;
 import boomerang.options.BoomerangOptions;
 import boomerang.pathtracking.PathTrackingBoomerangOptions;
 import boomerang.solver.Strategies;
+import boomerang.sparse.SparsificationStrategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sparse.SparsificationStrategy;
 
 public class BoomerangOptionsTest {
 
@@ -103,6 +103,48 @@ public class BoomerangOptionsTest {
     BoomerangOptions ignoreSparsificationAfterQuery =
         BoomerangOptions.builder().enableIgnoreSparsificationAfterQuery(false).build();
     Assertions.assertFalse(ignoreSparsificationAfterQuery.ignoreSparsificationAfterQuery());
+  }
+
+  @Test
+  public void sparsificationStrategyTest() {
+    Assertions.assertEquals(
+        BoomerangOptions.DEFAULT().getSparsificationStrategy(), SparsificationStrategy.NONE);
+
+    BoomerangOptions typeBased =
+        BoomerangOptions.builder()
+            .withSparsificationStrategy(SparsificationStrategy.TYPE_BASED)
+            .build();
+    Assertions.assertEquals(
+        typeBased.getSparsificationStrategy(), SparsificationStrategy.TYPE_BASED);
+
+    BoomerangOptions aliasAware =
+        BoomerangOptions.builder()
+            .withSparsificationStrategy(SparsificationStrategy.ALIAS_AWARE)
+            .build();
+    Assertions.assertEquals(
+        aliasAware.getSparsificationStrategy(), SparsificationStrategy.ALIAS_AWARE);
+
+    Assertions.assertEquals(SparsificationStrategy.NONE, SparsificationStrategy.fromName("none"));
+    Assertions.assertEquals(
+        SparsificationStrategy.TYPE_BASED, SparsificationStrategy.fromName("TypeBased"));
+    Assertions.assertEquals(
+        SparsificationStrategy.ALIAS_AWARE, SparsificationStrategy.fromName("aliasaware"));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> SparsificationStrategy.fromName("unknown"));
+    Assertions.assertThrows(
+        NullPointerException.class,
+        () -> BoomerangOptions.builder().withSparsificationStrategy(null));
+  }
+
+  @Test
+  public void checkValidSparsificationOptionsTest() {
+    BoomerangOptions options =
+        BoomerangOptions.builder()
+            .enableOnTheFlyControlFlow(true)
+            .withSparsificationStrategy(SparsificationStrategy.ALIAS_AWARE)
+            .build();
+
+    Assertions.assertThrows(RuntimeException.class, options::checkValid);
   }
 
   @Test

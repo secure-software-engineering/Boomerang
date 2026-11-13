@@ -31,4 +31,20 @@ public interface Type {
   boolean isSupertypeOf(String subType);
 
   boolean isBooleanType();
+
+  /**
+   * Checks whether a value of this type may be stored in a variable of type {@code target}, i.e.
+   * whether this type is a subtype of {@code target} or equal to it.
+   *
+   * <p>Implementations must answer conservatively: if the relation cannot be determined (e.g.
+   * phantom classes or missing hierarchy information), they return {@code true}. The default
+   * implementation always returns {@code true}.
+   *
+   * @param target the type of the variable the value is stored in
+   * @return false only if a value of this type can never be stored in a variable of type {@code
+   *     target}
+   */
+  default boolean isAssignableTo(Type target) {
+    return true;
+  }
 }

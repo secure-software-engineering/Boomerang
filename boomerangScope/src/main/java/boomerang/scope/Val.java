@@ -58,6 +58,16 @@ public abstract class Val {
 
   public abstract Val asUnbalanced(ControlFlowGraph.Edge stmt);
 
+  /**
+   * Returns this value without its unbalanced call site marker. Since {@link #equals(Object)} takes
+   * the marker into account, this allows comparing values regardless of how they entered a method.
+   *
+   * @return this value if it is balanced, otherwise an equal value without the marker
+   */
+  public Val asBalanced() {
+    return isUnbalanced() ? asUnbalanced(null) : this;
+  }
+
   public abstract boolean isLocal();
 
   public abstract boolean isArrayAllocationVal();
