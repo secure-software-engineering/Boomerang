@@ -38,7 +38,13 @@ public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
 
     this.delegate = delegate;
     this.method = method;
-    this.hashCode = Objects.hash(super.hashCode(), delegate);
+    // TODO(SootUp > 3.0.1): JInstanceFieldRef inherits equals from JFieldRef, which compares the
+    //  field signatures only (ignoring the base), and does not override hashCode. Thus, equality is
+    //  based on the base and the field signature instead of the delegate. Once SootUp fixes
+    //  equals and hashCode, replace this with Objects.hash(super.hashCode(), delegate) and compare
+    //  the delegates in equals.
+    this.hashCode =
+        Objects.hash(super.hashCode(), delegate.getBase(), delegate.getFieldSignature());
   }
 
   public JInstanceFieldRef getDelegate() {
@@ -77,7 +83,8 @@ public class JimpleUpInstanceFieldRef extends InstanceFieldVal {
     JimpleUpInstanceFieldRef that = (JimpleUpInstanceFieldRef) o;
     if (hashCode != that.hashCode) return false;
     if (!super.equals(o)) return false;
-    return Objects.equals(delegate, that.delegate);
+    return delegate.getBase().equals(that.delegate.getBase())
+        && delegate.getFieldSignature().equals(that.delegate.getFieldSignature());
   }
 
   @Override

@@ -15,6 +15,7 @@
 package test;
 
 import boomerang.options.BoomerangOptions;
+import boomerang.sparse.SparsificationStrategy;
 
 /*
  * Note: If you modify this class, you most likely want to modify its "copy"
@@ -33,6 +34,7 @@ import boomerang.options.BoomerangOptions;
  */
 public class BoomerangTestingOptionsBuilder {
   private static final String DEFAULT_OTF_CALLGRAPH_OPTION = "false";
+  private static final String DEFAULT_SPARSIFICATION_OPTION = "none";
 
   public static BoomerangOptions.OptionsBuilder create() {
     BoomerangOptions.OptionsBuilder builder = BoomerangOptions.builder();
@@ -52,6 +54,9 @@ public class BoomerangTestingOptionsBuilder {
                 + enableOnTheFlyCallGraph
                 + " (valid values: true, false)");
     }
+
+    String sparsification = System.getProperty("sparsification", DEFAULT_SPARSIFICATION_OPTION);
+    builder.withSparsificationStrategy(SparsificationStrategy.fromName(sparsification));
     return builder;
   }
 }

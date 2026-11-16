@@ -85,12 +85,15 @@ public class JimpleArrayRef extends ArrayVal {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     JimpleArrayRef that = (JimpleArrayRef) o;
-    return Objects.equals(delegate, that.delegate);
+    // Soot's ArrayRef does not override equals, i.e. the same array access in different statements
+    // would not be equal. Compare the base and the index instead (like the field references).
+    return Objects.equals(delegate.getBase(), that.delegate.getBase())
+        && Objects.equals(delegate.getIndex(), that.delegate.getIndex());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), delegate);
+    return Objects.hash(super.hashCode(), delegate.getBase(), delegate.getIndex());
   }
 
   @Override
