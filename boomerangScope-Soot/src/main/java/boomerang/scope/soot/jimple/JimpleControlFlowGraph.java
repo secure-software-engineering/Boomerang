@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import soot.Unit;
 import soot.UnitPatchingChain;
+import soot.jimple.CaughtExceptionRef;
 import soot.jimple.IdentityStmt;
 import soot.jimple.Stmt;
 import soot.toolkits.graph.BriefUnitGraph;
@@ -56,8 +57,9 @@ public class JimpleControlFlowGraph implements ControlFlowGraph {
     cacheBuild = true;
     List<Unit> heads = graph.getHeads();
     for (Unit u : heads) {
-      // We add a nop statement to the body and ignore IdentityStmt ($stack14 := @caughtexception)
-      if (u instanceof IdentityStmt) {
+      // exception handlers ($stack14 := @caughtexception) are heads of the graph, not of the method
+      if (u instanceof IdentityStmt
+          && ((IdentityStmt) u).getRightOp() instanceof CaughtExceptionRef) {
         continue;
       }
       Statement stmt = JimpleStatement.create((Stmt) u, method);

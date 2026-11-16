@@ -17,6 +17,7 @@ package boomerang.scope.opal
 import boomerang.scope.opal.tac.OpalMethod
 import boomerang.scope.test.MethodSignature
 import boomerang.scope.test.targets.ControlFlowGraphTarget
+import boomerang.scope.test.targets.StartPointTarget
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.opalj.br.IntegerType
@@ -46,5 +47,37 @@ class OpalControlFlowGraphTest {
     cfg.getEndPoints.forEach(stmt => {
       Assertions.assertTrue(stmt.isReturnStmt)
     })
+  }
+
+  @Test
+  def identityStmtIsTheStartPointAndHandlersAreNot(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[StartPointTarget].getName)
+
+    val signature = new MethodSignature(
+      classOf[StartPointTarget].getName,
+      "methodWithHandler",
+      integerType,
+      java.util.List.of(integerType)
+    )
+    val method = opalSetup.resolveMethod(signature)
+    val startPoints = OpalMethod.of(method, opalSetup.project.get).getControlFlowGraph.getStartPoints
+
+    // the body starts with the definition of this, and the handler with the caught exception
+    Assertions.assertEquals(1, startPoints.size())
+    Assertions.assertTrue(startPoints.iterator().next().isIdentityStmt)
+  }
+
+  @Test
+  def leadingNopOnlyForBodiesWithoutIdentityStmts(): Unit = {
+    val opalSetup = new OpalSetup()
+    opalSetup.setupOpal(classOf[StartPointTarget].getName)
+
+    val signature = new MethodSignature(classOf[StartPointTarget].getName, "delegate", integerType)
+    val method = opalSetup.resolveMethod(signature)
+    val startPoints = OpalMethod.of(method, opalSetup.project.get).getControlFlowGraph.getStartPoints
+
+    Assertions.assertEquals(1, startPoints.size())
+    Assertions.assertEquals("nop", startPoints.iterator().next().toString)
   }
 }
