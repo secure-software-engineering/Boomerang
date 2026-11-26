@@ -28,14 +28,23 @@ object NopTransformer {
     val tac = stmtGraph.tac
 
     def addNopStatements(stmtGraph: StmtGraph): StmtGraph = {
-      // Add a nop statement in the beginning
+      // Add a nop statement in the beginning, only for bodies that do not start with the definition
+      // of this or a parameter (static methods without parameters): the backward analysis steps
+      // through a statement, e.g. into a callee, only on the edge from its predecessor
       val nop = Nop(INITIAL_NOP)
 
       var result = stmtGraph
       val headStmt = stmtGraph.heads.filter(h => h.pc == 0 || h.pc == -1)
       assert(headStmt.size == 1)
 
-      result = result.insertBefore(nop, headStmt.iterator.next())
+      val head = headStmt.iterator.next()
+      val startsWithThisOrParameter = head.isAssignment && head.asAssignment.expr.isVar && {
+        val expr = head.asAssignment.expr.asVar
+        expr.isParameterLocal || (head.asAssignment.targetVar.isThisLocal && expr.isThisLocal)
+      }
+      if (!startsWithThisOrParameter) {
+        result = result.insertBefore(nop, head)
+      }
 
       var beforeStmtInsert = List.empty[Stmt[TacLocal]]
       tac.zipWithIndex.foreach(stmt => {

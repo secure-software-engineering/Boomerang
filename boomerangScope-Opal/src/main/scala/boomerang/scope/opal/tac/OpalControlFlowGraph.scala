@@ -73,7 +73,10 @@ class OpalControlFlowGraph(method: OpalMethod) extends ControlFlowGraph {
 
     graph.heads.foreach(stmt => {
       val headStmt = new OpalStatement(stmt, method)
-      if (!headStmt.isIdentityStmt) {
+      // exception handlers are heads of the graph, not of the method
+      val isHandler = headStmt.isCatchStmt || (stmt.isAssignment && stmt.asAssignment.expr.isVar &&
+      stmt.asAssignment.expr.asVar.isExceptionLocal)
+      if (!isHandler) {
         startPointCache.add(headStmt)
       }
     })

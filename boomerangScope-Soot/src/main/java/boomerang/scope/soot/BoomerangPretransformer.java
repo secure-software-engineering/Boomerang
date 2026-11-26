@@ -181,14 +181,20 @@ public class BoomerangPretransformer extends BodyTransformer {
    * statement, the analysis misses data-flows.
    */
   private void addNopStmtToMethods(Body b) {
-    JNopStmt nopStmt = new JNopStmt();
-    for (Unit u : b.getUnits()) {
-      if (u.getJavaSourceStartLineNumber() > 0) {
-        nopStmt.addAllTagsOf(u);
-        break;
+    JNopStmt nopStmt;
+    // Only bodies that do not start with their identity stmts (static methods without parameters)
+    // need an initial nop: the backward analysis steps through a statement, e.g. into a callee,
+    // only on the edge from its predecessor, so a first statement needs one
+    if (!(b.getUnits().getFirst() instanceof IdentityStmt)) {
+      nopStmt = new JNopStmt();
+      for (Unit u : b.getUnits()) {
+        if (u.getJavaSourceStartLineNumber() > 0) {
+          nopStmt.addAllTagsOf(u);
+          break;
+        }
       }
+      b.getUnits().insertBefore(nopStmt, b.getUnits().getFirst());
     }
-    b.getUnits().insertBefore(nopStmt, b.getUnits().getFirst());
     Set<IfStmt> ifStmts = new LinkedHashSet<>();
     for (Unit u : b.getUnits()) {
       if (u instanceof IfStmt) {
