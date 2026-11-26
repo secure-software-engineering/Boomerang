@@ -320,7 +320,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
 
     @Override
     public void onNoCalleeFound() {
-      byPassFlowAtCallSite(caller, currNode, callSite);
+      byPassFlowAtCallSite(currNode, callSiteEdge);
     }
 
     @Override
@@ -392,7 +392,7 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       Method callee,
       Edge calleeStartEdge) {
     if (dataFlowScope.isExcluded(callee)) {
-      byPassFlowAtCallSite(caller, currNode, callSite);
+      byPassFlowAtCallSite(currNode, succOfCallSite);
       return Collections.emptySet();
     }
     Val fact = currNode.fact();
@@ -419,7 +419,6 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       returnFlow(method, node);
       return;
     }
-    ((StaticCFG) cfg).setCurrentVal(value);
     cfg.addSuccsOfListener(
         new ForwardSolverSuccessorListener(curr, query, value, method, node, LOGGER, this));
   }
@@ -456,30 +455,31 @@ public abstract class ForwardBoomerangSolver<W extends Weight> extends AbstractB
       InvokeExpr invokeExpr) {
     assert icfg.isCallStmt(callSiteEdge.getStart());
     if (dataFlowScope.isExcluded(invokeExpr.getDeclaredMethod())) {
-      byPassFlowAtCallSite(caller, currNode, callSiteEdge.getStart());
+      byPassFlowAtCallSite(currNode, callSiteEdge);
       return;
     }
 
     icfg.addCalleeListener(new CallSiteCalleeListener(caller, callSiteEdge, currNode, invokeExpr));
   }
 
+  /**
+   * Propagates the fact over the call site without entering a callee.
+   *
+   * @param returnSiteEdge the edge from the call site to the return site. It is the same edge the
+   *     calls into the callees return to, which matters if the successors of the call site depend
+   *     on the propagated fact (e.g. for sparse control flow graphs)
+   */
   private void byPassFlowAtCallSite(
-      Method caller, Node<ControlFlowGraph.Edge, Val> currNode, Statement callSite) {
+      Node<ControlFlowGraph.Edge, Val> currNode, Edge returnSiteEdge) {
     LOGGER.trace(
-        "Bypassing call flow of {} at callsite: {} for {}", currNode.fact(), callSite, this);
+        "Bypassing call flow of {} at callsite: {} for {}",
+        currNode.fact(),
+        returnSiteEdge.getStart(),
+        this);
 
-    cfg.addSuccsOfListener(
-        new SuccessorListener(currNode.stmt().getTarget()) {
-
-          @Override
-          public void getSuccessor(Statement returnSite) {
-            for (State s :
-                flowFunctions.callToReturnFlow(
-                    query, new Edge(callSite, returnSite), currNode.fact())) {
-              propagate(currNode, s);
-            }
-          }
-        });
+    for (State s : flowFunctions.callToReturnFlow(query, returnSiteEdge, currNode.fact())) {
+      propagate(currNode, s);
+    }
   }
 
   @Override

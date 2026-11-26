@@ -33,6 +33,8 @@ import boomerang.scope.Statement;
 import boomerang.scope.Type;
 import boomerang.scope.Val;
 import boomerang.scope.ValCollection;
+import boomerang.sparse.SparseAliasingCFG;
+import boomerang.sparse.SparseCFGCache;
 import de.fraunhofer.iem.Location;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
@@ -43,8 +45,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sparse.SparseAliasingCFG;
-import sparse.SparseCFGCache;
 import sync.pds.solver.nodes.*;
 import wpds.impl.NestedWeightedPAutomatons;
 import wpds.impl.Transition;
@@ -55,6 +55,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
   private static final Logger LOGGER = LoggerFactory.getLogger(BackwardBoomerangSolver.class);
   private final BackwardQuery query;
   private final IBackwardFlowFunction flowFunction;
+  private final SparseCFGCache sparseCFGCache;
 
   public BackwardBoomerangSolver(
       ObservableICFG<Statement, Method> icfg,
@@ -68,6 +69,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
       NestedWeightedPAutomatons<Field, INode<Node<ControlFlowGraph.Edge, Val>>, W> fieldSummaries,
       FrameworkScope scope,
       BoomerangOptions options,
+      SparseCFGCache sparseCFGCache,
       Type propagationType) {
     super(
         icfg,
@@ -80,6 +82,7 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
         propagationType);
 
     this.query = query;
+    this.sparseCFGCache = sparseCFGCache;
     this.flowFunction =
         options.getFlowFunctionFactory().createBackwardFlowFunction(scope, options, this);
   }
@@ -184,58 +187,29 @@ public abstract class BackwardBoomerangSolver<W extends Weight> extends Abstract
   protected void normalFlow(Method method, Node<ControlFlowGraph.Edge, Val> currNode) {
     Edge curr = currNode.stmt();
     Val value = currNode.fact();
+    Statement start = curr.getStart();
 
-    /* TODO: [ms] re-enable  sparse + refactor if/else into own method!
-    if (options.getSparsificationStrategy() != SparsificationStrategy.NONE) {
-        propagateSparse(method, currNode, curr, value);
-    } else */
-    {
-      for (Statement pred :
-          curr.getStart().getMethod().getControlFlowGraph().getPredsOf(curr.getStart())) {
-        Collection<State> flow =
-            computeNormalFlow(method, curr, new Edge(pred, curr.getStart()), value);
-        for (State s : flow) {
-          options.getSparsificationStrategy().getCounter().countBackwardProgragation();
-          propagate(currNode, s);
-        }
+    for (Statement pred : getPredecessors(method, start, value)) {
+      Collection<State> flow = computeNormalFlow(method, curr, new Edge(pred, start), value);
+      for (State s : flow) {
+        sparseCFGCache.getPropagationCounter().countBackwardPropagation();
+        propagate(currNode, s);
       }
     }
   }
 
-  /*
-  // TODO: [ms] re-enable sparse
-    private void propagateSparse(Method method, Node<Edge, Val> currNode, Edge curr, Val value) {
-      Statement propStmt = curr.getStart();
-      SparseAliasingCFG sparseCFG = getSparseCFG(query, method, value, propStmt);
-      Stmt stmt = SootAdapter.asStmt(propStmt);
-      if (sparseCFG.getGraph().nodes().contains(stmt)) {
-        Set<Unit> predecessors = sparseCFG.getGraph().predecessors(stmt);
-        for (Unit pred : predecessors) {
-          Collection<State> flow =
-              computeNormalFlow(
-                  method, new Edge(SootAdapter.asStatement(pred, method), propStmt), value);
-          for (State s : flow) {
-            options.getSparsificationStrategy().getCounter().countBackward();
-            propagate(currNode, s);
-          }
-        }
-      } else {
-        System.out.println("node not in cfg:" + stmt);
-      }
-    }
-  */
-
   /**
-   * sparse BackwardQuery: (b2 (target.aliasing.Aliasing1.<target.aliasing.Aliasing1: void
-   * main(java.lang.String[])>),b2.secret = $stack9 -> return)
+   * Returns the predecessors in the sparse control flow graph if a sparse graph containing the
+   * statement is available and the predecessors in the original graph otherwise.
    */
-  private SparseAliasingCFG getSparseCFG(
-      BackwardQuery query, Method method, Val val, Statement stmt) {
-    SparseCFGCache sparseCFGCache =
-        SparseCFGCache.getInstance(
-            options.getSparsificationStrategy(), options.ignoreSparsificationAfterQuery());
-    return sparseCFGCache.getSparseCFGForBackwardPropagation(
-        query.var(), query.asNode().stmt().getStart(), method, val, stmt);
+  private Collection<Statement> getPredecessors(Method method, Statement stmt, Val value) {
+    SparseAliasingCFG sparseCFG =
+        sparseCFGCache.getSparseCFGForBackwardPropagation(
+            query.var(), query.cfgEdge().getStart(), method, value, stmt);
+    if (sparseCFG != null && sparseCFG.contains(stmt)) {
+      return sparseCFG.predecessors(stmt);
+    }
+    return stmt.getMethod().getControlFlowGraph().getPredsOf(stmt);
   }
 
   protected Collection<? extends State> computeCallFlow(

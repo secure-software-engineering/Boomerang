@@ -12,39 +12,27 @@
  *   Johannes Spaeth - initial API and implementation
  * *****************************************************************************
  */
-package boomerang.scope.soot.sparse.aliasaware;
+package boomerang.sparse.typebased;
 
-import soot.AbstractUnit;
-import soot.UnitPrinter;
-import soot.Value;
+import boomerang.options.BoomerangOptions;
+import boomerang.sparse.SparseCFGCache;
+import boomerang.sparse.SparsificationStrategy;
 
-public class DefinedOutside extends AbstractUnit {
+/** See {@link SparsificationStrategy#TYPE_BASED}. */
+public class TypeBasedSparsificationStrategy implements SparsificationStrategy {
 
-  Value value;
-
-  public DefinedOutside(Value value) {
-    this.value = value;
-  }
-
-  public Value getValue() {
-    return value;
+  @Override
+  public SparseCFGCache createCache(BoomerangOptions options) {
+    return new TypeBasedSparseCFGCache();
   }
 
   @Override
-  public Object clone() {
-    return null;
+  public String getName() {
+    return "typebased";
   }
 
   @Override
-  public boolean fallsThrough() {
-    return false;
+  public String toString() {
+    return getName();
   }
-
-  @Override
-  public boolean branches() {
-    return false;
-  }
-
-  @Override
-  public void toString(UnitPrinter unitPrinter) {}
 }

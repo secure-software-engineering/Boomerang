@@ -11,12 +11,26 @@ on:
 
 jobs:
   BuildAndTest:
-    name: Test with ${{ matrix.framework }} , ${{ matrix.enableOnTheFlyCallGraph }}
+    name: Test with ${{ matrix.framework }} , ${{ matrix.enableOnTheFlyCallGraph }} , ${{ matrix.sparsification }}
     strategy:
       fail-fast: false
       matrix:
         framework: [ Soot, SootUp, Opal ]
         enableOnTheFlyCallGraph: [ false, true ]
+        sparsification: [ none ]
+        include:
+          - framework: SootUp
+            enableOnTheFlyCallGraph: false
+            sparsification: typebased
+          - framework: SootUp
+            enableOnTheFlyCallGraph: true
+            sparsification: typebased
+          - framework: SootUp
+            enableOnTheFlyCallGraph: false
+            sparsification: aliasaware
+          - framework: SootUp
+            enableOnTheFlyCallGraph: true
+            sparsification: aliasaware
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -28,4 +42,4 @@ jobs:
           java-package: jdk
           java-version: 17
       - name: Build with Maven
-        run: mvn -B clean verify -DtestSetup=${{ matrix.framework }} -DenableOnTheFlyCallGraph=${{ matrix.enableOnTheFlyCallGraph }}
+        run: mvn -B clean verify -DtestSetup=${{ matrix.framework }} -DenableOnTheFlyCallGraph=${{ matrix.enableOnTheFlyCallGraph }} -Dsparsification=${{ matrix.sparsification }}

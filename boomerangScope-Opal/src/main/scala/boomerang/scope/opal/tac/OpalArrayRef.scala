@@ -38,14 +38,16 @@ class OpalArrayRef(
 
   override def getIndex: Int = if (indexExpr.isIntConst) indexExpr.asIntConst.value else -1
 
+  // Like the other values, the method and the unbalanced call site are part of the equality
   override def equals(other: Any): Boolean = other match {
     case that: OpalArrayRef =>
-      base == that.base &&
+      super.equals(that) &&
+        base == that.base &&
         indexExpr == that.indexExpr
     case _ => false
   }
 
-  override def hashCode: Int = Objects.hash(base, indexExpr)
+  override def hashCode: Int = Objects.hash(super.hashCode(), base, indexExpr)
 
   override def toString: String = getVariableName
 }

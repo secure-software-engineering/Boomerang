@@ -56,7 +56,7 @@
         <module>boomerangScope-SootUp</module>
         <module>boomerangScope-Opal</module>
         <module>boomerangScope-WALA</module>
-        <!--<module>SparseBoomerangCorrectness</module>-->
+        <module>SparseBoomerangCorrectness</module>
     </modules>
 
     <scm>

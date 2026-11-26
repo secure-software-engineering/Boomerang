@@ -135,6 +135,25 @@ public class JimpleType implements Type {
     return hierarchy.contains(thisClass);
   }
 
+  @Override
+  public boolean isAssignableTo(Type target) {
+    if (!(target instanceof JimpleType)) {
+      return true;
+    }
+
+    soot.Type targetType = ((JimpleType) target).getDelegate();
+    if (delegate.equals(targetType)) {
+      return true;
+    }
+
+    try {
+      return scene.getOrMakeFastHierarchy().canStoreType(delegate, targetType);
+    } catch (RuntimeException e) {
+      // Incomplete hierarchy (e.g. phantom classes): answer conservatively
+      return true;
+    }
+  }
+
   // TODO Move to SootUtils
   private Collection<SootClass> getFullHierarchy(SootClass sourceClass, Set<SootClass> visited) {
     Set<SootClass> result = new HashSet<>();
